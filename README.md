@@ -141,7 +141,6 @@ make format      # Format code with black and isort
 make type-check  # Run mypy type checking
 make check       # Run all checks (lint + type + security)
 make fix         # Auto-fix formatting issues
-make test        # Run tests
 ```
 
 ### Pre-commit Hooks

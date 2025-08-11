@@ -187,7 +187,7 @@ marimo/_lsp/
 __marimo__/
 *.DS_Store*
 # PlantGuard specific
-data/
+data/models/
 *.pt
 *.pth
 *.ckpt
@@ -199,4 +199,4 @@ data/
 *.m4a
 *.onnx
 *.csv
-*.qodo/*
+.qodo/

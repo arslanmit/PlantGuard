@@ -1,4 +1,4 @@
-.PHONY: lint format type-check install-dev install run clean
+.PHONY: lint format type-check install-dev install run notebook clean
 
 # Install project dependencies
 install:
@@ -12,6 +12,10 @@ install-dev:
 # Run the PlantGuard Streamlit app
 run:
 	python3 run_local.py
+
+# Run the PlantGuard Jupyter notebook
+notebook:
+	jupyter notebook notebooks/PlantGuard.ipynb
 
 # Format code with black and isort
 format:
