@@ -1,7 +1,10 @@
+"""Natural language processing module for plant care Q&A."""
+
 import functools
 from typing import Any
 
 from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline
+from transformers.pipelines import Pipeline
 
 FAQ_CONTEXT = """
 Powdery mildew: White powder on leaf; treatment: sulfur-based fungicide, airflow, morning watering.
@@ -12,12 +15,14 @@ General: Avoid excess nitrogen, reduce leaf wetness, weekly monitoring.
 
 
 @functools.lru_cache(maxsize=1)
-def qa_pipe() -> Any:
+def qa_pipe() -> Pipeline:
+    """Create and cache a question-answering pipeline."""
     tok = AutoTokenizer.from_pretrained("distilbert-base-uncased")
     mdl = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
     return pipeline("question-answering", model=mdl, tokenizer=tok)
 
 
 def answer(question: str, context: str = FAQ_CONTEXT) -> str:
+    """Answer a question using the provided context."""
     out: dict[str, Any] = qa_pipe()({"question": question, "context": context})
     return str(out.get("answer", ""))

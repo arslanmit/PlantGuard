@@ -1,27 +1,46 @@
 {
+    // Ruff as primary linter and formatter
+    "python.defaultInterpreterPath": "./.venv/bin/python",
     "python.linting.enabled": true,
-    "python.linting.flake8Enabled": true,
+    "python.linting.ruffEnabled": true,
+    "python.linting.flake8Enabled": false,
     "python.linting.mypyEnabled": true,
-    "python.linting.banditEnabled": true,
-    "python.formatting.provider": "black",
-    "python.sortImports.args": ["--profile", "black"],
+    "python.linting.banditEnabled": false,
+    // Ruff configuration
+    "python.linting.ruffArgs": [
+        "--config=pyproject.toml"
+    ],
+    // Formatting with ruff (replaces black)
+    "python.formatting.provider": "none",
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit"
+        "source.organizeImports": "explicit",
+        "source.fixAll.ruff": "explicit"
     },
-    "python.linting.flake8Args": ["--config=.flake8"],
-    "python.linting.mypyArgs": ["--config-file=pyproject.toml"],
+    // MyPy configuration
+    "python.linting.mypyArgs": [
+        "--config-file=pyproject.toml"
+    ],
+    // File exclusions
     "files.exclude": {
         "**/__pycache__": true,
         "**/.mypy_cache": true,
         "**/.pytest_cache": true,
+        "**/.ruff_cache": true,
         "**/htmlcov": true
     },
+    // Python-specific settings
     "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.defaultFormatter": "charliermarsh.ruff",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-            "source.organizeImports": "explicit"
+            "source.organizeImports": "explicit",
+            "source.fixAll.ruff": "explicit"
         }
-    }
+    },
+    // Ruff extension settings
+    "ruff.enable": true,
+    "ruff.organizeImports": true,
+    "ruff.fixAll": true,
+    "ruff.showNotifications": "always"
 }

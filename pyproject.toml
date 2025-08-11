@@ -8,14 +8,6 @@ target-version = "py313"   # Target Python 3.13 for latest syntax features
 fix = true                 # Automatically fix issues when possible
 
 # Comprehensive rule set covering all aspects of code quality:
-# E,F,W(pyflakes/pycodestyle), I(isort), B(bugbear), A(builtins),
-# ANN(annotations), N(naming), S(security/bandit), BLE(blind-except),
-# C90(mccabe), C4(comprehensions), DTZ(datetime tz), EM(errmsg),
-# ISC(implicit-str-concat), G(logging-format), PTH(pathlib),
-# PIE(misc), PT(pytest), Q(quotes), RET(returns), RSE(raise),
-# SIM(simplify), T20(print), TID(tidy-imports), TRY(exceptions),
-# UP(pyupgrade), PGH(pragma-handling), PERF(performance),
-# PL(pylint alternative rules), RUF(ruff internal)
 [tool.ruff.lint]
 # Comprehensive rule set for strict code quality
 select = [
@@ -111,9 +103,10 @@ check-typed-exception = true  # Check for typed exceptions
 [tool.ruff.lint.pycodestyle]
 max-doc-length = 120  # Maximum docstring line length
 
-# Test-specific exceptions (uncomment if needed)
-# [tool.ruff.lint.per-file-ignores]
-# "tests/**" = ["S101","T20"]  # Allow assert/print in tests
+# Test-specific exceptions
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004"]  # Allow assert statements and magic values in tests
+"run_local.py" = ["S603"]  # Allow subprocess calls in runner script
 
 # =========================
 # Formatter (Black) — format on save

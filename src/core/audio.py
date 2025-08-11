@@ -1,11 +1,15 @@
+"""Audio processing module for speech recognition and classification."""
+
 import functools
 from typing import Any
 
 from transformers import pipeline
+from transformers.pipelines import Pipeline
 
 
 @functools.lru_cache(maxsize=1)
-def asr_pipe() -> Any:
+def asr_pipe() -> Pipeline:
+    """Create and cache an automatic speech recognition pipeline."""
     # Local ASR for privacy; tiny model for speed
     return pipeline("automatic-speech-recognition", model="openai/whisper-tiny")
 

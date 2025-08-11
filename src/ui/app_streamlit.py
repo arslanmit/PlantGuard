@@ -1,10 +1,18 @@
-from typing import Any
+"""PlantGuard Streamlit application for multimodal plant disease detection."""
+
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import soundfile as sf
 import streamlit as st
 from PIL import Image
 from streamlit_webrtc import WebRtcMode, webrtc_streamer
+
+if TYPE_CHECKING:
+    AudioFrame = Any  # Placeholder for type checking
+else:
+    AudioFrame = Any
 
 from src.core.audio import transcribe_and_classify
 from src.core.nlp import answer
@@ -34,7 +42,8 @@ with tab2:
     if "audio_buf" not in st.session_state:
         st.session_state.audio_buf = []
 
-    def audio_frame_callback(frame: Any) -> Any:
+    def audio_frame_callback(frame: "AudioFrame") -> "AudioFrame":
+        """Process audio frame from microphone input."""
         data = frame.to_ndarray()  # (samples, channels), int16
         mono = data.mean(axis=1).astype(np.float32) / 32768.0
         st.session_state.audio_buf.append(mono)
@@ -64,9 +73,9 @@ with tab2:
     with col2:
         aud = st.file_uploader("or upload audio (wav/mp3/m4a)", ["wav", "mp3", "m4a"])
         if aud and st.button("Analyze file"):
-            with open("tmp_audio", "wb") as f:
-                f.write(aud.read())
-            text, cls = transcribe_and_classify("tmp_audio")
+            tmp_path = Path("tmp_audio")
+            tmp_path.write_bytes(aud.read())
+            text, cls = transcribe_and_classify(str(tmp_path))
             st.text_area("Transcription", text, height=150)
             st.success(f"Predicted (file): {cls}")
 
