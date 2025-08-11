@@ -1,33 +1,19 @@
 {
-    // Ruff as primary linter and formatter
+    // Python interpreter and environment
     "python.defaultInterpreterPath": "./.venv/bin/python",
-    "python.linting.enabled": true,
-    "python.linting.ruffEnabled": true,
-    "python.linting.flake8Enabled": false,
-    "python.linting.mypyEnabled": true,
-    "python.linting.banditEnabled": false,
-    // Ruff configuration
-    "python.linting.ruffArgs": [
-        "--config=pyproject.toml"
-    ],
-    // Formatting with ruff (replaces black)
+    "python.terminal.activateEnvironment": true,
+    // Modern Python analysis (Pylance is the default)
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoFormatStrings": true,
+    // Disable legacy linting (replaced by Ruff extension)
+    "python.linting.enabled": false,
     "python.formatting.provider": "none",
+    // Global editor settings
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.organizeImports": "explicit",
         "source.fixAll.ruff": "explicit"
-    },
-    // MyPy configuration
-    "python.linting.mypyArgs": [
-        "--config-file=pyproject.toml"
-    ],
-    // File exclusions
-    "files.exclude": {
-        "**/__pycache__": true,
-        "**/.mypy_cache": true,
-        "**/.pytest_cache": true,
-        "**/.ruff_cache": true,
-        "**/htmlcov": true
     },
     // Python-specific settings
     "[python]": {
@@ -36,11 +22,51 @@
         "editor.codeActionsOnSave": {
             "source.organizeImports": "explicit",
             "source.fixAll.ruff": "explicit"
-        }
+        },
+        "editor.rulers": [
+            100
+        ],
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
     },
-    // Ruff extension settings
+    // Ruff extension settings (native extension)
     "ruff.enable": true,
     "ruff.organizeImports": true,
     "ruff.fixAll": true,
-    "ruff.showNotifications": "always"
+    "ruff.configurationPreference": "filesystemFirst",
+    // MyPy type checker extension settings
+    "mypy-type-checker.args": [
+        "--config-file=pyproject.toml"
+    ],
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    // File exclusions
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true,
+        "**/.ruff_cache": true,
+        "**/htmlcov": true,
+        "**/*.pyc": true,
+        "**/.DS_Store": true
+    },
+    // Search exclusions
+    "search.exclude": {
+        "**/.venv": true,
+        "**/node_modules": true,
+        "**/.git": true,
+        "**/.mypy_cache": true,
+        "**/.pytest_cache": true,
+        "**/.ruff_cache": true
+    },
+    // Jupyter notebook settings
+    "jupyter.askForKernelRestart": false,
+    "jupyter.interactiveWindow.creationMode": "perFile",
+    // Git settings
+    "git.autofetch": true,
+    "git.confirmSync": false,
+    // Terminal settings
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.env.osx": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+    }
 }

@@ -1,4 +1,74 @@
 # =========================
+# Build System Configuration
+# =========================
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# =========================
+# Project Metadata
+# =========================
+[project]
+name = "plantguard"
+version = "0.1.0"
+description = "Multimodal plant disease detection system with offline ML inference"
+authors = [{name = "PlantGuard Team", email = "umit.arslan@outlook.com"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.11"
+keywords = ["plant", "disease", "detection", "machine-learning", "multimodal"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Dependencies from requirements.txt
+dependencies = [
+    "torch>=2.1.0",
+    "torchvision>=0.16.0", 
+    "torchaudio>=2.1.0",
+    "torchmetrics>=1.2.0",
+    "numpy>=1.24.0",
+    "pandas>=2.1.0",
+    "scikit-learn>=1.3.0",
+    "opencv-python-headless>=4.8.0",
+    "Pillow>=10.0.0",
+    "transformers>=4.34.0",
+    "accelerate>=0.24.0",
+    "datasets>=2.14.0",
+    "librosa>=0.10.1",
+    "soundfile>=0.12.1",
+    "SpeechRecognition>=3.10.0",
+    "streamlit>=1.27.0",
+    "streamlit-webrtc>=0.47.0",
+    "pycloudflared>=0.2.0",
+    "pyngrok>=7.0.0",
+    "python-dotenv>=1.0.0",
+    "tensorboard>=2.14.0",
+    "bandit>=1.7.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.1.0",
+    "mypy>=1.6.0", 
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "jupyter>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/arslanmit/PlantGuard"
+Repository = "https://github.com/arslanmit/PlantGuard"
+Issues = "https://github.com/arslanmit/PlantGuard/issues"
+
+# =========================
 # Python strict config (similar to Dart analysis_options.yaml)
 # =========================
 

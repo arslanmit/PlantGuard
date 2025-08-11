@@ -169,7 +169,6 @@ dmypy.json
 cython_debug/
 
 .idea/
-.vscode/
 .cursorignore
 .cursorindexingignore
 

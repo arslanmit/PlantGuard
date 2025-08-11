@@ -17,8 +17,12 @@ General: Avoid excess nitrogen, reduce leaf wetness, weekly monitoring.
 @functools.lru_cache(maxsize=1)
 def qa_pipe() -> Pipeline:
     """Create and cache a question-answering pipeline."""
-    tok = AutoTokenizer.from_pretrained("distilbert-base-uncased")
-    mdl = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-uncased")
+    # Pin to specific revision for security (latest stable as of 2024)
+    model_name = "distilbert-base-uncased"
+    revision = "914c22a"  # Pinned revision for security
+
+    tok = AutoTokenizer.from_pretrained(model_name, revision=revision)  # nosec B615
+    mdl = AutoModelForQuestionAnswering.from_pretrained(model_name, revision=revision)  # nosec B615
     return pipeline("question-answering", model=mdl, tokenizer=tok)
 
 

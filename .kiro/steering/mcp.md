@@ -15,10 +15,10 @@ inclusion: always
 ## MCP Usage Patterns
 
 ### When to Use MCP
-- Development tasks: GitHub operations, documentation lookup
+- GitHub operations: Repository management, documentation lookup
 - Research: Library documentation via Context7
 - Local operations: File management, dependency installation
-- Development notes: Memory tool for project decisions
+- Project notes: Memory tool for project decisions
 
 ### Required Testing
 Always test MCP tools before integration:
@@ -35,7 +35,7 @@ result = mcp_tool_name(sample_params)
 
 ## Approved MCP Tools
 
-**Development**: GitHub, Context7, Filesystem, Memory, Homebrew
+**Production**: GitHub, Context7, Filesystem, Memory, Homebrew
 **Research**: Brave Search (no user data)
 **Local**: All local file and system operations
 
@@ -58,9 +58,9 @@ result = mcp_tool_name(sample_params)
 }
 ```
 
-## Development Workflow
+## Production Workflow
 
-1. Use MCP for development tasks only (not core features)
+1. Use MCP for auxiliary tasks only (not core features)
 2. Maintain local fallbacks for all functionality
 3. Keep plant detection pipeline completely local
 4. Test MCP tools with sample calls before integration

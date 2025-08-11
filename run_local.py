@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Local development runner for PlantGuard
+PlantGuard application runner
 Usage: python run_local.py
 """
 
@@ -21,7 +21,7 @@ def check_requirements() -> bool:
         import transformers  # noqa: F401, PLC0415
     except ImportError:
         logger.exception("❌ Missing dependencies")
-        logger.exception("Please install requirements: pip install -r requirements-colab.txt")
+        logger.exception("Please install requirements: pip install -r requirements.txt")
         return False
     else:
         logger.info("✅ Core dependencies found")

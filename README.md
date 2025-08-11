@@ -4,13 +4,29 @@
 
 PlantGuard is a proof-of-concept multimodal AI system for plant disease detection. It combines computer vision (ResNet18), automatic speech recognition (Whisper-tiny), and natural language processing (DistilBERT) in a single Streamlit interface.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arslanmit/leaf-doctor-ai-bot/blob/main/notebooks/PlantGuard.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arslanmit/PlantGuard/blob/main/notebooks/PlantGuard.ipynb)
 
 ## Features
 
 - **🖼️ Leaf Image Analysis**: Upload leaf photos for disease classification (powdery_mildew, blight, rust, healthy)
 - **🎙️ Voice Input**: Record via microphone or upload audio files for voice-based disease reporting
 - **💬 Text Q&A**: Ask questions about plant diseases and get answers from a knowledge base
+
+## Environment Setup
+
+### Required Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# GitHub Personal Access Token (for private repository access)
+GITHUB_TOKEN=your_github_personal_access_token_here
+
+# Optional: Hugging Face Token (for model downloads)
+HF_TOKEN=your_hugging_face_token_here
+```
+
+**Note**: This repository is private. You'll need a GitHub Personal Access Token with repository access to clone and use it.
 
 ## Quick Start in Google Colab
 
@@ -19,10 +35,10 @@ PlantGuard is a proof-of-concept multimodal AI system for plant disease detectio
 ```python
 from getpass import getpass
 token = getpass("GitHub PAT: ")
-!git clone https://{token}:x-oauth-basic@github.com/arslanmit/leaf-doctor-ai-bot.git
-%cd leaf-doctor-ai-bot
+!git clone https://{token}:x-oauth-basic@github.com/arslanmit/PlantGuard.git
+%cd PlantGuard
 %pip uninstall -y pydrive2
-%pip install -r requirements-colab.txt
+%pip install -r requirements.txt
 %pip check
 ```
 
@@ -107,9 +123,7 @@ src/
 - Multi-language support
 - Advanced disease knowledge base
 
-## Development
-
-### Code Quality
+## Code Quality
 
 This project uses comprehensive linting and formatting tools:
 
@@ -118,42 +132,40 @@ This project uses comprehensive linting and formatting tools:
 - **flake8**: Style and error checking
 - **mypy**: Static type checking
 - **bandit**: Security analysis
-- **pre-commit**: Automated checks on commit
+- **bandit**: Security analysis
 
-### Setup Development Environment
+### Setup Environment
 
 ```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
+# Complete setup (recommended)
+make setup
 
-# Setup pre-commit hooks
-pre-commit install
-
-# Or use the setup script
-./scripts/setup_linting.sh
+# Or install dependencies only
+make deps
 ```
 
 ### Available Commands
 
 ```bash
-make lint        # Run all linting checks
-make format      # Format code with black and isort
-make type-check  # Run mypy type checking
-make check       # Run all checks (lint + type + security)
-make fix         # Auto-fix formatting issues
+make lint        # Run linting checks with Ruff
+make fmt         # Format code with Ruff
+make type        # Run mypy type checking
+make test        # Run tests with coverage
+make qa          # Run all quality checks (fmt + lint + type + test)
+make check       # CI-style checks (no auto-fix)
 ```
 
-### Pre-commit Hooks
+### Code Quality Workflow
 
-Pre-commit hooks automatically run on every commit to ensure code quality:
-- Trailing whitespace removal
-- End-of-file fixing
-- YAML validation
-- Black formatting
-- Import sorting with isort
-- flake8 linting
-- mypy type checking
-- bandit security checks
+Run quality checks manually or via CI:
+
+```bash
+make fmt        # Format code with ruff
+make lint       # Lint code with ruff  
+make type       # Type check with mypy
+make security   # Security scan with bandit
+make qa         # Run all quality checks
+```
 
 ## License
 
