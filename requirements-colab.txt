@@ -15,7 +15,7 @@ Pillow>=10.0.0
 
 # --- NLP / HF ---
 transformers>=4.34.0
-sentencepiece>=0.1.99
+# sentencepiece>=0.1.99  # Temporarily disabled due to build issues on Python 3.13
 accelerate>=0.24.0
 datasets>=2.14.0
 
@@ -27,7 +27,7 @@ SpeechRecognition>=3.10.0
 # --- UI ---
 streamlit>=1.27.0
 streamlit-webrtc>=0.47.0
-pycloudflared>=0.3.0
+pycloudflared>=0.2.0
 pyngrok>=7.0.0
 
 # --- Misc ---

@@ -1,5 +1,5 @@
 import functools
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from transformers import pipeline
 
@@ -11,7 +11,7 @@ def asr_pipe() -> Any:
 
 
 def transcribe(audio_path: str) -> str:
-    out: Dict[str, Any] = asr_pipe()(audio_path)
+    out: dict[str, Any] = asr_pipe()(audio_path)
     return str(out.get("text", ""))
 
 
@@ -19,13 +19,13 @@ def classify_from_transcript(text: str) -> str:
     t = text.lower()
     if any(k in t for k in ["powder", "toz", "beyaz", "un"]):
         return "powdery_mildew"
-    if any(k in t for k in ["brown", "spot", "leke", "yanık", "yanik"]):
+    if any(k in t for k in ["brown", "spot", "leke", "yanik"]):
         return "blight"
     if any(k in t for k in ["rust", "pas", "turuncu", "püstül", "pustul"]):
         return "rust"
     return "healthy"
 
 
-def transcribe_and_classify(audio_path: str) -> Tuple[str, str]:
+def transcribe_and_classify(audio_path: str) -> tuple[str, str]:
     txt = transcribe(audio_path)
     return txt, classify_from_transcript(txt)

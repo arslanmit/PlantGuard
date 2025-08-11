@@ -78,5 +78,6 @@ with tab3:
 
 st.divider()
 st.markdown(
-    "> This tool provides agronomic advice; it is not a professional diagnosis. Probabilities are shown as confidence indicators."
+    "> This tool provides agronomic advice; it is not a professional diagnosis. "
+    "Probabilities are shown as confidence indicators."
 )

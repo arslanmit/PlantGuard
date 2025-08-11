@@ -1,59 +1,80 @@
-.PHONY: lint format type-check install-dev install run notebook clean
+# ---------- Python QA Makefile (Ruff + Mypy + Pytest) ----------
+SHELL := /bin/bash
+PY      := .venv/bin/python
+PIP     := $(PY) -m pip
+RUFF    := $(PY) -m ruff
+MYPY    := $(PY) -m mypy
+PYTEST  := $(PY) -m pytest
+
+.DEFAULT_GOAL := qa
+
+.PHONY: help venv deps fmt lint type test qa check clean versions install run notebook
+
+help:
+	@echo "Targets:"
+	@echo "  venv       - Create .venv if missing"
+	@echo "  deps       - Install dev deps (ruff, mypy, pytest, pytest-cov)"
+	@echo "  fmt        - Auto-fix + format (Ruff)"
+	@echo "  lint       - Lint (Ruff)"
+	@echo "  type       - Type-check (Mypy)"
+	@echo "  test       - Run tests (Pytest+coverage)"
+	@echo "  qa         - fmt -> lint -> type -> test (DEFAULT)"
+	@echo "  check      - No-fix CI check (fails on issues)"
+	@echo "  clean      - Remove caches"
+	@echo "  versions   - Show tool versions"
+	@echo "  install    - Install project dependencies"
+	@echo "  run        - Run PlantGuard Streamlit app"
+	@echo "  notebook   - Run PlantGuard Jupyter notebook"
+
+venv:
+	@[ -x $(PY) ] || python3 -m venv .venv
+	@$(PIP) install --upgrade pip setuptools wheel
+
+deps: venv
+	@$(PIP) install ruff mypy pytest pytest-cov
 
 # Install project dependencies
-install:
-	pip3 install -r requirements-colab.txt
-
-# Install development dependencies
-install-dev:
-	pip install -r requirements-dev.txt
-	pre-commit install
+install: venv
+	@$(PIP) install -r requirements-colab.txt
 
 # Run the PlantGuard Streamlit app
-run:
-	python3 run_local.py
+run: venv
+	@$(PY) run_local.py
 
 # Run the PlantGuard Jupyter notebook
-notebook:
-	jupyter notebook notebooks/PlantGuard.ipynb
+notebook: venv
+	@$(PY) -m jupyter notebook notebooks/PlantGuard.ipynb
 
-# Format code with black and isort
-format:
-	black src/ run_local.py
-	isort src/ run_local.py
+fmt: deps
+	@$(RUFF) check --fix .
+	@$(RUFF) format .
 
-# Run all linting checks
-lint:
-	flake8 src/ run_local.py
-	black --check src/ run_local.py
-	isort --check-only src/ run_local.py
+lint: deps
+	@$(RUFF) check .
 
-# Run type checking
-type-check:
-	mypy src/
+type: deps
+	@$(MYPY) .
 
-# Run security checks
-security:
-	bandit -r src/
+test: deps
+	@$(PYTEST)
 
-# Run all checks
-check: lint type-check security
+qa: fmt lint type test
 
+check: deps
+	@$(RUFF) check .
+	@$(RUFF) format --check .
+	@$(MYPY) .
+	@$(PYTEST)
 
-
-# Clean up cache files
 clean:
+	rm -rf .mypy_cache .ruff_cache .pytest_cache dist build
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
-	find . -type d -name ".mypy_cache" -exec rm -rf {} +
-	find . -type d -name ".pytest_cache" -exec rm -rf {} +
-	find . -type d -name "htmlcov" -exec rm -rf {} +
 
-# Fix common issues automatically
-fix:
-	black src/ run_local.py
-	isort src/ run_local.py
+versions: deps
+	@$(PY) -V
+	@$(RUFF) --version
+	@$(MYPY) --version
+	@$(PYTEST) --version
 
-# Run pre-commit on all files
-pre-commit-all:
-	pre-commit run --all-files
+# ---------------------------------------------------------------

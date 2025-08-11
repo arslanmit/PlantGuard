@@ -1,13 +1,13 @@
 {
   "mcpServers": {
     "Context7": {
-    "command": "npx",
-    "args": [
-      "-y",
-      "@upstash/context7-mcp"
-    ],
-    "env": {},
-    "disabled": false,
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {},
+      "disabled": false,
       "autoApprove": [
         "*",
         "create_entities",
@@ -97,12 +97,13 @@
         "open_nodes"
       ]
     },
-    "filesystem-home": {
+    "filesystem": {
       "command": "npx",
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users"
+        "/Users",
+        "."
       ],
       "env": {},
       "disabled": false,
@@ -120,22 +121,6 @@
         "search_files",
         "get_file_info",
         "list_allowed_directories"
-      ]
-    },
-    "brave-search": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-brave-search"
-      ],
-      "env": {
-        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
-      },
-      "disabled": false,
-      "autoApprove": [
-        "*",
-        "brave_web_search",
-        "brave_local_search"
       ]
     },
     "browsermcp": {
@@ -172,6 +157,36 @@
         "mcp-server"
       ],
       "disabled": false,
+      "autoApprove": [
+        "*",
+        "install"
+      ]
+    },
+    "super-shell": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "super-shell-mcp"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "*",
+        "execute_command",
+        "get_whitelist",
+        "add_to_whitelist"
+      ]
+    },
+    "hf-mcp-server": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://huggingface.co/mcp",
+        "--header",
+        "--transport",
+        "sse-only",
+        "Authorization: Bearer ${HF_TOKEN}"
+      ],
+      "disabled": false,
       "autoApprove": []
     },
     "Figma MCP": {
@@ -185,31 +200,10 @@
       "env": {
         "FIGMA_API_KEY": "${FIGMA_API_KEY}"
       },
-      "disabled": false,
+      "disabled": true,
       "autoApprove": [
         "*",
         "get_figma_data"
-      ]
-    },
-    "github-mcp-server": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "-e",
-        "GITHUB_PERSONAL_ACCESS_TOKEN",
-        "ghcr.io/github/github-mcp-server"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
-      },
-      "disabled": false,
-      "autoApprove": [
-        "*",
-        "get_me",
-        "search_repositories",
-        "create_repository"
       ]
     }
   }

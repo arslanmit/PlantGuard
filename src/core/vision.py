@@ -1,5 +1,4 @@
 import functools
-from typing import Dict
 
 import torch
 import torch.nn.functional as F
@@ -13,26 +12,27 @@ _DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 @functools.lru_cache(maxsize=1)
 def load_image_model(num_classes: int = len(CLASSES)) -> torch.nn.Module:
-    model = resnet18(weights=ResNet18_Weights.DEFAULT)
-    in_f = model.fc.in_features
-    model.fc = torch.nn.Linear(in_f, num_classes)
+    model: torch.nn.Module = resnet18(weights=ResNet18_Weights.DEFAULT)
+    in_f = model.fc.in_features  # type: ignore
+    model.fc = torch.nn.Linear(in_f, num_classes)  # type: ignore
     # TODO: load fine-tuned checkpoint from data/*.pt
-    model.eval().to(_DEVICE)
+    model.eval()
+    model.to(_DEVICE)
     return model
 
 
 def _tfm() -> T.Compose:
-    w = ResNet18_Weights.DEFAULT
+    # Standard ImageNet normalization values
     return T.Compose(
         [
             T.Resize((224, 224)),
             T.ToTensor(),
-            T.Normalize(mean=w.meta["mean"], std=w.meta["std"]),
+            T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
 
 
-def predict_image(pil_img: Image.Image) -> Dict[str, float]:
+def predict_image(pil_img: Image.Image) -> dict[str, float]:
     x = _tfm()(pil_img).unsqueeze(0).to(_DEVICE)
     with torch.no_grad():
         logits = load_image_model()(x)
