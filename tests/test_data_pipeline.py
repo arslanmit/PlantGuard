@@ -58,8 +58,8 @@ def temp_dataset_dir() -> Generator[Path]:
                 # Create image with some variation
                 img_array = np.full((224, 224, 3), color, dtype=np.uint8)
                 noise = np.random.randint(-20, 20, img_array.shape, dtype=np.int16)
-                img_array = img_array.astype(np.int16) + noise
-                img_array = np.clip(img_array, 0, 255).astype(np.uint8)
+                img_array_int = img_array.astype(np.int16) + noise
+                img_array = np.clip(img_array_int, 0, 255).astype(np.uint8)
 
                 img = Image.fromarray(img_array)
                 img_path = class_dir / f"{class_name}_{i:03d}.jpg"
@@ -168,9 +168,9 @@ class TestStratifiedSplit:
         total_size = len(dataset)
         expected_train_size = int(total_size * 0.8)
 
-        assert len(train_dataset) == expected_train_size
-        assert len(val_dataset) == total_size - expected_train_size
-        assert len(train_dataset) + len(val_dataset) == total_size
+        assert len(train_dataset) == expected_train_size  # type: ignore[arg-type]
+        assert len(val_dataset) == total_size - expected_train_size  # type: ignore[arg-type]
+        assert len(train_dataset) + len(val_dataset) == total_size  # type: ignore[arg-type]
 
 
 class TestImageValidator:

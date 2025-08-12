@@ -112,5 +112,35 @@
         "**/.git/subtree-cache/**": true,
         "**/node_modules/*/**": true,
         "**/.hg/store/**": true
-    }
+    },
+    // Python Testing Configuration
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "tests",
+        "-v",
+        "--tb=short",
+        "--strict-markers"
+    ],
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    "python.testing.promptToConfigure": false,
+    "python.testing.cwd": "${workspaceFolder}",
+    // Test Explorer UI settings
+    "testExplorer.useNativeTesting": true,
+    "testExplorer.showCollapseButton": true,
+    "testExplorer.showExpandButton": true,
+    "testExplorer.showOnRun": true,
+    "testExplorer.onStart": "reset",
+    "testExplorer.onReload": "reset",
+    "testExplorer.sort": "byLocation",
+    // Coverage settings for tests
+    "coverage-gutters.showGutterCoverage": true,
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.showRulerCoverage": true,
+    "coverage-gutters.coverageFileNames": [
+        "coverage.xml",
+        "coverage.lcov",
+        "htmlcov/index.html",
+        ".coverage"
+    ]
 }

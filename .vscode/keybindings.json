@@ -1,0 +1,24 @@
+[
+    {
+        "key": "cmd+shift+t",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Run All Tests"
+    },
+    {
+        "key": "cmd+shift+u",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Run Tests (Fast)"
+    },
+    {
+        "key": "cmd+shift+r",
+        "command": "python.refreshTests"
+    },
+    {
+        "key": "cmd+shift+d",
+        "command": "workbench.action.debug.start",
+        "args": {
+            "name": "Debug Current Test File"
+        },
+        "when": "editorTextFocus && resourceExtname == '.py' && resourcePath =~ /test/"
+    }
+]
