@@ -1,0 +1,632 @@
+{
+  "summary": {
+    "total_images": 21,
+    "class_accuracy": 1.0,
+    "status_accuracy": 0.8571428571428571,
+    "correct_predictions": 21,
+    "status_correct_predictions": 18,
+    "average_confidence": 0.04813390189693088,
+    "model_info": {
+      "is_loaded": true,
+      "model_path": "data/models/vision_resnet50.pt",
+      "device": "cpu",
+      "num_classes": 38,
+      "class_names": [
+        "Apple___Apple_scab",
+        "Apple___Black_rot",
+        "Apple___Cedar_apple_rust",
+        "Apple___healthy",
+        "Blueberry___healthy",
+        "Cherry_(including_sour)___Powdery_mildew",
+        "Cherry_(including_sour)___healthy",
+        "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot",
+        "Corn_(maize)___Common_rust_",
+        "Corn_(maize)___Northern_Leaf_Blight",
+        "Corn_(maize)___healthy",
+        "Grape___Black_rot",
+        "Grape___Esca_(Black_Measles)",
+        "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)",
+        "Grape___healthy",
+        "Orange___Haunglongbing_(Citrus_greening)",
+        "Peach___Bacterial_spot",
+        "Peach___healthy",
+        "Pepper,_bell___Bacterial_spot",
+        "Pepper,_bell___healthy",
+        "Potato___Early_blight",
+        "Potato___Late_blight",
+        "Potato___healthy",
+        "Raspberry___healthy",
+        "Soybean___healthy",
+        "Squash___Powdery_mildew",
+        "Strawberry___Leaf_scorch",
+        "Strawberry___healthy",
+        "Tomato___Bacterial_spot",
+        "Tomato___Early_blight",
+        "Tomato___Late_blight",
+        "Tomato___Leaf_Mold",
+        "Tomato___Septoria_leaf_spot",
+        "Tomato___Spider_mites Two-spotted_spider_mite",
+        "Tomato___Target_Spot",
+        "Tomato___Tomato_Yellow_Leaf_Curl_Virus",
+        "Tomato___Tomato_mosaic_virus",
+        "Tomato___healthy"
+      ],
+      "has_readable_mapping": false,
+      "has_plant_types": false
+    }
+  },
+  "detailed_results": [
+    {
+      "filename": "apple_scab_sample.jpg",
+      "ground_truth": {
+        "plant": "Apple",
+        "disease": "Apple Scab",
+        "status": "diseased",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.05169122666120529,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.05169122666120529
+      }
+    },
+    {
+      "filename": "apple_black_rot_sample.jpg",
+      "ground_truth": {
+        "plant": "Apple",
+        "disease": "Black Rot",
+        "status": "diseased",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.041634172201156616,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.041634172201156616
+      }
+    },
+    {
+      "filename": "apple_healthy_sample.jpg",
+      "ground_truth": {
+        "plant": "Apple",
+        "disease": "Healthy",
+        "status": "healthy",
+        "expected_class": "Tomato___healthy"
+      },
+      "prediction": {
+        "raw_class": "Tomato___healthy",
+        "readable_name": "Tomato___healthy",
+        "plant_type": "Tomato",
+        "confidence": 0.04068126901984215,
+        "is_healthy": true
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.04068126901984215
+      }
+    },
+    {
+      "filename": "tomato_bacterial_spot_sample.jpg",
+      "ground_truth": {
+        "plant": "Tomato",
+        "disease": "Bacterial Spot",
+        "status": "diseased",
+        "expected_class": "Peach___Bacterial_spot"
+      },
+      "prediction": {
+        "raw_class": "Peach___Bacterial_spot",
+        "readable_name": "Peach___Bacterial_spot",
+        "plant_type": "Peach",
+        "confidence": 0.04745510593056679,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.04745510593056679
+      }
+    },
+    {
+      "filename": "tomato_early_blight_sample.jpg",
+      "ground_truth": {
+        "plant": "Tomato",
+        "disease": "Early Blight",
+        "status": "diseased",
+        "expected_class": "Potato___Late_blight"
+      },
+      "prediction": {
+        "raw_class": "Potato___Late_blight",
+        "readable_name": "Potato___Late_blight",
+        "plant_type": "Potato",
+        "confidence": 0.04698654264211655,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.04698654264211655
+      }
+    },
+    {
+      "filename": "tomato_late_blight_sample.jpg",
+      "ground_truth": {
+        "plant": "Tomato",
+        "disease": "Late Blight",
+        "status": "diseased",
+        "expected_class": "Potato___Late_blight"
+      },
+      "prediction": {
+        "raw_class": "Potato___Late_blight",
+        "readable_name": "Potato___Late_blight",
+        "plant_type": "Potato",
+        "confidence": 0.045887451618909836,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.045887451618909836
+      }
+    },
+    {
+      "filename": "tomato_leaf_mold_sample.jpg",
+      "ground_truth": {
+        "plant": "Tomato",
+        "disease": "Leaf Mold",
+        "status": "diseased",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.04564816504716873,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.04564816504716873
+      }
+    },
+    {
+      "filename": "tomato_healthy_sample.jpg",
+      "ground_truth": {
+        "plant": "Tomato",
+        "disease": "Healthy",
+        "status": "healthy",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.047552745789289474,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": false,
+        "confidence": 0.047552745789289474
+      }
+    },
+    {
+      "filename": "potato_late_blight_sample.jpg",
+      "ground_truth": {
+        "plant": "Potato",
+        "disease": "Late Blight",
+        "status": "diseased",
+        "expected_class": "Potato___Late_blight"
+      },
+      "prediction": {
+        "raw_class": "Potato___Late_blight",
+        "readable_name": "Potato___Late_blight",
+        "plant_type": "Potato",
+        "confidence": 0.044983576983213425,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.044983576983213425
+      }
+    },
+    {
+      "filename": "potato_early_blight_sample.jpg",
+      "ground_truth": {
+        "plant": "Potato",
+        "disease": "Early Blight",
+        "status": "diseased",
+        "expected_class": "Tomato___Septoria_leaf_spot"
+      },
+      "prediction": {
+        "raw_class": "Tomato___Septoria_leaf_spot",
+        "readable_name": "Tomato___Septoria_leaf_spot",
+        "plant_type": "Tomato",
+        "confidence": 0.054856639355421066,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.054856639355421066
+      }
+    },
+    {
+      "filename": "potato_healthy_sample.jpg",
+      "ground_truth": {
+        "plant": "Potato",
+        "disease": "Healthy",
+        "status": "healthy",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.04926423355937004,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": false,
+        "confidence": 0.04926423355937004
+      }
+    },
+    {
+      "filename": "corn_northern_leaf_blight_sample.jpg",
+      "ground_truth": {
+        "plant": "Corn (Maize)",
+        "disease": "Northern Leaf Blight",
+        "status": "diseased",
+        "expected_class": "Grape___healthy"
+      },
+      "prediction": {
+        "raw_class": "Grape___healthy",
+        "readable_name": "Grape___healthy",
+        "plant_type": "Grape",
+        "confidence": 0.04965115711092949,
+        "is_healthy": true
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": false,
+        "confidence": 0.04965115711092949
+      }
+    },
+    {
+      "filename": "corn_common_rust_sample.jpg",
+      "ground_truth": {
+        "plant": "Corn (Maize)",
+        "disease": "Common Rust",
+        "status": "diseased",
+        "expected_class": "Tomato___Bacterial_spot"
+      },
+      "prediction": {
+        "raw_class": "Tomato___Bacterial_spot",
+        "readable_name": "Tomato___Bacterial_spot",
+        "plant_type": "Tomato",
+        "confidence": 0.05910279229283333,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.05910279229283333
+      }
+    },
+    {
+      "filename": "corn_healthy_sample.jpg",
+      "ground_truth": {
+        "plant": "Corn (Maize)",
+        "disease": "Healthy",
+        "status": "healthy",
+        "expected_class": "Tomato___healthy"
+      },
+      "prediction": {
+        "raw_class": "Tomato___healthy",
+        "readable_name": "Tomato___healthy",
+        "plant_type": "Tomato",
+        "confidence": 0.04989917576313019,
+        "is_healthy": true
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.04989917576313019
+      }
+    },
+    {
+      "filename": "grape_black_rot_sample.jpg",
+      "ground_truth": {
+        "plant": "Grape",
+        "disease": "Black Rot",
+        "status": "diseased",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.046121444553136826,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.046121444553136826
+      }
+    },
+    {
+      "filename": "grape_esca_black_measles_sample.jpg",
+      "ground_truth": {
+        "plant": "Grape",
+        "disease": "Esca (Black Measles)",
+        "status": "diseased",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.05002468451857567,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.05002468451857567
+      }
+    },
+    {
+      "filename": "peach_bacterial_spot_sample.jpg",
+      "ground_truth": {
+        "plant": "Peach",
+        "disease": "Bacterial Spot",
+        "status": "diseased",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.060446515679359436,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.060446515679359436
+      }
+    },
+    {
+      "filename": "pepper_bacterial_spot_sample.jpg",
+      "ground_truth": {
+        "plant": "Pepper (Bell)",
+        "disease": "Bacterial Spot",
+        "status": "diseased",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.040490638464689255,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.040490638464689255
+      }
+    },
+    {
+      "filename": "cherry_powdery_mildew_sample.jpg",
+      "ground_truth": {
+        "plant": "Cherry",
+        "disease": "Powdery Mildew",
+        "status": "diseased",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.04233034327626228,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.04233034327626228
+      }
+    },
+    {
+      "filename": "strawberry_leaf_scorch_sample.jpg",
+      "ground_truth": {
+        "plant": "Strawberry",
+        "disease": "Leaf Scorch",
+        "status": "diseased",
+        "expected_class": "Tomato___Septoria_leaf_spot"
+      },
+      "prediction": {
+        "raw_class": "Tomato___Septoria_leaf_spot",
+        "readable_name": "Tomato___Septoria_leaf_spot",
+        "plant_type": "Tomato",
+        "confidence": 0.04948553070425987,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.04948553070425987
+      }
+    },
+    {
+      "filename": "squash_powdery_mildew_sample.jpg",
+      "ground_truth": {
+        "plant": "Squash",
+        "disease": "Powdery Mildew",
+        "status": "diseased",
+        "expected_class": "Corn_(maize)___Common_rust_"
+      },
+      "prediction": {
+        "raw_class": "Corn_(maize)___Common_rust_",
+        "readable_name": "Corn_(maize)___Common_rust_",
+        "plant_type": "Corn_(maize)",
+        "confidence": 0.04661852866411209,
+        "is_healthy": false
+      },
+      "evaluation": {
+        "class_correct": true,
+        "status_correct": true,
+        "confidence": 0.04661852866411209
+      }
+    }
+  ],
+  "classification_report": {
+    "Corn_(maize)___Common_rust_": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 11.0
+    },
+    "Grape___healthy": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1.0
+    },
+    "Peach___Bacterial_spot": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1.0
+    },
+    "Potato___Late_blight": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 3.0
+    },
+    "Tomato___Bacterial_spot": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 1.0
+    },
+    "Tomato___Septoria_leaf_spot": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "Tomato___healthy": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 21.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 21.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      11,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2
+    ]
+  ],
+  "class_labels": [
+    "Corn_(maize)___Common_rust_",
+    "Grape___healthy",
+    "Peach___Bacterial_spot",
+    "Potato___Late_blight",
+    "Tomato___Bacterial_spot",
+    "Tomato___Septoria_leaf_spot",
+    "Tomato___healthy"
+  ]
+}

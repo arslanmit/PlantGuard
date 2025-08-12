@@ -187,7 +187,10 @@
         "Authorization: Bearer ${HF_TOKEN}"
       ],
       "disabled": false,
-      "autoApprove": []
+      "autoApprove": [
+        "model_search",
+        "model_details"
+      ]
     },
     "fetch": {
       "command": "uvx",

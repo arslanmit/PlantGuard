@@ -46,7 +46,7 @@ endif
 
 .DEFAULT_GOAL := help
 
-.PHONY: help start setup install run dev test clean
+.PHONY: help start setup install run switcher model-switcher dev test clean
 .PHONY: format lint check fix train notebook
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
@@ -58,6 +58,7 @@ help:
 	@echo "$(GREEN)🚀 Getting Started$(NC)"
 	@echo "  $(BLUE)start$(NC)          - First-time setup + launch app"
 	@echo "  $(BLUE)run$(NC)            - Launch PlantGuard app"
+	@echo "  $(BLUE)switcher$(NC)       - Launch Model Switcher UI (port 8502)"
 	@echo "  $(BLUE)setup$(NC)          - Install dependencies & configure"
 	@echo "  $(BLUE)notebook$(NC)       - Open Jupyter for development"
 	@echo ""
@@ -94,8 +95,16 @@ help:
 
 # ========== Getting Started ==========
 
-# First-time setup and launch
-start: setup run
+# First-time setup and launch (idempotent)
+start:
+	@echo "$(BLUE)🚀 Starting PlantGuard (first-time setup if needed)...$(NC)"
+	@if [ ! -x $(PY) ]; then \
+		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
+		make setup; \
+	else \
+		echo "$(GREEN)✅ Virtual environment found$(NC)"; \
+	fi
+	@make run
 
 # Complete environment setup
 setup:
@@ -105,7 +114,10 @@ setup:
 	@$(PIP) install --upgrade pip setuptools wheel
 	@echo "$(YELLOW)Step 2: Installing dependencies$(NC)"
 	@$(PIP) install -r requirements.txt
-	@echo "$(YELLOW)Step 3: Installing PlantGuard in development mode$(NC)"
+	@echo "$(YELLOW)Step 3: Cleaning old build metadata (egg-info)$(NC)"
+	@chmod -R u+w src/plantguard.egg-info 2>/dev/null || true
+	@rm -rf src/plantguard.egg-info plantguard.egg-info 2>/dev/null || true
+	@echo "$(YELLOW)Step 4: Installing PlantGuard in development mode$(NC)"
 	@$(PIP) install -e . --no-deps --quiet --disable-pip-version-check
 	@echo "$(GREEN)✅ Setup complete! Run 'make run' to start PlantGuard$(NC)"
 
@@ -120,6 +132,8 @@ deps:
 # Install PlantGuard package
 install: deps
 	@echo "$(BLUE)🔧 Installing PlantGuard package...$(NC)"
+	@chmod -R u+w src/plantguard.egg-info 2>/dev/null || true
+	@rm -rf src/plantguard.egg-info plantguard.egg-info 2>/dev/null || true
 	@$(PIP) install -e . --no-deps --quiet --disable-pip-version-check
 	@echo "$(GREEN)✅ PlantGuard installed$(NC)"
 
@@ -134,6 +148,19 @@ run:
 	fi
 	@echo "$(GREEN)🌿 PlantGuard is starting at http://localhost:8501$(NC)"
 	@$(PY) run_local.py
+
+# Launch Model Switcher UI (Streamlit)
+switcher:
+	@echo "$(BLUE)🚀 Starting PlantGuard Model Switcher...$(NC)"
+	@if [ ! -x $(PY) ]; then \
+		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
+		make setup; \
+	fi
+	@echo "$(GREEN)🌿 Model Switcher is starting at http://localhost:8502$(NC)"
+	@$(PY) -m streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502
+
+# Alias
+model-switcher: switcher
 
 # Open Jupyter notebook for development
 notebook:

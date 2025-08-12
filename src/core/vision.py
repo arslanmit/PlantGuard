@@ -177,7 +177,11 @@ class VisionAdapter:
             logger.info("Loading model checkpoint from %s", path)
 
             # Load checkpoint
-            checkpoint = torch.load(path, map_location=self.device, weights_only=False)  # nosec B614
+            # Use weights_only when available for safer loading; fall back if not supported
+            try:
+                checkpoint = torch.load(path, map_location=self.device, weights_only=True)  # nosec B614
+            except TypeError:
+                checkpoint = torch.load(path, map_location=self.device)  # nosec B614
 
             # Extract information
             num_classes = checkpoint.get("num_classes", 38)

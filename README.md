@@ -534,3 +534,177 @@ make all-deps        # Everything combined
 ---
 
 **🌿 PlantGuard** - *Empowering farmers with AI-driven plant health insights*
+
+## 🌱 Model Switching - Quick Start Guide
+
+### 🚀 Easy Model Switching Commands
+
+#### Makefile Shortcuts
+
+```bash
+# Launch main app (http://localhost:8501)
+make run
+
+# First-time setup + launch
+make start
+
+# Launch the Model Switcher UI (http://localhost:8502)
+make switcher   # alias: make model-switcher
+```
+
+#### Command Line Interface
+
+```bash
+# List all available models
+python scripts/model_switching/model_switcher.py --list
+
+# Switch to the best model (Vision Transformer)
+python scripts/model_switching/model_switcher.py --switch vit_best
+
+# Switch to the fast model (MobileNet)
+python scripts/model_switching/model_switcher.py --switch mobilenet_fast
+
+# Test current model on sample images
+python scripts/model_switching/model_switcher.py --quick-test
+
+# Test on a specific image
+python scripts/model_switching/model_switcher.py --test data/pictures/apple_scab_sample.jpg
+
+# Compare all models
+python scripts/model_switching/model_switcher.py --benchmark
+
+# Show current model info
+python scripts/model_switching/model_switcher.py --current
+```
+
+### Web Interface
+
+```bash
+# Preferred: launch the model switcher UI via Makefile
+make switcher  # opens on http://localhost:8502
+
+# Launch the enhanced PlantGuard app
+streamlit run scripts/model_switching/app_with_model_manager.py
+```
+
+Once the Model Switcher is open:
+
+- Use the sidebar dropdown to choose a model
+- Click "Switch Model" (also available in the main content area)
+- The selected model will load and become the current model
+
+### 🤖 Available Models
+
+#### 1. Vision Transformer (vit_best) - RECOMMENDED
+- Accuracy: 100% on your test set
+- Best for: Highest accuracy, production use
+- Model: Abhiram4/PlantDiseaseDetectorVit2
+- Classes: 44 plant diseases
+
+#### 2. MobileNet (mobilenet_fast)
+- Accuracy: 95% on your test set
+- Best for: Fast inference, mobile/edge devices
+- Model: Diginsa/Plant-Disease-Detection-Project
+- Classes: 38 plant diseases
+
+#### 3. Local ResNet (local_resnet) — ENABLED
+- Accuracy: 5% (untrained)
+- Best for: Custom training (requires PlantVillage dataset)
+- Weights: `data/models/vision_resnet50.pt`
+
+### ⚙️ Configuration
+
+Edit `config/models.json` to:
+- Add new Hugging Face models
+- Change confidence thresholds
+- Enable/disable models
+- Set default model
+
+Example configuration:
+```json
+{
+  "default_model": "vit_best",
+  "models": {
+    "vit_best": {
+      "name": "Vision Transformer (Best Performance)",
+      "type": "huggingface",
+      "model_id": "Abhiram4/PlantDiseaseDetectorVit2",
+      "accuracy": 1.0,
+      "confidence_threshold": 0.7,
+      "enabled": true
+    }
+  }
+}
+```
+
+### 🔧 Integration in Your Code
+
+```python
+from src.core.model_manager import PlantGuardModelManager
+
+# Initialize manager
+manager = PlantGuardModelManager()
+
+# Switch models easily
+manager.switch_model("vit_best")
+
+# Get prediction with metadata
+result = manager.get_readable_prediction(image)
+print(f"Plant: {result['plant_type']}")
+print(f"Disease: {result['disease']}")
+print(f"Confidence: {result['confidence_percentage']}")
+```
+
+### 📊 Performance Comparison
+
+| Model | Accuracy | Speed | Memory | Best For |
+|-------|----------|-------|---------|----------|
+| Vision Transformer | 100% | Medium | High | Production accuracy |
+| MobileNet | 95% | Fast | Low | Mobile/Edge devices |
+| Local ResNet | 5% | Fast | Medium | Custom training |
+
+### 🎯 Recommendations
+
+#### For Production Use:
+- Use Vision Transformer (vit_best) for highest accuracy
+- Set confidence threshold to 0.7 or higher
+
+#### For Mobile/Edge Deployment:
+- Use MobileNet (mobilenet_fast) for speed
+- Lower confidence threshold to 0.6
+
+#### For Custom Training:
+- Enable Local ResNet after training on your data
+- Use PlantVillage dataset for training
+
+### 🔄 Switching Models During Runtime
+
+The system supports hot-swapping models without restarting your application:
+
+```python
+# In your Streamlit app
+if st.button("Switch to Fast Model"):
+    manager.switch_model("mobilenet_fast")
+    st.rerun()  # Refresh the app
+```
+
+In the Model Switcher UI, simply select a model from the sidebar and click "Switch Model".
+
+### 🏁 Quick Test
+
+Test your setup:
+```bash
+# 1. List models
+python scripts/model_switching/model_switcher.py --list
+
+# 2. Switch to best model
+python scripts/model_switching/model_switcher.py --switch vit_best
+
+# 3. Test on samples
+python scripts/model_switching/model_switcher.py --quick-test
+
+# 4. Launch web UI (preferred)
+make switcher      # http://localhost:8502
+# or
+streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502
+```

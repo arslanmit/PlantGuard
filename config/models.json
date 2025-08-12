@@ -1,0 +1,35 @@
+{
+  "default_model": "vit_best",
+  "models": {
+    "vit_best": {
+      "name": "Vision Transformer (Best Performance)",
+      "type": "huggingface",
+      "model_id": "Abhiram4/PlantDiseaseDetectorVit2",
+      "description": "Vision Transformer model with 100% accuracy on test set",
+      "accuracy": 1.0,
+      "confidence_threshold": 0.7,
+      "enabled": true,
+      "device": "auto"
+    },
+    "mobilenet_fast": {
+      "name": "MobileNet (Fast & Lightweight)",
+      "type": "huggingface",
+      "model_id": "Diginsa/Plant-Disease-Detection-Project",
+      "description": "Lightweight MobileNet model, good for mobile/edge devices",
+      "accuracy": 0.95,
+      "confidence_threshold": 0.6,
+      "enabled": true,
+      "device": "auto"
+    },
+    "local_resnet": {
+      "name": "Local ResNet50",
+      "type": "local",
+      "model_id": "data/models/vision_resnet50.pt",
+      "description": "Local ResNet50 model (requires training)",
+      "accuracy": 0.05,
+      "confidence_threshold": 0.5,
+      "enabled": true,
+      "device": "auto"
+    }
+  }
+}

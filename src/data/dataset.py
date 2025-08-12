@@ -6,17 +6,21 @@ with support for stratified train/validation splits and data augmentation.
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import torch
 from PIL import Image
 from sklearn.model_selection import train_test_split
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
 
 logger = logging.getLogger(__name__)
+
+
+class NoReadableSamplesError(RuntimeError):
+    """Raised when no readable samples can be loaded from the dataset."""
 
 
 class PlantVillageDataset(Dataset):
@@ -62,7 +66,7 @@ class PlantVillageDataset(Dataset):
         return len(self.samples)
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, int]:
-        """Get a sample from the dataset.
+        """Get a sample from the dataset, skipping corrupted files if needed.
 
         Args:
             idx: Index of the sample
@@ -70,15 +74,30 @@ class PlantVillageDataset(Dataset):
         Returns:
             Tuple of (image_tensor, label)
         """
-        image_path, label = self.samples[idx]
+        num_samples = len(self.samples)
+        attempts = 0
 
-        # Load image
-        image = Image.open(image_path).convert("RGB")
+        while attempts < num_samples:
+            image_path, label = self.samples[idx]
+            try:
+                # Load image
+                with Image.open(image_path) as pil_image:
+                    rgb_image = pil_image.convert("RGB")
 
-        # Apply transforms
-        image = self.transform(image) if self.transform else transforms.ToTensor()(image)
+                # Apply transforms
+                if self.transform:
+                    image_tensor = cast(torch.Tensor, self.transform(rgb_image))
+                else:
+                    image_tensor = transforms.ToTensor()(rgb_image)
+            except (OSError, ValueError, RuntimeError):
+                # Skip corrupted/unreadable file and try next
+                idx = (idx + 1) % num_samples
+                attempts += 1
+            else:
+                return image_tensor, label
 
-        return image, label
+        # If all attempts failed, raise a specific error
+        raise NoReadableSamplesError()
 
     def get_class_distribution(self) -> dict[str, int]:
         """Get the distribution of classes in the dataset.
@@ -253,7 +272,7 @@ def create_data_loaders(
     )
 
     # Update validation dataset to use validation subset indices
-    if hasattr(val_subset, "indices"):
+    if isinstance(val_subset, Subset):
         val_dataset.samples = [train_dataset.samples[i] for i in val_subset.indices]
 
     # Create data loaders

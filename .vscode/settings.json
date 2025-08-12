@@ -126,5 +126,14 @@
     "kiroAgent.trustedCommands": [
         "*",
         "find *"
-    ]
+    ],
+    "cursorpyright.analysis.autoImportCompletions": true,
+    "cursorpyright.analysis.diagnosticMode": "workspace",
+    "cursorpyright.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "error",
+        "reportMissingTypeStubs": "warning",
+        "reportUnusedImport": "information",
+        "reportUnusedVariable": "information"
+    },
+    "cursorpyright.analysis.typeCheckingMode": "basic"
 }

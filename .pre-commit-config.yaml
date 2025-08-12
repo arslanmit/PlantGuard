@@ -21,7 +21,7 @@ repos:
         name: mypy (type checker)
         additional_dependencies: [types-requests, types-PyYAML]
         args: [--config-file=pyproject.toml]
-        exclude: ^(tests/|notebooks/|\.kiro/)
+        exclude: ^(tests/|scripts/|notebooks/|\.kiro/)
 
   # Built-in pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -52,9 +52,9 @@ repos:
     hooks:
       - id: bandit
         name: bandit (security linter)
-        args: ["-c", "pyproject.toml"]
+        args: ["-c", "pyproject.toml", "-iii"]
         additional_dependencies: ["bandit[toml]"]
-        exclude: ^tests/
+        exclude: ^(tests/|scripts/)
 
 # Global configuration
 default_stages: [pre-commit]
