@@ -22,22 +22,22 @@
     - Implement data integrity checks for training pipeline
     - _Requirements: 1.1, 1.5_
 
-- [ ] 3. Vision Model Development
-  - [ ] 3.1 Implement ResNet50 model architecture and training
+- [x] 3. Vision Model Development
+  - [x] 3.1 Implement ResNet50 model architecture and training
     - Create ResNet50 model class with custom classification head for 38 PlantVillage classes
     - Implement training script with loss calculation, backpropagation, and optimization
     - Add validation loop with accuracy metrics and model checkpointing
     - Integrate TensorBoard logging for training metrics visualization
     - _Requirements: 1.3, 1.4, 8.1, 8.3, 8.4_
 
-  - [ ] 3.2 Complete VisionAdapter implementation
+  - [x] 3.2 Complete VisionAdapter implementation
     - Implement predict() method returning disease class and confidence score
     - Add model loading from checkpoint functionality with proper error handling
     - Create batch prediction capability for multiple images
     - Update image preprocessing to match training pipeline
     - _Requirements: 1.3, 6.1_
 
-  - [ ] 3.3 Create PlantVillage class mapping
+  - [x] 3.3 Create PlantVillage class mapping
     - Generate class names JSON file mapping model indices to disease names
     - Implement class name loading in VisionAdapter
     - Add human-readable disease name conversion

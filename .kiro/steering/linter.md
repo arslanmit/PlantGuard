@@ -2,79 +2,103 @@
 inclusion: always
 ---
 
-# Code Quality & Linting Standards
+# PlantGuard Code Quality Standards
 
-## Critical Rule
+## Critical Validation Rule
 
-**ALWAYS** validate generated and existing code against the linting rules defined in `pyproject.toml`. Fix any violations immediately before presenting code to the user.
+**MANDATORY**: Validate all generated code against `pyproject.toml` linting rules before presenting to user. Fix violations immediately.
 
-## Mandatory Code Standards
+## Code Style Requirements
 
-### Line Length & Formatting
+### Formatting Standards
+- **Line length**: 100 characters maximum
+- **Quotes**: Double quotes for all strings
+- **Import order**: First-party (`src`, `plantguard`) before third-party (`torch`, `numpy`, `streamlit`, `PIL`)
+- **Indentation**: 4 spaces (no tabs)
 
-- **Max line length**: 100 characters
-- **String quotes**: Use double quotes consistently
-- **Import sorting**: First-party (`src`, `plantguard`) before third-party (`torch`, `numpy`, `streamlit`, `PIL`)
+### Type Annotations (Mandatory)
+- Complete type hints for all function parameters and return values
+- Use `-> None` for functions without return values
+- Avoid `Any` types - use specific generics for `*args`/`**kwargs`
+- Import types from `typing` or `collections.abc`
 
-### Type Annotations (Required)
-
-- All function definitions must include complete type hints
-- Return types required for all functions (use `-> None` for procedures)
-- No `Any` types for `*args`/`**kwargs` - use proper generic types
-- Import types from `typing` or `collections.abc` as needed
+Example:
+```python
+def process_image(img: PIL.Image.Image, threshold: float = 0.5) -> tuple[str, float]:
+    """Process plant image for disease detection."""
+```
 
 ### Function Complexity Limits
+- Maximum 6 parameters per function
+- Cyclomatic complexity ≤ 10
+- Maximum 50 statements per function
+- Maximum 6 return statements
+- Maximum 12 conditional branches
 
-- **Max parameters**: 6 per function
-- **Max cyclomatic complexity**: 10
-- **Max statements**: 50 per function
-- **Max return statements**: 6 per function
-- **Max branches**: 12 conditional branches
+### PlantGuard-Specific Standards
+- Use `logger.info()` instead of `print()` in production code
+- Use `pathlib.Path` for all file operations
+- Specify exception types: `except FileNotFoundError:` not `except:`
+- Clean up temporary files immediately after use
+- Use `@st.cache_resource` for model loading in Streamlit
 
-### Security & Best Practices
+## Pre-Code Generation Checklist
 
-- No bare `except:` clauses - always specify exception types
-- No `print()` statements in production code - use logging instead
-- Use `pathlib.Path` over `os.path` for file operations
-- Proper exception handling with specific exception types
-- No hardcoded secrets or credentials
+1. Review existing code style in target file/module
+2. Verify import organization follows project conventions
+3. Confirm all functions will have complete type annotations
+4. Plan error handling with specific exception types
 
-## AI Assistant Actions
+## Post-Code Generation Validation
 
-### Before Writing Code
+1. Check line length compliance (≤100 characters)
+2. Verify type annotations on all functions
+3. Confirm no bare `except:` clauses
+4. Validate proper logging usage (no `print()` statements)
+5. Check file path operations use `pathlib.Path`
 
-1. Check existing code style in the file/module
-2. Ensure all imports are properly organized
-3. Verify type hints are complete and accurate
+## Common Fixes for PlantGuard
 
-### After Writing Code
+### Type Annotations
+```python
+# Fix missing annotations
+def load_model(path: str) -> torch.nn.Module:
+    return torch.load(path)
 
-1. Run mental check against 100-character line limit
-2. Verify all functions have type annotations
-3. Check for security anti-patterns (bare except, hardcoded values)
-4. Ensure proper error handling patterns
+# Fix generic types
+def process_batch(*images: PIL.Image.Image) -> list[tuple[str, float]]:
+    return [(predict(img)) for img in images]
+```
 
-### Common Fixes to Apply
+### Error Handling
+```python
+# Replace bare except
+try:
+    model = load_model(path)
+except (FileNotFoundError, torch.serialization.pickle.UnpicklingError) as e:
+    logger.error(f"Model loading failed: {e}")
+    return None
+```
 
-- Add missing type annotations: `def process_image(img: PIL.Image.Image) -> tuple[str, float]:`
-- Break long lines at logical points (after commas, before operators)
-- Replace `print()` with `logger.info()` or `st.write()`
-- Use specific exceptions: `except FileNotFoundError:` instead of `except:`
-- Add docstrings for public functions with clear parameter descriptions
+### Logging
+```python
+# Replace print statements
+logger.info(f"Processing image: {image_path}")  # Not print()
+st.write(f"Detected disease: {disease}")        # For Streamlit UI
+```
 
-## Testing Requirements
+## Testing Standards
 
 - All `src/` modules require test coverage
-- Use `pytest` with strict markers
-- Tests may use `assert` statements and magic values (exceptions to normal rules)
+- Use `pytest` with type checking enabled
+- Test files may use `assert` and magic values (exceptions to style rules)
+- Mock external dependencies in tests
 
-## Quality Commands
-
-Run these commands to validate code quality:
+## Quality Validation Commands
 
 ```bash
-ruff check --fix .        # Auto-fix style issues
-ruff format .             # Format code consistently  
-mypy src/                 # Type checking
-pytest --cov=src/         # Run tests with coverage
+ruff check --fix .     # Auto-fix style violations
+ruff format .          # Apply consistent formatting
+mypy src/              # Type checking validation
+pytest --cov=src/      # Run tests with coverage report
 ```
