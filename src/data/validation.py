@@ -734,7 +734,7 @@ def generate_data_report(
         # Save report if output path provided
         if output_path:
             output_path = Path(output_path)
-            with output_path.open("w") as f:
+            with output_path.open("w", encoding="utf-8") as f:
                 json.dump(report, f, indent=2, default=str)
             logger.info("Data report saved to %s", output_path)
 

@@ -4,6 +4,7 @@
 Usage: python run_local.py
 """
 
+import importlib.util as importlib_util
 import logging
 import subprocess  # nosec B404
 import sys
@@ -14,18 +15,17 @@ logger = logging.getLogger(__name__)
 
 
 def check_requirements() -> bool:
-    """Check if requirements are installed."""
-    try:
-        import streamlit  # noqa: F401
-        import torch  # noqa: F401
-        import transformers  # noqa: F401
-    except ImportError:
-        logger.exception("❌ Missing dependencies")
-        logger.exception("Please install requirements: pip install -r requirements.txt")
+    """Check if core dependencies are discoverable without importing them."""
+    required = ["streamlit", "torch", "transformers"]
+    missing = [name for name in required if importlib_util.find_spec(name) is None]
+
+    if missing:
+        logger.error("❌ Missing dependencies: %s", ", ".join(missing))
+        logger.error("Please install requirements: pip install -r requirements.txt")
         return False
-    else:
-        logger.info("✅ Core dependencies found")
-        return True
+
+    logger.info("✅ Core dependencies found")
+    return True
 
 
 def run_streamlit() -> bool:

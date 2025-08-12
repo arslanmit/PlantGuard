@@ -49,11 +49,11 @@ def main():
     model_options = {f"{m['name']} ({m['accuracy']:.1%})": m["id"] for m in enabled_models}
 
     current_model_info = manager.get_current_model_info()
-    current_model_name = current_model_info.get("name", "None")
+    _current_model_name = current_model_info.get("name", "None")
 
     # Find current selection
     default_index = 0
-    for i, (display_name, model_id) in enumerate(model_options.items()):
+    for i, (_display_name, model_id) in enumerate(model_options.items()):
         if model_id == current_model_info.get("model_id", "").split("/")[-1]:
             default_index = i
             break
@@ -220,7 +220,7 @@ def main():
                 # Load test metadata
                 metadata_path = "data/pictures/sample_images_metadata.json"
                 if Path(metadata_path).exists():
-                    with open(metadata_path) as f:
+                    with open(metadata_path, encoding="utf-8") as f:
                         metadata = json.load(f)
 
                     benchmark_results = []

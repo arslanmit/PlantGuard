@@ -1,0 +1,15 @@
+{
+  "typeCheckingMode": "basic",
+  "reportMissingTypeStubs": "warning",
+  "reportMissingImports": "error",
+  "reportUnusedImport": "information",
+  "reportUnusedVariable": "information",
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": [
+        "src"
+      ]
+    }
+  ]
+}

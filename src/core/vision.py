@@ -5,17 +5,81 @@ This module contains the VisionAdapter class for plant disease detection using R
 
 import json
 import logging
+from collections.abc import Callable
 from pathlib import Path
-from typing import NoReturn
+from typing import Any, NoReturn, cast
 
 import torch
+import torch.nn.functional as F
 from PIL import Image
-from torch.nn import functional
 from torchvision import transforms
 
 from .models import PlantDiseaseResNet50
 
 logger = logging.getLogger(__name__)
+
+
+class ModelNotLoadedError(RuntimeError):
+    """Raised when a model-dependent operation is called before loading the model."""
+
+    def __init__(self) -> None:
+        super().__init__("Model not loaded. Call load_checkpoint() first.")
+
+
+class ModelNoneError(RuntimeError):
+    """Raised when model is unexpectedly None after load check."""
+
+    def __init__(self) -> None:
+        super().__init__("Model reference is None")
+
+
+class PredictionError(RuntimeError):
+    """Raised when single-image prediction fails."""
+
+    def __init__(self) -> None:
+        super().__init__("Prediction failed")
+
+
+class BatchPredictionError(RuntimeError):
+    """Raised when batch prediction fails."""
+
+    def __init__(self) -> None:
+        super().__init__("Batch prediction failed")
+
+
+class LoadCheckpointError(RuntimeError):
+    """Raised when loading a checkpoint fails."""
+
+    def __init__(self) -> None:
+        super().__init__("Failed to load checkpoint")
+
+
+class CheckpointNotFoundError(FileNotFoundError):
+    """Raised when the checkpoint file cannot be found."""
+
+    def __init__(self) -> None:
+        super().__init__("Checkpoint file not found")
+
+
+class ImagePreprocessError(RuntimeError):
+    """Raised when image preprocessing fails."""
+
+    def __init__(self) -> None:
+        super().__init__("Image preprocessing failed")
+
+
+class ClassMappingLoadError(RuntimeError):
+    """Raised when class mapping file cannot be loaded."""
+
+    def __init__(self) -> None:
+        super().__init__("Failed to load class mapping")
+
+
+class InvalidClassesError(KeyError):
+    """Raised when classes format in mapping is invalid."""
+
+    def __init__(self) -> None:
+        super().__init__("Invalid classes format")
 
 
 class VisionAdapter:
@@ -25,17 +89,24 @@ class VisionAdapter:
     using a fine-tuned ResNet50 model.
     """
 
-    def __init__(self, model_path: str | None = None, device: str = "cpu") -> None:
+    def __init__(
+        self,
+        model_path: str | None = None,
+        device: str = "cpu",
+        img_size: tuple[int, int] = (224, 224),
+    ) -> None:
         """Initialize VisionAdapter.
 
         Args:
             model_path: Path to trained model weights
             device: Device to run model on ("cpu" or "cuda")
+            img_size: Image resize target as (height, width)
         """
         self.device = torch.device(device)
         self.model_path = model_path
         self.model: PlantDiseaseResNet50 | None = None
-        self.transform = self._create_transform()
+        self.img_size = img_size
+        self.transform: Callable[[Image.Image], torch.Tensor] = self._create_transform(img_size)
         self.class_names: list[str] = []
         self.is_loaded = False
         self.class_to_readable: dict[str, str] = {}
@@ -51,19 +122,23 @@ class VisionAdapter:
                 logger.exception("Failed to load model from %s", model_path)
 
     def _raise_model_none_error(self) -> NoReturn:
-        """Raise RuntimeError for model being None despite is_loaded check."""
-        msg = "Model is None despite is_loaded check"
-        raise RuntimeError(msg)
+        """Raise when model is None despite is_loaded check."""
+        raise ModelNoneError()
 
-    def _create_transform(self) -> transforms.Compose:
+    def _create_transform(self, img_size: tuple[int, int]) -> Callable[[Image.Image], torch.Tensor]:
         """Create image preprocessing transform."""
-        return transforms.Compose(
+        composed = transforms.Compose(
             [
-                transforms.Resize((224, 224)),
+                transforms.Resize(img_size),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             ]
         )
+        return cast(Callable[[Image.Image], torch.Tensor], composed)
+
+    def _raise_invalid_classes(self) -> NoReturn:
+        """Raise when class list in mapping is invalid."""
+        raise InvalidClassesError()
 
     def predict(self, image: Image.Image) -> tuple[str, float]:
         """Predict disease class for input image.
@@ -75,8 +150,7 @@ class VisionAdapter:
             Tuple of (disease_class_name, confidence_score)
         """
         if not self.is_loaded:
-            msg = "Model not loaded. Call load_checkpoint() first."
-            raise RuntimeError(msg)
+            raise ModelNotLoadedError()
 
         try:
             # Preprocess image
@@ -88,7 +162,7 @@ class VisionAdapter:
                 self.model.eval()
                 with torch.no_grad():
                     outputs = self.model(input_batch)
-                    probabilities = functional.softmax(outputs, dim=1)
+                    probabilities = F.softmax(outputs, dim=1)
                     confidence, predicted_idx = torch.max(probabilities, 1)
 
                     predicted_class = self.class_names[int(predicted_idx.item())]
@@ -105,10 +179,9 @@ class VisionAdapter:
             # This should never happen due to is_loaded check, but needed for type safety
             self._raise_model_none_error()
 
-        except (RuntimeError, IndexError, ValueError) as e:
+        except (RuntimeError, IndexError, ValueError) as error:
             logger.exception("Prediction failed")
-            msg = f"Prediction failed: {e}"
-            raise RuntimeError(msg) from e
+            raise PredictionError() from error
 
     def predict_batch(self, images: list[Image.Image]) -> list[tuple[str, float]]:
         """Predict disease classes for multiple images.
@@ -120,8 +193,7 @@ class VisionAdapter:
             List of tuples (disease_class_name, confidence_score)
         """
         if not self.is_loaded:
-            msg = "Model not loaded. Call load_checkpoint() first."
-            raise RuntimeError(msg)
+            raise ModelNotLoadedError()
 
         if not images:
             return []
@@ -141,14 +213,16 @@ class VisionAdapter:
                 self.model.eval()
                 with torch.no_grad():
                     outputs = self.model(input_batch)
-                    probabilities = functional.softmax(outputs, dim=1)
+                    probabilities = F.softmax(outputs, dim=1)
                     confidences, predicted_indices = torch.max(probabilities, 1)
 
-                    results = []
-                    for i in range(len(images)):
-                        predicted_class = self.class_names[int(predicted_indices[i].item())]
-                        confidence_score = float(confidences[i].item())
-                        results.append((predicted_class, confidence_score))
+                    results = [
+                        (
+                            self.class_names[int(predicted_indices[i].item())],
+                            float(confidences[i].item()),
+                        )
+                        for i, _ in enumerate(images)
+                    ]
 
                     logger.debug("Batch prediction completed for %d images", len(images))
                     return results
@@ -156,22 +230,24 @@ class VisionAdapter:
             # This should never happen due to is_loaded check, but needed for type safety
             self._raise_model_none_error()
 
-        except (RuntimeError, IndexError, ValueError) as e:
+        except (RuntimeError, IndexError, ValueError) as error:
             logger.exception("Batch prediction failed")
-            msg = f"Batch prediction failed: {e}"
-            raise RuntimeError(msg) from e
+            raise BatchPredictionError() from error
 
     def load_checkpoint(self, path: str) -> None:
         """Load trained model weights.
 
         Args:
             path: Path to model checkpoint
+
+        Note:
+            Only load checkpoints from trusted sources. torch.load may execute
+            arbitrary code if the file is malicious.
         """
         checkpoint_path = Path(path)
 
         if not checkpoint_path.exists():
-            msg = f"Checkpoint file not found: {path}"
-            raise FileNotFoundError(msg)
+            raise CheckpointNotFoundError()
 
         try:
             logger.info("Loading model checkpoint from %s", path)
@@ -208,11 +284,12 @@ class VisionAdapter:
                 self.device,
             )
 
-        except (FileNotFoundError, RuntimeError, KeyError, ValueError) as e:
+        except (FileNotFoundError, RuntimeError, KeyError, ValueError) as error:
             logger.exception("Failed to load checkpoint")
             self.is_loaded = False
-            msg = f"Failed to load checkpoint: {e}"
-            raise RuntimeError(msg) from e
+            self.model = None
+            self.class_names = []
+            raise LoadCheckpointError() from error
 
     def preprocess_image(self, image: Image.Image) -> torch.Tensor:
         """Apply preprocessing transformations to image.
@@ -229,11 +306,10 @@ class VisionAdapter:
                 image = image.convert("RGB")
 
             # Apply transforms
-            tensor: torch.Tensor = self.transform(image)
-        except (ValueError, RuntimeError, TypeError) as e:
+            tensor = self.transform(image)
+        except (ValueError, RuntimeError, TypeError) as error:
             logger.exception("Image preprocessing failed")
-            msg = f"Image preprocessing failed: {e}"
-            raise RuntimeError(msg) from e
+            raise ImagePreprocessError() from error
         else:
             return tensor
 
@@ -252,19 +328,27 @@ class VisionAdapter:
             mapping_path: Path to class mapping JSON file
         """
         try:
-            with Path(mapping_path).open() as f:
+            with Path(mapping_path).open(encoding="utf-8") as f:
                 mapping_data = json.load(f)
 
-            self.class_names = mapping_data["classes"]
-            self.class_to_readable = mapping_data.get("class_to_readable", {})
-            self.plant_types = mapping_data.get("plant_types", {})
+            classes = mapping_data.get("classes")
+            if not isinstance(classes, list) or not all(isinstance(c, str) for c in classes):
+                self._raise_invalid_classes()
+            self.class_names = classes
+            ctr = mapping_data.get("class_to_readable", {})
+            if not isinstance(ctr, dict):
+                ctr = {}
+            ptr = mapping_data.get("plant_types", {})
+            if not isinstance(ptr, dict):
+                ptr = {}
+            self.class_to_readable = ctr
+            self.plant_types = ptr
 
             logger.info("Class mapping loaded: %d classes", len(self.class_names))
 
-        except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+        except (FileNotFoundError, json.JSONDecodeError, KeyError) as error:
             logger.exception("Failed to load class mapping")
-            msg = f"Failed to load class mapping: {e}"
-            raise RuntimeError(msg) from e
+            raise ClassMappingLoadError() from error
 
     def get_readable_name(self, class_name: str) -> str:
         """Convert class name to human-readable format.
@@ -319,7 +403,7 @@ class VisionAdapter:
 
         return raw_class, readable_name, confidence, plant_type
 
-    def get_model_info(self) -> dict:
+    def get_model_info(self) -> dict[str, Any]:
         """Get information about the loaded model.
 
         Returns:

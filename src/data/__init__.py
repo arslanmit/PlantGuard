@@ -3,14 +3,10 @@
 This module contains data loading, preprocessing, and validation utilities.
 """
 
-# Import existing modules (if they exist)
-try:
-    from .preprocessing import AudioPreprocessor, ImagePreprocessor
-except ImportError:
-    AudioPreprocessor = None
-    ImagePreprocessor = None
+import importlib
+from typing import Any
 
-# Import new dataset utilities
+# Import new dataset and validation utilities at module import time
 from .dataset import (
     DataTransforms,
     PlantVillageDataset,
@@ -18,15 +14,24 @@ from .dataset import (
     create_stratified_split,
     get_dataset_statistics,
 )
-
-# Import new validation utilities
 from .validation import DataIntegrityChecker, DatasetAnalyzer, ImageValidator, generate_data_report
+
+# Import existing modules (if they exist) dynamically
+AudioPreprocessor: Any | None
+ImagePreprocessor: Any | None
+try:
+    preprocessing = importlib.import_module(f"{__package__}.preprocessing")
+    AudioPreprocessor = getattr(preprocessing, "AudioPreprocessor", None)
+    ImagePreprocessor = getattr(preprocessing, "ImagePreprocessor", None)
+except (ImportError, AttributeError):
+    AudioPreprocessor = None
+    ImagePreprocessor = None
 
 # Legacy compatibility
 get_dataloaders = create_data_loaders
 DataValidator = ImageValidator
 
-__all__ = [
+__all__: list[str] = [
     # Legacy exports (if available)
     "AudioPreprocessor",
     "DataIntegrityChecker",

@@ -3,6 +3,7 @@
 
 import json
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import torch
@@ -10,7 +11,7 @@ from PIL import Image
 from transformers import AutoImageProcessor, AutoModelForImageClassification
 
 
-def test_model(model_name: str, test_images_dir: str, metadata_path: str) -> dict:
+def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) -> dict[str, Any]:
     """Test a Hugging Face model on test images."""
     print(f"🔄 Loading model: {model_name}")
 
@@ -18,6 +19,7 @@ def test_model(model_name: str, test_images_dir: str, metadata_path: str) -> dic
         # Load model and processor
         processor = AutoImageProcessor.from_pretrained(model_name)
         model = AutoModelForImageClassification.from_pretrained(model_name)
+        model.eval()
 
         print("✅ Model loaded successfully")
         print(f"📊 Model has {model.config.num_labels} classes")
@@ -43,33 +45,49 @@ def test_model(model_name: str, test_images_dir: str, metadata_path: str) -> dic
     plant_correct = 0
     status_correct = 0
 
-    print(f"\n🧪 Testing on {len(metadata['sample_images'])} images:")
+    samples = metadata.get("sample_images", [])
+    print(f"\n🧪 Testing on {len(samples)} images:")
     print("-" * 80)
 
-    for sample in metadata["sample_images"]:
-        image_path = Path(test_images_dir) / sample["filename"]
+    for sample in samples:
+        filename = sample.get("filename")
+        if not filename:
+            print("⚠️  Skipping sample with missing filename")
+            continue
+
+        base = Path(test_images_dir).resolve()
+        image_path = (base / filename).resolve()
+        if base != image_path and base not in image_path.parents:
+            print(f"⚠️  Skipping unsafe path: {filename}")
+            continue
 
         if not image_path.exists():
             continue
 
         try:
             # Load and preprocess image
-            image = Image.open(image_path).convert("RGB")
+            with Image.open(image_path) as im:
+                image = im.convert("RGB")
             inputs = processor(image, return_tensors="pt")
+            device = model.device
+            inputs = {k: v.to(device) for k, v in inputs.items()}
 
             # Get prediction
             with torch.no_grad():
                 outputs = model(**inputs)
                 predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
-                predicted_class_id = predictions.argmax().item()
-                confidence = predictions.max().item()
+                predicted_class_id: int = int(predictions.argmax().item())
+                confidence: float = float(predictions.max().item())
 
             predicted_label = class_labels[predicted_class_id]
 
             # Ground truth
-            gt_plant = sample["plant"]
-            gt_disease = sample["disease"]
-            gt_status = sample["status"]
+            gt_plant = sample.get("plant")
+            gt_disease = sample.get("disease")
+            gt_status = sample.get("status")
+            if gt_plant is None or gt_disease is None or gt_status is None:
+                print(f"⚠️  Skipping sample with missing fields: {sample}")
+                continue
 
             # Analyze prediction
             pred_lower = predicted_label.lower()
@@ -80,7 +98,7 @@ def test_model(model_name: str, test_images_dir: str, metadata_path: str) -> dic
             plant_match = any(plant_word in pred_lower for plant_word in gt_plant_lower.split())
 
             # Check disease match
-            if gt_disease.lower() == "healthy":
+            if gt_disease_lower == "healthy":
                 disease_match = "healthy" in pred_lower
             else:
                 disease_words = gt_disease_lower.replace(" ", "_").split("_")
@@ -150,7 +168,7 @@ def test_model(model_name: str, test_images_dir: str, metadata_path: str) -> dic
         return {"error": "No valid predictions made"}
 
 
-def print_results(results: dict) -> None:
+def print_results(results: dict[str, Any]) -> None:
     """Print test results in a readable format."""
     if "error" in results:
         print(f"❌ Error: {results['error']}")
@@ -194,13 +212,13 @@ def main():
         print(f"❌ Test images directory not found: {test_images_dir}")
         return
 
-    all_results = []
+    all_results: list[dict[str, Any]] = []
 
     for model_name in models_to_test:
         print(f"\n{'=' * 20} TESTING {model_name} {'=' * 20}")
 
         try:
-            results = test_model(model_name, test_images_dir, metadata_path)
+            results = evaluate_model(model_name, test_images_dir, metadata_path)
             all_results.append(results)
             print_results(results)
 
@@ -218,9 +236,9 @@ def main():
         valid_results = [r for r in all_results if "error" not in r]
         if valid_results:
             for result in valid_results:
-                model_name = result["model_name"].split("/")[-1]  # Short name
+                short_model_name = result["model_name"].split("/")[-1]  # Short name
                 print(
-                    f"{model_name:30} | Overall: {result['overall_accuracy']:.1%} | Plant: {result['plant_accuracy']:.1%} | Status: {result['status_accuracy']:.1%}"
+                    f"{short_model_name:30} | Overall: {result['overall_accuracy']:.1%} | Plant: {result['plant_accuracy']:.1%} | Status: {result['status_accuracy']:.1%}"
                 )
 
             # Find best model

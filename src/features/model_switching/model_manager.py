@@ -7,12 +7,25 @@ detection models easily through configuration.
 import json
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol, runtime_checkable
 
 import torch
 from PIL import Image
 
 logger = logging.getLogger(__name__)
+
+
+@runtime_checkable
+class VisionAdapterProtocol(Protocol):
+    """Protocol for vision adapters compatible with the model manager."""
+
+    def predict(self, image: Image.Image) -> tuple[str, float]:
+        """Return (predicted_class, confidence) for the given image."""
+        ...
+
+    def get_class_names(self) -> list[str]:
+        """Return a copy of the class names supported by the model."""
+        ...
 
 
 class ModelConfig:
@@ -42,8 +55,8 @@ class PlantGuardModelManager:
         """
         self.config_path = Path(config_path)
         self.models_config: dict[str, ModelConfig] = {}
-        self.current_model = None
-        self.current_adapter = None
+        self.current_model: ModelConfig | None = None
+        self.current_adapter: VisionAdapterProtocol | None = None
         self.device = self._get_device()
         self.autoload_default = autoload_default
 
@@ -68,7 +81,7 @@ class PlantGuardModelManager:
             self.create_default_config()
 
         try:
-            with open(self.config_path) as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 config_data = json.load(f)
 
             self.models_config = {}
@@ -128,7 +141,7 @@ class PlantGuardModelManager:
         self.config_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Save default config
-        with open(self.config_path, "w") as f:
+        with open(self.config_path, "w", encoding="utf-8") as f:
             json.dump(default_config, f, indent=2)
 
         logger.info("Created default model config: %s", self.config_path)
@@ -224,8 +237,8 @@ class PlantGuardModelManager:
                 with torch.no_grad():
                     outputs = self.model(**inputs)
                     predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
-                    predicted_class_id = predictions.argmax().item()
-                    confidence = predictions.max().item()
+                    predicted_class_id: int = int(predictions.argmax().item())
+                    confidence: float = float(predictions.max().item())
 
                 return self.class_names[predicted_class_id], confidence
 
@@ -245,7 +258,8 @@ class PlantGuardModelManager:
         import sys
         from pathlib import Path
 
-        sys.path.insert(0, str(Path(__file__).parent.parent))
+        # Ensure project root is on sys.path to import the src package
+        sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
         from src.core.vision import VisionAdapter
 
         device_str = (
@@ -375,7 +389,7 @@ class PlantGuardModelManager:
 
         try:
             # Load current config
-            with open(self.config_path) as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 config_data = json.load(f)
 
             # Apply updates
@@ -384,7 +398,7 @@ class PlantGuardModelManager:
                     config_data["models"][model_id][key] = value
 
             # Save updated config
-            with open(self.config_path, "w") as f:
+            with open(self.config_path, "w", encoding="utf-8") as f:
                 json.dump(config_data, f, indent=2)
 
             # Reload configs

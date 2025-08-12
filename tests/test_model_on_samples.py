@@ -15,7 +15,7 @@ import torch
 from PIL import Image
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.core.vision import VisionAdapter
 from src.utils.logging import setup_logger
@@ -27,7 +27,7 @@ logger = setup_logger("test_model", log_file="logs/test_model.log")
 def load_test_metadata(metadata_path: str) -> dict[str, Any]:
     """Load test image metadata."""
     metadata_file = Path(metadata_path)
-    with metadata_file.open() as f:
+    with metadata_file.open(encoding="utf-8") as f:
         data: dict[str, Any] = json.load(f)
         return data
 
@@ -194,8 +194,9 @@ def _calculate_metrics(
 
     # Detailed classification report
     try:
+        # Use string literal to satisfy some type stubs that expect str for zero_division
         class_report = classification_report(
-            ground_truths, predictions, output_dict=True, zero_division=0
+            ground_truths, predictions, output_dict=True, zero_division="warn"
         )
     except ValueError as e:
         logger.warning("Could not generate classification report: %s", e)
@@ -371,7 +372,7 @@ def main() -> None:
     # Save results to file
     output_file = "test_results.json"
     output_path = Path(output_file)
-    with output_path.open("w") as f:
+    with output_path.open("w", encoding="utf-8") as f:
         json.dump(results, f, indent=2, default=str)
 
 

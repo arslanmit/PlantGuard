@@ -2,14 +2,16 @@
 """Test different preprocessing approaches on a sample image."""
 
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 import torch
+import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.core.vision import VisionAdapter
 
@@ -30,7 +32,7 @@ def test_different_preprocessing():
     print()
 
     # Different preprocessing approaches
-    preprocessing_methods = {
+    preprocessing_methods: dict[str, Callable[[Image.Image], torch.Tensor]] = {
         "Current (224x224)": transforms.Compose(
             [
                 transforms.Resize((224, 224)),
@@ -70,10 +72,12 @@ def test_different_preprocessing():
             input_batch = tensor.unsqueeze(0)
 
             # Get prediction
-            vision_adapter.model.eval()
+            model = vision_adapter.model
+            assert model is not None, "Model is not loaded"
+            model.eval()
             with torch.no_grad():
-                outputs = vision_adapter.model(input_batch)
-                probabilities = torch.nn.functional.softmax(outputs, dim=1)
+                outputs = model(input_batch)
+                probabilities = F.softmax(outputs, dim=1)
                 confidence, predicted_idx = torch.max(probabilities, 1)
 
                 predicted_class = vision_adapter.class_names[int(predicted_idx.item())]
@@ -102,10 +106,12 @@ def show_top_predictions():
     input_batch = tensor.unsqueeze(0)
 
     # Get all predictions
-    vision_adapter.model.eval()
+    model = vision_adapter.model
+    assert model is not None, "Model is not loaded"
+    model.eval()
     with torch.no_grad():
-        outputs = vision_adapter.model(input_batch)
-        probabilities = torch.nn.functional.softmax(outputs, dim=1)
+        outputs = model(input_batch)
+        probabilities = F.softmax(outputs, dim=1)
 
         # Get top 5
         top5_prob, top5_idx = torch.topk(probabilities, 5, dim=1)

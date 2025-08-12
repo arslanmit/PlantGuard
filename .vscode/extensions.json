@@ -1,6 +1,5 @@
 {
     "recommendations": [
-        "ms-python.python",
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
         "ms-python.mypy-type-checker",
@@ -19,7 +18,8 @@
         "ms-vscode.vscode-json",
         "tamasfe.even-better-toml",
         "ms-python.flake8",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "anysphere.cursorpyright"
     ],
     "unwantedRecommendations": [
         "dart-code.dart-code",

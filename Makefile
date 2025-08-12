@@ -51,6 +51,7 @@ endif
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
 .PHONY: reset fresh restart debug profile
+.PHONY: qa
 
 help:
 	@echo "$(CYAN)🌿 PlantGuard - AI Plant Disease Detection$(NC)"
@@ -63,6 +64,7 @@ help:
 	@echo "  $(BLUE)notebook$(NC)       - Open Jupyter for development"
 	@echo ""
 	@echo "$(GREEN)💻 Development$(NC)"
+	@echo "  $(BLUE)qa$(NC)             - Run dev, format, lint, check, fix, test"
 	@echo "  $(BLUE)dev$(NC)            - Quick development workflow (format + check)"
 	@echo "  $(BLUE)format$(NC)         - Auto-format code"
 	@echo "  $(BLUE)lint$(NC)           - Check code quality"
@@ -218,6 +220,16 @@ fix:
 	@# Fix end-of-file issues
 	@find $(SRC_DIR) -name "*.py" -exec sh -c 'if [ -s "{}" ] && [ "$$(tail -c1 "{}" | wc -l)" -eq 0 ]; then echo >> "{}"; fi' \; 2>/dev/null || true
 	@echo "$(GREEN)✅ Common issues fixed$(NC)"
+
+# QA workflow: run all development steps sequentially
+qa:
+	@$(MAKE) dev
+	@$(MAKE) format
+	@$(MAKE) lint
+	@$(MAKE) check
+	@$(MAKE) fix
+	@$(MAKE) test
+	@echo "$(GREEN)✅ QA workflow complete$(NC)"
 
 # Security scan
 security:

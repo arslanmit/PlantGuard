@@ -5,6 +5,7 @@ with support for stratified train/validation splits and data augmentation.
 """
 
 import logging
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, cast
 
@@ -32,8 +33,8 @@ class PlantVillageDataset(Dataset):
     def __init__(
         self,
         root_dir: str | Path,
-        transform: transforms.Compose | None = None,
-        target_transform: transforms.Compose | None = None,
+        transform: Callable[[Image.Image], torch.Tensor] | None = None,
+        target_transform: Callable[[int], int] | None = None,
     ) -> None:
         """Initialize PlantVillage dataset.
 
@@ -86,7 +87,7 @@ class PlantVillageDataset(Dataset):
 
                 # Apply transforms
                 if self.transform:
-                    image_tensor = cast(torch.Tensor, self.transform(rgb_image))
+                    image_tensor = self.transform(rgb_image)
                 else:
                     image_tensor = transforms.ToTensor()(rgb_image)
             except (OSError, ValueError, RuntimeError):
@@ -121,7 +122,7 @@ class DataTransforms:
         image_size: int = 224,
         mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
         std: tuple[float, float, float] = (0.229, 0.224, 0.225),
-    ) -> transforms.Compose:
+    ) -> Callable[[Image.Image], torch.Tensor]:
         """Get training transformations with data augmentation.
 
         Args:
@@ -132,7 +133,7 @@ class DataTransforms:
         Returns:
             Composed transforms for training
         """
-        return transforms.Compose(
+        composed = transforms.Compose(
             [
                 # Slightly larger for random crop
                 transforms.Resize((image_size + 32, image_size + 32)),
@@ -144,13 +145,14 @@ class DataTransforms:
                 transforms.Normalize(mean=mean, std=std),
             ]
         )
+        return cast(Callable[[Image.Image], torch.Tensor], composed)
 
     @staticmethod
     def get_val_transforms(
         image_size: int = 224,
         mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
         std: tuple[float, float, float] = (0.229, 0.224, 0.225),
-    ) -> transforms.Compose:
+    ) -> Callable[[Image.Image], torch.Tensor]:
         """Get validation transformations without augmentation.
 
         Args:
@@ -161,20 +163,21 @@ class DataTransforms:
         Returns:
             Composed transforms for validation
         """
-        return transforms.Compose(
+        composed = transforms.Compose(
             [
                 transforms.Resize((image_size, image_size)),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=mean, std=std),
             ]
         )
+        return cast(Callable[[Image.Image], torch.Tensor], composed)
 
     @staticmethod
     def get_inference_transforms(
         image_size: int = 224,
         mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
         std: tuple[float, float, float] = (0.229, 0.224, 0.225),
-    ) -> transforms.Compose:
+    ) -> Callable[[Image.Image], torch.Tensor]:
         """Get inference transformations for single image prediction.
 
         Args:
@@ -185,13 +188,14 @@ class DataTransforms:
         Returns:
             Composed transforms for inference
         """
-        return transforms.Compose(
+        composed = transforms.Compose(
             [
                 transforms.Resize((image_size, image_size)),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=mean, std=std),
             ]
         )
+        return cast(Callable[[Image.Image], torch.Tensor], composed)
 
 
 def create_stratified_split(

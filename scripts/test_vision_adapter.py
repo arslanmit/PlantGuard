@@ -11,11 +11,11 @@ from pathlib import Path
 import torch
 from PIL import Image
 
-# Add src to path
-sys.path.append(str(Path(__file__).parent.parent / "src"))
+# Add project root to path then import from src package
+sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from core.models import PlantDiseaseResNet50
-from core.vision import VisionAdapter
+from src.core.models import PlantDiseaseResNet50
+from src.core.vision import VisionAdapter
 
 logger = logging.getLogger(__name__)
 

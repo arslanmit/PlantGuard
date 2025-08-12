@@ -80,12 +80,6 @@
     "markdown.validate.enabled": false,
     "markdownlint.run": "onSave",
     "python.analysis.diagnosticMode": "workspace",
-    "python.analysis.diagnosticSeverityOverrides": {
-        "reportMissingImports": "error",
-        "reportMissingTypeStubs": "warning",
-        "reportUnusedImport": "information",
-        "reportUnusedVariable": "information"
-    },
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": false,
     "python.linting.mypyEnabled": false,
@@ -127,13 +121,5 @@
         "*",
         "find *"
     ],
-    "cursorpyright.analysis.autoImportCompletions": true,
-    "cursorpyright.analysis.diagnosticMode": "workspace",
-    "cursorpyright.analysis.diagnosticSeverityOverrides": {
-        "reportMissingImports": "error",
-        "reportMissingTypeStubs": "warning",
-        "reportUnusedImport": "information",
-        "reportUnusedVariable": "information"
-    },
-    "cursorpyright.analysis.typeCheckingMode": "basic"
+    "codium.codeCompletion.enable": false
 }
