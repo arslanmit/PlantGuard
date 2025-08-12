@@ -1,8 +1,8 @@
-"""
-Test script for VisionAdapter implementation.
+"""Test script for VisionAdapter implementation.
 
 This script tests the VisionAdapter functionality without requiring a trained model.
 """
+# ruff: noqa: S101, PLR2004
 
 import logging
 import sys

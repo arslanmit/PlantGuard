@@ -186,15 +186,10 @@ marimo/_lsp/
 __marimo__/
 *.DS_Store*
 # PlantGuard specific
-data/models/
 data/PlantVillage/
 data/temp/
 logs/
 runs/
-*.pt
-*.pth
-*.ckpt
-*.h5
 *.pkl
 *.joblib
 *.wav
@@ -203,6 +198,19 @@ runs/
 *.onnx
 *.csv
 .qodo/
+
+# Ignore training checkpoints but keep final models
+data/models/best_model.pt
+data/models/latest_model.pt
+data/models/checkpoint_*.pt
+data/models/epoch_*.pt
+
+# Keep essential model files
+!data/models/vision_resnet50.pt
+!data/models/class_names.json
+!data/models/speech_cnn_lstm.pt
+!data/models/fusion_mlp.pt
+!data/models/*.json
 
 # TensorBoard logs
 events.out.tfevents.*

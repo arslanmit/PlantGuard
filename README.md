@@ -174,7 +174,7 @@ Run quality checks manually or via CI:
 
 ```bash
 make fmt        # Format code with ruff
-make lint       # Lint code with ruff  
+make lint       # Lint code with ruff
 make type       # Type check with mypy
 make security   # Security scan with bandit
 make qa         # Run all quality checks

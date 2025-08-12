@@ -25,10 +25,18 @@ st.caption("Image + Voice + Text | Early leaf disease detection (PoC)")
 
 
 # Initialize adapters (cached for performance)
-@st.cache_resource
+@st.cache_resource  # type: ignore[misc]
 def load_adapters() -> tuple[VisionAdapter, AudioAdapter, TextAdapter]:
     """Load and cache the ML adapters."""
-    vision = VisionAdapter()
+    # Load vision model with checkpoint
+    vision_model_path = "data/models/vision_resnet50.pt"
+    vision = VisionAdapter(model_path=vision_model_path)
+
+    # Load class mapping
+    classes_path = "data/knowledge_base/plantvillage_classes.json"
+    if Path(classes_path).exists():
+        vision.load_class_mapping(classes_path)
+
     audio = AudioAdapter()
     text = TextAdapter()
     return vision, audio, text
@@ -45,10 +53,19 @@ with tab1:
         img = Image.open(img_file).convert("RGB")
         st.image(img, use_container_width=True, caption="Uploaded image")
         if st.button("Analyze", key="img"):
-            disease_class, confidence = vision_adapter.predict(img)
+            raw_class, readable_name, confidence, plant_type = (
+                vision_adapter.predict_with_readable_name(img)
+            )
             st.subheader("Analysis Results")
-            st.success(f"Predicted Disease: {disease_class}")
+            st.success(f"Plant Type: {plant_type}")
+            st.success(f"Condition: {readable_name}")
             st.info(f"Confidence: {confidence:.2%}")
+
+            # Show health status
+            if vision_adapter.is_healthy(raw_class):
+                st.success("✅ Plant appears healthy!")
+            else:
+                st.warning("⚠️ Disease detected - consider treatment")
 
 # Voice (Mic + Upload)
 with tab2:

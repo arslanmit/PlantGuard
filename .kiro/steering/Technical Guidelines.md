@@ -52,7 +52,7 @@ class VisionAdapter:
     def predict(self, image: PIL.Image) -> Union[Tensor, Tuple[str, float]]
     def load_checkpoint(self, path: str) -> None
 
-# src/core/audio.py  
+# src/core/audio.py
 class AudioAdapter:
     def transcribe(self, audio_file) -> str  # MUST be offline (Whisper-tiny)
     def predict_disease(self, audio_features) -> Tuple[str, float]
@@ -78,7 +78,7 @@ def load_models():
 
 **Input Validation Rules**:
 - Images: Max 200MB, formats `["jpg","jpeg","png"]`
-- Audio: 1-60 seconds, formats `["wav","mp3"]` 
+- Audio: 1-60 seconds, formats `["wav","mp3"]`
 - Text: Max 1000 characters for chat input
 - Always use `st.session_state` for conversation history
 
@@ -95,7 +95,7 @@ except Exception as e:
 
 **Code Requirements**:
 - Type hints for all public methods
-- Docstrings with input/output specifications  
+- Docstrings with input/output specifications
 - Use `@lru_cache` or module-level singletons for heavy models
 - Always clean up temporary files (especially audio)
 
@@ -112,7 +112,7 @@ except Exception as e:
 from torch.utils.tensorboard import SummaryWriter
 writer = SummaryWriter(f'./runs/experiment_{timestamp}')
 writer.add_scalar("Loss/train", loss, step)
-writer.add_scalar("Loss/val", val_loss, epoch)  
+writer.add_scalar("Loss/val", val_loss, epoch)
 writer.add_scalar("Accuracy/val", val_acc, epoch)
 ```
 
@@ -127,14 +127,14 @@ writer.add_scalar("Accuracy/val", val_acc, epoch)
 **Core Implementation Files**:
 ```
 src/core/vision.py      # VisionAdapter - ResNet50 plant disease detection
-src/core/audio.py       # AudioAdapter - Whisper + CNN-LSTM disease classification  
+src/core/audio.py       # AudioAdapter - Whisper + CNN-LSTM disease classification
 src/core/nlp.py         # TextAdapter + ChatModel - DistilBERT + fusion layer
 src/ui/app_streamlit.py # Main Streamlit UI with multimodal inputs
 ```
 
 **Model Checkpoint Locations**:
 - Vision: `data/vision_resnet50.pt` + `data/classes.json`
-- Speech: `data/speech_cnn_lstm.pt` 
+- Speech: `data/speech_cnn_lstm.pt`
 - Text QA: `data/text_qa_model/` (DistilBERT checkpoint)
 - Fusion: `data/fusion_mlp.pt`
 

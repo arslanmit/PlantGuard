@@ -1,6 +1,4 @@
-"""
-Error handling utilities for PlantGuard.
-"""
+"""Error handling utilities for PlantGuard."""
 
 import logging
 from typing import Any
@@ -14,8 +12,7 @@ class ErrorHandler:
     """Centralized error handling for PlantGuard system."""
 
     def handle_vision_error(self, error: Exception, image: Image.Image | None = None) -> str:
-        """
-        Handle vision processing errors.
+        """Handle vision processing errors.
 
         Args:
             error: The exception that occurred
@@ -43,8 +40,7 @@ class ErrorHandler:
         )
 
     def handle_audio_error(self, error: Exception, audio_data: bytes | None = None) -> str:
-        """
-        Handle audio processing errors.
+        """Handle audio processing errors.
 
         Args:
             error: The exception that occurred
@@ -67,8 +63,7 @@ class ErrorHandler:
         return "Unable to process audio recording. Please try recording again with clear speech."
 
     def handle_system_error(self, error: Exception) -> dict[str, str | bool]:
-        """
-        Handle system-wide errors.
+        """Handle system-wide errors.
 
         Args:
             error: The exception that occurred
@@ -89,8 +84,7 @@ class ErrorHandler:
     def handle_analysis_error(
         self, error: Exception, image: Image.Image | None = None
     ) -> dict[str, Any]:
-        """
-        Handle errors during plant analysis.
+        """Handle errors during plant analysis.
 
         Args:
             error: The exception that occurred

@@ -1,5 +1,4 @@
-"""
-PlantGuard Data Module
+"""PlantGuard Data Module.
 
 This module contains data loading, preprocessing, and validation utilities.
 """

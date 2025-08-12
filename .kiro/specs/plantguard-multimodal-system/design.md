@@ -18,40 +18,40 @@ graph TB
         AUD[Audio Recording]
         TXT[Text Input]
     end
-    
+
     subgraph "Processing Layer"
         VA[Vision Adapter]
         AA[Audio Adapter]
         TA[Text Adapter]
     end
-    
+
     subgraph "Model Layer"
         RN[ResNet50]
         WH[Whisper-tiny]
         KB[Knowledge Base]
     end
-    
+
     subgraph "Integration Layer"
         PG[PlantGuard Bot]
         RG[Response Generator]
     end
-    
+
     UI --> IMG
     UI --> AUD
     UI --> TXT
-    
+
     IMG --> VA
     AUD --> AA
     TXT --> TA
-    
+
     VA --> RN
     AA --> WH
     TA --> KB
-    
+
     RN --> PG
     WH --> PG
     KB --> PG
-    
+
     PG --> RG
     RG --> UI
 ```
@@ -83,7 +83,7 @@ graph TB
 class VisionAdapter:
     def __init__(self, model_path: str, device: str = "cpu"):
         """Initialize with trained model weights"""
-        
+
     def predict(self, image: PIL.Image.Image) -> Tuple[str, float]:
         """
         Args:
@@ -91,10 +91,10 @@ class VisionAdapter:
         Returns:
             Tuple of (disease_class_name, confidence_score)
         """
-        
+
     def load_checkpoint(self, path: str) -> None:
         """Load trained model weights"""
-        
+
     def preprocess_image(self, image: PIL.Image.Image) -> torch.Tensor:
         """Apply standard preprocessing transformations"""
 ```
@@ -123,7 +123,7 @@ class VisionAdapter:
 class AudioAdapter:
     def __init__(self, model_name: str = "openai/whisper-tiny"):
         """Initialize ASR pipeline"""
-        
+
     def transcribe(self, audio_file: Union[str, bytes]) -> str:
         """
         Args:
@@ -131,10 +131,10 @@ class AudioAdapter:
         Returns:
             Transcribed text string
         """
-        
+
     def process_audio_bytes(self, audio_bytes: bytes) -> str:
         """Handle in-memory audio data from Streamlit"""
-        
+
     def cleanup_temp_files(self) -> None:
         """Remove temporary audio files"""
 ```
@@ -163,7 +163,7 @@ class AudioAdapter:
 class TextAdapter:
     def __init__(self, knowledge_base_path: str = "data/disease_info.json"):
         """Load disease knowledge base"""
-        
+
     def get_disease_info(self, disease_class: str) -> Dict[str, str]:
         """
         Args:
@@ -171,7 +171,7 @@ class TextAdapter:
         Returns:
             Dictionary with disease info (name, description, treatment)
         """
-        
+
     def generate_response(self, disease_class: str, user_query: str = "") -> str:
         """
         Args:
@@ -180,7 +180,7 @@ class TextAdapter:
         Returns:
             Formatted response with diagnosis and advice
         """
-        
+
     def analyze_query_intent(self, query: str) -> List[str]:
         """Extract intent keywords from user query"""
 ```
@@ -209,23 +209,23 @@ class TextAdapter:
 class PlantGuardBot:
     def __init__(self, model_path: str, device: str = "cpu"):
         """Initialize all adapters and models"""
-        
-    def analyze_plant(self, 
+
+    def analyze_plant(self,
                      image: PIL.Image.Image,
                      audio_path: Optional[str] = None,
                      text_query: str = "") -> Dict[str, Any]:
         """
         Main analysis method combining all modalities
-        
+
         Args:
             image: Plant leaf image (required)
             audio_path: Optional path to audio file
             text_query: Optional text question
-            
+
         Returns:
             Dictionary with diagnosis, confidence, response, metadata
         """
-        
+
     def get_health_status(self) -> Dict[str, str]:
         """Return system health and model status"""
 ```
@@ -334,10 +334,10 @@ class ModelConfig:
 class ErrorHandler:
     def handle_vision_error(self, error: Exception, image: PIL.Image) -> str:
         """Provide fallback response for vision processing errors"""
-        
+
     def handle_audio_error(self, error: Exception, audio_data: bytes) -> str:
         """Handle audio processing failures gracefully"""
-        
+
     def handle_system_error(self, error: Exception) -> Dict[str, str]:
         """System-wide error handling with user-friendly messages"""
 ```

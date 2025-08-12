@@ -242,7 +242,7 @@ dataset = PlantVillageDataset("data/PlantVillage", transform=custom_transforms)
 This implementation satisfies the following requirements from the PlantGuard specification:
 
 - **Requirement 1.2**: Image preprocessing pipeline with resize, normalization, and augmentation
-- **Requirement 1.1**: Image format validation and corruption detection  
+- **Requirement 1.1**: Image format validation and corruption detection
 - **Requirement 1.5**: Data integrity checks for training pipeline
 - **Requirement 8.2**: Train/validation split functionality with stratified sampling
 

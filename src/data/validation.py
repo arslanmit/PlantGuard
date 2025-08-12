@@ -1,5 +1,4 @@
-"""
-Data validation and quality checks for PlantGuard dataset.
+"""Data validation and quality checks for PlantGuard dataset.
 
 This module provides utilities for validating image formats, detecting corruption,
 analyzing dataset statistics, and ensuring data integrity for the training pipeline.
@@ -25,9 +24,7 @@ VALIDATION_RATE_THRESHOLD = 0.95
 
 
 class ImageValidator:
-    """
-    Validator for image files with format checking and corruption detection.
-    """
+    """Validator for image files with format checking and corruption detection."""
 
     SUPPORTED_FORMATS: ClassVar[set[str]] = {".jpg", ".jpeg", ".png", ".bmp", ".tiff", ".tif"}
     MIN_IMAGE_SIZE = (32, 32)  # Minimum width, height
@@ -35,8 +32,7 @@ class ImageValidator:
     MAX_FILE_SIZE_MB = 200  # Maximum file size in MB
 
     def __init__(self, strict_mode: bool = False) -> None:
-        """
-        Initialize image validator.
+        """Initialize image validator.
 
         Args:
             strict_mode: If True, raise exceptions on validation failures
@@ -124,8 +120,7 @@ class ImageValidator:
         return True
 
     def validate_image_file(self, image_path: str | Path) -> dict[str, Any]:
-        """
-        Validate a single image file for format, corruption, and size constraints.
+        """Validate a single image file for format, corruption, and size constraints.
 
         Args:
             image_path: Path to the image file
@@ -215,8 +210,7 @@ class ImageValidator:
         return result
 
     def validate_dataset_directory(self, data_dir: str | Path) -> dict[str, Any]:
-        """
-        Validate all images in a dataset directory structure.
+        """Validate all images in a dataset directory structure.
 
         Args:
             data_dir: Root directory containing class subdirectories
@@ -281,16 +275,13 @@ class ImageValidator:
 
 
 class DatasetAnalyzer:
-    """
-    Analyzer for dataset statistics and class distribution analysis.
-    """
+    """Analyzer for dataset statistics and class distribution analysis."""
 
     def __init__(self) -> None:
         """Initialize dataset analyzer."""
 
     def analyze_class_distribution(self, data_dir: str | Path) -> dict[str, Any]:
-        """
-        Analyze class distribution in the dataset directory.
+        """Analyze class distribution in the dataset directory.
 
         Args:
             data_dir: Root directory containing class subdirectories
@@ -383,8 +374,7 @@ class DatasetAnalyzer:
     def analyze_image_properties(
         self, data_dir: str | Path, sample_size: int | None = 1000
     ) -> dict[str, Any]:
-        """
-        Analyze image properties like dimensions, file sizes, and color distributions.
+        """Analyze image properties like dimensions, file sizes, and color distributions.
 
         Args:
             data_dir: Root directory containing images
@@ -488,16 +478,13 @@ class DatasetAnalyzer:
 
 
 class DataIntegrityChecker:
-    """
-    Checker for data integrity issues in the training pipeline.
-    """
+    """Checker for data integrity issues in the training pipeline."""
 
     def __init__(self) -> None:
         """Initialize data integrity checker."""
 
     def check_directory_structure(self, data_dir: str | Path) -> dict[str, Any]:
-        """
-        Check if dataset directory follows expected structure.
+        """Check if dataset directory follows expected structure.
 
         Args:
             data_dir: Root directory to check
@@ -553,8 +540,7 @@ class DataIntegrityChecker:
     def check_class_consistency(
         self, data_dir: str | Path, min_samples_per_class: int = 10
     ) -> dict[str, Any]:
-        """
-        Check consistency of classes and minimum sample requirements.
+        """Check consistency of classes and minimum sample requirements.
 
         Args:
             data_dir: Root directory containing class subdirectories
@@ -609,8 +595,7 @@ class DataIntegrityChecker:
     def run_full_integrity_check(
         self, data_dir: str | Path, min_samples_per_class: int = 10
     ) -> dict[str, Any]:
-        """
-        Run comprehensive data integrity check.
+        """Run comprehensive data integrity check.
 
         Args:
             data_dir: Root directory to check
@@ -670,8 +655,7 @@ class DataIntegrityChecker:
 def generate_data_report(
     data_dir: str | Path, output_path: str | Path | None = None
 ) -> dict[str, Any]:
-    """
-    Generate comprehensive data quality report.
+    """Generate comprehensive data quality report.
 
     Args:
         data_dir: Root directory containing dataset

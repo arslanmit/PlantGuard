@@ -1,5 +1,4 @@
-"""
-PlantGuard User Interface Module
+"""PlantGuard User Interface Module.
 
 This module contains the Streamlit-based user interface components.
 """

@@ -1,0 +1,75 @@
+# Pre-commit configuration for PlantGuard
+# See https://pre-commit.com for more information
+repos:
+  # Ruff - Modern Python linter and formatter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.8
+    hooks:
+      - id: ruff
+        name: ruff (linter)
+        args: [--fix]
+        types_or: [python, pyi, jupyter]
+      - id: ruff-format
+        name: ruff (formatter)
+        types_or: [python, pyi, jupyter]
+
+  # MyPy - Static type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+    hooks:
+      - id: mypy
+        name: mypy (type checker)
+        additional_dependencies: [types-requests, types-PyYAML]
+        args: [--config-file=pyproject.toml]
+        exclude: ^(tests/|notebooks/)
+
+  # Built-in pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: trim trailing whitespace
+      - id: end-of-file-fixer
+        name: fix end of files
+      - id: check-yaml
+        name: check yaml
+      - id: check-toml
+        name: check toml
+      - id: check-json
+        name: check json
+      - id: check-added-large-files
+        name: check for added large files
+        args: ["--maxkb=1000"]
+        exclude: ^data/models/.*\.(pt|pth|ckpt|h5)$
+      - id: check-merge-conflict
+        name: check for merge conflicts
+      - id: debug-statements
+        name: debug statements (Python)
+
+  # Security scanning
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.6
+    hooks:
+      - id: bandit
+        name: bandit (security linter)
+        args: ["-c", "pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
+        exclude: ^tests/
+
+# Global configuration
+default_stages: [pre-commit]
+fail_fast: false
+minimum_pre_commit_version: "3.0.0"
+
+# CI configuration
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: ""
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false

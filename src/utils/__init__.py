@@ -1,5 +1,4 @@
-"""
-PlantGuard Utilities Module
+"""PlantGuard Utilities Module.
 
 This module contains utility functions and helper classes.
 """

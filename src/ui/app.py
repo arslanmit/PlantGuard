@@ -1,6 +1,4 @@
-"""
-Main Streamlit application for PlantGuard.
-"""
+"""Main Streamlit application for PlantGuard."""
 
 import logging
 

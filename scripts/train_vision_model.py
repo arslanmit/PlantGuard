@@ -1,5 +1,4 @@
-"""
-Training script for PlantGuard vision model.
+"""Training script for PlantGuard vision model.
 
 This script trains a ResNet50 model on the PlantVillage dataset for plant disease classification.
 """
@@ -39,8 +38,7 @@ class PlantVillageTrainer:
         learning_rate: float = 0.001,
         weight_decay: float = 1e-4,
     ):
-        """
-        Initialize trainer.
+        """Initialize trainer.
 
         Args:
             model: PyTorch model to train
@@ -68,13 +66,12 @@ class PlantVillageTrainer:
 
         # Metrics tracking
         self.best_val_acc = 0.0
-        self.train_losses = []
-        self.val_losses = []
-        self.val_accuracies = []
+        self.train_losses: list[float] = []
+        self.val_losses: list[float] = []
+        self.val_accuracies: list[float] = []
 
     def train_epoch(self) -> float:
-        """
-        Train for one epoch.
+        """Train for one epoch.
 
         Returns:
             Average training loss for the epoch
@@ -85,8 +82,8 @@ class PlantVillageTrainer:
 
         progress_bar = tqdm(self.train_loader, desc="Training")
 
-        for batch_idx, (images, labels) in enumerate(progress_bar):
-            images, labels = images.to(self.device), labels.to(self.device)
+        for batch_idx, (batch_images, batch_labels) in enumerate(progress_bar):
+            images, labels = batch_images.to(self.device), batch_labels.to(self.device)
 
             # Zero gradients
             self.optimizer.zero_grad()
@@ -113,8 +110,7 @@ class PlantVillageTrainer:
         return running_loss / num_batches
 
     def validate(self) -> tuple[float, float]:
-        """
-        Validate the model.
+        """Validate the model.
 
         Returns:
             Tuple of (validation_loss, validation_accuracy)
@@ -127,8 +123,8 @@ class PlantVillageTrainer:
         with torch.no_grad():
             progress_bar = tqdm(self.val_loader, desc="Validation")
 
-            for images, labels in progress_bar:
-                images, labels = images.to(self.device), labels.to(self.device)
+            for batch_images, batch_labels in progress_bar:
+                images, labels = batch_images.to(self.device), batch_labels.to(self.device)
 
                 outputs = self.model(images)
                 loss = self.criterion(outputs, labels)
@@ -161,8 +157,7 @@ class PlantVillageTrainer:
         save_path: Path,
         class_names: list[str],
     ) -> None:
-        """
-        Save model checkpoint.
+        """Save model checkpoint.
 
         Args:
             epoch: Current epoch number
@@ -190,8 +185,7 @@ class PlantVillageTrainer:
         class_names: list[str],
         writer: SummaryWriter,
     ) -> None:
-        """
-        Train the model for specified number of epochs.
+        """Train the model for specified number of epochs.
 
         Args:
             num_epochs: Number of epochs to train
@@ -250,8 +244,7 @@ class PlantVillageTrainer:
 
 
 def create_data_transforms() -> tuple[transforms.Compose, transforms.Compose]:
-    """
-    Create data transforms for training and validation.
+    """Create data transforms for training and validation.
 
     Returns:
         Tuple of (train_transform, val_transform)
@@ -286,8 +279,7 @@ def create_data_loaders(
     batch_size: int = 32,
     num_workers: int = 4,
 ) -> tuple[DataLoader, DataLoader, list[str]]:
-    """
-    Create data loaders for training and validation.
+    """Create data loaders for training and validation.
 
     Args:
         data_dir: Path to dataset directory

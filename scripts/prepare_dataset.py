@@ -1,5 +1,4 @@
-"""
-Dataset preparation utilities for PlantGuard.
+"""Dataset preparation utilities for PlantGuard.
 
 This script helps prepare the PlantVillage dataset for training.
 """
@@ -21,8 +20,7 @@ def split_dataset(
     train_ratio: float = 0.8,
     random_state: int = 42,
 ) -> None:
-    """
-    Split dataset into train and validation sets.
+    """Split dataset into train and validation sets.
 
     Args:
         source_dir: Source directory with class subdirectories
@@ -89,8 +87,7 @@ def split_dataset(
 
 
 def validate_dataset(dataset_dir: Path) -> dict[str, int]:
-    """
-    Validate dataset structure and count samples.
+    """Validate dataset structure and count samples.
 
     Args:
         dataset_dir: Directory containing train/val subdirectories

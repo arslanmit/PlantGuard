@@ -52,7 +52,7 @@ class VisionAdapter:
     def predict(self, image: PIL.Image.Image) -> tuple[str, float]
     def load_checkpoint(self, path: str) -> None
 
-# src/core/audio.py  
+# src/core/audio.py
 class AudioAdapter:
     def transcribe(self, audio_file) -> str  # MUST be offline
     def predict_disease(self, audio_features) -> tuple[str, float]
@@ -87,7 +87,7 @@ def load_models():
 
 ```
 src/core/vision.py      # VisionAdapter - ResNet50 plant disease detection
-src/core/audio.py       # AudioAdapter - Whisper + disease classification  
+src/core/audio.py       # AudioAdapter - Whisper + disease classification
 src/core/nlp.py         # TextAdapter + ChatModel - DistilBERT + fusion
 src/ui/app_streamlit.py # Main Streamlit UI
 data/models/            # Model checkpoints

@@ -75,7 +75,7 @@ tensorboard --logdir runs
 
 The training script logs:
 - Training loss per epoch
-- Validation loss per epoch  
+- Validation loss per epoch
 - Validation accuracy per epoch
 - Learning rate schedule
 - Model checkpoints (best and latest)

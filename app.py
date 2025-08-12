@@ -1,5 +1,4 @@
-"""
-PlantGuard - Multimodal Plant Disease Detection System
+"""PlantGuard - Multimodal Plant Disease Detection System.
 
 Main Streamlit application entry point.
 """

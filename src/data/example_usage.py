@@ -1,5 +1,4 @@
-"""
-Example usage of PlantGuard data pipeline utilities.
+"""Example usage of PlantGuard data pipeline utilities.
 
 This script demonstrates how to use the dataset loading, validation,
 and analysis utilities for the PlantVillage dataset.
@@ -22,8 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def example_dataset_loading(data_dir: str) -> None:
-    """
-    Example of loading PlantVillage dataset with train/validation split.
+    """Example of loading PlantVillage dataset with train/validation split.
 
     Args:
         data_dir: Path to dataset directory containing class subdirectories
@@ -56,8 +54,7 @@ def example_dataset_loading(data_dir: str) -> None:
 
 
 def example_data_validation(data_dir: str) -> None:
-    """
-    Example of validating dataset images and structure.
+    """Example of validating dataset images and structure.
 
     Args:
         data_dir: Path to dataset directory
@@ -87,8 +84,7 @@ def example_data_validation(data_dir: str) -> None:
 
 
 def example_dataset_analysis(data_dir: str) -> None:
-    """
-    Example of analyzing dataset statistics and class distribution.
+    """Example of analyzing dataset statistics and class distribution.
 
     Args:
         data_dir: Path to dataset directory
@@ -159,8 +155,7 @@ def example_dataset_analysis(data_dir: str) -> None:
 
 
 def example_integrity_check(data_dir: str) -> None:
-    """
-    Example of running data integrity checks.
+    """Example of running data integrity checks.
 
     Args:
         data_dir: Path to dataset directory
@@ -198,8 +193,7 @@ def example_integrity_check(data_dir: str) -> None:
 
 
 def example_generate_report(data_dir: str, output_path: str | None = None) -> None:
-    """
-    Example of generating comprehensive data quality report.
+    """Example of generating comprehensive data quality report.
 
     Args:
         data_dir: Path to dataset directory
@@ -255,8 +249,7 @@ def example_generate_report(data_dir: str, output_path: str | None = None) -> No
 
 
 def main() -> None:
-    """
-    Main function to run all examples.
+    """Main function to run all examples.
 
     Note: Update DATA_DIR to point to your PlantVillage dataset directory.
     """

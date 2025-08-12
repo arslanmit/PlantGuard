@@ -1,5 +1,4 @@
-"""
-PlantGuard Bot - Main Orchestration Class
+"""PlantGuard Bot - Main Orchestration Class.
 
 This module contains the main PlantGuardBot class that coordinates all components
 for multimodal plant disease detection and response generation.
@@ -21,16 +20,14 @@ logger = logging.getLogger(__name__)
 
 
 class PlantGuardBot:
-    """
-    Main orchestration class for PlantGuard multimodal plant disease detection.
+    """Main orchestration class for PlantGuard multimodal plant disease detection.
 
     This class coordinates vision, audio, and text processing to provide
     comprehensive plant disease diagnosis and treatment recommendations.
     """
 
     def __init__(self, config_path: str | None = None, device: str = "cpu"):
-        """
-        Initialize PlantGuardBot with all required components.
+        """Initialize PlantGuardBot with all required components.
 
         Args:
             config_path: Path to configuration file
@@ -73,8 +70,7 @@ class PlantGuardBot:
     def analyze_plant(
         self, image: Image.Image, audio_path: str | None = None, text_query: str = ""
     ) -> dict[str, Any]:
-        """
-        Main analysis method combining all modalities.
+        """Main analysis method combining all modalities.
 
         Args:
             image: Plant leaf image (required)
@@ -113,8 +109,7 @@ class PlantGuardBot:
             return self.error_handler.handle_analysis_error(e, image)
 
     def get_health_status(self) -> dict[str, str]:
-        """
-        Return system health and model status.
+        """Return system health and model status.
 
         Returns:
             Dictionary with system status information

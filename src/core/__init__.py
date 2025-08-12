@@ -1,5 +1,4 @@
-"""
-PlantGuard Core Module
+"""PlantGuard Core Module.
 
 This module contains the core components for the PlantGuard multimodal
 plant disease detection system.

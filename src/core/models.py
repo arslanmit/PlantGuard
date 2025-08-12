@@ -1,5 +1,4 @@
-"""
-Model architectures for PlantGuard.
+"""Model architectures for PlantGuard.
 
 This module contains the ResNet50 model architecture for plant disease classification.
 """
@@ -14,16 +13,14 @@ logger = logging.getLogger(__name__)
 
 
 class PlantDiseaseResNet50(nn.Module):
-    """
-    ResNet50 model for plant disease classification.
+    """ResNet50 model for plant disease classification.
 
     Uses ImageNet pre-trained ResNet50 with custom classification head
     for 38 PlantVillage disease classes.
     """
 
     def __init__(self, num_classes: int = 38, pretrained: bool = True):
-        """
-        Initialize ResNet50 model.
+        """Initialize ResNet50 model.
 
         Args:
             num_classes: Number of disease classes (default: 38 for PlantVillage)
@@ -46,8 +43,7 @@ class PlantDiseaseResNet50(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Forward pass through the model.
+        """Forward pass through the model.
 
         Args:
             x: Input tensor of shape (batch_size, 3, 224, 224)
@@ -59,8 +55,7 @@ class PlantDiseaseResNet50(nn.Module):
         return features
 
     def get_features(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Extract features from the model before final classification.
+        """Extract features from the model before final classification.
 
         Args:
             x: Input tensor of shape (batch_size, 3, 224, 224)

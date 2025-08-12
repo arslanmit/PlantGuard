@@ -1,6 +1,4 @@
-"""
-Logging configuration for PlantGuard.
-"""
+"""Logging configuration for PlantGuard."""
 
 import logging
 import sys
@@ -13,8 +11,7 @@ def setup_logger(
     log_file: str | None = None,
     format_string: str | None = None,
 ) -> logging.Logger:
-    """
-    Set up logger with console and optional file output.
+    """Set up logger with console and optional file output.
 
     Args:
         name: Logger name

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""
-Test runner script for PlantGuard project.
+"""Test runner script for PlantGuard project.
+
 Provides convenient commands for running different types of tests.
 """
 
@@ -20,7 +20,7 @@ def run_command(cmd: list[str], description: str) -> bool:
     print("-" * 50)  # noqa: T201
 
     try:
-        subprocess.run(cmd, check=True, cwd=Path.cwd())  # noqa: S603
+        subprocess.run(cmd, check=True, cwd=Path.cwd())
     except subprocess.CalledProcessError as e:
         print(f"❌ {description} failed with exit code {e.returncode}")  # noqa: T201
         return False

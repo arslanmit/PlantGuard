@@ -93,31 +93,24 @@
     "editor.defaultFormatter": "Dart-Code.dart-code"
   },
   "explorer.confirmPasteNative": false,
-  // ───────── PYTHON + LINT/TYPE ─────────
   "python.createEnvironment.trigger": "off",
   "python.defaultInterpreterPath": ".venv/bin/python",
-  // Ruff: lint + format (Problems paneline düşer)
   "ruff.lint.enable": true,
   "ruff.format.enable": true,
-  // Kaydettiğinde otomatik düzelt ve importları sırala
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit"
   },
-  // Mypy: tip hataları Problems panelinde
   "mypy-type-checker.args": [
     "--config-file",
     "pyproject.toml"
   ],
-  // Pylance ek denetim
   "python.analysis.typeCheckingMode": "basic",
-  // Python özel formatlayıcı (Ruff)
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true
   },
-  // ───────── EXCLUDE AYARI ─────────
   "files.exclude": {
     "**/__pycache__": true,
     "**/.mypy_cache": true,

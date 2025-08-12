@@ -1,5 +1,4 @@
-"""
-Dataset loading utilities for PlantGuard multimodal system.
+"""Dataset loading utilities for PlantGuard multimodal system.
 
 This module provides utilities for loading and preprocessing the PlantVillage dataset
 with support for stratified train/validation splits and data augmentation.
@@ -21,8 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class PlantVillageDataset(Dataset):
-    """
-    Custom dataset class for PlantVillage plant disease detection.
+    """Custom dataset class for PlantVillage plant disease detection.
 
     Supports loading images with labels and applying transformations.
     """
@@ -33,8 +31,7 @@ class PlantVillageDataset(Dataset):
         transform: transforms.Compose | None = None,
         target_transform: transforms.Compose | None = None,
     ) -> None:
-        """
-        Initialize PlantVillage dataset.
+        """Initialize PlantVillage dataset.
 
         Args:
             root_dir: Root directory containing class subdirectories
@@ -65,8 +62,7 @@ class PlantVillageDataset(Dataset):
         return len(self.samples)
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, int]:
-        """
-        Get a sample from the dataset.
+        """Get a sample from the dataset.
 
         Args:
             idx: Index of the sample
@@ -85,8 +81,7 @@ class PlantVillageDataset(Dataset):
         return image, label
 
     def get_class_distribution(self) -> dict[str, int]:
-        """
-        Get the distribution of classes in the dataset.
+        """Get the distribution of classes in the dataset.
 
         Returns:
             Dictionary mapping class names to sample counts
@@ -100,9 +95,7 @@ class PlantVillageDataset(Dataset):
 
 
 class DataTransforms:
-    """
-    Predefined data transformations for training and validation.
-    """
+    """Predefined data transformations for training and validation."""
 
     @staticmethod
     def get_train_transforms(
@@ -110,8 +103,7 @@ class DataTransforms:
         mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
         std: tuple[float, float, float] = (0.229, 0.224, 0.225),
     ) -> transforms.Compose:
-        """
-        Get training transformations with data augmentation.
+        """Get training transformations with data augmentation.
 
         Args:
             image_size: Target image size (square)
@@ -140,8 +132,7 @@ class DataTransforms:
         mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
         std: tuple[float, float, float] = (0.229, 0.224, 0.225),
     ) -> transforms.Compose:
-        """
-        Get validation transformations without augmentation.
+        """Get validation transformations without augmentation.
 
         Args:
             image_size: Target image size (square)
@@ -165,8 +156,7 @@ class DataTransforms:
         mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
         std: tuple[float, float, float] = (0.229, 0.224, 0.225),
     ) -> transforms.Compose:
-        """
-        Get inference transformations for single image prediction.
+        """Get inference transformations for single image prediction.
 
         Args:
             image_size: Target image size (square)
@@ -190,8 +180,7 @@ def create_stratified_split(
     train_ratio: float = 0.8,
     random_state: int = 42,
 ) -> tuple[Dataset, Dataset]:
-    """
-    Create stratified train/validation split maintaining class distribution.
+    """Create stratified train/validation split maintaining class distribution.
 
     Args:
         dataset: PlantVillage dataset to split
@@ -234,8 +223,7 @@ def create_data_loaders(
     pin_memory: bool = True,
     random_state: int = 42,
 ) -> tuple[DataLoader, DataLoader, list[str]]:
-    """
-    Create train and validation data loaders with stratified splitting.
+    """Create train and validation data loaders with stratified splitting.
 
     Args:
         data_dir: Root directory containing class subdirectories
@@ -299,8 +287,7 @@ def create_data_loaders(
 
 
 def get_dataset_statistics(dataset: PlantVillageDataset) -> dict[str, Any]:
-    """
-    Calculate comprehensive dataset statistics.
+    """Calculate comprehensive dataset statistics.
 
     Args:
         dataset: PlantVillage dataset to analyze

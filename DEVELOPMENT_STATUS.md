@@ -30,7 +30,7 @@ None currently.
 - [ ] 2.1 Create dataset loading utilities
 - [ ] 2.2 Implement data validation and quality checks
 
-#### Task 3: Vision Model Development  
+#### Task 3: Vision Model Development
 
 - [ ] 3.1 Create ResNet50 vision adapter
 - [ ] 3.2 Implement model training pipeline

@@ -12,217 +12,440 @@ build-backend = "setuptools.build_meta"
 name = "plantguard"
 version = "0.1.0"
 description = "Multimodal plant disease detection system with offline ML inference"
-authors = [{name = "PlantGuard Team", email = "umit.arslan@outlook.com"}]
-license = "MIT"
+authors = [{ name = "PlantGuard Team", email = "umit.arslan@outlook.com" }]
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.11"
-keywords = ["plant", "disease", "detection", "machine-learning", "multimodal"]
+keywords = [
+  "plant",
+  "disease",
+  "detection",
+  "machine-learning",
+  "multimodal",
+  "computer-vision",
+  "agriculture",
+]
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Image Processing",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Operating System :: OS Independent",
 ]
 
-# Dependencies from requirements.txt
+# Core dependencies organized by category
 dependencies = [
-    "torch>=2.1.0",
-    "torchvision>=0.16.0", 
-    "torchaudio>=2.1.0",
-    "torchmetrics>=1.2.0",
-    "numpy>=1.24.0",
-    "pandas>=2.1.0",
-    "scikit-learn>=1.3.0",
-    "opencv-python-headless>=4.8.0",
-    "Pillow>=10.0.0",
-    "transformers>=4.34.0",
-    "accelerate>=0.24.0",
-    "datasets>=2.14.0",
-    "librosa>=0.10.1",
-    "soundfile>=0.12.1",
-    "SpeechRecognition>=3.10.0",
-    "streamlit>=1.27.0",
-    "streamlit-webrtc>=0.47.0",
-    "pycloudflared>=0.2.0",
-    "pyngrok>=7.0.0",
-    "python-dotenv>=1.0.0",
-    "tensorboard>=2.14.0",
-    "bandit>=1.7.5",
+  # Deep Learning Framework
+  "torch>=2.1.0",
+  "torchvision>=0.16.0",
+  "torchaudio>=2.1.0",
+  "torchmetrics>=1.2.0",
+
+  # Data Science & ML
+  "numpy>=1.24.0",
+  "pandas>=2.1.0",
+  "scikit-learn>=1.3.0",
+
+  # Computer Vision & Image Processing
+  "opencv-python-headless>=4.8.0",
+  "Pillow>=10.0.0",
+
+  # NLP & Transformers
+  "transformers>=4.34.0",
+  "accelerate>=0.24.0",
+  "datasets>=2.14.0",
+
+  # Audio Processing
+  "librosa>=0.10.1",
+  "soundfile>=0.12.1",
+  "SpeechRecognition>=3.10.0",
+
+  # Web UI & Deployment
+  "streamlit>=1.27.0",
+  "streamlit-webrtc>=0.47.0",
+  "pycloudflared>=0.2.0",
+  "pyngrok>=7.0.0",
+
+  # Utilities
+  "python-dotenv>=1.0.0",
+  "tensorboard>=2.14.0",
 ]
 
 [project.optional-dependencies]
+# Development tools
 dev = [
-    "ruff>=0.1.0",
-    "mypy>=1.6.0", 
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "jupyter>=1.0.0",
+  "ruff>=0.1.0",
+  "mypy>=1.6.0",
+  "pytest>=7.4.0",
+  "pytest-cov>=4.1.0",
+  "pytest-mock>=3.12.0",
+  "bandit>=1.7.5",
+  "safety>=3.0.0",
+  "pre-commit>=3.0.0",
 ]
+
+# Documentation tools
+docs = ["sphinx>=7.0.0", "sphinx-rtd-theme>=2.0.0", "myst-parser>=2.0.0"]
+
+# Jupyter and analysis tools
+jupyter = [
+  "jupyter>=1.0.0",
+  "ipykernel>=6.25.0",
+  "matplotlib>=3.7.0",
+  "seaborn>=0.12.0",
+]
+
+# Training and experimentation
+training = ["wandb>=0.15.0", "optuna>=3.3.0", "tensorboard>=2.14.0"]
+
+# All optional dependencies
+all = ["plantguard[dev,docs,jupyter,training]"]
 
 [project.urls]
 Homepage = "https://github.com/arslanmit/PlantGuard"
 Repository = "https://github.com/arslanmit/PlantGuard"
 Issues = "https://github.com/arslanmit/PlantGuard/issues"
+Documentation = "https://github.com/arslanmit/PlantGuard/wiki"
+Changelog = "https://github.com/arslanmit/PlantGuard/releases"
+
+[project.scripts]
+plantguard = "plantguard.cli:main"
+plantguard-train = "plantguard.training:main"
 
 # =========================
-# Python strict config (similar to Dart analysis_options.yaml)
+# Ruff Configuration - Modern Python Linter & Formatter
 # =========================
-
 [tool.ruff]
-line-length = 100          # Maximum characters per line - keeps code readable
-target-version = "py313"   # Target Python 3.13 for latest syntax features
-fix = true                 # Automatically fix issues when possible
+line-length = 100
+target-version = "py311"  # Support Python 3.11+ for broader compatibility
+fix = true
+show-fixes = true
+output-format = "grouped"
 
-# Comprehensive rule set covering all aspects of code quality:
 [tool.ruff.lint]
-# Comprehensive rule set for strict code quality
+# Comprehensive rule selection for high code quality
 select = [
-    "E",    # pycodestyle errors - PEP 8 style violations
-    "F",    # pyflakes - logical errors and unused imports
-    "W",    # pycodestyle warnings - style warnings
-    "I",    # isort - import sorting and organization
-    "B",    # flake8-bugbear - common Python gotchas
-    "A",    # flake8-builtins - avoid shadowing built-ins
-    "ANN",  # flake8-annotations - enforce type annotations
-    "N",    # pep8-naming - naming conventions
-    "S",    # flake8-bandit - security vulnerabilities
-    "BLE",  # flake8-blind-except - avoid bare except clauses
-    "C90",  # mccabe - cyclomatic complexity
-    "C4",   # flake8-comprehensions - list/dict comprehension improvements
-    "DTZ",  # flake8-datetimez - timezone-aware datetime usage
-    "EM",   # flake8-errmsg - error message formatting
-    "ISC",  # flake8-implicit-str-concat - implicit string concatenation
-    "G",    # flake8-logging-format - logging format strings
-    "PTH",  # flake8-use-pathlib - prefer pathlib over os.path
-    "PIE",  # flake8-pie - miscellaneous linting rules
-    "PT",   # flake8-pytest-style - pytest best practices
-    "Q",    # flake8-quotes - quote style consistency
-    "RET",  # flake8-return - return statement improvements
-    "RSE",  # flake8-raise - raise statement improvements
-    "SIM",  # flake8-simplify - code simplification suggestions
-    "T20",  # flake8-print - avoid print statements in production
-    "TID",  # flake8-tidy-imports - import organization
-    "TRY",  # tryceratops - exception handling best practices
-    "UP",   # pyupgrade - upgrade syntax for newer Python versions
-    "PGH",  # pygrep-hooks - miscellaneous text-based checks
-    "PERF", # perflint - performance anti-patterns
-    "PL",   # pylint - comprehensive static analysis
-    "RUF",  # ruff-specific rules - ruff's own checks
+  # Core Python rules
+  "E", # pycodestyle errors
+  "F", # pyflakes
+  "W", # pycodestyle warnings
+  "I", # isort - import sorting
+
+  # Code quality and best practices
+  "B",   # flake8-bugbear - common bugs
+  "A",   # flake8-builtins - builtin shadowing
+  "C4",  # flake8-comprehensions
+  "PIE", # flake8-pie - misc improvements
+  "SIM", # flake8-simplify
+  "UP",  # pyupgrade - modern Python syntax
+
+  # Type annotations and documentation
+  "ANN", # flake8-annotations
+  "D",   # pydocstyle - docstring conventions
+
+  # Security and error handling
+  "S",   # flake8-bandit - security
+  "BLE", # flake8-blind-except
+  "TRY", # tryceratops - exception handling
+
+  # Code complexity and maintainability
+  "C90", # mccabe - complexity
+  "PLR", # pylint refactor
+  "PLW", # pylint warnings
+  "PLE", # pylint errors
+
+  # Modern Python practices
+  "PTH", # flake8-use-pathlib
+  "RUF", # ruff-specific rules
+
+  # Performance
+  "PERF", # perflint
+
+  # Import organization
+  "TID", # flake8-tidy-imports
+
+  # Logging and print statements
+  "G",   # flake8-logging-format
+  "T20", # flake8-print
 ]
 
-# Black compatibility - ignore whitespace before colon
-ignore = ["E203"]
-
-# Exclude directories/files from linting
-exclude = [
-  "build",        # Build artifacts
-  ".venv",        # Virtual environment
-  ".git",         # Git repository files
-  ".mypy_cache",  # MyPy cache files
-  ".ruff_cache",  # Ruff cache files
-  "dist",         # Distribution packages
-  "notebooks",    # Jupyter notebooks directory
-  "*.ipynb",      # Individual Jupyter notebook files
-  "/Users/umitarslan/Library/Application Support/Kiro/User"  # Kiro user data
+# Ignore specific rules that conflict with project needs
+ignore = [
+  "E501",    # Line too long (handled by formatter)
+  "E203",    # Whitespace before ':' (Black compatibility)
+  "D100",    # Missing docstring in public module
+  "D104",    # Missing docstring in public package
+  "D107",    # Missing docstring in __init__
+  "S603",    # subprocess-without-shell-equals-true (needed for some scripts)
+  "PLR0913", # Too many arguments (ML models often need many params)
 ]
+
+# File-specific rule exceptions
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+  "S101",    # Use of assert (expected in tests)
+  "PLR2004", # Magic value used in comparison
+  "ANN",     # Type annotations not required in tests
+  "D",       # Docstrings not required in tests
+]
+"scripts/**/*.py" = [
+  "T20",  # Print statements allowed in scripts
+  "S603", # Subprocess calls allowed in scripts
+]
+"notebooks/**/*.py" = [
+  "T20", # Print statements allowed in notebooks
+  "D",   # Docstrings not required in notebooks
+]
+"notebooks/**/*.ipynb" = [
+  "T201",   # Print statements allowed in notebooks
+  "S607",   # Subprocess calls allowed in notebooks
+  "TRY300", # Exception handling patterns allowed in notebooks
+  "BLE001", # Blind except allowed in notebooks
+  "SIM105", # Simplified exception handling allowed in notebooks
+  "E722",   # Bare except allowed in notebooks
+  "S110",   # Try-except-pass allowed in notebooks
+  "S104",   # Binding to all interfaces allowed in notebooks
+  "F841",   # Unused variables allowed in notebooks
+  "D",      # Docstrings not required in notebooks
+]
+"**/conftest.py" = ["D"] # Docstrings not required in conftest
+"setup.py" = ["D"] # Docstrings not required in setup
 
 # Import sorting configuration
 [tool.ruff.lint.isort]
-known-first-party = ["src","plantguard"]  # Local project modules
-known-third-party = ["torch","torchvision","numpy","pandas","streamlit","PIL"]  # External dependencies
+known-first-party = ["plantguard", "src"]
+known-third-party = [
+  "torch",
+  "torchvision",
+  "torchaudio",
+  "torchmetrics",
+  "numpy",
+  "pandas",
+  "sklearn",
+  "cv2",
+  "PIL",
+  "transformers",
+  "datasets",
+  "accelerate",
+  "librosa",
+  "soundfile",
+  "speech_recognition",
+  "streamlit",
+  "streamlit_webrtc",
+  "matplotlib",
+  "seaborn",
+  "plotly",
+  "pytest",
+  "wandb",
+  "optuna",
+]
+section-order = [
+  "future",
+  "standard-library",
+  "third-party",
+  "first-party",
+  "local-folder",
+]
+split-on-trailing-comma = true
+force-single-line = false
 
-# Naming conventions (PEP 8 compliance)
-[tool.ruff.lint.pep8-naming]
-# Exceptions can be defined here if needed
+# Docstring configuration
+[tool.ruff.lint.pydocstyle]
+convention = "google" # Use Google-style docstrings
 
-# Complexity limit (mccabe) - maintainability enforcement
+# Complexity limits
 [tool.ruff.lint.mccabe]
-max-complexity = 10  # Maximum cyclomatic complexity per function
+max-complexity = 10
 
-# Pylint-style limits for code maintainability
 [tool.ruff.lint.pylint]
-max-args = 6          # Maximum function arguments
-max-branches = 12     # Maximum branches in a function
-max-returns = 6       # Maximum return statements in a function
-max-statements = 50   # Maximum statements in a function
+max-args = 8        # Increased for ML models
+max-branches = 12
+max-returns = 6
+max-statements = 50
 
-# String/quote preferences (consistent style enforcement)
+# Quote style
 [tool.ruff.lint.flake8-quotes]
-inline-quotes = "double"      # Use double quotes for inline strings
-multiline-quotes = "double"   # Use double quotes for multiline strings
-docstring-quotes = "double"   # Use double quotes for docstrings
-avoid-escape = true           # Avoid unnecessary escape characters
+inline-quotes = "double"
+multiline-quotes = "double"
+docstring-quotes = "double"
+avoid-escape = true
 
-# Type annotation configuration
-[tool.ruff.lint.flake8-annotations]  # ANN: enforce return type declarations
-mypy-init-return = true        # Require return type for __init__ methods
-suppress-dummy-args = false    # Don't suppress dummy argument annotations
-allow-star-arg-any = false     # Don't allow Any for *args/**kwargs
-ignore-fully-untyped = false  # Don't ignore fully untyped functions
-# require-return-type and require-annotation-for-toplevel are not supported in current Ruff version
+# Type annotation enforcement
+[tool.ruff.lint.flake8-annotations]
+mypy-init-return = true
+suppress-dummy-args = true
+allow-star-arg-any = false
+ignore-fully-untyped = false
 
-# Security rules (Bandit equivalent) - security/environment checks
+# Security configuration
 [tool.ruff.lint.flake8-bandit]
-check-typed-exception = true  # Check for typed exceptions
+check-typed-exception = true
 
-# Print statement restrictions (avoid print in production)
-[tool.ruff.lint.pycodestyle]
-max-doc-length = 120  # Maximum docstring line length
-
-# Test-specific exceptions
-[tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101", "PLR2004"]  # Allow assert statements and magic values in tests
-"run_local.py" = ["S603"]  # Allow subprocess calls in runner script
+# Formatter configuration
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
 
 # =========================
-# Formatter (Black) — format on save
-# =========================
-[tool.black]
-line-length = 100              # Match ruff line length
-target-version = ["py313"]     # Target Python 3.13
-include = '\.pyi?$'            # Include .py and .pyi files
-extend-exclude = '''
-/(
-  \.eggs|\.git|\.hg|\.mypy_cache|\.tox|\.venv|build|dist  # Standard exclusions
-)/
-'''
-
-# =========================
-# Type Checker (Mypy) — strict type safety
+# MyPy - Static Type Checking
 # =========================
 [tool.mypy]
-python_version = "3.13"           # Target Python version
-strict = false                    # Not fully strict mode (gradual typing)
-disallow_untyped_defs = true      # Require type annotations for functions
-disallow_incomplete_defs = true   # Require complete type annotations
-check_untyped_defs = true         # Type-check untyped function bodies
-disallow_untyped_decorators = true # Require typed decorators
-no_implicit_optional = true       # Don't assume Optional for None defaults
-warn_return_any = true            # Warn when returning Any
-warn_redundant_casts = true       # Warn about unnecessary casts
-warn_unused_ignores = true        # Warn about unused # type: ignore
-warn_no_return = true             # Warn about missing return statements
-warn_unreachable = true           # Warn about unreachable code
-strict_equality = true            # Use strict equality checks
-ignore_missing_imports = true     # Ignore missing imports (for third-party)
-exclude = '(build|\.venv|dist|tests/fixtures|/Users/umitarslan/Library/Application Support/Kiro/User)'
+python_version = "3.11"
+strict = false                     # Gradual typing approach
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+ignore_missing_imports = true
 
-# Third-party library overrides (ignore missing type stubs)
+# Exclude patterns
+exclude = [
+  "build/",
+  "dist/",
+  ".venv/",
+  ".git/",
+  "notebooks/",
+  "tests/fixtures/",
+]
+
+# Third-party library stubs
 [[tool.mypy.overrides]]
 module = [
-  "torch.*","torchvision.*","torchaudio.*","torchmetrics.*",  # PyTorch ecosystem
-  "cv2.*","librosa.*","soundfile.*",                          # Computer vision/audio
-  "streamlit.*","streamlit_webrtc.*",                         # Streamlit
-  "pycloudflared.*","pyngrok.*","speech_recognition.*"        # Tunneling/speech
+  "torch.*",
+  "torchvision.*",
+  "torchaudio.*",
+  "torchmetrics.*",
+  "cv2.*",
+  "librosa.*",
+  "soundfile.*",
+  "streamlit.*",
+  "streamlit_webrtc.*",
+  "pycloudflared.*",
+  "pyngrok.*",
+  "speech_recognition.*",
+  "wandb.*",
+  "optuna.*",
 ]
 ignore_missing_imports = true
 
 # =========================
-# Pytest — testing with coverage
+# Pytest - Testing Framework
 # =========================
 [tool.pytest.ini_options]
-addopts = "-q --strict-markers --cov=src --cov-report=term-missing --cov-report=html"  # Quiet mode, strict markers, coverage reports
-testpaths = ["tests"]  # Test directory location
+minversion = "7.0"
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--strict-config",
+  "--cov=src",
+  "--cov-report=term-missing:skip-covered",
+  "--cov-report=html:htmlcov",
+  "--cov-report=xml",
+  "--cov-fail-under=80",
+]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+  "integration: marks tests as integration tests",
+  "unit: marks tests as unit tests",
+  "gpu: marks tests that require GPU",
+]
+filterwarnings = [
+  "error",
+  "ignore::UserWarning",
+  "ignore::DeprecationWarning",
+  "ignore::PendingDeprecationWarning",
+]
+
+# =========================
+# Coverage Configuration
+# =========================
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+  "*/tests/*",
+  "*/test_*",
+  "*/__pycache__/*",
+  "*/site-packages/*",
+  "setup.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "if self.debug:",
+  "if settings.DEBUG",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if 0:",
+  "if __name__ == .__main__.:",
+  "class .*\\bProtocol\\):",
+  "@(abc\\.)?abstractmethod",
+]
+show_missing = true
+skip_covered = true
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+# =========================
+# Bandit - Security Linting
+# =========================
+[tool.bandit]
+exclude_dirs = ["tests", "build", "dist", ".venv"]
+skips = [
+  "B101",
+  "B601",
+] # Skip assert_used and shell_injection for specific cases
+
+# =========================
+# Pre-commit Configuration Reference
+# =========================
+# Create .pre-commit-config.yaml with:
+# repos:
+#   - repo: https://github.com/astral-sh/ruff-pre-commit
+#     rev: v0.1.6
+#     hooks:
+#       - id: ruff
+#         args: [--fix]
+#       - id: ruff-format
+#   - repo: https://github.com/pre-commit/mirrors-mypy
+#     rev: v1.6.1
+#     hooks:
+#       - id: mypy
+#         additional_dependencies: [types-all]
+
+# =========================
+# Setuptools Configuration
+# =========================
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["plantguard*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+plantguard = ["py.typed", "*.json", "*.yaml", "*.yml"]

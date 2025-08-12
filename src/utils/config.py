@@ -1,6 +1,4 @@
-"""
-Configuration management for PlantGuard.
-"""
+"""Configuration management for PlantGuard."""
 
 import os
 from dataclasses import dataclass, field

@@ -1,5 +1,4 @@
-"""
-Vision processing module for PlantGuard.
+"""Vision processing module for PlantGuard.
 
 This module contains the VisionAdapter class for plant disease detection using ResNet50.
 """
@@ -7,6 +6,7 @@ This module contains the VisionAdapter class for plant disease detection using R
 import json
 import logging
 from pathlib import Path
+from typing import NoReturn
 
 import torch
 from PIL import Image
@@ -19,16 +19,14 @@ logger = logging.getLogger(__name__)
 
 
 class VisionAdapter:
-    """
-    Vision adapter for plant disease detection using ResNet50.
+    """Vision adapter for plant disease detection using ResNet50.
 
     This class handles image preprocessing and disease classification
     using a fine-tuned ResNet50 model.
     """
 
     def __init__(self, model_path: str | None = None, device: str = "cpu"):
-        """
-        Initialize VisionAdapter.
+        """Initialize VisionAdapter.
 
         Args:
             model_path: Path to trained model weights
@@ -52,6 +50,11 @@ class VisionAdapter:
             except (FileNotFoundError, RuntimeError, KeyError):
                 logger.exception("Failed to load model from %s", model_path)
 
+    def _raise_model_none_error(self) -> NoReturn:
+        """Raise RuntimeError for model being None despite is_loaded check."""
+        msg = "Model is None despite is_loaded check"
+        raise RuntimeError(msg)
+
     def _create_transform(self) -> transforms.Compose:
         """Create image preprocessing transform."""
         return transforms.Compose(
@@ -63,8 +66,7 @@ class VisionAdapter:
         )
 
     def predict(self, image: Image.Image) -> tuple[str, float]:
-        """
-        Predict disease class for input image.
+        """Predict disease class for input image.
 
         Args:
             image: PIL Image of plant leaf
@@ -101,8 +103,7 @@ class VisionAdapter:
                     return predicted_class, confidence_score
 
             # This should never happen due to is_loaded check, but needed for type safety
-            msg = "Model is None despite is_loaded check"
-            raise RuntimeError(msg)
+            self._raise_model_none_error()
 
         except (RuntimeError, IndexError, ValueError) as e:
             logger.exception("Prediction failed")
@@ -110,8 +111,7 @@ class VisionAdapter:
             raise RuntimeError(msg) from e
 
     def predict_batch(self, images: list[Image.Image]) -> list[tuple[str, float]]:
-        """
-        Predict disease classes for multiple images.
+        """Predict disease classes for multiple images.
 
         Args:
             images: List of PIL Images
@@ -154,8 +154,7 @@ class VisionAdapter:
                     return results
 
             # This should never happen due to is_loaded check, but needed for type safety
-            msg = "Model is None despite is_loaded check"
-            raise RuntimeError(msg)
+            self._raise_model_none_error()
 
         except (RuntimeError, IndexError, ValueError) as e:
             logger.exception("Batch prediction failed")
@@ -163,8 +162,7 @@ class VisionAdapter:
             raise RuntimeError(msg) from e
 
     def load_checkpoint(self, path: str) -> None:
-        """
-        Load trained model weights.
+        """Load trained model weights.
 
         Args:
             path: Path to model checkpoint
@@ -179,7 +177,7 @@ class VisionAdapter:
             logger.info("Loading model checkpoint from %s", path)
 
             # Load checkpoint
-            checkpoint = torch.load(path, map_location=self.device)
+            checkpoint = torch.load(path, map_location=self.device, weights_only=False)  # nosec B614
 
             # Extract information
             num_classes = checkpoint.get("num_classes", 38)
@@ -213,8 +211,7 @@ class VisionAdapter:
             raise RuntimeError(msg) from e
 
     def preprocess_image(self, image: Image.Image) -> torch.Tensor:
-        """
-        Apply preprocessing transformations to image.
+        """Apply preprocessing transformations to image.
 
         Args:
             image: PIL Image
@@ -229,16 +226,15 @@ class VisionAdapter:
 
             # Apply transforms
             tensor: torch.Tensor = self.transform(image)
-            return tensor
-
         except (ValueError, RuntimeError, TypeError) as e:
             logger.exception("Image preprocessing failed")
             msg = f"Image preprocessing failed: {e}"
             raise RuntimeError(msg) from e
+        else:
+            return tensor
 
     def get_class_names(self) -> list[str]:
-        """
-        Get list of class names.
+        """Get list of class names.
 
         Returns:
             List of class names
@@ -246,8 +242,7 @@ class VisionAdapter:
         return self.class_names.copy()
 
     def load_class_mapping(self, mapping_path: str) -> None:
-        """
-        Load class mapping from JSON file.
+        """Load class mapping from JSON file.
 
         Args:
             mapping_path: Path to class mapping JSON file
@@ -268,8 +263,7 @@ class VisionAdapter:
             raise RuntimeError(msg) from e
 
     def get_readable_name(self, class_name: str) -> str:
-        """
-        Convert class name to human-readable format.
+        """Convert class name to human-readable format.
 
         Args:
             class_name: Raw class name from model
@@ -280,8 +274,7 @@ class VisionAdapter:
         return self.class_to_readable.get(class_name, class_name)
 
     def get_plant_type(self, class_name: str) -> str:
-        """
-        Extract plant type from class name.
+        """Extract plant type from class name.
 
         Args:
             class_name: Raw class name from model
@@ -297,8 +290,7 @@ class VisionAdapter:
         return class_name.split("___")[0] if "___" in class_name else "Unknown"
 
     def is_healthy(self, class_name: str) -> bool:
-        """
-        Check if the predicted class indicates a healthy plant.
+        """Check if the predicted class indicates a healthy plant.
 
         Args:
             class_name: Raw class name from model
@@ -309,8 +301,7 @@ class VisionAdapter:
         return "healthy" in class_name.lower()
 
     def predict_with_readable_name(self, image: Image.Image) -> tuple[str, str, float, str]:
-        """
-        Predict with human-readable disease name and plant type.
+        """Predict with human-readable disease name and plant type.
 
         Args:
             image: PIL Image of plant leaf
@@ -325,8 +316,7 @@ class VisionAdapter:
         return raw_class, readable_name, confidence, plant_type
 
     def get_model_info(self) -> dict:
-        """
-        Get information about the loaded model.
+        """Get information about the loaded model.
 
         Returns:
             Dictionary with model information

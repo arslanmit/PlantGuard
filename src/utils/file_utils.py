@@ -1,6 +1,4 @@
-"""
-File management utilities for PlantGuard.
-"""
+"""File management utilities for PlantGuard."""
 
 import logging
 import tempfile
@@ -13,8 +11,7 @@ class FileManager:
     """Utility class for secure file operations."""
 
     def __init__(self, temp_dir: str = "data/temp"):
-        """
-        Initialize FileManager.
+        """Initialize FileManager.
 
         Args:
             temp_dir: Directory for temporary files
@@ -24,8 +21,7 @@ class FileManager:
         self._temp_files: list[str] = []
 
     def create_temp_file(self, suffix: str = "", prefix: str = "plantguard_") -> str:
-        """
-        Create a secure temporary file.
+        """Create a secure temporary file.
 
         Args:
             suffix: File suffix (e.g., ".wav", ".jpg")
@@ -58,8 +54,7 @@ class FileManager:
         self._temp_files.clear()
 
     def validate_file_size(self, file_path: str, max_size: int) -> bool:
-        """
-        Validate file size.
+        """Validate file size.
 
         Args:
             file_path: Path to file
@@ -77,8 +72,7 @@ class FileManager:
             return file_size <= max_size
 
     def validate_file_format(self, file_path: str, allowed_formats: list[str]) -> bool:
-        """
-        Validate file format by extension.
+        """Validate file format by extension.
 
         Args:
             file_path: Path to file
@@ -96,8 +90,7 @@ class FileManager:
             return file_extension in [fmt.lower() for fmt in allowed_formats]
 
     def ensure_directory(self, directory: str) -> Path:
-        """
-        Ensure directory exists, create if necessary.
+        """Ensure directory exists, create if necessary.
 
         Args:
             directory: Directory path

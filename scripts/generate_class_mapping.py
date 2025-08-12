@@ -1,5 +1,4 @@
-"""
-Generate class mapping JSON file from dataset directory.
+"""Generate class mapping JSON file from dataset directory.
 
 This script creates a mapping between model class indices and human-readable names.
 """
@@ -14,8 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def clean_class_name(raw_name: str) -> str:
-    """
-    Convert raw class name to human-readable format.
+    """Convert raw class name to human-readable format.
 
     Args:
         raw_name: Raw class name from dataset
@@ -49,8 +47,7 @@ def clean_class_name(raw_name: str) -> str:
 
 
 def extract_plant_type(class_name: str) -> str:
-    """
-    Extract plant type from class name.
+    """Extract plant type from class name.
 
     Args:
         class_name: Raw class name
@@ -74,8 +71,7 @@ def extract_plant_type(class_name: str) -> str:
 
 
 def generate_class_mapping(dataset_dir: Path) -> dict:
-    """
-    Generate class mapping from dataset directory.
+    """Generate class mapping from dataset directory.
 
     Args:
         dataset_dir: Path to dataset directory
@@ -96,7 +92,7 @@ def generate_class_mapping(dataset_dir: Path) -> dict:
 
     # Generate mappings
     class_to_readable = {}
-    plant_types = {}
+    plant_types: dict[str, list[str]] = {}
 
     for class_name in class_names:
         # Generate readable name
