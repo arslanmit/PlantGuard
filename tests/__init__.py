@@ -1,1 +1,3 @@
-# Tests package
+"""
+PlantGuard Test Suite
+"""

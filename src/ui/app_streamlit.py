@@ -14,13 +14,27 @@ if TYPE_CHECKING:
 else:
     AudioFrame = Any
 
-from src.core.audio import transcribe_and_classify
-from src.core.nlp import answer
-from src.core.vision import predict_image
+# Import the actual classes and methods that exist
+from src.core.audio import AudioAdapter
+from src.core.nlp import TextAdapter
+from src.core.vision import VisionAdapter
 
 st.set_page_config(page_title="PlantGuard", page_icon="🌿")
 st.title("🌿 PlantGuard — Streamlit")
 st.caption("Image + Voice + Text | Early leaf disease detection (PoC)")
+
+
+# Initialize adapters (cached for performance)
+@st.cache_resource
+def load_adapters() -> tuple[VisionAdapter, AudioAdapter, TextAdapter]:
+    """Load and cache the ML adapters."""
+    vision = VisionAdapter()
+    audio = AudioAdapter()
+    text = TextAdapter()
+    return vision, audio, text
+
+
+vision_adapter, audio_adapter, text_adapter = load_adapters()
 
 tab1, tab2, tab3 = st.tabs(["Leaf Image", "Voice", "Text Q&A"])
 
@@ -29,11 +43,12 @@ with tab1:
     img_file = st.file_uploader("Upload a leaf photo", ["png", "jpg", "jpeg"])
     if img_file:
         img = Image.open(img_file).convert("RGB")
-        st.image(img, use_column_width=True, caption="Uploaded image")
+        st.image(img, use_container_width=True, caption="Uploaded image")
         if st.button("Analyze", key="img"):
-            probs = predict_image(img)
-            st.subheader("Probabilities")
-            st.json(probs)
+            disease_class, confidence = vision_adapter.predict(img)
+            st.subheader("Analysis Results")
+            st.success(f"Predicted Disease: {disease_class}")
+            st.info(f"Confidence: {confidence:.2%}")
 
 # Voice (Mic + Upload)
 with tab2:
@@ -63,9 +78,9 @@ with tab2:
             if st.session_state.audio_buf:
                 audio = np.concatenate(st.session_state.audio_buf, axis=0)
                 sf.write("mic.wav", audio, 48000)
-                text, cls = transcribe_and_classify("mic.wav")
+                text = audio_adapter.transcribe("mic.wav")
                 st.text_area("Transcription", text, height=150)
-                st.success(f"Predicted (mic): {cls}")
+                st.success("Audio transcribed successfully")
                 st.session_state.audio_buf = []
             else:
                 st.warning("Speak into the mic and allow permissions first.")
@@ -75,15 +90,16 @@ with tab2:
         if aud and st.button("Analyze file"):
             tmp_path = Path("tmp_audio")
             tmp_path.write_bytes(aud.read())
-            text, cls = transcribe_and_classify(str(tmp_path))
+            text = audio_adapter.transcribe(str(tmp_path))
             st.text_area("Transcription", text, height=150)
-            st.success(f"Predicted (file): {cls}")
+            st.success("Audio file transcribed successfully")
 
 # Text Q&A
 with tab3:
     q = st.text_input("Ask a question (e.g., 'How to treat powdery mildew?')")
     if q and st.button("Ask", key="qa"):
-        st.write(answer(q))
+        response = text_adapter.generate_response("general", q)
+        st.write(response)
 
 st.divider()
 st.markdown(

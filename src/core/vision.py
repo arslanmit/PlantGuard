@@ -1,42 +1,73 @@
-"""Computer vision module for plant disease detection."""
+"""
+Vision processing module for PlantGuard.
 
-import functools
+This module contains the VisionAdapter class for plant disease detection using ResNet50.
+"""
+
+import logging
 
 import torch
 from PIL import Image
-from torch.nn import functional
+from torch import nn
 from torchvision import transforms
-from torchvision.models import ResNet18_Weights, resnet18
 
-CLASSES = ["powdery_mildew", "blight", "rust", "healthy"]
-_DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+logger = logging.getLogger(__name__)
 
 
-@functools.lru_cache(maxsize=1)
-def load_image_model(num_classes: int = len(CLASSES)) -> torch.nn.Module:
-    model: torch.nn.Module = resnet18(weights=ResNet18_Weights.DEFAULT)
-    in_f = model.fc.in_features  # type: ignore[union-attr]
-    model.fc = torch.nn.Linear(in_f, num_classes)  # type: ignore[arg-type]
-    # TODO: load fine-tuned checkpoint from data/*.pt
-    model.eval()
-    model.to(_DEVICE)
-    return model
+class VisionAdapter:
+    """
+    Vision adapter for plant disease detection using ResNet50.
 
+    This class handles image preprocessing and disease classification
+    using a fine-tuned ResNet50 model.
+    """
 
-def _tfm() -> transforms.Compose:
-    # Standard ImageNet normalization values
-    return transforms.Compose(
-        [
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ]
-    )
+    def __init__(self, model_path: str | None = None, device: str = "cpu"):
+        """
+        Initialize VisionAdapter.
 
+        Args:
+            model_path: Path to trained model weights
+            device: Device to run model on ("cpu" or "cuda")
+        """
+        self.device = torch.device(device)
+        self.model_path = model_path
+        self.model: nn.Module | None = None
+        self.transform = self._create_transform()
+        self.class_names: list[str] = []  # Will be loaded with model
 
-def predict_image(pil_img: Image.Image) -> dict[str, float]:
-    x = _tfm()(pil_img).unsqueeze(0).to(_DEVICE)
-    with torch.no_grad():
-        logits = load_image_model()(x)
-        probs = functional.softmax(logits, dim=1).cpu().squeeze().tolist()
-    return {c: float(probs[i]) for i, c in enumerate(CLASSES)}
+        logger.info("VisionAdapter initialized with device: %s", self.device)
+
+    def _create_transform(self) -> transforms.Compose:
+        """Create image preprocessing transform."""
+        return transforms.Compose(
+            [
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ]
+        )
+
+    def predict(self, image: Image.Image) -> tuple[str, float]:
+        """
+        Predict disease class for input image.
+
+        Args:
+            image: PIL Image of plant leaf
+
+        Returns:
+            Tuple of (disease_class_name, confidence_score)
+        """
+        # Placeholder implementation - will be implemented in Task 3
+        logger.warning("VisionAdapter.predict() is not yet implemented")
+        return "placeholder_disease", 0.5
+
+    def load_checkpoint(self, path: str) -> None:
+        """
+        Load trained model weights.
+
+        Args:
+            path: Path to model checkpoint
+        """
+        # Placeholder implementation - will be implemented in Task 3
+        logger.warning("VisionAdapter.load_checkpoint() is not yet implemented")

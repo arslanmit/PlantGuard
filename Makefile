@@ -73,35 +73,27 @@ run: deps
 
 notebook: deps
 	@echo "📓 Opening PlantGuard Jupyter notebook..."
-	@$(PIP) install -q jupyter >/dev/null 2>&1 || true
 	@$(JUPYTER) notebook $(NOTEBOOKS_DIR)/PlantGuard.ipynb
 
 # ========== Code Quality & Testing ==========
-fmt: 
+fmt: deps
 	@echo "🎨 Formatting code with Ruff..."
-	@if [ ! -x $(PY) ]; then $(MAKE) venv; fi
-	@$(PIP) install -q ruff >/dev/null 2>&1 || true
 	@$(RUFF) check --fix . --quiet
 	@$(RUFF) format . --quiet
 	@echo "✅ Code formatted"
 
-lint:
+lint: deps
 	@echo "🔍 Linting code with Ruff..."
-	@if [ ! -x $(PY) ]; then $(MAKE) venv; fi
-	@$(PIP) install -q ruff >/dev/null 2>&1 || true
 	@$(RUFF) check .
 	@echo "✅ Linting complete"
 
-type:
+type: deps
 	@echo "🔍 Type checking with Mypy..."
-	@if [ ! -x $(PY) ]; then $(MAKE) venv; fi
-	@$(PIP) install -q mypy >/dev/null 2>&1 || true
 	@$(MYPY) $(SRC_DIR)
 	@echo "✅ Type checking complete"
 
-test: venv
+test: deps
 	@echo "🧪 Running tests with coverage..."
-	@$(PIP) install -q pytest pytest-cov >/dev/null 2>&1 || true
 	@$(PYTEST) --cov=$(SRC_DIR) --cov-report=term-missing --cov-report=html
 	@echo "✅ Tests complete"
 
@@ -122,7 +114,6 @@ train-models: deps
 
 tensorboard: deps
 	@echo "📊 Starting TensorBoard..."
-	@$(PIP) install -q tensorboard >/dev/null 2>&1 || true
 	@$(PY) -m tensorboard.main --logdir=$(RUNS_DIR) --port=6006 &
 	@echo "TensorBoard running at http://localhost:6006"
 

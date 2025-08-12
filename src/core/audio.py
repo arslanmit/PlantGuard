@@ -1,35 +1,63 @@
-"""Audio processing module for speech recognition and classification."""
+"""
+Audio processing module for PlantGuard.
 
-import functools
-from typing import Any
+This module contains the AudioAdapter class for speech-to-text processing using Whisper.
+"""
 
-from transformers import pipeline
-from transformers.pipelines import Pipeline
+import logging
 
-
-@functools.lru_cache(maxsize=1)
-def asr_pipe() -> Pipeline:
-    """Create and cache an automatic speech recognition pipeline."""
-    # Local ASR for privacy; tiny model for speed
-    return pipeline("automatic-speech-recognition", model="openai/whisper-tiny")
+logger = logging.getLogger(__name__)
 
 
-def transcribe(audio_path: str) -> str:
-    out: dict[str, Any] = asr_pipe()(audio_path)
-    return str(out.get("text", ""))
+class AudioAdapter:
+    """
+    Audio adapter for speech-to-text processing using Whisper.
 
+    This class handles audio file processing and transcription
+    using OpenAI's Whisper model.
+    """
 
-def classify_from_transcript(text: str) -> str:
-    t = text.lower()
-    if any(k in t for k in ["powder", "toz", "beyaz", "un"]):
-        return "powdery_mildew"
-    if any(k in t for k in ["brown", "spot", "leke", "yanik"]):
-        return "blight"
-    if any(k in t for k in ["rust", "pas", "turuncu", "püstül", "pustul"]):
-        return "rust"
-    return "healthy"
+    def __init__(self, model_name: str = "openai/whisper-tiny"):
+        """
+        Initialize AudioAdapter.
 
+        Args:
+            model_name: Whisper model name to use
+        """
+        self.model_name = model_name
+        self.pipeline = None  # Will be loaded lazily
 
-def transcribe_and_classify(audio_path: str) -> tuple[str, str]:
-    txt = transcribe(audio_path)
-    return txt, classify_from_transcript(txt)
+        logger.info("AudioAdapter initialized with model: %s", self.model_name)
+
+    def transcribe(self, audio_file: str | bytes) -> str:
+        """
+        Transcribe audio file to text.
+
+        Args:
+            audio_file: Path to audio file or audio bytes
+
+        Returns:
+            Transcribed text string
+        """
+        # Placeholder implementation - will be implemented in Task 4
+        logger.warning("AudioAdapter.transcribe() is not yet implemented")
+        return "placeholder transcription"
+
+    def process_audio_bytes(self, audio_bytes: bytes) -> str:
+        """
+        Process in-memory audio data.
+
+        Args:
+            audio_bytes: Audio data as bytes
+
+        Returns:
+            Transcribed text string
+        """
+        # Placeholder implementation - will be implemented in Task 4
+        logger.warning("AudioAdapter.process_audio_bytes() is not yet implemented")
+        return "placeholder transcription"
+
+    def cleanup_temp_files(self) -> None:
+        """Remove temporary audio files."""
+        # Placeholder implementation - will be implemented in Task 4
+        logger.debug("AudioAdapter.cleanup_temp_files() called")

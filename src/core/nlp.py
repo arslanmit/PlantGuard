@@ -1,32 +1,78 @@
-"""Natural language processing module for plant care Q&A."""
+"""
+Natural language processing module for PlantGuard.
 
-import functools
-from typing import Any
-
-from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline
-from transformers.pipelines import Pipeline
-
-FAQ_CONTEXT = """
-Powdery mildew: White powder on leaf; treatment: sulfur-based fungicide, airflow, morning watering.
-Blight: Brown irregular spots; copper-based products, remove infected leaves.
-Rust: Orange/rust pustules; remove infected tissue, use resistant cultivars.
-General: Avoid excess nitrogen, reduce leaf wetness, weekly monitoring.
+This module contains the TextAdapter class for knowledge base management
+and response generation.
 """
 
+import logging
 
-@functools.lru_cache(maxsize=1)
-def qa_pipe() -> Pipeline:
-    """Create and cache a question-answering pipeline."""
-    # Pin to specific revision for security (latest stable as of 2024)
-    model_name = "distilbert-base-uncased"
-    revision = "914c22a"  # Pinned revision for security
-
-    tok = AutoTokenizer.from_pretrained(model_name, revision=revision)  # nosec B615
-    mdl = AutoModelForQuestionAnswering.from_pretrained(model_name, revision=revision)  # nosec B615
-    return pipeline("question-answering", model=mdl, tokenizer=tok)
+logger = logging.getLogger(__name__)
 
 
-def answer(question: str, context: str = FAQ_CONTEXT) -> str:
-    """Answer a question using the provided context."""
-    out: dict[str, Any] = qa_pipe()({"question": question, "context": context})
-    return str(out.get("answer", ""))
+class TextAdapter:
+    """
+    Text adapter for knowledge base management and response generation.
+
+    This class handles disease information retrieval and response formatting
+    based on user queries and disease predictions.
+    """
+
+    def __init__(self, knowledge_base_path: str = "data/knowledge_base/disease_info.json"):
+        """
+        Initialize TextAdapter.
+
+        Args:
+            knowledge_base_path: Path to disease information JSON file
+        """
+        self.knowledge_base_path = knowledge_base_path
+        self.disease_info: dict = {}
+
+        logger.info("TextAdapter initialized with knowledge base: %s", knowledge_base_path)
+
+    def get_disease_info(self, disease_class: str) -> dict[str, str]:
+        """
+        Get disease information from knowledge base.
+
+        Args:
+            disease_class: Disease class name from vision model
+
+        Returns:
+            Dictionary with disease info (name, description, treatment)
+        """
+        # Placeholder implementation - will be implemented in Task 5
+        logger.warning("TextAdapter.get_disease_info() is not yet implemented")
+        return {
+            "disease_name": "Placeholder Disease",
+            "description": "This is a placeholder description.",
+            "treatment": "This is placeholder treatment advice.",
+        }
+
+    def generate_response(self, disease_class: str, user_query: str = "") -> str:
+        """
+        Generate response based on disease prediction and user query.
+
+        Args:
+            disease_class: Predicted disease from vision model
+            user_query: Optional user question (from text/voice)
+
+        Returns:
+            Formatted response with diagnosis and advice
+        """
+        # Placeholder implementation - will be implemented in Task 5
+        logger.warning("TextAdapter.generate_response() is not yet implemented")
+        return f"Placeholder response for {disease_class}. Query: {user_query}"
+
+    def analyze_query_intent(self, query: str) -> list[str]:
+        """
+        Extract intent keywords from user query.
+
+        Args:
+            query: User query text
+
+        Returns:
+            List of intent keywords
+        """
+        # Placeholder implementation - will be implemented in Task 5
+        logger.warning("TextAdapter.analyze_query_intent() is not yet implemented")
+        return ["placeholder", "intent"]

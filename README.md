@@ -84,11 +84,20 @@ print(ngrok.connect(8501, bind_tls=True))
 ```
 src/
 ├── core/
-│   ├── vision.py    # ResNet18-based image classification
-│   ├── audio.py     # Whisper-tiny ASR + rule-based classification
-│   └── nlp.py       # DistilBERT Q&A pipeline
-└── ui/
-    └── app_streamlit.py  # Main Streamlit interface
+│   ├── vision.py    # ResNet50-based image classification (PlantVillage dataset)
+│   ├── audio.py     # Whisper-tiny ASR for voice input
+│   └── nlp.py       # Knowledge base and response generation
+├── data/
+│   ├── dataset.py   # PlantVillage dataset loading and preprocessing
+│   └── preprocessing.py  # Image and audio preprocessing utilities
+├── utils/
+│   ├── config.py    # Configuration management
+│   ├── logging.py   # Logging setup
+│   ├── error_handling.py  # Error handling utilities
+│   └── file_utils.py      # File management utilities
+├── ui/
+│   └── app.py       # Main Streamlit interface
+└── plantguard_bot.py  # Main orchestration class
 ```
 
 ## Privacy & Ethics
@@ -100,11 +109,12 @@ src/
 
 ## Technical Details
 
-- **Vision**: ResNet18 with ImageNet pretraining (fine-tuning checkpoint support)
-- **Audio**: OpenAI Whisper-tiny for transcription + rule-based disease classification
-- **NLP**: DistilBERT for question-answering on plant disease knowledge base
-- **UI**: Streamlit with WebRTC for microphone support
-- **Deployment**: Cloudflare Quick Tunnel (no account) or ngrok
+- **Vision**: ResNet50 with ImageNet pretraining, fine-tuned on PlantVillage dataset (38 disease classes)
+- **Audio**: OpenAI Whisper-tiny for local speech-to-text transcription
+- **NLP**: JSON-based knowledge base with template-based response generation
+- **UI**: Streamlit with audio input support for multimodal interaction
+- **Privacy**: All processing happens locally, no external API calls
+- **Deployment**: Hugging Face Spaces or local deployment
 
 ## Acceptance Criteria
 
@@ -142,6 +152,9 @@ make setup
 
 # Or install dependencies only
 make deps
+
+# All dependencies (production + development) are in requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Available Commands

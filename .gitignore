@@ -187,6 +187,10 @@ __marimo__/
 *.DS_Store*
 # PlantGuard specific
 data/models/
+data/PlantVillage/
+data/temp/
+logs/
+runs/
 *.pt
 *.pth
 *.ckpt
@@ -199,3 +203,9 @@ data/models/
 *.onnx
 *.csv
 .qodo/
+
+# TensorBoard logs
+events.out.tfevents.*
+
+# Streamlit
+.streamlit/
