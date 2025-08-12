@@ -9,14 +9,14 @@
   - Create requirements.txt with pinned versions of all dependencies
   - _Requirements: 4.1, 4.4_
 
-- [ ] 2. Data Pipeline Implementation
-  - [ ] 2.1 Create dataset loading utilities
+- [x] 2. Data Pipeline Implementation
+  - [x] 2.1 Create dataset loading utilities
     - Implement ImageFolder-based dataset loader for PlantVillage data
     - Create data preprocessing pipeline with resize, normalization, and augmentation transforms
     - Write train/validation split functionality with stratified sampling
     - _Requirements: 1.2, 8.2_
 
-  - [ ] 2.2 Implement data validation and quality checks
+  - [x] 2.2 Implement data validation and quality checks
     - Add image format validation and corruption detection
     - Create dataset statistics and class distribution analysis
     - Implement data integrity checks for training pipeline
