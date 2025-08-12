@@ -67,6 +67,7 @@ help:
 	@echo "  type           - Type check (Mypy)"
 	@echo "  fix-mypy       - Fix common MyPy issues"
 	@echo "  fix-files      - Fix file formatting issues"
+	@echo "  fix-eol        - Fix end-of-file issues (add missing newlines)"
 	@echo "  security       - Security scan (Bandit)"
 	@echo "  safety         - Check for known vulnerabilities"
 	@echo "  qa             - Full quality assurance pipeline"
@@ -424,6 +425,26 @@ fix-files:
 		fi; \
 	done 2>/dev/null || true
 	@echo "$(GREEN)✅ File fixes complete$(NC)"
+
+fix-eol:
+	@echo "$(BLUE)🔧 Fixing end-of-file issues (end-of-file-fixer)...$(NC)"
+	@echo "$(YELLOW)Adding newlines to files that need them...$(NC)"
+	@# Fix Python files
+	@if [ -d src ]; then find src -name "*.py" -exec sh -c 'if [ -s "{}" ] && [ "$(tail -c1 "{}" | wc -l)" -eq 0 ]; then echo "Fixing: {}"; echo >> "{}"; fi' \; 2>/dev/null || true; fi
+	@if [ -d tests ]; then find tests -name "*.py" -exec sh -c 'if [ -s "{}" ] && [ "$(tail -c1 "{}" | wc -l)" -eq 0 ]; then echo "Fixing: {}"; echo >> "{}"; fi' \; 2>/dev/null || true; fi
+	@if [ -d scripts ]; then find scripts -name "*.py" -exec sh -c 'if [ -s "{}" ] && [ "$(tail -c1 "{}" | wc -l)" -eq 0 ]; then echo "Fixing: {}"; echo >> "{}"; fi' \; 2>/dev/null || true; fi
+	@# Fix JSON files (common culprits)
+	@if [ -d data ]; then find data -name "*.json" -exec sh -c 'if [ -s "{}" ] && [ "$(tail -c1 "{}" | wc -l)" -eq 0 ]; then echo "Fixing: {}"; echo >> "{}"; fi' \; 2>/dev/null || true; fi
+	@if [ -d .kiro ]; then find .kiro -name "*.json" -exec sh -c 'if [ -s "{}" ] && [ "$(tail -c1 "{}" | wc -l)" -eq 0 ]; then echo "Fixing: {}"; echo >> "{}"; fi' \; 2>/dev/null || true; fi
+	@# Fix other common files
+	@for file in *.py *.json *.md *.txt *.yaml *.yml Makefile; do \
+		if [ -f "$file" ] && [ -s "$file" ] && [ "$(tail -c1 "$file" | wc -l)" -eq 0 ]; then \
+			echo "Fixing: $file"; \
+			echo >> "$file"; \
+		fi; \
+	done 2>/dev/null || true
+	@echo "$(GREEN)✅ End-of-file fixes complete$(NC)"
+	@echo "$(CYAN)💡 Run 'git add . && git commit' to commit the fixed files$(NC)"
 
 pre-commit-install: dev-deps
 	@echo "$(BLUE)🔧 Installing pre-commit hooks...$(NC)"

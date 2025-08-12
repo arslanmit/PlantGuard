@@ -25,7 +25,7 @@ st.caption("Image + Voice + Text | Early leaf disease detection (PoC)")
 
 
 # Initialize adapters (cached for performance)
-@st.cache_resource  # type: ignore[misc]
+@st.cache_resource
 def load_adapters() -> tuple[VisionAdapter, AudioAdapter, TextAdapter]:
     """Load and cache the ML adapters."""
     # Load vision model with checkpoint

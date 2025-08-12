@@ -324,6 +324,11 @@ exclude = [
   "tests/fixtures/",
 ]
 
+# File-specific overrides
+[[tool.mypy.overrides]]
+module = "src.ui.app_streamlit"
+disallow_untyped_decorators = false  # Allow @st.cache_resource without type annotations
+
 # Third-party library stubs
 [[tool.mypy.overrides]]
 module = [

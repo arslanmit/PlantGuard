@@ -196,7 +196,10 @@
       ],
       "env": {},
       "disabled": false,
-      "autoApprove": []
+      "autoApprove": [
+        "*",
+        "fetch"
+      ]
     },
     "Figma MCP": {
       "command": "npx",
