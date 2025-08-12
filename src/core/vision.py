@@ -25,7 +25,7 @@ class VisionAdapter:
     using a fine-tuned ResNet50 model.
     """
 
-    def __init__(self, model_path: str | None = None, device: str = "cpu"):
+    def __init__(self, model_path: str | None = None, device: str = "cpu") -> None:
         """Initialize VisionAdapter.
 
         Args:

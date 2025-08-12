@@ -15,7 +15,7 @@ class AudioAdapter:
     using OpenAI's Whisper model.
     """
 
-    def __init__(self, model_name: str = "openai/whisper-tiny"):
+    def __init__(self, model_name: str = "openai/whisper-tiny") -> None:
         """Initialize AudioAdapter.
 
         Args:

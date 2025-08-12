@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class FileManager:
     """Utility class for secure file operations."""
 
-    def __init__(self, temp_dir: str = "data/temp"):
+    def __init__(self, temp_dir: str = "data/temp") -> None:
         """Initialize FileManager.
 
         Args:

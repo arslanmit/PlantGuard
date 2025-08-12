@@ -16,7 +16,7 @@ class TextAdapter:
     based on user queries and disease predictions.
     """
 
-    def __init__(self, knowledge_base_path: str = "data/knowledge_base/disease_info.json"):
+    def __init__(self, knowledge_base_path: str = "data/knowledge_base/disease_info.json") -> None:
         """Initialize TextAdapter.
 
         Args:
@@ -58,11 +58,31 @@ class TextAdapter:
 
         # Simple knowledge base responses
         responses = {
-            "powdery mildew": "Powdery mildew is a fungal disease that appears as white, powdery spots on leaves. Treatment includes improving air circulation, reducing humidity, and applying fungicidal sprays.",
-            "blight": "Blight diseases cause rapid browning and death of plant tissues. Remove affected parts immediately and apply copper-based fungicides. Ensure good drainage and avoid overhead watering.",
-            "rust": "Rust appears as orange or reddish spots on leaves. Remove infected leaves, improve air circulation, and apply fungicidal treatments. Water at soil level to avoid wetting leaves.",
-            "bacterial spot": "Bacterial spot causes dark, water-soaked lesions on leaves and fruits. Remove infected plant parts, avoid overhead watering, and apply copper-based bactericides.",
-            "healthy": "Your plant appears healthy! Continue with regular care including proper watering, adequate sunlight, and good air circulation to maintain plant health.",
+            "powdery mildew": (
+                "Powdery mildew is a fungal disease that appears as white, powdery spots on "
+                "leaves. Treatment includes improving air circulation, reducing humidity, and "
+                "applying fungicidal sprays."
+            ),
+            "blight": (
+                "Blight diseases cause rapid browning and death of plant tissues. Remove "
+                "affected parts immediately and apply copper-based fungicides. Ensure good "
+                "drainage and avoid overhead watering."
+            ),
+            "rust": (
+                "Rust appears as orange or reddish spots on leaves. Remove infected leaves, "
+                "improve air circulation, and apply fungicidal treatments. Water at soil "
+                "level to avoid wetting leaves."
+            ),
+            "bacterial spot": (
+                "Bacterial spot causes dark, water-soaked lesions on leaves and fruits. "
+                "Remove infected plant parts, avoid overhead watering, and apply "
+                "copper-based bactericides."
+            ),
+            "healthy": (
+                "Your plant appears healthy! Continue with regular care including proper "
+                "watering, adequate sunlight, and good air circulation to maintain plant "
+                "health."
+            ),
         }
 
         # Find relevant response
@@ -72,7 +92,11 @@ class TextAdapter:
                 return response
 
         # Default response
-        return f"I'd be happy to help with your plant care question: '{user_query}'. For specific diseases, please upload a photo for analysis. General care tips: ensure proper watering, adequate sunlight, and good air circulation."
+        return (
+            f"I'd be happy to help with your plant care question: '{user_query}'. "
+            "For specific diseases, please upload a photo for analysis. General care tips: "
+            "ensure proper watering, adequate sunlight, and good air circulation."
+        )
 
     def analyze_query_intent(self, query: str) -> list[str]:
         """Extract intent keywords from user query.

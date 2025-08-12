@@ -21,7 +21,7 @@ repos:
         name: mypy (type checker)
         additional_dependencies: [types-requests, types-PyYAML]
         args: [--config-file=pyproject.toml]
-        exclude: ^(tests/|notebooks/)
+        exclude: ^(tests/|notebooks/|\.kiro/)
 
   # Built-in pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -60,6 +60,7 @@ repos:
 default_stages: [pre-commit]
 fail_fast: false
 minimum_pre_commit_version: "3.0.0"
+exclude: ^\.kiro/.*
 
 # CI configuration
 ci:

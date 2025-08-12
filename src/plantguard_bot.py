@@ -26,7 +26,7 @@ class PlantGuardBot:
     comprehensive plant disease diagnosis and treatment recommendations.
     """
 
-    def __init__(self, config_path: str | None = None, device: str = "cpu"):
+    def __init__(self, config_path: str | None = None, device: str = "cpu") -> None:
         """Initialize PlantGuardBot with all required components.
 
         Args:

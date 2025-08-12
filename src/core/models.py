@@ -19,7 +19,7 @@ class PlantDiseaseResNet50(nn.Module):
     for 38 PlantVillage disease classes.
     """
 
-    def __init__(self, num_classes: int = 38, pretrained: bool = True):
+    def __init__(self, num_classes: int = 38, pretrained: bool = True) -> None:
         """Initialize ResNet50 model.
 
         Args:

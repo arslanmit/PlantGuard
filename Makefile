@@ -18,13 +18,31 @@ RUNS_DIR := runs
 TESTS_DIR := tests
 LOGS_DIR := logs
 
-# Colors for output
-RED := \033[0;31m
-GREEN := \033[0;32m
-YELLOW := \033[0;33m
-BLUE := \033[0;34m
-CYAN := \033[0;36m
-NC := \033[0m # No Color
+# Colors for output (auto-detect terminal support)
+ifeq ($(shell test -t 1 && echo 1),1)
+    ifneq ($(NO_COLOR),1)
+        RED := \033[0;31m
+        GREEN := \033[0;32m
+        YELLOW := \033[0;33m
+        BLUE := \033[0;34m
+        CYAN := \033[0;36m
+        NC := \033[0m # No Color
+    else
+        RED :=
+        GREEN :=
+        YELLOW :=
+        BLUE :=
+        CYAN :=
+        NC :=
+    endif
+else
+    RED :=
+    GREEN :=
+    YELLOW :=
+    BLUE :=
+    CYAN :=
+    NC :=
+endif
 
 .DEFAULT_GOAL := help
 
