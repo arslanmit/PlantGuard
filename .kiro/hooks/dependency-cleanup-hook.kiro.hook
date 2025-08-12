@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "name": "Dependency Cleanup",
+  "description": "When files are deleted, scan the entire codebase to identify and remove related dependencies that are no longer needed",
+  "version": "1",
+  "when": {
+    "type": "fileDeleted",
+    "patterns": [
+      "**/*.py",
+      "**/*.js",
+      "**/*.ts",
+      "**/*.jsx",
+      "**/*.tsx",
+      "requirements.txt",
+      "package.json",
+      "pyproject.toml"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Files have been deleted from the codebase. Please analyze the entire project to identify any dependencies, imports, or references that are no longer needed due to these deletions. Check:\n\n1. Import statements in remaining files that may reference deleted modules\n2. Dependencies in requirements.txt, package.json, or pyproject.toml that are no longer used\n3. Configuration references to deleted files\n4. Test files that may reference deleted components\n5. Documentation that references deleted functionality\n\nProvide a comprehensive cleanup plan and implement the necessary changes to remove unused dependencies and references."
+  }
+}
