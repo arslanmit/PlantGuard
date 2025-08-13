@@ -189,7 +189,7 @@ def print_results(results: dict[str, Any]) -> None:
     print(f"Model classes: {results['num_classes']}")
 
 
-def main():
+def main() -> None:
     """Test multiple Hugging Face models."""
     print("🤗 Testing Hugging Face Plant Disease Models")
     print("=" * 80)

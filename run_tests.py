@@ -15,29 +15,29 @@ MIN_ARGS = 2
 
 def run_command(cmd: list[str], description: str) -> bool:
     """Run a command and return success status."""
-    print(f"\n🔍 {description}")  # noqa: T201
-    print(f"Running: {' '.join(cmd)}")  # noqa: T201
-    print("-" * 50)  # noqa: T201
+    print(f"\n🔍 {description}")
+    print(f"Running: {' '.join(cmd)}")
+    print("-" * 50)
 
     try:
         subprocess.run(cmd, check=True, cwd=Path.cwd())
     except subprocess.CalledProcessError as e:
-        print(f"❌ {description} failed with exit code {e.returncode}")  # noqa: T201
+        print(f"❌ {description} failed with exit code {e.returncode}")
         return False
 
-    print(f"✅ {description} completed successfully")  # noqa: T201
+    print(f"✅ {description} completed successfully")
     return True
 
 
 def _show_usage() -> None:
     """Show usage information."""
-    print("Usage: python run_tests.py [command]")  # noqa: T201
-    print("\nAvailable commands:")  # noqa: T201
-    print("  all       - Run all tests with coverage")  # noqa: T201
-    print("  unit      - Run unit tests only")  # noqa: T201
-    print("  fast      - Run tests without coverage")  # noqa: T201
-    print("  coverage  - Generate coverage report")  # noqa: T201
-    print("  clean     - Clean test artifacts")  # noqa: T201
+    print("Usage: python run_tests.py [command]")
+    print("\nAvailable commands:")
+    print("  all       - Run all tests with coverage")
+    print("  unit      - Run unit tests only")
+    print("  fast      - Run tests without coverage")
+    print("  coverage  - Generate coverage report")
+    print("  clean     - Clean test artifacts")
 
 
 def _run_all_tests() -> bool:
@@ -79,7 +79,7 @@ def _generate_coverage() -> bool:
     )
     if success:
         coverage_path = Path.cwd() / "htmlcov" / "index.html"
-        print(f"\n📊 Coverage report generated in: {coverage_path}")  # noqa: T201
+        print(f"\n📊 Coverage report generated in: {coverage_path}")
     return success
 
 
@@ -93,8 +93,8 @@ def _clean_artifacts() -> bool:
                 shutil.rmtree(path)
             else:
                 path.unlink()
-            print(f"🧹 Removed {artifact}")  # noqa: T201
-    print("✅ Test artifacts cleaned")  # noqa: T201
+            print(f"🧹 Removed {artifact}")
+    print("✅ Test artifacts cleaned")
     return True
 
 
@@ -117,7 +117,7 @@ def main() -> None:
     elif command == "clean":
         success = _clean_artifacts()
     else:
-        print(f"❌ Unknown command: {command}")  # noqa: T201
+        print(f"❌ Unknown command: {command}")
         success = False
 
     sys.exit(0 if success else 1)

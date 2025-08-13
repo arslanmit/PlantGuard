@@ -16,7 +16,8 @@ class SimpleModel(nn.Module):
         self.linear = nn.Linear(10, 1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.linear(x)
+        result: torch.Tensor = self.linear(x)
+        return result
 
 
 def test_end_to_end_training_setup() -> None:

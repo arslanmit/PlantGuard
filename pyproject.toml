@@ -203,6 +203,7 @@ ignore = [
   # flake8-annotations (ANN)
   "ANN001", # arg annotations not required everywhere
   "ANN201", # return annotations not required everywhere
+  "ANN401",
 
   # flake8-blind-except (BLE)
   "BLE001", # allow catch-all Exception when justified

@@ -2,7 +2,6 @@
 
 This script tests the VisionAdapter functionality without requiring a trained model.
 """
-# ruff: noqa: S101
 
 import logging
 import sys

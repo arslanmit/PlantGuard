@@ -2,6 +2,7 @@
 """Simple test of PlantGuard vision model on sample images."""
 
 import json
+import logging
 import sys
 from pathlib import Path
 
@@ -12,11 +13,14 @@ from PIL import Image
 
 from src.core.vision import VisionAdapter
 
+logger = logging.getLogger(__name__)
+
 
 def main() -> None:
     """Test the model on sample images."""
-    print("🌱 PlantGuard Model Test")
-    print("=" * 50)
+    logging.basicConfig(level=logging.INFO)
+    logger.info("🌱 PlantGuard Model Test")
+    logger.info("=" * 50)
 
     # Load model
     model_path = "data/models/vision_resnet50.pt"
@@ -24,11 +28,11 @@ def main() -> None:
 
     try:
         vision_adapter.load_checkpoint(model_path)
-        print("✅ Model loaded successfully")
-        print(f"📊 Model has {len(vision_adapter.class_names)} classes")
-        print()
+        logger.info("✅ Model loaded successfully")
+        logger.info("📊 Model has %s classes", len(vision_adapter.class_names))
+        logger.info("")
     except Exception as e:
-        print(f"❌ Failed to load model: {e}")
+        logger.error("❌ Failed to load model: %s", e)
         return
 
     # Load test metadata
@@ -41,8 +45,8 @@ def main() -> None:
     correct_status = 0
     total = 0
 
-    print("🔍 Testing images:")
-    print("-" * 80)
+    logger.info("🔍 Testing images:")
+    logger.info("-" * 80)
 
     for sample in metadata["sample_images"]:
         image_path = Path("data/pictures") / sample["filename"]
@@ -97,26 +101,35 @@ def main() -> None:
         status_icon = "💚" if status_correct else "💔"
         exact_icon = "✅" if (exact_correct and plant_correct) else "❌"
 
-        print(f"{exact_icon} {sample['filename']}")
-        print(f"   GT: {gt_plant} - {gt_disease} ({gt_status})")
-        print(
-            f"   Pred: {pred_plant} - {pred_disease} (conf: {confidence:.3f}) {plant_icon}{status_icon}"
+        logger.info("%s %s", exact_icon, sample["filename"])
+        logger.info("   GT: %s - %s (%s)", gt_plant, gt_disease, gt_status)
+        logger.info(
+            "   Pred: %s - %s (conf: %.3f) %s%s",
+            pred_plant,
+            pred_disease,
+            confidence,
+            plant_icon,
+            status_icon,
         )
-        print()
+        logger.info("")
 
     # Summary
-    print("📊 RESULTS SUMMARY")
-    print("=" * 50)
-    print(f"Total images tested: {total}")
-    print(f"Exact matches: {correct_exact}/{total} ({correct_exact / total:.1%})")
-    print(f"Plant type correct: {correct_plant}/{total} ({correct_plant / total:.1%})")
-    print(f"Health status correct: {correct_status}/{total} ({correct_status / total:.1%})")
-    print()
+    logger.info("📊 RESULTS SUMMARY")
+    logger.info("=" * 50)
+    logger.info("Total images tested: %s", total)
+    logger.info("Exact matches: %s/%s (%.1%%)", correct_exact, total, correct_exact / total * 100)
+    logger.info(
+        "Plant type correct: %s/%s (%.1%%)", correct_plant, total, correct_plant / total * 100
+    )
+    logger.info(
+        "Health status correct: %s/%s (%.1%%)", correct_status, total, correct_status / total * 100
+    )
+    logger.info("")
 
     # Show available classes
-    print("🏷️  Available model classes:")
+    logger.info("🏷️  Available model classes:")
     for i, class_name in enumerate(vision_adapter.class_names):
-        print(f"  {i:2d}: {class_name}")
+        logger.info("  %2d: %s", i, class_name)
 
 
 if __name__ == "__main__":

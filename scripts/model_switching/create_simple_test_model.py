@@ -2,6 +2,7 @@
 """Create a simple test model that can make basic predictions on your 21 test images."""
 
 import json
+import logging
 import sys
 from pathlib import Path
 
@@ -14,6 +15,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from src.core.models import PlantDiseaseResNet50
 
+logger = logging.getLogger(__name__)
+
 
 def create_simple_pattern_model() -> str:
     """Create a model with simple pattern-based predictions."""
@@ -25,7 +28,7 @@ def create_simple_pattern_model() -> str:
     class_names = class_data["classes"]
     num_classes = len(class_names)
 
-    print(f"Creating simple test model with {num_classes} classes")
+    logger.info("Creating simple test model with %s classes", num_classes)
 
     # Create model
     model = PlantDiseaseResNet50(num_classes=num_classes, pretrained=True)
@@ -84,7 +87,7 @@ def create_simple_pattern_model() -> str:
     checkpoint_path = models_dir / "vision_resnet50_simple.pt"
 
     torch.save(checkpoint, checkpoint_path)
-    print(f"Simple test model saved to: {checkpoint_path}")
+    logger.info("Simple test model saved to: %s", checkpoint_path)
 
     return str(checkpoint_path)
 
@@ -104,19 +107,20 @@ def test_simple_model(model_path: str) -> None:
         "data/pictures/potato_late_blight_sample.jpg",
     ]
 
-    print("\n🧪 Testing simple model:")
-    print("-" * 40)
+    logger.info("\n🧪 Testing simple model:")
+    logger.info("-" * 40)
 
     for img_path in test_images:
         if Path(img_path).exists():
             image = Image.open(img_path)
             predicted_class, confidence = vision_adapter.predict(image)
-            print(f"{Path(img_path).name}: {predicted_class} ({confidence:.3f})")
+            logger.info("%s: %s (%.3f)", Path(img_path).name, predicted_class, confidence)
 
 
 def main() -> None:
-    print("🔧 Creating Simple Test Model for PlantGuard")
-    print("=" * 50)
+    logging.basicConfig(level=logging.INFO)
+    logger.info("🔧 Creating Simple Test Model for PlantGuard")
+    logger.info("=" * 50)
 
     # Create simple model
     model_path = create_simple_pattern_model()
@@ -124,11 +128,11 @@ def main() -> None:
     # Test it
     test_simple_model(model_path)
 
-    print("\n💡 This is still a basic test model.")
-    print("   For real performance, you need to:")
-    print("   1. Download the PlantVillage dataset")
-    print("   2. Run proper training with: python scripts/train_vision_model.py")
-    print("   3. Or use a pre-trained model from Hugging Face")
+    logger.info("\n💡 This is still a basic test model.")
+    logger.info("   For real performance, you need to:")
+    logger.info("   1. Download the PlantVillage dataset")
+    logger.info("   2. Run proper training with: python scripts/train_vision_model.py")
+    logger.info("   3. Or use a pre-trained model from Hugging Face")
 
 
 if __name__ == "__main__":

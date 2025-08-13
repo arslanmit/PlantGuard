@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.core.vision import VisionAdapter
 
 
-def test_different_preprocessing():
+def test_different_preprocessing() -> None:
     """Test different preprocessing approaches."""
     # Load model
     vision_adapter = VisionAdapter(device="cpu")
@@ -90,7 +90,7 @@ def test_different_preprocessing():
             print()
 
 
-def show_top_predictions():
+def show_top_predictions() -> None:
     """Show top 5 predictions for a sample image."""
     vision_adapter = VisionAdapter(device="cpu")
     vision_adapter.load_checkpoint("data/models/vision_resnet50.pt")
@@ -124,7 +124,7 @@ def show_top_predictions():
             print(f"   {i + 1}. {class_name} ({prob:.4f})")
 
 
-def main():
+def main() -> None:
     print("🧪 PlantGuard Preprocessing Test")
     print("=" * 60)
 

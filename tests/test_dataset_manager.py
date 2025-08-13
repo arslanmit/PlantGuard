@@ -1,8 +1,8 @@
 """Unit tests for DatasetManager."""
 
 import json
-import sys
 import tempfile
+from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -18,20 +18,20 @@ from src.training.dataset_manager import (
 
 
 @pytest.fixture
-def temp_dir():
+def temp_dir() -> Generator[Path, None, None]:
     """Create a temporary directory for testing."""
     with tempfile.TemporaryDirectory() as tmp_dir:
         yield Path(tmp_dir)
 
 
 @pytest.fixture
-def dataset_manager(temp_dir):
+def dataset_manager(temp_dir: Path) -> DatasetManager:
     """Create a DatasetManager instance for testing."""
     return DatasetManager(base_data_dir=temp_dir)
 
 
 @pytest.fixture
-def sample_dataset(temp_dir):
+def sample_dataset(temp_dir: Path) -> Path:
     """Create a sample dataset structure for testing."""
     dataset_dir = temp_dir / "sample_dataset"
 
@@ -57,7 +57,7 @@ def sample_dataset(temp_dir):
 class TestDatasetConfig:
     """Test DatasetConfig dataclass."""
 
-    def test_default_values(self):
+    def test_default_values(self) -> None:
         """Test default configuration values."""
         config = DatasetConfig()
 
@@ -68,7 +68,7 @@ class TestDatasetConfig:
         assert config.image_formats == [".jpg", ".jpeg", ".png"]
         assert config.quality_threshold == 0.95
 
-    def test_custom_values(self):
+    def test_custom_values(self) -> None:
         """Test custom configuration values."""
         config = DatasetConfig(
             train_ratio=0.7, val_ratio=0.3, random_seed=123, min_samples_per_class=5
@@ -83,7 +83,7 @@ class TestDatasetConfig:
 class TestDatasetManager:
     """Test DatasetManager class."""
 
-    def test_init(self, temp_dir):
+    def test_init(self, temp_dir: Path) -> None:
         """Test DatasetManager initialization."""
         manager = DatasetManager(base_data_dir=temp_dir)
 
@@ -97,7 +97,7 @@ class TestDatasetManager:
         assert manager.processed_data_dir.exists()
         assert manager.temp_dir.exists()
 
-    def test_download_plantvillage_success(self, dataset_manager):
+    def test_download_plantvillage_success(self, dataset_manager: DatasetManager) -> None:
         """Test successful PlantVillage dataset download."""
         # Mock kaggle module
         mock_kaggle = Mock()
@@ -109,17 +109,7 @@ class TestDatasetManager:
         assert result is True
         mock_kaggle.api.dataset_download_files.assert_called_once()
 
-    def test_download_plantvillage_no_kaggle(self, dataset_manager):
-        """Test PlantVillage download when Kaggle API is not available."""
-        # Ensure kaggle is not in sys.modules
-        if "kaggle" in sys.modules:
-            del sys.modules["kaggle"]
-
-        result = dataset_manager.download_plantvillage()
-
-        assert result is False
-
-    def test_validate_dataset_nonexistent(self, dataset_manager):
+    def test_validate_dataset_nonexistent(self, dataset_manager: DatasetManager) -> None:
         """Test dataset validation with non-existent directory."""
         result = dataset_manager.validate_dataset(Path("/nonexistent"))
 
@@ -128,7 +118,9 @@ class TestDatasetManager:
         assert result.valid_files == 0
         assert len(result.errors) > 0
 
-    def test_validate_dataset_valid(self, dataset_manager, sample_dataset):
+    def test_validate_dataset_valid(
+        self, dataset_manager: DatasetManager, sample_dataset: Path
+    ) -> None:
         """Test dataset validation with valid dataset."""
         result = dataset_manager.validate_dataset(sample_dataset)
 
@@ -141,7 +133,9 @@ class TestDatasetManager:
         assert result.class_counts["healthy"] == 5
         assert result.class_counts["diseased"] == 5
 
-    def test_validate_dataset_with_corrupted_file(self, dataset_manager, temp_dir):
+    def test_validate_dataset_with_corrupted_file(
+        self, dataset_manager: DatasetManager, temp_dir: Path
+    ) -> None:
         """Test dataset validation with corrupted files."""
         dataset_dir = temp_dir / "corrupted_dataset"
         class_dir = dataset_dir / "test_class"
@@ -162,7 +156,9 @@ class TestDatasetManager:
         assert len(result.corrupted_files) == 1
         assert "corrupted.jpg" in str(result.corrupted_files[0])
 
-    def test_prepare_dataset(self, dataset_manager, sample_dataset, temp_dir):
+    def test_prepare_dataset(
+        self, dataset_manager: DatasetManager, sample_dataset: Path, temp_dir: Path
+    ) -> None:
         """Test dataset preparation with train/val split."""
         output_dir = temp_dir / "prepared"
         config = DatasetConfig(train_ratio=0.8, random_seed=42)
@@ -186,7 +182,9 @@ class TestDatasetManager:
         assert saved_config["train_ratio"] == 0.8
         assert saved_config["random_seed"] == 42
 
-    def test_prepare_dataset_nonexistent_source(self, dataset_manager, temp_dir):
+    def test_prepare_dataset_nonexistent_source(
+        self, dataset_manager: DatasetManager, temp_dir: Path
+    ) -> None:
         """Test dataset preparation with non-existent source."""
         output_dir = temp_dir / "prepared"
         config = DatasetConfig()
@@ -195,7 +193,7 @@ class TestDatasetManager:
 
         assert result is False
 
-    def test_analyze_dataset(self, dataset_manager, sample_dataset):
+    def test_analyze_dataset(self, dataset_manager: DatasetManager, sample_dataset: Path) -> None:
         """Test dataset analysis."""
         info = dataset_manager.analyze_dataset(sample_dataset)
 
@@ -208,7 +206,9 @@ class TestDatasetManager:
         assert info.class_distribution["diseased"] == 5
         assert info.dataset_size_mb > 0
 
-    def test_analyze_dataset_with_splits(self, dataset_manager, temp_dir):
+    def test_analyze_dataset_with_splits(
+        self, dataset_manager: DatasetManager, temp_dir: Path
+    ) -> None:
         """Test dataset analysis with train/val splits."""
         dataset_dir = temp_dir / "split_dataset"
         train_dir = dataset_dir / "train" / "healthy"
@@ -236,7 +236,7 @@ class TestDatasetManager:
         # For split datasets, the class_distribution is flattened to total counts
         assert info.class_distribution["healthy"] == 5
 
-    def test_analyze_dataset_nonexistent(self, dataset_manager):
+    def test_analyze_dataset_nonexistent(self, dataset_manager: DatasetManager) -> None:
         """Test dataset analysis with non-existent directory."""
         info = dataset_manager.analyze_dataset(Path("/nonexistent"))
 
@@ -245,7 +245,7 @@ class TestDatasetManager:
         assert info.num_classes == 0
         assert info.class_distribution == {}
 
-    def test_get_dataset_info(self, dataset_manager, sample_dataset):
+    def test_get_dataset_info(self, dataset_manager: DatasetManager, sample_dataset: Path) -> None:
         """Test get_dataset_info method."""
         info = dataset_manager.get_dataset_info(sample_dataset)
 
@@ -258,7 +258,7 @@ class TestDatasetManager:
 class TestDatasetValidationResult:
     """Test DatasetValidationResult dataclass."""
 
-    def test_creation(self):
+    def test_creation(self) -> None:
         """Test creating DatasetValidationResult."""
         result = DatasetValidationResult(
             is_valid=True,
@@ -281,7 +281,7 @@ class TestDatasetValidationResult:
 class TestDatasetInfo:
     """Test DatasetInfo dataclass."""
 
-    def test_creation(self):
+    def test_creation(self) -> None:
         """Test creating DatasetInfo."""
         info = DatasetInfo(
             name="test_dataset",

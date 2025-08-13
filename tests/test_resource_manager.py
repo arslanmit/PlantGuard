@@ -1,5 +1,6 @@
 """Unit tests for resource management utilities."""
 
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -24,7 +25,7 @@ class TestResourceManager:
     @patch("torch.cuda.is_available", return_value=True)
     @patch("torch.cuda.device_count", return_value=1)
     @patch("torch.cuda.get_device_name", return_value="NVIDIA RTX 3080")
-    def test_detect_device_cuda(self, mock_name, mock_count, mock_available) -> None:
+    def test_detect_device_cuda(self, mock_name: Any, mock_count: Any, mock_available: Any) -> None:
         """Test CUDA device detection."""
         manager = ResourceManager()
         device_type, device_name, device_count = manager._detect_device()
@@ -35,7 +36,7 @@ class TestResourceManager:
 
     @patch("torch.cuda.is_available", return_value=False)
     @patch("torch.backends.mps.is_available", return_value=True)
-    def test_detect_device_mps(self, mock_mps, mock_cuda) -> None:
+    def test_detect_device_mps(self, mock_mps: Any, mock_cuda: Any) -> None:
         """Test MPS device detection."""
         manager = ResourceManager()
         device_type, device_name, device_count = manager._detect_device()
@@ -48,7 +49,9 @@ class TestResourceManager:
     @patch("torch.backends.mps.is_available", return_value=False)
     @patch("torch.get_num_threads", return_value=8)
     @patch("platform.processor", return_value="Intel Core i7")
-    def test_detect_device_cpu(self, mock_processor, mock_threads, mock_mps, mock_cuda) -> None:
+    def test_detect_device_cpu(
+        self, mock_processor: Any, mock_threads: Any, mock_mps: Any, mock_cuda: Any
+    ) -> None:
         """Test CPU device detection."""
         manager = ResourceManager()
         device_type, device_name, device_count = manager._detect_device()
@@ -60,7 +63,9 @@ class TestResourceManager:
     @patch("torch.cuda.is_available", return_value=True)
     @patch("torch.cuda.get_device_properties")
     @patch("torch.cuda.memory_allocated", return_value=1024**3)  # 1GB
-    def test_get_memory_info_cuda(self, mock_allocated, mock_properties, mock_available) -> None:
+    def test_get_memory_info_cuda(
+        self, mock_allocated: Any, mock_properties: Any, mock_available: Any
+    ) -> None:
         """Test CUDA memory information retrieval."""
         # Mock device properties
         mock_props = MagicMock()
@@ -74,7 +79,7 @@ class TestResourceManager:
         assert available_gb == 7.0  # 8GB - 1GB allocated
 
     @patch("psutil.virtual_memory")
-    def test_get_memory_info_mps(self, mock_memory) -> None:
+    def test_get_memory_info_mps(self, mock_memory: Any) -> None:
         """Test MPS memory information retrieval."""
         # Mock system memory
         mock_mem = MagicMock()
@@ -104,7 +109,9 @@ class TestResourceManager:
 
     @patch("torch.cuda.is_available", return_value=True)
     @patch("torch.cuda.get_device_capability", return_value=(7, 5))  # Compute capability 7.5
-    def test_check_mixed_precision_support_cuda(self, mock_capability, mock_available) -> None:
+    def test_check_mixed_precision_support_cuda(
+        self, mock_capability: Any, mock_available: Any
+    ) -> None:
         """Test mixed precision support check for CUDA."""
         manager = ResourceManager()
         supported = manager._check_mixed_precision_support("cuda")
@@ -112,7 +119,9 @@ class TestResourceManager:
 
     @patch("torch.cuda.is_available", return_value=True)
     @patch("torch.cuda.get_device_capability", return_value=(6, 1))  # Compute capability 6.1
-    def test_check_mixed_precision_support_cuda_old(self, mock_capability, mock_available) -> None:
+    def test_check_mixed_precision_support_cuda_old(
+        self, mock_capability: Any, mock_available: Any
+    ) -> None:
         """Test mixed precision support check for old CUDA."""
         manager = ResourceManager()
         supported = manager._check_mixed_precision_support("cuda")
@@ -144,7 +153,7 @@ class TestResourceManager:
         assert manager._round_to_power_of_2(100) == 64
 
     @patch.object(ResourceManager, "detect_resources")
-    def test_get_optimal_batch_size(self, mock_detect) -> None:
+    def test_get_optimal_batch_size(self, mock_detect: Any) -> None:
         """Test optimal batch size calculation."""
         # Mock resource info
         mock_resource_info = ResourceInfo(
@@ -177,7 +186,7 @@ class TestResourceManager:
         assert batch_size & (batch_size - 1) == 0
 
     @patch.object(ResourceManager, "detect_resources")
-    def test_get_optimal_batch_size_cpu(self, mock_detect) -> None:
+    def test_get_optimal_batch_size_cpu(self, mock_detect: Any) -> None:
         """Test optimal batch size calculation for CPU."""
         # Mock CPU resource info
         mock_resource_info = ResourceInfo(
@@ -203,7 +212,7 @@ class TestResourceManager:
         assert batch_size <= 16
 
     @patch.object(ResourceManager, "detect_resources")
-    def test_get_optimal_num_workers(self, mock_detect) -> None:
+    def test_get_optimal_num_workers(self, mock_detect: Any) -> None:
         """Test optimal number of workers calculation."""
         mock_resource_info = ResourceInfo(
             device_type="cuda",
@@ -228,7 +237,7 @@ class TestResourceManager:
         assert num_workers == 8
 
     @patch.object(ResourceManager, "detect_resources")
-    def test_get_optimal_num_workers_cpu(self, mock_detect) -> None:
+    def test_get_optimal_num_workers_cpu(self, mock_detect: Any) -> None:
         """Test optimal number of workers calculation for CPU."""
         mock_resource_info = ResourceInfo(
             device_type="cpu",
@@ -255,7 +264,9 @@ class TestResourceManager:
     @patch.object(ResourceManager, "detect_resources")
     @patch.object(ResourceManager, "get_optimal_batch_size", return_value=32)
     @patch.object(ResourceManager, "get_optimal_num_workers", return_value=4)
-    def test_optimize_training_config(self, mock_workers, mock_batch, mock_detect) -> None:
+    def test_optimize_training_config(
+        self, mock_workers: Any, mock_batch: Any, mock_detect: Any
+    ) -> None:
         """Test training configuration optimization."""
         mock_resource_info = ResourceInfo(
             device_type="cuda",
@@ -289,7 +300,7 @@ class TestResourceManager:
         assert optimized["mixed_precision"] is True
 
     @patch.object(ResourceManager, "detect_resources")
-    def test_optimize_training_config_mixed_precision_warning(self, mock_detect) -> None:
+    def test_optimize_training_config_mixed_precision_warning(self, mock_detect: Any) -> None:
         """Test mixed precision warning when not supported."""
         mock_resource_info = ResourceInfo(
             device_type="cpu",
@@ -329,7 +340,7 @@ class TestResourceManager:
     @patch("torch.cuda.memory_reserved", return_value=2 * 1024**3)  # 2GB
     @patch("torch.cuda.get_device_properties")
     def test_get_memory_usage_cuda(
-        self, mock_props, mock_reserved, mock_allocated, mock_available
+        self, mock_props: Any, mock_reserved: Any, mock_allocated: Any, mock_available: Any
     ) -> None:
         """Test memory usage retrieval for CUDA."""
         mock_device_props = MagicMock()
@@ -368,7 +379,7 @@ class TestResourceManager:
 
     @patch("torch.cuda.is_available", return_value=True)
     @patch("torch.cuda.empty_cache")
-    def test_clear_memory_cache(self, mock_empty_cache, mock_available) -> None:
+    def test_clear_memory_cache(self, mock_empty_cache: Any, mock_available: Any) -> None:
         """Test memory cache clearing."""
         manager = ResourceManager()
         manager.clear_memory_cache()
@@ -388,7 +399,7 @@ class TestGlobalFunctions:
         assert isinstance(manager1, ResourceManager)
 
     @patch.object(ResourceManager, "optimize_training_config")
-    def test_detect_optimal_config_with_base(self, mock_optimize) -> None:
+    def test_detect_optimal_config_with_base(self, mock_optimize: Any) -> None:
         """Test detect_optimal_config with base configuration."""
         base_config = {"epochs": 100, "learning_rate": 0.001}
         mock_optimize.return_value = {"epochs": 100, "learning_rate": 0.001, "device": "cuda"}
@@ -399,7 +410,7 @@ class TestGlobalFunctions:
         assert result["epochs"] == 100
 
     @patch.object(ResourceManager, "optimize_training_config")
-    def test_detect_optimal_config_without_base(self, mock_optimize) -> None:
+    def test_detect_optimal_config_without_base(self, mock_optimize: Any) -> None:
         """Test detect_optimal_config without base configuration."""
         mock_optimize.return_value = {"device": "cuda", "batch_size": 32}
 
