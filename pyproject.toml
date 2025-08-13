@@ -383,9 +383,10 @@ exclude = [
   ".venv/",
   ".git/",
   "notebooks/",
-  "tests/fixtures/",
-  # Exclude ad-hoc scripts and tests from strict type checking
-  "tests/",
+  "logs/",
+  "runs/",
+  ".kiro/",
+
 ]
 
 # File-specific overrides
