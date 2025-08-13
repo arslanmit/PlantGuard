@@ -1,0 +1,57 @@
+{
+  "experiment_name": "plantguard_quick_test",
+  "experiment_description": "Quick test configuration for debugging",
+  "tags": [
+    "test",
+    "debug"
+  ],
+  "model_architecture": "resnet50",
+  "num_classes": 38,
+  "pretrained": true,
+  "freeze_backbone": false,
+  "dropout_rate": 0.5,
+  "epochs": 5,
+  "batch_size": 16,
+  "learning_rate": 0.01,
+  "weight_decay": 0.0001,
+  "optimizer": "adam",
+  "momentum": 0.9,
+  "scheduler": {
+    "type": "step",
+    "step_size": 30,
+    "gamma": 0.1,
+    "patience": 10,
+    "factor": 0.5,
+    "T_max": 100,
+    "eta_min": 0.0
+  },
+  "early_stopping": {
+    "enabled": false,
+    "patience": 15,
+    "min_delta": 0.001,
+    "monitor": "val_loss",
+    "mode": "min"
+  },
+  "data_augmentation": {
+    "enabled": true,
+    "rotation": 15.0,
+    "brightness": 0.2,
+    "contrast": 0.2,
+    "horizontal_flip": true,
+    "vertical_flip": false,
+    "normalize": true
+  },
+  "mixed_precision": true,
+  "gradient_accumulation_steps": 1,
+  "gradient_clip_norm": 1.0,
+  "device": "auto",
+  "num_workers": 2,
+  "pin_memory": true,
+  "persistent_workers": true,
+  "train_ratio": 0.8,
+  "val_ratio": 0.2,
+  "random_seed": 42,
+  "save_every_n_epochs": 1,
+  "log_every_n_steps": 10,
+  "max_checkpoints_to_keep": 5
+}

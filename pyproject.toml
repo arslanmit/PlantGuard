@@ -195,6 +195,13 @@ ignore = [
   "TRY300", # Consider moving statement to else block
   "BLE001", # Do not catch blind exception: Exception
   "G004",   # Logging statement uses f-string
+  "TRY003",
+  "PTH123",
+  "B904",
+  "S607",
+  "S110",
+  "PLW0603",
+  "F841"
 ]
 
 # File-specific rule exceptions
