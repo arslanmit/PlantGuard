@@ -20,6 +20,11 @@ def main() -> None:
         default="data/raw/plantvillage",
         help="Output directory for downloaded dataset (default: data/raw/plantvillage)",
     )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force re-download even if dataset already exists",
+    )
     args = parser.parse_args()
 
     dm = DatasetManager()
@@ -36,15 +41,22 @@ def main() -> None:
     print("     - Set permissions: chmod 600 ~/.kaggle/kaggle.json")
     print()
 
-    # Check if output directory already exists and has content
-    if output_dir.exists() and any(output_dir.iterdir()):
+    # Check if we should force download or if directory exists
+    if not args.force and output_dir.exists() and any(output_dir.iterdir()):
         print(f"⚠️  Output directory {output_dir} already exists and contains files")
-        response = input("Do you want to continue? This may overwrite existing files (y/N): ")
-        if response.lower() not in ["y", "yes"]:
-            print("❌ Download cancelled")
-            sys.exit(0)
+        print("💡 Use --force flag to re-download, or manually place dataset in this directory")
 
-    success = dm.download_plantvillage(output_dir)
+        # Let the dataset manager handle the existing dataset check
+        success = dm.download_plantvillage(output_dir)
+    else:
+        if args.force and output_dir.exists():
+            print("🔄 Force flag specified, will re-download dataset...")
+            # Remove existing directory for clean download
+            import shutil
+
+            shutil.rmtree(output_dir)
+
+        success = dm.download_plantvillage(output_dir)
 
     if success:
         print("✅ Dataset download completed successfully")

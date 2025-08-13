@@ -89,6 +89,23 @@ class DatasetManager:
 
         target_dir = Path(target_dir)
 
+        # Check if dataset already exists
+        if target_dir.exists() and self._is_valid_plantvillage_dataset(target_dir):
+            logger.info("PlantVillage dataset already exists at %s", target_dir)
+            print(f"✅ PlantVillage dataset already exists at {target_dir}")
+            print("📊 Validating existing dataset...")
+
+            # Quick validation
+            validation_result = self.validate_dataset(target_dir)
+            if validation_result.is_valid:
+                print(
+                    f"✅ Dataset is valid: {validation_result.valid_files} files, {validation_result.total_files} total"
+                )
+                print("🔄 Skipping download. Use --force to re-download.")
+                return True
+            else:
+                print("⚠️  Existing dataset appears corrupted. Proceeding with download...")
+
         try:
             # Check if kaggle is available
             import kaggle
@@ -113,6 +130,51 @@ class DatasetManager:
         except Exception:
             logger.exception("Failed to download PlantVillage dataset")
             return False
+
+    def _is_valid_plantvillage_dataset(self, dataset_dir: Path) -> bool:
+        """Check if directory contains a valid PlantVillage dataset structure.
+
+        Args:
+            dataset_dir: Directory to check
+
+        Returns:
+            True if appears to be a valid PlantVillage dataset
+        """
+        if not dataset_dir.exists():
+            return False
+
+        # Check for common PlantVillage class directories
+        expected_classes = [
+            "Potato___Early_blight",
+            "Potato___Late_blight",
+            "Potato___healthy",
+            "Tomato___Early_blight",
+            "Tomato___Late_blight",
+            "Tomato___healthy",
+        ]
+
+        # Look for class directories (either directly or in subdirectories)
+        found_classes = 0
+
+        # Check direct structure
+        for class_dir in dataset_dir.iterdir():
+            if class_dir.is_dir() and any(
+                expected in class_dir.name for expected in expected_classes
+            ):
+                found_classes += 1
+
+        # Check if there are subdirectories that might contain the classes
+        if found_classes == 0:
+            for subdir in dataset_dir.iterdir():
+                if subdir.is_dir():
+                    for class_dir in subdir.iterdir():
+                        if class_dir.is_dir() and any(
+                            expected in class_dir.name for expected in expected_classes
+                        ):
+                            found_classes += 1
+
+        # Consider valid if we found at least 3 expected classes
+        return found_classes >= 3
 
     def _validate_image_file(self, image_file: Path) -> tuple[bool, list[str]]:
         """Validate a single image file.
