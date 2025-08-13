@@ -13,7 +13,7 @@ from PIL import Image
 from src.core.vision import VisionAdapter
 
 
-def main():
+def main() -> None:
     """Test the model on sample images."""
     print("🌱 PlantGuard Model Test")
     print("=" * 50)

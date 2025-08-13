@@ -20,12 +20,12 @@ logger = setup_logger("plantguard", log_file="logs/app.log")
 
 
 @st.cache_resource
-def get_model_manager():
+def get_model_manager() -> "PlantGuardModelManager":
     """Get cached model manager instance without autoload to render UI fast."""
     return PlantGuardModelManager(autoload_default=False)
 
 
-def main():
+def main() -> None:
     """Main PlantGuard application with model switching."""
     st.set_page_config(
         page_title="PlantGuard - Plant Disease Detection",
@@ -157,7 +157,11 @@ def main():
                             st.image(img, caption=img_path.name, use_column_width=True)
 
                             if st.button("Analyze", key=f"sample_{i}"):
-                                uploaded_file = img_path
+                                # Convert Path to file-like object for processing
+                                with open(img_path, "rb") as f:
+                                    image_bytes = f.read()
+                                # Process the image directly
+                                img_for_analysis = Image.open(img_path)
                         except Exception:
                             continue
 

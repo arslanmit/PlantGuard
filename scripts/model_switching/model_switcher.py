@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from src.core.model_manager import PlantGuardModelManager
 
 
-def list_models(manager: PlantGuardModelManager):
+def list_models(manager: "PlantGuardModelManager") -> None:
     """List all available models."""
     models = manager.list_available_models()
 
@@ -39,7 +39,7 @@ def list_models(manager: PlantGuardModelManager):
         print(f"   Description: {model['description']}")
 
 
-def switch_model(manager: PlantGuardModelManager, model_id: str):
+def switch_model(manager: "PlantGuardModelManager", model_id: str) -> None:
     """Switch to a specific model."""
     print(f"🔄 Switching to model: {model_id}")
 
@@ -58,7 +58,7 @@ def switch_model(manager: PlantGuardModelManager, model_id: str):
         print(f"❌ Failed to switch to model: {model_id}")
 
 
-def test_model(manager: PlantGuardModelManager, image_path: str):
+def test_model(manager: "PlantGuardModelManager", image_path: str) -> None:
     """Test current model on an image."""
     if not Path(image_path).exists():
         print(f"❌ Image not found: {image_path}")
@@ -81,7 +81,7 @@ def test_model(manager: PlantGuardModelManager, image_path: str):
         print(f"❌ Failed to test image: {e}")
 
 
-def quick_test(manager: PlantGuardModelManager):
+def quick_test(manager: "PlantGuardModelManager") -> None:
     """Quick test on sample images."""
     test_images = [
         "data/pictures/apple_scab_sample.jpg",
@@ -110,7 +110,7 @@ def quick_test(manager: PlantGuardModelManager):
             print(f"\n📸 {Path(img_path).name} - Not found")
 
 
-def benchmark_models(manager: PlantGuardModelManager):
+def benchmark_models(manager: "PlantGuardModelManager") -> None:
     """Benchmark all available models on test images."""
     models = manager.list_available_models()
     enabled_models = [m for m in models if m["enabled"]]
@@ -197,7 +197,7 @@ def benchmark_models(manager: PlantGuardModelManager):
             print()
 
 
-def main():
+def main() -> None:
     """Main CLI interface."""
     parser = argparse.ArgumentParser(description="PlantGuard Model Switcher")
     parser.add_argument("--list", "-l", action="store_true", help="List available models")

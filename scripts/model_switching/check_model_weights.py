@@ -10,7 +10,7 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 
-def check_model_training_status(model_path: str):
+def check_model_training_status(model_path: str) -> bool:
     """Check if model appears to be trained or is just random weights."""
     print("🔍 Analyzing model weights...")
 
@@ -61,27 +61,23 @@ def check_model_training_status(model_path: str):
         return False
 
 
-def main():
+def main() -> None:
     model_path = "data/models/vision_resnet50.pt"
 
     if not Path(model_path).exists():
         print(f"❌ Model file not found: {model_path}")
         return
 
-    is_trained = check_model_training_status(model_path)
+    check_model_training_status(model_path)
 
     print("\n🎯 Recommendation:")
-    if not is_trained:
-        print("   Your model appears to be untrained or poorly trained.")
-        print("   You should run the training script to properly train it.")
-        print("   Try: python scripts/train_vision_model.py")
-    else:
-        print("   Model appears trained but performance is poor.")
-        print("   Consider:")
-        print("   - Retraining with more epochs")
-        print("   - Adjusting learning rate")
-        print("   - Using data augmentation")
-        print("   - Checking training data quality")
+    print("   Based on the analysis above:")
+    print("   - If weights appear untrained, run: python scripts/train_vision_model.py")
+    print("   - If weights appear trained but performance is poor, consider:")
+    print("     * Retraining with more epochs")
+    print("     * Adjusting learning rate")
+    print("     * Using data augmentation")
+    print("     * Checking training data quality")
 
 
 if __name__ == "__main__":

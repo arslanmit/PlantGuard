@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 
-def update_main_app():
+def update_main_app() -> None:
     """Update the main Streamlit app to use the Model Manager."""
     app_code = '''"""PlantGuard - Multimodal Plant Disease Detection System with Model Switching.
 
@@ -359,10 +359,9 @@ if __name__ == "__main__":
         f.write(app_code)
 
     print(f"✅ Created enhanced PlantGuard app: {output_path}")
-    return output_path
 
 
-def create_quick_start_guide():
+def create_quick_start_guide() -> None:
     """Create a quick start guide for the model switching system."""
     guide = """# 🌱 PlantGuard Model Switching - Quick Start Guide
 
@@ -523,29 +522,28 @@ You should see 100% accuracy on the Vision Transformer model!
         f.write(guide)
 
     print(f"✅ Created quick start guide: {guide_path}")
-    return guide_path
 
 
-def main():
+def main() -> None:
     """Main integration function."""
     print("🚀 Integrating Model Manager into PlantGuard")
     print("=" * 60)
 
     # Update main app
-    app_path = update_main_app()
+    update_main_app()
 
     # Create guide
-    guide_path = create_quick_start_guide()
+    create_quick_start_guide()
 
     print("\n🎉 INTEGRATION COMPLETE!")
     print("=" * 60)
 
-    print(f"\n📱 **Enhanced App**: {app_path}")
+    print("\n📱 **Enhanced App**: scripts/model_switching/app_with_model_manager.py")
     print("   - Full model switching in Streamlit UI")
     print("   - Auto-loading of best models")
     print("   - Batch analysis support")
 
-    print(f"\n📖 **Quick Start Guide**: {guide_path}")
+    print("\n📖 **Quick Start Guide**: MODEL_SWITCHING_GUIDE.md")
     print("   - All commands and examples")
     print("   - Performance comparisons")
     print("   - Configuration instructions")

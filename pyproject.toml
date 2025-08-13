@@ -378,7 +378,6 @@ exclude = [
   "notebooks/",
   "tests/fixtures/",
   # Exclude ad-hoc scripts and tests from strict type checking
-  "scripts/",
   "tests/",
 ]
 

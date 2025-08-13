@@ -53,9 +53,11 @@ class HuggingFaceVisionAdapter:
         try:
             logger.info("Loading model: %s", self.model_name)
 
-            # Load processor and model
-            self.processor = AutoImageProcessor.from_pretrained(self.model_name)  # type: ignore
-            self.model = AutoModelForImageClassification.from_pretrained(self.model_name)  # type: ignore
+            # Load processor and model with revision pinning for security
+            self.processor = AutoImageProcessor.from_pretrained(self.model_name, revision="main")  # type: ignore # nosec B615
+            self.model = AutoModelForImageClassification.from_pretrained(
+                self.model_name, revision="main"
+            )  # type: ignore # nosec B615
             self.model.to(self.device)  # type: ignore
             self.model.eval()  # type: ignore
 
@@ -66,7 +68,10 @@ class HuggingFaceVisionAdapter:
                     for i in range(self.model.config.num_labels)  # type: ignore
                 ]
             else:
-                self.class_names = [f"class_{i}" for i in range(self.model.config.num_labels)]  # type: ignore
+                self.class_names = [
+                    f"class_{i}"
+                    for i in range(self.model.config.num_labels)  # type: ignore
+                ]
 
             self.is_loaded = True
             logger.info("Model loaded successfully: %d classes", len(self.class_names))

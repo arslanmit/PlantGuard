@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from src.core.models import PlantDiseaseResNet50
 
 
-def create_simple_pattern_model():
+def create_simple_pattern_model() -> str:
     """Create a model with simple pattern-based predictions."""
     # Load class information
     classes_path = Path("data/knowledge_base/plantvillage_classes.json")
@@ -86,10 +86,10 @@ def create_simple_pattern_model():
     torch.save(checkpoint, checkpoint_path)
     print(f"Simple test model saved to: {checkpoint_path}")
 
-    return checkpoint_path
+    return str(checkpoint_path)
 
 
-def test_simple_model(model_path):
+def test_simple_model(model_path: str) -> None:
     """Test the simple model on a few images."""
     from src.core.vision import VisionAdapter
 
@@ -114,7 +114,7 @@ def test_simple_model(model_path):
             print(f"{Path(img_path).name}: {predicted_class} ({confidence:.3f})")
 
 
-def main():
+def main() -> None:
     print("🔧 Creating Simple Test Model for PlantGuard")
     print("=" * 50)
 

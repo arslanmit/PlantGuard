@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 from src.core.huggingface_vision import HuggingFaceVisionAdapter
 
 
-def comprehensive_test():
+def comprehensive_test() -> None:
     """Run comprehensive test on all 21 images."""
     print("🌱 PlantGuard Final Model Test")
     print("Using: Abhiram4/PlantDiseaseDetectorVit2 (Vision Transformer)")
@@ -173,7 +173,7 @@ def comprehensive_test():
     print(f"   Device: {adapter.device}")
 
 
-def main():
+def main() -> None:
     comprehensive_test()
 
 

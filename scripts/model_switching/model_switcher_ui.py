@@ -8,19 +8,69 @@ from pathlib import Path
 import streamlit as st
 from PIL import Image
 
-# Add project src to path (repo root / src)
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from src.core.model_manager import PlantGuardModelManager
+from src.features.model_switching.model_manager import PlantGuardModelManager
 
 
 @st.cache_resource
-def get_model_manager():
+def get_model_manager() -> "PlantGuardModelManager":
     """Get cached model manager instance without autoload to render UI fast."""
     return PlantGuardModelManager(autoload_default=False)
 
 
-def main():
+def process_image(
+    image: Image.Image, image_name: str, manager: "PlantGuardModelManager", current_model_info: dict
+) -> None:
+    """Process an image and display results."""
+    # Display image
+    st.image(image, caption=f"Testing: {image_name}", use_container_width=True)
+
+    # Get prediction
+    if "error" not in current_model_info:
+        with st.spinner("Analyzing image..."):
+            result = manager.get_readable_prediction(image)
+
+        # Display results
+        st.markdown("### 📋 Prediction Results")
+
+        col_a, col_b = st.columns(2)
+
+        with col_a:
+            st.metric("🌿 Plant Type", result["plant_type"])
+            st.metric("🦠 Disease", result["disease"])
+
+        with col_b:
+            st.metric("📊 Confidence", result["confidence_percentage"])
+            health_status = "Healthy ✅" if result["is_healthy"] else "Diseased ⚠️"
+            st.metric("💚 Health Status", health_status)
+
+        # Additional info
+        st.info(f"💡 **Recommendation:** {result['recommendation']}")
+
+        # Raw prediction details
+        with st.expander("🔧 Technical Details"):
+            st.json(
+                {
+                    "raw_prediction": result["raw_prediction"],
+                    "confidence_score": result["confidence"],
+                    "model_info": result["model_info"],
+                }
+            )
+
+        # Show model info
+        st.markdown("### 🤖 Model Information")
+        st.write(f"**Model:** {current_model_info['name']}")
+        st.write(f"**Type:** {current_model_info['type']}")
+        if current_model_info.get("description"):
+            st.write(f"**Description:** {current_model_info['description']}")
+
+    else:
+        st.error(f"❌ Model Error: {current_model_info['error']}")
+
+
+def main() -> None:
     """Main Streamlit app."""
     st.set_page_config(page_title="PlantGuard Model Switcher", page_icon="🌱", layout="wide")
 
@@ -132,57 +182,22 @@ def main():
             if selected_sample != "None":
                 sample_path = Path("data/pictures") / selected_sample
                 if sample_path.exists():
-                    uploaded_file = sample_path
+                    # Process sample image directly
+                    image = Image.open(sample_path)
+                    image_name = selected_sample
 
-        # Process image
+                    # Process the sample image
+                    process_image(image, image_name, manager, current_model_info)
+
+        # Process uploaded image
         if uploaded_file is not None:
             try:
                 # Load image
-                if isinstance(uploaded_file, Path):
-                    image = Image.open(uploaded_file)
-                    image_name = uploaded_file.name
-                else:
-                    image = Image.open(uploaded_file)
-                    image_name = uploaded_file.name
+                image = Image.open(uploaded_file)
+                image_name = uploaded_file.name
 
-                # Display image
-                st.image(image, caption=f"Testing: {image_name}", use_column_width=True)
-
-                # Get prediction
-                if "error" not in current_model_info:
-                    with st.spinner("Analyzing image..."):
-                        result = manager.get_readable_prediction(image)
-
-                    # Display results
-                    st.markdown("### 📋 Prediction Results")
-
-                    col_a, col_b = st.columns(2)
-
-                    with col_a:
-                        st.metric("🌿 Plant Type", result["plant_type"])
-                        st.metric("🦠 Disease", result["disease"])
-
-                    with col_b:
-                        st.metric("📊 Confidence", result["confidence_percentage"])
-
-                        health_status = "Healthy ✅" if result["is_healthy"] else "Diseased ⚠️"
-                        st.metric("💚 Health Status", health_status)
-
-                    # Additional info
-                    st.info(f"💡 **Recommendation:** {result['recommendation']}")
-
-                    # Raw prediction details
-                    with st.expander("🔧 Technical Details"):
-                        st.json(
-                            {
-                                "raw_prediction": result["raw_prediction"],
-                                "confidence_score": result["confidence"],
-                                "model_info": result["model_info"],
-                            }
-                        )
-
-                else:
-                    st.error("No model loaded for prediction")
+                # Process the uploaded image
+                process_image(image, image_name, manager, current_model_info)
 
             except Exception as e:
                 st.error(f"Error processing image: {e}")

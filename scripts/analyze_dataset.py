@@ -53,8 +53,12 @@ def main() -> None:
 
             print("  📋 Class distribution:")
             if isinstance(info.class_distribution, dict):
-                if any(isinstance(v, dict) for v in info.class_distribution.values()):
-                    # Split dataset format
+                # Check if this is a split dataset format (nested dict)
+                distribution_values = list(info.class_distribution.values())
+                has_nested_dicts = any(isinstance(v, dict) for v in distribution_values)
+
+                if has_nested_dicts:
+                    # Split dataset format: dict[str, dict[str, int]]
                     for class_name, splits in info.class_distribution.items():
                         if isinstance(splits, dict):
                             total = splits.get("train", 0) + splits.get("val", 0)
@@ -63,12 +67,11 @@ def main() -> None:
                             print(
                                 f"    {class_name}: {total} total (train: {train_count}, val: {val_count})"
                             )
-                        else:
-                            print(f"    {class_name}: {splits}")
                 else:
-                    # Single directory format
+                    # Single directory format: dict[str, int]
                     for class_name, count in sorted(info.class_distribution.items()):
-                        print(f"    {class_name}: {count}")
+                        if isinstance(count, int):
+                            print(f"    {class_name}: {count}")
 
             if info.corrupted_files:
                 print(f"  ⚠️  Corrupted files: {len(info.corrupted_files)}")

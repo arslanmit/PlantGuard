@@ -78,6 +78,10 @@ def main() -> None:
     print(f"  Random seed: {config.random_seed}")
     print(f"  Min samples per class: {config.min_samples_per_class}")
 
+    if source_dir is None:
+        print("❌ No source directory available")
+        sys.exit(1)
+
     success = dm.prepare_dataset(source_dir, output_dir, config)
 
     if success:

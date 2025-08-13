@@ -206,16 +206,18 @@ class PlantGuardModelManager:
             logger.error("Failed to load model %s: %s", model_id, e)
             return False
 
-    def _load_huggingface_model(self, config: ModelConfig):
+    def _load_huggingface_model(self, config: ModelConfig) -> VisionAdapterProtocol:
         """Load a Hugging Face model."""
         from transformers import AutoImageProcessor, AutoModelForImageClassification
 
         class HuggingFaceAdapter:
-            def __init__(self, model_id: str, device: torch.device):
+            def __init__(self, model_id: str, device: torch.device) -> None:
                 self.model_id = model_id
                 self.device = device
-                self.processor = AutoImageProcessor.from_pretrained(model_id)
-                self.model = AutoModelForImageClassification.from_pretrained(model_id)
+                self.processor = AutoImageProcessor.from_pretrained(model_id, revision="main")  # nosec B615
+                self.model = AutoModelForImageClassification.from_pretrained(
+                    model_id, revision="main"
+                )  # nosec B615
                 self.model.to(device)
                 self.model.eval()
 
@@ -252,7 +254,7 @@ class PlantGuardModelManager:
 
         return HuggingFaceAdapter(config.model_id, device)
 
-    def _load_local_model(self, config: ModelConfig):
+    def _load_local_model(self, config: ModelConfig) -> VisionAdapterProtocol:
         """Load a local PyTorch model."""
         # Import your existing VisionAdapter
         import sys

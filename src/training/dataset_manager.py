@@ -36,7 +36,7 @@ class DatasetInfo:
     version: str
     total_samples: int
     num_classes: int
-    class_distribution: dict[str, int]
+    class_distribution: dict[str, int] | dict[str, dict[str, int]]
     train_samples: int
     val_samples: int
     dataset_size_mb: float
@@ -277,7 +277,8 @@ class DatasetManager:
         for class_name, count in class_counts.items():
             if count < MIN_SAMPLES_PER_CLASS:
                 warnings.append(
-                    f"Class '{class_name}' has only {count} samples (minimum: {MIN_SAMPLES_PER_CLASS})"
+                    f"Class '{class_name}' has only {count} samples "
+                    f"(minimum: {MIN_SAMPLES_PER_CLASS})"
                 )
 
         # Check if we have any classes at all
@@ -416,7 +417,8 @@ class DatasetManager:
         """Analyze dataset with train/val split structure.
 
         Returns:
-            Tuple of (class_distribution, total_samples, train_samples, val_samples, corrupted_files)
+            Tuple of (class_distribution, total_samples, train_samples, val_samples,
+                     corrupted_files)
         """
         class_distribution: dict[str, dict[str, int]] = {}
         train_samples = 0

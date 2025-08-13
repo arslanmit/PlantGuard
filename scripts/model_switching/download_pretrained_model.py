@@ -12,7 +12,7 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 
-def download_model_from_url():
+def download_model_from_url() -> bool:
     """Download a pre-trained model from a public source."""
     print("🔄 Attempting to download pre-trained plant disease model...")
 
@@ -30,7 +30,7 @@ def download_model_from_url():
     return False
 
 
-def create_better_test_model():
+def create_better_test_model() -> str:
     """Create a better test model using ImageNet features."""
     from src.core.models import PlantDiseaseResNet50
 
@@ -72,11 +72,10 @@ def create_better_test_model():
 
     torch.save(checkpoint, checkpoint_path)
     print(f"✅ ImageNet-based model saved to: {checkpoint_path}")
+    return str(checkpoint_path)
 
-    return checkpoint_path
 
-
-def test_with_imagenet_model(model_path):
+def test_with_imagenet_model(model_path: str) -> None:
     """Test the ImageNet-based model."""
     from src.core.vision import VisionAdapter
 
@@ -129,15 +128,17 @@ def test_with_imagenet_model(model_path):
     )
 
 
-def main():
+def main() -> None:
     print("🚀 PlantGuard Model Download & Setup")
     print("=" * 50)
 
     # Try to download pre-trained model
-    if not download_model_from_url():
-        # Fallback: create ImageNet-based model
-        model_path = create_better_test_model()
-        test_with_imagenet_model(model_path)
+    download_model_from_url()
+
+    # Create ImageNet-based model as fallback
+    create_better_test_model()
+    # Note: Using default model path for testing
+    test_with_imagenet_model("data/models/vision_resnet50.pt")
 
     print("\n🎯 RECOMMENDATIONS FOR REAL USAGE:")
     print("=" * 50)

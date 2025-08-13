@@ -6,7 +6,9 @@ import json
 from pathlib import Path
 
 
-def add_huggingface_model(model_id: str, name: str | None = None, description: str | None = None):
+def add_huggingface_model(
+    model_id: str, name: str | None = None, description: str | None = None
+) -> bool:
     """Add a new Hugging Face model to the configuration."""
     config_path = Path("config/models.json")
 
@@ -53,7 +55,7 @@ def add_huggingface_model(model_id: str, name: str | None = None, description: s
     return True
 
 
-def list_huggingface_plant_models():
+def list_huggingface_plant_models() -> None:
     """Show some popular plant disease models from Hugging Face."""
     models = [
         {
@@ -93,7 +95,7 @@ def list_huggingface_plant_models():
         print(f"   Add with: python add_new_model.py --add {model['id']}")
 
 
-def remove_model(model_key: str):
+def remove_model(model_key: str) -> bool:
     """Remove a model from the configuration."""
     config_path = Path("config/models.json")
 
@@ -132,7 +134,7 @@ def remove_model(model_key: str):
     return True
 
 
-def enable_disable_model(model_key: str, enable: bool):
+def enable_disable_model(model_key: str, enable: bool) -> bool:
     """Enable or disable a model."""
     config_path = Path("config/models.json")
 
@@ -161,7 +163,7 @@ def enable_disable_model(model_key: str, enable: bool):
     return True
 
 
-def set_default_model(model_key: str):
+def set_default_model(model_key: str) -> bool:
     """Set the default model."""
     config_path = Path("config/models.json")
 
@@ -194,7 +196,7 @@ def set_default_model(model_key: str):
     return True
 
 
-def show_config():
+def show_config() -> None:
     """Show current configuration."""
     config_path = Path("config/models.json")
 
@@ -224,7 +226,7 @@ def show_config():
         print(f"    Status: {status}")
 
 
-def main():
+def main() -> None:
     """Main CLI interface."""
     parser = argparse.ArgumentParser(description="PlantGuard Model Configuration Manager")
     parser.add_argument("--add", type=str, help="Add Hugging Face model by ID")
