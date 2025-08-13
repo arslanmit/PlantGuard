@@ -158,7 +158,7 @@ Create `.env` file for enhanced functionality:
 
 ```bash
 # GitHub Personal Access Token (for private repo access)
-GITHUB_TOKEN=your_github_personal_access_token_here
+TOKEN_GITHUB=your_github_personal_access_token_here
 
 # Hugging Face Token (for model downloads)
 HF_TOKEN=your_hugging_face_token_here
