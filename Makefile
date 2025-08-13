@@ -74,6 +74,9 @@ help:
 	@echo ""
 	@echo "$(GREEN)🤖 Machine Learning$(NC)"
 	@echo "  $(BLUE)train$(NC)          - Train plant disease models"
+	@echo "  $(BLUE)setup-dataset$(NC)  - Setup training dataset (real or dummy)"
+	@echo "  $(BLUE)dummy-dataset$(NC)  - Create dummy dataset for testing"
+	@echo "  $(BLUE)prepare-dataset$(NC) - Prepare real PlantVillage dataset"
 	@echo "  $(BLUE)models$(NC)         - Show model information"
 	@echo "  $(BLUE)debug$(NC)          - Debug model performance"
 	@echo ""
@@ -264,13 +267,70 @@ train:
 	@echo "$(BLUE)🤖 Training PlantGuard models...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup; fi
 	@mkdir -p $(RUNS_DIR)
-	@echo "$(YELLOW)Training vision model (ResNet50)...$(NC)"
-	@if [ -f scripts/train_vision_model.py ]; then \
-		$(PY) scripts/train_vision_model.py; \
+	@echo "$(YELLOW)Checking dataset availability...$(NC)"
+	@if [ -d "data/PlantVillage/train" ] && [ -d "data/PlantVillage/val" ]; then \
+		echo "$(GREEN)✅ PlantVillage dataset found$(NC)"; \
+		DATASET_DIR="data/PlantVillage"; \
+	elif [ -d "data/plantvillage_dummy/train" ] && [ -d "data/plantvillage_dummy/val" ]; then \
+		echo "$(GREEN)✅ Dummy dataset found$(NC)"; \
+		DATASET_DIR="data/plantvillage_dummy"; \
+	else \
+		echo "$(YELLOW)⚠️  No dataset found. Creating dummy dataset for testing...$(NC)"; \
+		$(PY) scripts/setup_dummy_dataset.py --output_dir data/plantvillage_dummy --num_classes 5 --samples_per_class 20; \
+		DATASET_DIR="data/plantvillage_dummy"; \
+	fi; \
+	echo "$(YELLOW)Training vision model (ResNet50)...$(NC)"; \
+	if [ -f scripts/train_vision_model.py ]; then \
+		$(PY) scripts/train_vision_model.py --data_dir $$DATASET_DIR --epochs 5 --batch_size 8; \
 	else \
 		echo "$(YELLOW)⚠️  Vision training script not found$(NC)"; \
 	fi
 	@echo "$(GREEN)✅ Model training complete$(NC)"
+
+# Setup dataset (real PlantVillage or dummy for testing)
+setup-dataset:
+	@echo "$(BLUE)📊 Setting up training dataset...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)Dataset setup options:$(NC)"
+	@echo "  1. $(GREEN)Real PlantVillage dataset$(NC) (recommended for production)"
+	@echo "     - Download from Kaggle: https://www.kaggle.com/datasets/abdallahalidev/plantvillage-dataset"
+	@echo "     - Extract to: data/PlantVillage/"
+	@echo "     - Run: make prepare-dataset"
+	@echo ""
+	@echo "  2. $(YELLOW)Dummy dataset$(NC) (for testing only)"
+	@echo "     - Run: make dummy-dataset"
+	@echo ""
+	@echo "$(CYAN)Current status:$(NC)"
+	@if [ -d "data/PlantVillage/train" ]; then \
+		echo "  $(GREEN)✅ Real PlantVillage dataset found$(NC)"; \
+	else \
+		echo "  $(RED)❌ Real PlantVillage dataset not found$(NC)"; \
+	fi
+	@if [ -d "data/plantvillage_dummy/train" ]; then \
+		echo "  $(GREEN)✅ Dummy dataset found$(NC)"; \
+	else \
+		echo "  $(RED)❌ Dummy dataset not found$(NC)"; \
+	fi
+
+# Create dummy dataset for testing
+dummy-dataset:
+	@echo "$(BLUE)🎭 Creating dummy dataset for testing...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@$(PY) scripts/setup_dummy_dataset.py --output_dir data/plantvillage_dummy --num_classes 8 --samples_per_class 50
+	@echo "$(GREEN)✅ Dummy dataset created at data/plantvillage_dummy/$(NC)"
+	@echo "$(YELLOW)⚠️  This is for testing only. Use real PlantVillage dataset for production.$(NC)"
+
+# Prepare real PlantVillage dataset (assumes raw data is available)
+prepare-dataset:
+	@echo "$(BLUE)📊 Preparing PlantVillage dataset...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@if [ ! -d "data/PlantVillage_raw" ]; then \
+		echo "$(RED)❌ Raw PlantVillage dataset not found at data/PlantVillage_raw/$(NC)"; \
+		echo "$(YELLOW)Please download and extract the dataset first$(NC)"; \
+		exit 1; \
+	fi
+	@$(PY) scripts/prepare_dataset.py --source_dir data/PlantVillage_raw --output_dir data/PlantVillage --train_ratio 0.8
+	@echo "$(GREEN)✅ Dataset prepared at data/PlantVillage/$(NC)"
 
 # Show model information
 models:
