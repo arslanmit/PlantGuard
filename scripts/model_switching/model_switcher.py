@@ -189,7 +189,7 @@ def benchmark_models(manager: "PlantGuardModelManager") -> None:
 
         sorted_results = sorted(results.items(), key=lambda x: x[1]["accuracy"], reverse=True)
 
-        for i, (model_id, result) in enumerate(sorted_results):
+        for i, (_, result) in enumerate(sorted_results):
             rank = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else f"{i + 1}."
             print(f"{rank} {result['name']}")
             print(f"    Accuracy: {result['accuracy']:.1%}")

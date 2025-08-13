@@ -175,7 +175,7 @@ def main() -> None:
             sample_names = [img.name for img in sample_images]
             selected_sample = st.selectbox(
                 "Sample images:",
-                options=["None"] + sample_names,
+                options=["None", *sample_names],
                 help="Select a sample image for testing",
             )
 
@@ -265,7 +265,8 @@ def main() -> None:
 
                                         total += 1
 
-                                    except Exception:
+                                    except Exception as e:
+                                        st.warning(f"Error processing image: {e}")
                                         continue
 
                             if total > 0:

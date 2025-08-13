@@ -1,7 +1,7 @@
 """Integration tests for training configuration system."""
 
 import torch
-import torch.nn as nn
+from torch import nn
 
 from src.training.config import TrainingConfig
 from src.training.optimizers import create_training_components

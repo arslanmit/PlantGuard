@@ -63,10 +63,7 @@ def test_different_preprocessing():
     for method_name, transform in preprocessing_methods.items():
         try:
             # Apply preprocessing
-            if image.mode != "RGB":
-                rgb_image = image.convert("RGB")
-            else:
-                rgb_image = image
+            rgb_image = image.convert("RGB") if image.mode != "RGB" else image
 
             tensor = transform(rgb_image)
             input_batch = tensor.unsqueeze(0)

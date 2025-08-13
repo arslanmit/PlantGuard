@@ -2,7 +2,7 @@
 
 import pytest
 import torch
-import torch.nn as nn
+from torch import nn
 from torch.optim.lr_scheduler import (
     CosineAnnealingLR,
     ExponentialLR,
@@ -292,8 +292,9 @@ class TestTrainingComponents:
         components = TrainingComponents(self.model, self.config)
         initial_lr = components.get_current_lr()
 
-        # Step scheduler multiple times
+        # Step scheduler multiple times (with optimizer step first)
         for _ in range(30):  # step_size = 30
+            components.step_optimizer()  # Must call optimizer.step() before scheduler.step()
             components.step_scheduler()
 
         # Learning rate should be reduced after 30 steps
@@ -310,9 +311,13 @@ class TestTrainingComponents:
         components = TrainingComponents(self.model, config)
 
         # Step with metric - need patience+1 steps to trigger
+        components.step_optimizer()  # Must call optimizer.step() before scheduler.step()
         components.step_scheduler(metric=1.0)
+        components.step_optimizer()
         components.step_scheduler(metric=1.1)  # Worse
+        components.step_optimizer()
         components.step_scheduler(metric=1.2)  # Still worse
+        components.step_optimizer()
         components.step_scheduler(metric=1.3)  # Still worse (triggers after patience=2)
 
         # Should reduce learning rate after patience steps
@@ -328,6 +333,7 @@ class TestTrainingComponents:
         components = TrainingComponents(self.model, config)
 
         # Should not crash when no metric provided
+        components.step_optimizer()  # Must call optimizer.step() before scheduler.step()
         components.step_scheduler()  # No metric provided
         assert components.get_current_lr() == 0.001  # Should remain unchanged
 
@@ -358,6 +364,7 @@ class TestTrainingComponents:
 
         # Set some state
         components.check_early_stopping(1.0, 1)
+        components.step_optimizer()  # Must call optimizer.step() before scheduler.step()
         components.step_scheduler()
 
         # Get state dict
@@ -396,6 +403,7 @@ class TestTrainingComponents:
         assert components.scheduler is None
 
         # Should not crash when stepping
+        components.step_optimizer()  # Call optimizer step first for consistency
         components.step_scheduler()
 
 

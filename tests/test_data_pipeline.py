@@ -1,5 +1,4 @@
-"""
-Tests for PlantGuard data pipeline utilities.
+"""Tests for PlantGuard data pipeline utilities.
 
 This module contains unit tests for dataset loading, validation,
 and analysis functionality.
@@ -27,8 +26,7 @@ from src.data import (
 
 @pytest.fixture
 def temp_dataset_dir() -> Generator[Path]:
-    """
-    Create a temporary dataset directory with sample images for testing.
+    """Create a temporary dataset directory with sample images for testing.
 
     Yields:
         Path to temporary dataset directory

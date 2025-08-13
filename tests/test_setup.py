@@ -1,6 +1,4 @@
-"""
-Test basic setup and imports.
-"""
+"""Test basic setup and imports."""
 
 import sys
 from pathlib import Path

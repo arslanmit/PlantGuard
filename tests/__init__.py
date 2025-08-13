@@ -1,3 +1,1 @@
-"""
-PlantGuard Test Suite
-"""
+"""PlantGuard Test Suite."""

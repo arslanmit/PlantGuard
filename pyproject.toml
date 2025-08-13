@@ -204,81 +204,30 @@ ignore = [
   "F841"
 ]
 
-# File-specific rule exceptions
+# Per-file ignores for different file types
 [tool.ruff.lint.per-file-ignores]
+# Test files are allowed to use assert statements and print for debugging
 "tests/**/*.py" = [
-  "S101",    # Use of assert (expected in tests)
-  "PLR2004", # Magic value used in comparison
-  "ANN",     # Type annotations not required in tests
-  "D",       # Docstrings not required in tests
+  "S101",   # Use of assert detected (allowed in tests)
+  "T201",   # Print found (allowed in test debugging)
+  "ANN001", # Missing type annotation for function argument (relaxed for tests)
+  "ANN201", # Missing return type annotation (relaxed for tests)
+  "D102",   # Missing docstring in public method (relaxed for tests)
+  "D103",   # Missing docstring in public function (relaxed for tests)
 ]
+# Scripts are allowed to use print statements for CLI output
 "scripts/**/*.py" = [
-  "T20",  # Print statements allowed in scripts
-  "S603", # Subprocess calls allowed in scripts
+  "T201",   # Print found (allowed in scripts for CLI output)
+  "D103",   # Missing docstring in public function (relaxed for scripts)
 ]
-# Top-level tests and utility scripts (outside of tests/ and scripts/)
-"test_*.py" = [
-  "ANN",
-  "D",
-  "T20",
-  "PLR2004",
-  "C90",
-  "PLR",
-  "BLE001",
-  "PTH123",
-  "SIM108",
-]
-"*_test.py" = [
-  "ANN",
-  "D",
-  "T20",
-  "PLR2004",
-]
-"scripts/model_switching/**/*.py" = [
-  "T20",
-  "ANN",
-  "BLE001",
-  "TRY",
-  "PTH123",
-  "C90",
-  "PLR",
-  "B007",
-  "E402",
-  "F841",
-  "RUF005",
-  "S112",
-  "D",
-]
-"src/core/huggingface_vision.py" = ["TRY300"]
-"src/core/model_manager.py" = ["PTH123", "BLE001", "TRY400", "ANN202", "TRY003", "PLR2004", "TRY300"]
-"src/features/model_switching/huggingface_vision.py" = ["TRY300"]
-"src/features/model_switching/model_manager.py" = [
-  "PTH123",
-  "BLE001",
-  "TRY400",
-  "ANN202",
-  "TRY003",
-  "PLR2004",
-  "TRY300",
-]
+# Notebooks are allowed to use print statements
 "notebooks/**/*.py" = [
-  "T20", # Print statements allowed in notebooks
-  "D",   # Docstrings not required in notebooks
+  "T201",   # Print found (allowed in notebooks)
 ]
+# Jupyter notebooks (.ipynb files) are allowed to use print statements
 "notebooks/**/*.ipynb" = [
-  "T201",   # Print statements allowed in notebooks
-  "S607",   # Subprocess calls allowed in notebooks
-  "TRY300", # Exception handling patterns allowed in notebooks
-  "BLE001", # Blind except allowed in notebooks
-  "SIM105", # Simplified exception handling allowed in notebooks
-  "E722",   # Bare except allowed in notebooks
-  "S110",   # Try-except-pass allowed in notebooks
-  "S104",   # Binding to all interfaces allowed in notebooks
-  "F841",   # Unused variables allowed in notebooks
-  "D",      # Docstrings not required in notebooks
+  "T201",   # Print found (allowed in notebooks)
 ]
-"**/conftest.py" = ["D"] # Docstrings not required in conftest
-"setup.py" = ["D"] # Docstrings not required in setup
 
 # Import sorting configuration
 [tool.ruff.lint.isort]

@@ -68,7 +68,7 @@ def main() -> None:
         # Find current selection
         default_index = 0
         if "error" not in current_model_info:
-            for i, (display_name, model_id) in enumerate(model_options.items()):
+            for i, (_, model_id) in enumerate(model_options.items()):
                 if model_id in current_model_info.get("model_id", ""):
                     default_index = i
                     break
@@ -162,7 +162,8 @@ def main() -> None:
                                     image_bytes = f.read()
                                 # Process the image directly
                                 img_for_analysis = Image.open(img_path)
-                        except Exception:
+                        except Exception as e:
+                            st.warning(f"Could not load image {img_path}: {e}")
                             continue
 
         with col2:
