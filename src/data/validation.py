@@ -738,7 +738,7 @@ def generate_data_report(
                 json.dump(report, f, indent=2, default=str)
             logger.info("Data report saved to %s", output_path)
 
-        return report  # noqa: TRY300
+        return report
 
     except Exception:
         logger.exception("Failed to generate data report")

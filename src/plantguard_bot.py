@@ -95,7 +95,7 @@ class PlantGuardBot:
             # Generate response
             response = self.text_adapter.generate_response(disease_class, combined_query)
 
-            return {  # noqa: TRY300
+            return {
                 "disease_class": disease_class,
                 "confidence": confidence,
                 "response": response,

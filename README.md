@@ -51,6 +51,10 @@ PlantGuard is a production-ready multimodal AI system for plant disease detectio
 
 #### **Training Infrastructure** ✅
 - [x] **Complete training pipeline** for ResNet50 vision model
+- [x] **Advanced dataset management** with DatasetManager for download, validation, and preparation
+- [x] **Kaggle integration** for automatic PlantVillage dataset acquisition
+- [x] **Dataset validation** with integrity checking and corruption detection
+- [x] **Dataset analysis** with comprehensive statistics and class distribution reporting
 - [x] **TensorBoard integration** with comprehensive metrics logging
 - [x] **Data augmentation pipeline** with transforms for training/validation
 - [x] **Learning rate scheduling** and optimization strategies
@@ -190,6 +194,10 @@ The PlantGuard Makefile has been completely redesigned to be intuitive and user-
 | `make validate` | `make status` | Check project health |
 | `make models-info` | `make models` | Show model information |
 | `make train-models` | `make train` | Train ML models |
+| *New* | `make setup-dataset` | Show dataset status and guidance |
+| *New* | `make download-dataset` | Download PlantVillage from Kaggle |
+| *New* | `make validate-dataset` | Validate dataset integrity |
+| *New* | `make analyze-dataset` | Analyze dataset statistics |
 
 ### **Essential Commands**
 
@@ -206,8 +214,14 @@ make lint            # Check code quality
 make test            # Run tests
 make fix             # Auto-fix common issues
 
-# Machine learning
+# Machine learning & datasets
 make train           # Train PlantGuard models
+make setup-dataset   # Show dataset status and setup options
+make download-dataset # Download PlantVillage dataset from Kaggle
+make prepare-dataset # Prepare dataset with train/val splits
+make validate-dataset # Validate dataset integrity and quality
+make analyze-dataset # Analyze dataset statistics and distribution
+make dummy-dataset   # Create dummy dataset for testing
 make models          # Show model information and sizes
 make notebook        # Open Jupyter notebook for development
 
@@ -238,6 +252,12 @@ make start    # Does everything automatically
 # Daily Development
 make dev      # Format + lint before commit
 make run      # Launch app for testing
+
+# Dataset Management
+make setup-dataset    # Check dataset status and get guidance
+make download-dataset # Download PlantVillage from Kaggle
+make validate-dataset # Check dataset integrity
+make analyze-dataset  # View dataset statistics
 
 # Machine Learning Work
 make train    # Train models
@@ -270,6 +290,168 @@ make build           # Build package for distribution
 make restart         # Restart application during development
 ```
 
+## 📊 **DATASET MANAGEMENT**
+
+### **Enhanced Dataset Commands** ✅
+
+PlantGuard now includes a comprehensive dataset management system with advanced commands for handling the PlantVillage dataset and custom datasets.
+
+#### **Dataset Setup Workflow**
+
+```bash
+# 1. Check dataset status and get guidance
+make setup-dataset   # Shows current status and next steps
+
+# 2. Download PlantVillage dataset automatically (requires Kaggle API)
+make download-dataset # Downloads from Kaggle with proper error handling
+
+# 3. Prepare dataset with train/validation splits
+make prepare-dataset # Creates train/val splits from raw data
+
+# 4. Validate dataset integrity
+make validate-dataset # Checks for corrupted files and validates structure
+
+# 5. Analyze dataset statistics
+make analyze-dataset # Shows class distribution and dataset metrics
+
+# Alternative: Create dummy dataset for testing
+make dummy-dataset   # Creates synthetic dataset for development/testing
+```
+
+#### **Dataset Management Features**
+
+**Automatic Dataset Detection**:
+- Checks multiple common dataset locations
+- Supports both processed and raw dataset formats
+- Handles legacy PlantVillage dataset structures
+- Provides clear status reporting and next steps
+
+**Kaggle Integration**:
+- Automatic PlantVillage dataset download from Kaggle
+- Comprehensive setup instructions for Kaggle API
+- Detailed error handling and troubleshooting guidance
+- Progress tracking and status reporting
+
+**Dataset Validation**:
+- Integrity checking for image files
+- Corruption detection and reporting
+- Class distribution analysis
+- Train/validation split validation
+- Minimum sample requirements checking
+
+**Dataset Analysis**:
+- Comprehensive statistics reporting
+- Class distribution visualization
+- Dataset size and sample count metrics
+- Train/validation split analysis
+- Corrupted file identification and reporting
+
+#### **Dataset Command Examples**
+
+```bash
+# Check what datasets are available
+make setup-dataset
+# Output:
+# ✅ Dummy dataset found
+# ❌ No processed PlantVillage dataset found
+# ❌ Raw PlantVillage dataset not found
+
+# Download PlantVillage dataset (requires Kaggle API setup)
+make download-dataset
+# Provides setup instructions if Kaggle API not configured
+
+# Validate dataset integrity
+make validate-dataset
+# Output:
+# 🔍 Validating Dummy dataset at data/plantvillage_dummy...
+# 📊 Results for Dummy dataset:
+#   Total files: 400
+#   Valid files: 400
+#   Corrupted files: 0
+#   Classes found: 8
+#   ✅ Dataset is valid
+
+# Analyze dataset statistics
+make analyze-dataset
+# Output:
+# 📊 Analyzing Dummy dataset at data/plantvillage_dummy...
+# 📈 Dataset Analysis for Dummy dataset:
+#   Name: plantvillage_dummy
+#   Total samples: 400
+#   Number of classes: 8
+#   Dataset size: 14.7 MB
+#   Train samples: 320
+#   Validation samples: 80
+```
+
+#### **Kaggle API Setup**
+
+For automatic dataset download, configure the Kaggle API:
+
+```bash
+# 1. Install Kaggle API
+pip install kaggle
+
+# 2. Get API token from https://www.kaggle.com/account
+# 3. Place kaggle.json in ~/.kaggle/
+mkdir -p ~/.kaggle
+cp kaggle.json ~/.kaggle/
+chmod 600 ~/.kaggle/kaggle.json
+
+# 4. Test API access
+kaggle datasets list
+
+# 5. Download PlantVillage dataset
+make download-dataset
+```
+
+#### **Dataset Directory Structure**
+
+```
+data/
+├── raw/
+│   └── plantvillage/          # Raw downloaded dataset
+├── processed/
+│   └── plantvillage/          # Prepared dataset with train/val splits
+│       ├── train/             # Training images by class
+│       ├── val/               # Validation images by class
+│       └── dataset_config.json # Dataset configuration
+├── plantvillage_dummy/        # Dummy dataset for testing
+│   ├── train/                 # Synthetic training images
+│   └── val/                   # Synthetic validation images
+└── temp/                      # Temporary files (auto-cleaned)
+```
+
+#### **DatasetManager Integration**
+
+The enhanced dataset commands use the new `DatasetManager` class:
+
+```python
+from src.training.dataset_manager import DatasetManager, DatasetConfig
+
+# Initialize dataset manager
+dm = DatasetManager()
+
+# Download dataset
+success = dm.download_plantvillage()
+
+# Validate dataset
+result = dm.validate_dataset(Path("data/plantvillage_dummy"))
+print(f"Valid: {result.is_valid}")
+print(f"Total files: {result.total_files}")
+print(f"Classes: {len(result.class_counts)}")
+
+# Analyze dataset
+info = dm.analyze_dataset(Path("data/plantvillage_dummy"))
+print(f"Total samples: {info.total_samples}")
+print(f"Classes: {info.num_classes}")
+print(f"Size: {info.dataset_size_mb:.1f} MB")
+
+# Prepare dataset with custom configuration
+config = DatasetConfig(train_ratio=0.8, random_seed=42)
+dm.prepare_dataset(source_dir, output_dir, config)
+```
+
 ## 🏗️ **SYSTEM ARCHITECTURE**
 
 ### **Core Implementation Structure**
@@ -284,6 +466,8 @@ PlantGuard/
 │   │   ├── audio.py           # 🔄 Whisper integration ready
 │   │   ├── nlp.py             # 🔄 DistilBERT integration ready
 │   │   └── models.py          # ✅ PlantDiseaseResNet50 architecture
+│   ├── training/
+│   │   └── dataset_manager.py # ✅ Advanced dataset management system
 │   ├── ui/
 │   │   ├── app.py             # ✅ Basic Streamlit structure
 │   │   └── app_streamlit.py   # ✅ Complete multimodal interface
@@ -300,7 +484,12 @@ PlantGuard/
 │   │   └── app_with_model_manager.py # ✅ Enhanced main app
 │   ├── train_vision_model.py  # ✅ Complete training pipeline
 │   ├── test_vision_adapter.py # ✅ Comprehensive testing
-│   └── prepare_dataset.py     # 🔄 Dataset preparation utilities
+│   ├── download_dataset.py    # ✅ Kaggle dataset download with error handling
+│   ├── validate_dataset.py    # ✅ Dataset integrity validation
+│   ├── analyze_dataset.py     # ✅ Dataset statistics and analysis
+│   ├── setup_dummy_dataset.py # ✅ Dummy dataset creation for testing
+│   ├── prepare_dataset_new.py # ✅ Dataset preparation with DatasetManager
+│   └── prepare_dataset.py     # ✅ Legacy dataset preparation utilities
 ├── config/
 │   └── models.json            # ✅ Model configuration & management
 ├── data/
@@ -463,11 +652,14 @@ make clean           # Cleans up when things get messy
 make status          # Check if everything is working
 make info            # Project overview and quick reference
 make models          # See your trained models and sizes
+make setup-dataset   # Check dataset status and get guidance
 
 # 🎯 Smart Defaults - Commands do what you expect
 make help            # Beautiful, organized help with examples
 make format          # Formats code the right way
 make test            # Runs tests with sensible output
+make download-dataset # Download datasets with proper error handling
+make validate-dataset # Check dataset integrity automatically
 ```
 
 ### **Current Functional Features**
@@ -488,6 +680,10 @@ make switcher        # Model Switcher UI (http://localhost:8502)
 # 8. Train custom ResNet50 models → Complete pipeline with TensorBoard
 # 9. Manage models through intuitive web interface
 # 10. Access detailed model information and technical specifications
+# 11. Advanced dataset management → Download, validate, and analyze datasets
+# 12. Automatic Kaggle integration → Download PlantVillage dataset with one command
+# 13. Dataset integrity validation → Check for corrupted files and validate structure
+# 14. Comprehensive dataset analysis → Class distribution and statistics reporting
 ```
 
 ### **Development Commands**

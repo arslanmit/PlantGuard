@@ -74,9 +74,12 @@ help:
 	@echo ""
 	@echo "$(GREEN)🤖 Machine Learning$(NC)"
 	@echo "  $(BLUE)train$(NC)          - Train plant disease models"
-	@echo "  $(BLUE)setup-dataset$(NC)  - Setup training dataset (real or dummy)"
+	@echo "  $(BLUE)setup-dataset$(NC)  - Show dataset status and setup options"
+	@echo "  $(BLUE)download-dataset$(NC) - Download PlantVillage dataset from Kaggle"
+	@echo "  $(BLUE)prepare-dataset$(NC) - Prepare dataset with train/val splits"
+	@echo "  $(BLUE)validate-dataset$(NC) - Validate dataset integrity and quality"
+	@echo "  $(BLUE)analyze-dataset$(NC) - Analyze dataset statistics and distribution"
 	@echo "  $(BLUE)dummy-dataset$(NC)  - Create dummy dataset for testing"
-	@echo "  $(BLUE)prepare-dataset$(NC) - Prepare real PlantVillage dataset"
 	@echo "  $(BLUE)models$(NC)         - Show model information"
 	@echo "  $(BLUE)debug$(NC)          - Debug model performance"
 	@echo ""
@@ -293,24 +296,52 @@ setup-dataset:
 	@if [ ! -x $(PY) ]; then make setup; fi
 	@echo "$(CYAN)Dataset setup options:$(NC)"
 	@echo "  1. $(GREEN)Real PlantVillage dataset$(NC) (recommended for production)"
-	@echo "     - Download from Kaggle: https://www.kaggle.com/datasets/abdallahalidev/plantvillage-dataset"
-	@echo "     - Extract to: data/PlantVillage/"
+	@echo "     - Download automatically: make download-dataset"
+	@echo "     - Or download manually from: https://www.kaggle.com/datasets/abdallahalidev/plantvillage-dataset"
+	@echo "     - Extract to: data/raw/plantvillage/"
 	@echo "     - Run: make prepare-dataset"
 	@echo ""
 	@echo "  2. $(YELLOW)Dummy dataset$(NC) (for testing only)"
 	@echo "     - Run: make dummy-dataset"
 	@echo ""
 	@echo "$(CYAN)Current status:$(NC)"
-	@if [ -d "data/PlantVillage/train" ]; then \
-		echo "  $(GREEN)✅ Real PlantVillage dataset found$(NC)"; \
-	else \
-		echo "  $(RED)❌ Real PlantVillage dataset not found$(NC)"; \
-	fi
-	@if [ -d "data/plantvillage_dummy/train" ]; then \
-		echo "  $(GREEN)✅ Dummy dataset found$(NC)"; \
-	else \
-		echo "  $(RED)❌ Dummy dataset not found$(NC)"; \
-	fi
+	@$(PY) -c "\
+from pathlib import Path; \
+from src.training.dataset_manager import DatasetManager; \
+import sys; \
+dm = DatasetManager(); \
+processed_exists = (Path('data/processed/plantvillage/train').exists() and Path('data/processed/plantvillage/val').exists()); \
+legacy_exists = (Path('data/PlantVillage/train').exists() and Path('data/PlantVillage/val').exists()); \
+raw_exists = Path('data/raw/plantvillage').exists(); \
+dummy_exists = (Path('data/plantvillage_dummy/train').exists() and Path('data/plantvillage_dummy/val').exists()); \
+print('  ✅ Processed PlantVillage dataset found' if processed_exists else ('  ✅ Legacy PlantVillage dataset found' if legacy_exists else '  ❌ No processed PlantVillage dataset found')); \
+print('  ✅ Raw PlantVillage dataset found' if raw_exists else '  ❌ Raw PlantVillage dataset not found'); \
+print('  ✅ Dummy dataset found' if dummy_exists else '  ❌ Dummy dataset not found'); \
+"
+	@echo ""
+	@echo "$(CYAN)💡 Quick commands:$(NC)"
+	@echo "  $(BLUE)make download-dataset$(NC)  - Download PlantVillage from Kaggle"
+	@echo "  $(BLUE)make prepare-dataset$(NC)   - Prepare dataset with train/val splits"
+	@echo "  $(BLUE)make validate-dataset$(NC)  - Check dataset integrity"
+	@echo "  $(BLUE)make analyze-dataset$(NC)   - Show dataset statistics"
+
+# Download PlantVillage dataset automatically
+download-dataset:
+	@echo "$(BLUE)📥 Downloading PlantVillage dataset...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@$(PY) scripts/download_dataset.py
+
+# Validate dataset integrity
+validate-dataset:
+	@echo "$(BLUE)🔍 Validating dataset integrity...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@$(PY) scripts/validate_dataset.py
+
+# Analyze dataset statistics
+analyze-dataset:
+	@echo "$(BLUE)📊 Analyzing dataset statistics...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@$(PY) scripts/analyze_dataset.py
 
 # Create dummy dataset for testing
 dummy-dataset:
@@ -324,13 +355,7 @@ dummy-dataset:
 prepare-dataset:
 	@echo "$(BLUE)📊 Preparing PlantVillage dataset...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup; fi
-	@if [ ! -d "data/PlantVillage_raw" ]; then \
-		echo "$(RED)❌ Raw PlantVillage dataset not found at data/PlantVillage_raw/$(NC)"; \
-		echo "$(YELLOW)Please download and extract the dataset first$(NC)"; \
-		exit 1; \
-	fi
-	@$(PY) scripts/prepare_dataset.py --source_dir data/PlantVillage_raw --output_dir data/PlantVillage --train_ratio 0.8
-	@echo "$(GREEN)✅ Dataset prepared at data/PlantVillage/$(NC)"
+	@$(PY) scripts/prepare_dataset_new.py
 
 # Show model information
 models:
