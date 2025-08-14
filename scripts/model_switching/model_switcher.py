@@ -125,7 +125,7 @@ def benchmark_models(manager: "PlantGuardModelManager") -> None:
         print(f"❌ Test metadata not found: {metadata_path}")
         return
 
-    with open(metadata_path) as f:
+    with Path(metadata_path).open() as f:
         metadata = json.load(f)
 
     print("🏁 Benchmarking Models on Test Dataset")

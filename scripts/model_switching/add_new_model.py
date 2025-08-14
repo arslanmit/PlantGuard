@@ -17,7 +17,7 @@ def add_huggingface_model(
         return False
 
     # Load current config
-    with open(config_path) as f:
+    with config_path.open() as f:
         config = json.load(f)
 
     # Generate model key
@@ -44,7 +44,7 @@ def add_huggingface_model(
     config["models"][model_key] = model_config
 
     # Save updated config
-    with open(config_path, "w") as f:
+    with config_path.open("w") as f:
         json.dump(config, f, indent=2)
 
     print(f"✅ Added model: {model_key}")
@@ -104,7 +104,7 @@ def remove_model(model_key: str) -> bool:
         return False
 
     # Load current config
-    with open(config_path) as f:
+    with config_path.open() as f:
         config = json.load(f)
 
     if model_key not in config["models"]:
@@ -125,7 +125,7 @@ def remove_model(model_key: str) -> bool:
             print("⚠️  No default model set (no enabled models remaining)")
 
     # Save updated config
-    with open(config_path, "w") as f:
+    with config_path.open("w") as f:
         json.dump(config, f, indent=2)
 
     print(f"✅ Removed model: {model_key}")
@@ -143,7 +143,7 @@ def enable_disable_model(model_key: str, enable: bool) -> bool:
         return False
 
     # Load current config
-    with open(config_path) as f:
+    with config_path.open() as f:
         config = json.load(f)
 
     if model_key not in config["models"]:
@@ -154,7 +154,7 @@ def enable_disable_model(model_key: str, enable: bool) -> bool:
     config["models"][model_key]["enabled"] = enable
 
     # Save updated config
-    with open(config_path, "w") as f:
+    with config_path.open("w") as f:
         json.dump(config, f, indent=2)
 
     status = "enabled" if enable else "disabled"
@@ -172,7 +172,7 @@ def set_default_model(model_key: str) -> bool:
         return False
 
     # Load current config
-    with open(config_path) as f:
+    with config_path.open() as f:
         config = json.load(f)
 
     if model_key not in config["models"]:
@@ -187,7 +187,7 @@ def set_default_model(model_key: str) -> bool:
     config["default_model"] = model_key
 
     # Save updated config
-    with open(config_path, "w") as f:
+    with config_path.open("w") as f:
         json.dump(config, f, indent=2)
 
     print(f"✅ Set default model to: {model_key}")
@@ -204,7 +204,7 @@ def show_config() -> None:
         print("❌ Configuration file not found")
         return
 
-    with open(config_path) as f:
+    with config_path.open() as f:
         config = json.load(f)
 
     print("⚙️  Current PlantGuard Model Configuration:")

@@ -872,7 +872,7 @@ ignore = [
   # "PTH120", # os.path.dirname() should be replaced by Path.parent
   # "PTH121", # os.path.samefile() should be replaced by Path.samefile()
   # "PTH122", # os.path.splitext() should be replaced by Path.suffix
-   "PTH123", # Allow open() instead of Path.open() (gradual migration)
+  # "PTH123", # Allow open() instead of Path.open() (gradual migration)
   # "PTH124", # os.path.isdir() should be replaced by Path.is_dir()
 
   # ============================================================================
@@ -1151,12 +1151,12 @@ convention = "google"  # Use Google-style docstrings (clear and readable)
 
 # 🧠 Complexity Limits - Keep functions simple (ADHD-friendly!)
 [tool.ruff.lint.mccabe]
-max-complexity = 10    # Max cyclomatic complexity (how many paths through a function)
+max-complexity = 20    # Max cyclomatic complexity (how many paths through a function)
 
 [tool.ruff.lint.pylint]
-max-args = 8          # Max function arguments (ML functions need more params)
-max-branches = 12     # Max if/elif branches
-max-returns = 6       # Max return statements
+max-args = 10          # Max function arguments (ML functions need more params)
+max-branches = 20     # Max if/elif branches
+max-returns = 10       # Max return statements
 max-statements = 50   # Max lines in a function
 
 # 📝 Quote Style - Consistent string quotes

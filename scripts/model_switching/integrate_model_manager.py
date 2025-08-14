@@ -358,7 +358,7 @@ if __name__ == "__main__":
 
     # Write the enhanced app under feature scripts folder
     output_path = Path("scripts/model_switching/app_with_model_manager.py")
-    with open(output_path, "w") as f:
+    with output_path.open("w") as f:
         f.write(app_code)
 
     print(f"✅ Created enhanced PlantGuard app: {output_path}")
@@ -521,7 +521,7 @@ You should see 100% accuracy on the Vision Transformer model!
 """
 
     guide_path = Path("MODEL_SWITCHING_GUIDE.md")
-    with open(guide_path, "w") as f:
+    with guide_path.open("w") as f:
         f.write(guide)
 
     print(f"✅ Created quick start guide: {guide_path}")

@@ -235,7 +235,7 @@ def main() -> None:
                 # Load test metadata
                 metadata_path = "data/pictures/sample_images_metadata.json"
                 if Path(metadata_path).exists():
-                    with open(metadata_path, encoding="utf-8") as f:
+                    with Path(metadata_path).open(encoding="utf-8") as f:
                         metadata = json.load(f)
 
                     benchmark_results = []
