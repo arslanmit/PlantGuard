@@ -554,16 +554,595 @@ ignore = [
   # Result: All pycodestyle rules EXCEPT line length checking!
 
   # ============================================================================
-  # ⚠️ DEPRECATED & REMAPPED RULES - Important updates
+  # � ISORT S(I) - Import organization and sorting
   # ============================================================================
-  # 🚫 REMOVED RULES (no longer exist in Ruff):
-  # "ANN101", # missing type annotation for self - DEPRECATED
-  # "ANN102", # missing type annotation for cls - DEPRECATED
-  #
-  # 🔄 REMAPPED RULES (consolidated into other rules):
-  # "SIM111", # remapped to SIM110 (both any() and all() suggestions)
-  #
-  # 💡 These rules are automatically handled by Ruff and don't need to be specified
+  # "I001",   # import block is un-sorted or un-formatted
+  # "I002",   # missing required import (e.g. from __future__ import annotations)
+
+  # ============================================================================
+  # 🔤 FLAKE8-BUILTINS (A) - Builtin shadowing
+  # ============================================================================
+  # "A001",   # variable is shadowing a python builtin
+  # "A002",   # argument is shadowing a python builtin
+  # "A003",   # class attribute is shadowing a python builtin
+  # "A004",   # import is shadowing a python builtin
+  # "A005",   # module is shadowing a python builtin
+  # "A006",   # variable is shadowing a python builtin in a nested scope
+
+  # ============================================================================
+  # 🐛 FLAKE8-BUGBEAR (B) - Common Python gotchas and bugs
+  # ============================================================================
+  # "B002",   # Python does not support the unary prefix increment
+  # "B003",   # assigning to os.environ doesn't clear the environment
+  # "B004",   # using hasattr(x, '__call__') to test if x is callable is unreliable
+  # "B005",   # using .strip() with multi-character strings is misleading
+  # "B006",   # do not use mutable data structures for argument defaults
+  "B007",   # loop control variable not used within the loop body (common in ML)
+  # "B008",   # do not perform function calls in argument defaults
+  # "B009",   # do not call getattr with a constant attribute value
+  # "B010",   # do not call setattr with a constant attribute value
+  # "B011",   # do not call assert False since python -O removes these calls
+  # "B012",   # use of break, continue or return inside finally blocks
+  # "B013",   # a length-one tuple literal is redundant
+  # "B014",   # exception handler is an exception group
+  # "B015",   # pointless comparison
+  # "B016",   # cannot raise a literal
+  # "B017",   # assertRaises(Exception) should be considered evil
+  "B018",   # found useless expression (sometimes needed for side effects)
+  # "B019",   # use of assert detected
+  # "B020",   # loop control variable overrides iterable it iterates
+  # "B021",   # f-string used as docstring
+  # "B022",   # no arguments passed to contextmanager
+  # "B023",   # function definition does not bind loop variable
+  # "B024",   # abstract base class with no abstract methods
+  # "B025",   # duplicate try block exception handler
+  # "B026",   # star-arg unpacking after a keyword argument is strongly discouraged
+  # "B027",   # empty method in an abstract base class
+  # "B028",   # no explicit stacklevel keyword argument found
+  # "B029",   # using except (...): with an empty tuple does not catch anything
+  # "B030",   # except handlers should only be exception classes or tuples of exception classes
+  # "B031",   # using itertools.groupby without explicitly sorting first
+  # "B032",   # possible unintentional type annotation (use =)
+  # "B033",   # duplicate value in set
+  # "B034",   # re.sub called with positional arguments
+  # "B035",   # found except clause that may not bind an exception
+  # "B901",   # using return x in a generator function used to be syntactically invalid
+  # "B902",   # blind except Exception: statement
+  # "B903",   # data class should use __slots__
+  "B904",   # allow 'raise ...' without explicit 'from' (common in ML)
+  # "B905",   # zip() without an explicit strict= parameter
+
+  # ============================================================================
+  # 🔄 FLAKE8-COMPREHENSIONS (C4) - List/dict comprehension improvements
+  # ============================================================================
+  # "C400",   # unnecessary generator (rewrite as a list comprehension)
+  # "C401",   # unnecessary generator (rewrite as a set comprehension)
+  # "C402",   # unnecessary generator (rewrite as a dict comprehension)
+  # "C403",   # unnecessary list comprehension (rewrite as a set comprehension)
+  # "C404",   # unnecessary list comprehension (rewrite as a dict comprehension)
+  # "C405",   # unnecessary literal (rewrite as a set literal)
+  # "C406",   # unnecessary literal (rewrite as a dict literal)
+  # "C408",   # unnecessary dict call (rewrite as a literal)
+  # "C409",   # unnecessary list passed to tuple() (rewrite as a tuple literal)
+  # "C410",   # unnecessary list passed to list() (remove the outer call to list())
+  # "C411",   # unnecessary list call (remove the outer call to list())
+  # "C413",   # unnecessary reversed call around sorted()
+  # "C414",   # unnecessary double cast
+  # "C415",   # unnecessary subscript reversal of iterable
+  # "C416",   # unnecessary list comprehension (rewrite using list())
+  # "C417",   # unnecessary map usage (rewrite using a generator expression)
+  # "C418",   # unnecessary dict literal passed to dict() (remove the outer call)
+  # "C419",   # unnecessary list comprehension
+
+  # ============================================================================
+  # 🧠 MCCABE (C90) - Cyclomatic complexity
+  # ============================================================================
+  "C901",   # function is too complex (ML functions can be complex)
+
+  # ============================================================================
+  # 📝 PYDOCSTYLE (D) - Documentation style
+  # ============================================================================
+  "D100",   # missing docstring in public module
+  # "D101",   # missing docstring in public class
+  "D102",   # missing docstring in public method
+  "D103",   # missing docstring in public function
+  "D104",   # missing docstring in public package
+  # "D105",   # missing docstring in magic method
+  # "D106",   # missing docstring in public nested class
+  "D107",   # missing docstring in __init__
+  # "D200",   # one-line docstring should fit on one line with quotes
+  # "D201",   # no blank lines allowed before function docstring
+  # "D202",   # no blank lines allowed after function docstring
+  # "D203",   # 1 blank line required before class docstring
+  # "D204",   # 1 blank line required after class docstring
+  # "D205",   # 1 blank line required between summary line and description
+  # "D206",   # docstring should be indented with spaces, not tabs
+  # "D207",   # docstring is under-indented
+  # "D208",   # docstring is over-indented
+  # "D209",   # multi-line docstring closing quotes should be on a separate line
+  # "D210",   # no whitespaces allowed surrounding docstring text
+  # "D211",   # no blank lines allowed before class docstring
+  # "D212",   # multi-line docstring summary should start at the first line
+  # "D213",   # multi-line docstring summary should start at the second line
+  # "D214",   # section is over-indented
+  # "D215",   # section underline is over-indented
+  # "D300",   # use """triple double quotes"""
+  # "D301",   # use r""" if any backslashes in a docstring
+  # "D400",   # first line should end with a period
+  # "D401",   # first line should be in imperative mood
+  # "D402",   # first line should not be the function's signature
+  # "D403",   # first word of the first line should be properly capitalized
+  # "D404",   # first word of the docstring should not be This
+  # "D405",   # section name should be properly capitalized
+  # "D406",   # section name should end with a newline
+  # "D407",   # missing dashed underline after section
+  # "D408",   # section underline should be in the line following the section's name
+  # "D409",   # section underline should match the length of its name
+  # "D410",   # missing blank line after section
+  # "D411",   # missing blank line before section
+  # "D412",   # no blank lines allowed between a section header and its content
+  # "D413",   # missing blank line after last section
+  # "D414",   # section has no content
+  # "D415",   # first line should end with a period, question mark, or exclamation point
+  # "D416",   # section name should end with a colon
+  # "D417",   # missing argument descriptions in the docstring
+
+  # ============================================================================
+  # 🔒 FLAKE8-BANDIT (S) - Security issues
+  # ============================================================================
+  "S101",   # allow assert statements (useful for debugging)
+  # "S102",   # exec used
+  # "S103",   # set-bad-file-permissions
+  # "S104",   # hardcoded-bind-all-interfaces
+  # "S105",   # hardcoded-password-string
+  # "S106",   # hardcoded-password-funcarg
+  # "S107",   # hardcoded-password-default
+  # "S108",   # hardcoded-temp-file
+  "S110",   # allow broad except patterns (ML models can fail in many ways)
+  # "S112",   # try-except-continue
+  # "S113",   # request-without-timeout
+  # "S201",   # flask-debug-true
+  # "S202",   # tarfile-unsafe-members
+  # "S301",   # pickle
+  # "S302",   # marshal
+  # "S303",   # md5
+  # "S304",   # insecure-cipher
+  # "S305",   # insecure-cipher-mode
+  # "S306",   # insecure-cipher-mode-ecb
+  # "S307",   # insecure-cipher-mode-cbc
+  # "S308",   # mark-safe
+  # "S310",   # urllib-urlopen
+  # "S311",   # random
+  # "S312",   # telnetlib
+  # "S313",   # xml-bad-cElementTree
+  # "S314",   # xml-bad-ElementTree
+  # "S315",   # xml-bad-expatreader
+  # "S316",   # xml-bad-expatbuilder
+  # "S317",   # xml-bad-sax
+  # "S318",   # xml-bad-minidom
+  # "S319",   # xml-bad-pulldom
+  # "S320",   # xml-bad-etree
+  # "S321",   # ftplib
+  # "S322",   # input
+  # "S323",   # unverified-context
+  # "S324",   # insecure-hash-function
+  # "S401",   # import-telnetlib
+  # "S402",   # import-ftplib
+  # "S403",   # import-pickle
+  # "S404",   # import-subprocess
+  # "S405",   # import-xml-etree
+  # "S406",   # import-xml-sax
+  # "S407",   # import-xml-expat
+  # "S408",   # import-xml-minidom
+  # "S409",   # import-xml-pulldom
+  # "S410",   # import-lxml
+  # "S411",   # import-xmlrpclib
+  # "S412",   # import-httpoxy
+  # "S413",   # import-pycrypto
+  # "S501",   # request-with-no-cert-validation
+  # "S502",   # ssl-insecure-version
+  # "S503",   # ssl-bad-defaults
+  # "S504",   # ssl-with-bad-version
+  # "S505",   # weak-cryptographic-key
+  # "S506",   # yaml-load
+  # "S507",   # ssh-no-host-key-verification
+  # "S508",   # snmp-insecure-version
+  # "S509",   # snmp-weak-cryptography
+  # "S601",   # paramiko-calls
+  # "S602",   # subprocess-popen-with-shell-equals-true
+  "S603",   # subprocess calls (needed for some ML tools)
+  # "S604",   # call-with-shell-equals-true
+  # "S605",   # start-process-with-a-shell
+  # "S606",   # start-process-with-no-shell
+  "S607",   # partial paths in subprocess (common in ML)
+  # "S608",   # hardcoded-sql-expression
+  # "S609",   # unix-command-wildcard-injection
+  # "S701",   # jinja2-autoescape-false
+  # "S702",   # use-of-mako-templates
+
+  # ============================================================================
+  # 🚨 FLAKE8-BLIND-EXCEPT (BLE) - Exception handling
+  # ============================================================================
+  "BLE001", # allow catch-all Exception when justified
+
+  # ============================================================================
+  # 📝 FLAKE8-ANNOTATIONS (ANN) - Type annotations
+  # ============================================================================
+  "ANN001", # function arguments don't need types everywhere
+  "ANN002", # missing type annotation for *args (gradual typing)
+  "ANN003", # missing type annotation for **kwargs (gradual typing)
+  # "ANN101", # REMOVED: deprecated rule (no longer exists in Ruff)
+  # "ANN102", # REMOVED: deprecated rule (no longer exists in Ruff)
+  "ANN201", # return types not required everywhere
+  # "ANN202", # missing return type annotation for private function
+  # "ANN204", # missing return type annotation for special method
+  # "ANN205", # missing return type annotation for staticmethod
+  # "ANN206", # missing return type annotation for classmethod
+  "ANN401", # allow Any type when needed
+
+  # ============================================================================
+  # 🖨️ FLAKE8-PRINT (T20) - Print statements
+  # ============================================================================
+  "T201",   # allow print() in CLI scripts and debugging
+  # "T203",   # pprint found
+
+  # ============================================================================
+  # 📊 FLAKE8-LOGGING-FORMAT (G) - Logging format
+  # ============================================================================
+  # "G001",   # logging .format() string
+  # "G002",   # logging % string
+  # "G003",   # logging + string
+  "G004",   # allow f-strings in logging (more readable)
+  # "G010",   # logging warn instead of warning
+  # "G101",   # logging extra not a dict
+  # "G201",   # logging .exception(...) should be logging.exception(...)
+  # "G202",   # logging .exception(...) should be logging.exception(...)
+
+  # ============================================================================
+  # 🥧 FLAKE8-PIE (PIE) - Miscellaneous improvements
+  # ============================================================================
+  # "PIE790", # unnecessary pass statement
+  # "PIE794", # duplicate class field definition
+  # "PIE796", # prefer unique enums
+  # "PIE800", # unnecessary spread **
+  # "PIE804", # unnecessary dict kwargs
+  # "PIE807", # prefer list() over useless lambda
+  # "PIE810", # single starts-with/ends-with
+
+  # ============================================================================
+  # 🔄 FLAKE8-SIMPLIFY (SIM) - Code simplification
+  # ============================================================================
+  "SIM102", # use ternary operator (sometimes if/else is clearer)
+  # "SIM103", # return condition directly
+  # "SIM106", # use ternary operator instead of if-else-block for simple variable assignments
+  # "SIM108", # use ternary operator instead of if-else-block that assigns a boolean
+  "SIM110", # use any(...) instead of for loop AND all(...) instead of for loop (remapped from SIM111)
+  # "SIM112", # use CAPITAL_ENVIRONMENT_VARIABLES
+  # "SIM113", # use enumerate instead of manually incrementing a counter
+  # "SIM114", # combine if branches using logical or operator
+  # "SIM115", # use context handler for opening files
+  # "SIM116", # use dict.get(key, "default") instead of conditional assignment
+  # "SIM117", # use a single with-statement with multiple contexts instead of nested with-statements
+  # "SIM118", # use key in dict instead of key in dict.keys()
+  # "SIM201", # use != instead of not ==
+  # "SIM202", # use == instead of not !=
+  # "SIM208", # use != instead of not ==
+  # "SIM210", # use bool(...) instead of True if ... else False
+  # "SIM211", # use bool(...) instead of False if ... else True
+  # "SIM212", # use value if condition else other_value instead of other_value if not condition else value
+  # "SIM220", # use False instead of a == b and a != b
+  # "SIM221", # use True instead of a == b or a != b
+  # "SIM222", # use True instead of ... or True
+  # "SIM223", # use False instead of ... and False
+  # "SIM300", # yoda condition detected
+  # "SIM401", # use dict.get(key, "default") instead of conditional assignment
+
+  # ============================================================================
+  # 🚀 PYUPGRADE (UP) - Modern Python syntax
+  # ============================================================================
+  # "UP001",  # use {} instead of format()
+  # "UP003",  # use {} instead of format()
+  # "UP004",  # use {} instead of format()
+  # "UP005",  # use {} instead of format()
+  # "UP006",  # use {} instead of format()
+  # "UP007",  # use {} instead of format()
+  # "UP008",  # use super() instead of super(__class__, self)
+  # "UP009",  # use UTF-8 encoding declaration
+  # "UP010",  # use {} instead of format()
+  # "UP011",  # use {} instead of format()
+  # "UP012",  # use {} instead of format()
+  # "UP013",  # use {} instead of format()
+  # "UP014",  # use {} instead of format()
+  # "UP015",  # use {} instead of format()
+  # "UP017",  # use datetime.timezone.utc
+  # "UP018",  # use {} instead of format()
+  # "UP019",  # use {} instead of format()
+  # "UP020",  # use {} instead of format()
+  # "UP021",  # use {} instead of format()
+  # "UP022",  # use {} instead of format()
+  # "UP023",  # use {} instead of format()
+  # "UP024",  # use {} instead of format()
+  # "UP025",  # use {} instead of format()
+  # "UP026",  # use {} instead of format()
+  # "UP027",  # use {} instead of format()
+  # "UP028",  # use {} instead of format()
+  # "UP029",  # use {} instead of format()
+  # "UP030",  # use implicit references for positional format fields
+  # "UP031",  # use format specifiers instead of percent format
+  # "UP032",  # use f-string instead of format call
+  # "UP033",  # use {} instead of format()
+  # "UP034",  # use {} instead of format()
+  # "UP035",  # use {} instead of format()
+  # "UP036",  # use {} instead of format()
+  # "UP037",  # use {} instead of format()
+
+  # ============================================================================
+  # 🔄 TRYCERATOPS (TRY) - Exception handling improvements
+  # ============================================================================
+  "TRY003", # long exception messages are OK
+  # "TRY004", # prefer TypeError exception for invalid type
+  # "TRY100", # use logging.exception instead of logging.error
+  # "TRY101", # use raise from to specify exception cause
+  # "TRY200", # use raise without specifying exception name
+  # "TRY201", # use raise without specifying exception name
+  "TRY300", # don't require 'else' on 'try'
+  "TRY301", # don't require specific exception handling
+  # "TRY302", # useless try-except, consider removing or re-raising
+  "TRY400", # allow logging.error instead of logging.exception
+  "TRY401", # allow verbose logging
+
+  # ============================================================================
+  # 📁 FLAKE8-USE-PATHLIB (PTH) - Use pathlib instead of os.path
+  # ============================================================================
+  # "PTH100", # os.path.abspath() should be replaced by Path.resolve()
+  # "PTH101", # os.chmod() should be replaced by Path.chmod()
+  # "PTH102", # os.mkdir() should be replaced by Path.mkdir()
+  # "PTH103", # os.makedirs() should be replaced by Path.mkdir(parents=True)
+  # "PTH104", # os.rename() should be replaced by Path.rename()
+  # "PTH105", # os.replace() should be replaced by Path.replace()
+  # "PTH106", # os.rmdir() should be replaced by Path.rmdir()
+  # "PTH107", # os.remove() should be replaced by Path.unlink()
+  # "PTH108", # os.unlink() should be replaced by Path.unlink()
+  "PTH109", # prefer Path.cwd() (gradual migration)
+  "PTH110", # prefer Path.exists() (gradual migration)
+  # "PTH111", # os.path.expanduser() should be replaced by Path.expanduser()
+  # "PTH112", # os.path.isdir() should be replaced by Path.is_dir()
+  # "PTH113", # os.path.isfile() should be replaced by Path.is_file()
+  # "PTH114", # os.path.islink() should be replaced by Path.is_symlink()
+  # "PTH115", # os.path.readlink() should be replaced by Path.readlink()
+  # "PTH116", # os.stat() should be replaced by Path.stat()
+  # "PTH117", # os.path.isabs() should be replaced by Path.is_absolute()
+  "PTH118", # prefer Path '/' operator (gradual migration)
+  # "PTH119", # os.path.basename() should be replaced by Path.name
+  # "PTH120", # os.path.dirname() should be replaced by Path.parent
+  # "PTH121", # os.path.samefile() should be replaced by Path.samefile()
+  # "PTH122", # os.path.splitext() should be replaced by Path.suffix
+  "PTH123", # prefer Path.open() (gradual migration)
+  # "PTH124", # os.path.isdir() should be replaced by Path.is_dir()
+
+  # ============================================================================
+  # 🔧 RUFF-SPECIFIC (RUF) - Ruff-specific rules
+  # ============================================================================
+  # "RUF001", # ambiguous unicode character in string
+  # "RUF002", # ambiguous unicode character in docstring
+  # "RUF003", # ambiguous unicode character in comment
+  "RUF005", # consider iterable unpacking instead of concatenation (sometimes explicit is clearer)
+  # "RUF006", # store a reference to the return value of asyncio.create_task
+  # "RUF007", # prefer itertools.pairwise() over zip() when iterating over successive pairs
+  # "RUF008", # do not use mutable default values for dataclass fields
+  # "RUF009", # do not perform function call in dataclass defaults
+  # "RUF010", # use explicit conversion flag
+  # "RUF011", # ruff-static-key-dict-comprehension
+  # "RUF012", # mutable class attributes should be annotated with typing.ClassVar
+  # "RUF013", # PEP 484 prohibits implicit Optional
+  # "RUF100", # unused noqa directive
+
+  # ============================================================================
+  # ⚡ PERFLINT (PERF) - Performance improvements
+  # ============================================================================
+  # "PERF101", # do not cast an iterable to list before iterating over it
+  # "PERF102", # when using only the keys of a dict use the keys() method
+  "PERF203", # try-except within a loop incurs performance overhead (sometimes necessary in ML)
+  # "PERF401", # use a list comprehension to create a transformed list
+  # "PERF402", # use list or set comprehensions instead of for-loops
+  # "PERF403", # use dict comprehensions instead of for-loops
+
+  # ============================================================================
+  # 📦 FLAKE8-TIDY-IMPORTS (TID) - Import organization
+  # ============================================================================
+  # "TID251", # banned imports
+  # "TID252", # prefer absolute imports over relative imports
+
+  # ============================================================================
+  # 🧠 PYLINT (PL) - Code structure and logic
+  # ============================================================================
+  # PLR - Pylint Refactor
+  # "PLR0124", # name compared with itself
+  # "PLR0133", # two constants compared
+  # "PLR0206", # property with parameters
+  "PLR0402", # use from import instead of import (sometimes import is clearer)
+  "PLR0911", # too many return statements
+  "PLR0912", # too many branches
+  "PLR0913", # too many arguments (ML functions need many params)
+  "PLR0915", # too many statements
+  # "PLR1701", # merge isinstance calls
+  # "PLR1722", # use sys.exit() instead of exit()
+  # "PLR1733", # unnecessary dictionary index lookup
+  # "PLR1736", # unnecessary list index lookup
+  "PLR2004", # magic values (ML has lots of constants)
+  # "PLR2044", # line with empty comment
+  # "PLR5501", # consider using elif instead of else if
+
+  # PLW - Pylint Warning
+  # "PLW0120", # else clause on loop without a break statement
+  "PLW0127", # self-assigning variable (sometimes used for type narrowing)
+  # "PLW0129", # assert on string literal
+  # "PLW0131", # named expression used without context
+  # "PLW0133", # exception statement has no effect
+  # "PLW0245", # super without brackets
+  # "PLW0406", # import self
+  # "PLW0602", # global variable not assigned
+  "PLW0603", # global variables (sometimes needed in ML)
+  # "PLW0604", # global at module level
+  # "PLW1508", # invalid envvar default
+  # "PLW1509", # subprocess-popen-preexec-fn
+  "PLW1510", # subprocess.run without explicit check (sometimes not needed)
+  "PLW1514", # unspecified encoding in open (gradual migration to explicit encoding)
+  # "PLW1641", # eq-without-hash
+  # "PLW2101", # useless-with-lock
+  "PLW2901", # for loop variable overwritten
+  # "PLW3301", # nested-min-max
+
+  # PLE - Pylint Error
+  # "PLE0101", # return in __init__
+  # "PLE0116", # continue in finally
+  # "PLE0117", # nonlocal without binding
+  # "PLE0118", # used prior global declaration
+  # "PLE0241", # duplicate bases
+  # "PLE0302", # unexpected special method signature
+  # "PLE0307", # invalid str return type
+  # "PLE0604", # invalid object in all
+  # "PLE0605", # invalid format for all
+  # "PLE1142", # await outside async function
+  # "PLE1205", # too many arguments for logging format string
+  # "PLE1206", # not enough arguments for logging format string
+  # "PLE1300", # unsupported format character
+  # "PLE1307", # bad string format type
+  # "PLE1310", # bad str strip arg
+  # "PLE1507", # invalid envvar value
+  # "PLE1700", # yield from in async generator
+  # "PLE2502", # contains duplicate key
+  # "PLE2510", # invalid unpack sequence
+  # "PLE2512", # invalid star expression target
+  # "PLE2513", # invalid star expression target
+  # "PLE2514", # invalid star expression target
+  # "PLE2515", # invalid star expression target
+
+  # ============================================================================
+  # 🔧 ADDITIONAL RULE CATEGORIES - Future-ready and optional
+  # ============================================================================
+
+  # 🧪 PYTEST (PT) - Testing best practices (uncomment individual rules to enable)
+  # "PT001",  # use @pytest.fixture() over @pytest.fixture
+  # "PT002",  # configuration for fixture should be moved into a conftest.py file
+  # "PT003",  # scope='function' is implied in @pytest.fixture()
+  # "PT004",  # fixture does not return anything, add leading underscore
+  # "PT005",  # fixture returns a value, remove leading underscore
+  # "PT006",  # wrong name(s) type in @pytest.mark.parametrize, expected tuple
+  # "PT007",  # wrong values type in @pytest.mark.parametrize expected list of tuples
+  # "PT008",  # use return_value= instead of patching with lambda
+  # "PT009",  # use a regular assert instead of unittest-style method
+  # "PT010",  # set the expected exception in pytest.raises()
+  # "PT011",  # pytest.raises({exception}) is too broad, set the match parameter
+  # "PT012",  # pytest.raises() block should contain a single simple statement
+  # "PT013",  # found incorrect import of pytest, use simple import pytest instead
+  # "PT014",  # found duplicate test cases {indexes} in @pytest.mark.parametrize
+  # "PT015",  # assertion always fails, replace with pytest.fail()
+  # "PT016",  # no message passed to pytest.fail()
+  # "PT017",  # found assertion on exception {name} in except block, use pytest.raises() instead
+  # "PT018",  # assertion should be broken down into multiple parts
+  # "PT019",  # fixture {name} without value is injected as parameter, use @pytest.mark.usefixtures instead
+  # "PT020",  # @pytest.yield_fixture is deprecated, use @pytest.fixture
+  # "PT021",  # use yield instead of request.addfinalizer
+  # "PT022",  # no teardown in fixture {name}, use return instead of yield
+  # "PT023",  # use @pytest.mark.foo() over @pytest.mark.foo
+  # "PT024",  # pytest.mark.asyncio is unnecessary for fixtures
+  # "PT025",  # pytest.mark.asyncio is unnecessary for fixtures
+  # "PT026",  # useless pytest.mark.asyncio on non-async function
+  # "PT027",  # use pytest.raises() instead of unittest-style method
+
+  # 🎨 FLAKE8-COMMAS (COM) - Trailing commas (uncomment individual rules to enable)
+  # "COM812", # missing trailing comma
+  # "COM818", # trailing comma on bare tuple prohibited
+  # "COM819", # trailing comma prohibited
+
+  # 📝 FLAKE8-QUOTES (Q) - Quote consistency (uncomment individual rules to enable)
+  # "Q000",   # single quotes found but double quotes preferred
+  # "Q001",   # single quote multiline found but double quotes preferred
+  # "Q002",   # single quote docstring found but double quotes preferred
+  # "Q003",   # change outer quotes to avoid escaping inner quotes
+
+  # 🔍 ERADICATE (ERA) - Commented-out code (uncomment to enable)
+  # "ERA001", # found commented-out code
+
+  # 🔘 FLAKE8-BOOLEAN-TRAP (FBT) - Boolean trap anti-pattern (uncomment individual rules to enable)
+  # "FBT001", # boolean positional arg in function definition
+  # "FBT002", # boolean default value in function definition
+  # "FBT003", # boolean positional value in function call
+
+  # 🔧 FLAKE8-UNUSED-ARGUMENTS (ARG) - Unused function arguments (uncomment individual rules to enable)
+  # "ARG001", # unused function argument
+  # "ARG002", # unused method argument
+  # "ARG003", # unused class method argument
+  # "ARG004", # unused static method argument
+  # "ARG005", # unused lambda argument
+
+  # 🔄 FLAKE8-2020 (YTT) - Python 2/3 compatibility (uncomment individual rules to enable)
+  # "YTT101", # sys.version[:3] referenced (python3.10+), use sys.version_info
+  # "YTT102", # sys.version[2] referenced (python3.10+), use sys.version_info
+  # "YTT103", # sys.version compared to string (python3.10+), use sys.version_info
+  # "YTT201", # sys.version_info[0] == 3 referenced (python3.10+), use sys.version_info
+  # "YTT202", # six.PY3 referenced (python3.10+), use sys.version_info
+  # "YTT203", # sys.version_info[1] referenced (python3.10+), use sys.version_info
+  # "YTT204", # sys.version_info.minor referenced (python3.10+), use sys.version_info
+  # "YTT301", # sys.version[0] referenced (python3.10+), use sys.version_info
+  # "YTT302", # sys.version compared to string (python3.10+), use sys.version_info
+  # "YTT303", # sys.version[:1] referenced (python3.10+), use sys.version_info
+
+  # 🌐 FLAKE8-DJANGO (DJ) - Django best practices (uncomment individual rules to enable)
+  # "DJ001",  # avoid using null=True on string-based fields
+  # "DJ003",  # avoid using null=True on string-based fields
+  # "DJ006",  # avoid using exclude with ModelForm, use fields instead
+  # "DJ007",  # avoid using __all__ with ModelForm, use fields instead
+  # "DJ008",  # model's __str__ method should return a string
+  # "DJ012",  # avoid using null=True on string-based fields
+  # "DJ013",  # avoid using null=True on string-based fields
+
+  # 📊 PANDAS-VET (PD) - Pandas best practices (uncomment individual rules to enable)
+  # "PD002",  # inplace=True should be avoided; it has inconsistent behavior
+  # "PD003",  # .isna is preferred to .isnull; functionality is equivalent
+  # "PD004",  # .notna is preferred to .notnull; functionality is equivalent
+  # "PD007",  # .ix is deprecated; use more explicit .loc or .iloc
+  # "PD008",  # use .loc instead of .at. If speed is important, use numpy
+  # "PD009",  # use .iloc instead of .iat. If speed is important, use numpy
+  # "PD010",  # .pivot_table is preferred to .pivot or .unstack; provides same functionality
+  # "PD011",  # use .to_numpy() instead of .values
+  # "PD012",  # .read_csv is preferred to .read_table; provides same functionality
+  # "PD013",  # .melt is preferred to .stack; provides same functionality
+  # "PD015",  # use .merge method instead of pd.merge function. They have equivalent functionality
+  # "PD901",  # df is a bad variable name. Be kinder to your future self
+
+  # 🔄 REFURB (FURB) - Code modernization (uncomment individual rules to enable)
+  # "FURB101", # open and read should be replaced by pathlib
+  # "FURB103", # open and write should be replaced by pathlib
+  # "FURB105", # print and open should be replaced by pathlib
+  # "FURB110", # if-exp-else-none should be replaced by and
+  # "FURB113", # repeated-append should be replaced by extend
+  # "FURB116", # f-string-number-format should be replaced by format specifier
+  # "FURB118", # operator.methodcaller should be replaced by lambda
+  # "FURB129", # read-whole-file should be replaced by pathlib
+  # "FURB131", # delete-full-slice should be replaced by clear
+  # "FURB132", # check-and-remove-from-set should be replaced by discard
+  # "FURB136", # if-expr-min-max should be replaced by min/max
+  # "FURB140", # reimplemented-starmap should be replaced by itertools.starmap
+  # "FURB142", # for-loop-set-mutations should be replaced by comprehension
+  # "FURB145", # slice-copy should be replaced by copy
+  # "FURB148", # unnecessary-enumerate should be replaced by zip
+  # "FURB152", # math-constant should be replaced by constant
+  # "FURB154", # repeated-global should be replaced by global
+  # "FURB157", # verbose-decimal-constructor should be replaced by literal
+  # "FURB161", # bit-count should be replaced by int.bit_count
+  # "FURB163", # redundant-log-base should be replaced by math.log
+  # "FURB164", # unnecessary-from-float should be replaced by literal
+  # "FURB166", # int-on-sliced-str should be replaced by str methods
+  # "FURB167", # regex-flag-alias should be replaced by flag
+  # "FURB168", # isinstance-type-none should be replaced by is-none check
+  # "FURB169", # type-none-comparison should be replaced by is-none check
+  # "FURB171", # single-item-membership-test should be replaced by comparison
+  # "FURB177", # implicit-cwd should be replaced by pathlib
+  # "FURB180", # meta-class-abc should be replaced by abc.ABC
+  # "FURB181", # hashlib-digest-hex should be replaced by hexdigest
+  # "FURB187", # list-reverse-copy should be replaced by slicing
 
   # ============================================================================
   # 📏 PYCODESTYLE ERRORS (E) - Code formatting and style
@@ -671,11 +1250,11 @@ ignore = [
   # "F707",   # an except: block as not the last exception handler
   # "F722",   # syntax error in forward annotation
   # "F811",   # redefinition of unused name from line N
-  "F821",   # undefined name (can happen with dynamic imports)
+  # "F821",   # undefined name (can happen with dynamic imports)
   # "F822",   # undefined name name in __all__
-  "F823",   # local variable referenced before assignment
+  # "F823",   # local variable referenced before assignment
   # "F831",   # duplicate argument name in function definition
-  "F841",   # unused variables (common during development)
+  # "F841",   # unused variables (common during development)
   # "F901",   # raise NotImplemented should be raise NotImplementedError
 
   # ============================================================================
