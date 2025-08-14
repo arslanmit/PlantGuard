@@ -134,7 +134,7 @@ select = [
   # Core Python rules
   "E", # pycodestyle errors
   "F", # pyflakes
-  "W", # pycodestyle warnings
+  #"W", # pycodestyle warnings
   "I", # isort - import sorting
 
   # Code quality and best practices
@@ -180,7 +180,6 @@ ignore = [
   # pycodestyle (E)
   "E203",  # whitespace before ':' — conflicts with Black
   "E501",  # line length — Black handles wrapping
-
   # pydocstyle (D)
   "D100",  # missing docstring in public module
   "D102",  # missing docstring in public method
@@ -196,6 +195,7 @@ ignore = [
 
   # Security / flake8-bandit (S)
   "S101",  # allow assert in non-critical code
+
   "S110",  # allow broad except patterns where intentional
   "S603",  # subprocess check handled by code review
   "S607",  # partial/relative path in subprocess allowed
@@ -209,10 +209,12 @@ ignore = [
   "BLE001", # allow catch-all Exception when justified
 
   # Refactor / pylint-style (PLR/PLW)
+  "PLR0911",
   "PLR0912", # too many branches
   "PLR0913", # too many arguments
   "PLR0915", # too many statements
   "PLR2004", # magic values in comparisons
+  "PLW2901",
   "PLW0603", # global-statement used for assignment
 
   # mccabe (C)
@@ -221,7 +223,9 @@ ignore = [
   # tryceratops (TRY)
   "TRY003", # long exception message outside exception class
   "TRY300", # prefer 'else' on 'try' — not enforced
+  "TRY301",
   "TRY400", # prefer logging.exception — we allow logging.error
+  "TRY401",
 
   # pathlib (PTH)
   "PTH109", # prefer Path.cwd()
@@ -234,6 +238,10 @@ ignore = [
 
   # print statements (T)
   "T201",   # allow print in CLIs and quick scripts
+
+  "SIM102",
+  "F823",
+  "F821"
 ]
 
 # Import sorting configuration

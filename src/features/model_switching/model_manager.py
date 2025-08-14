@@ -31,7 +31,7 @@ class VisionAdapterProtocol(Protocol):
 class ModelConfig:
     """Configuration for a plant disease model."""
 
-    def __init__(self, config_dict: dict[str, Any]):
+    def __init__(self, config_dict: dict[str, Any]) -> None:
         self.name = config_dict["name"]
         self.type = config_dict["type"]  # "huggingface", "local", "custom"
         self.model_id = config_dict["model_id"]
@@ -46,7 +46,9 @@ class ModelConfig:
 class PlantGuardModelManager:
     """Unified model manager for easy switching between different models."""
 
-    def __init__(self, config_path: str = "config/models.json", autoload_default: bool = True):
+    def __init__(
+        self, config_path: str = "config/models.json", autoload_default: bool = True
+    ) -> None:
         """Initialize the model manager.
 
         Args:
