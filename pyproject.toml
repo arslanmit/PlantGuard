@@ -520,7 +520,7 @@ ignore = [
   # "B004",   # using hasattr(x, '__call__') to test if x is callable is unreliable
   # "B005",   # using .strip() with multi-character strings is misleading
   # "B006",   # do not use mutable data structures for argument defaults
-  # "B007",   # loop control variable not used within the loop body (common in ML)
+  "B007",   # loop control variable not used within the loop body (needed for ML training loops and batch processing)
   # "B008",   # do not perform function calls in argument defaults
   # "B009",   # do not call getattr with a constant attribute value
   # "B010",   # do not call setattr with a constant attribute value
@@ -552,7 +552,7 @@ ignore = [
   # "B901",   # using return x in a generator function used to be syntactically invalid
   # "B902",   # blind except Exception: statement
   # "B903",   # data class should use __slots__
-  # "B904",   # allow 'raise ...' without explicit 'from' (common in ML)
+  # "B904",   # allow 'raise ...' without explicit 'from' (needed for ML error handling and model failures)
   # "B905",   # zip() without an explicit strict= parameter
 
   # ============================================================================
@@ -580,15 +580,15 @@ ignore = [
   # ============================================================================
   # 🧠 MCCABE (C90) - Cyclomatic complexity
   # ============================================================================
-   "C901",   # function is too complex (ML functions can be complex)
+   "C901",   # function is too complex (needed for ML pipelines and complex model architectures)
 
   # ============================================================================
   # 📝 PYDOCSTYLE (D) - Documentation style
   # ============================================================================
-  # "D100",   # missing docstring in public module
+  "D100",   # missing docstring in public module (rapid ML prototyping)
   # "D101",   # missing docstring in public class
   # "D102",   # missing docstring in public method
-  # "D103",   # missing docstring in public function
+  "D103",   # missing docstring in public function (rapid ML prototyping)
   # "D104",   # missing docstring in public package
   # "D105",   # missing docstring in magic method
   # "D106",   # missing docstring in public nested class
@@ -633,21 +633,22 @@ ignore = [
   # ============================================================================
   # 🔒 FLAKE8-BANDIT (S) - Security issues
   # ============================================================================
-  # "S101",   # allow assert statements (useful for debugging)
-  # "S102",   # exec used
+  "S101",   # allow assert statements (useful for debugging and ML validation)
+  # "S102",   # exec used (needed for dynamic model loading in some ML frameworks)
   # "S103",   # set-bad-file-permissions
   # "S104",   # hardcoded-bind-all-interfaces
   # "S105",   # hardcoded-password-string
   # "S106",   # hardcoded-password-funcarg
   # "S107",   # hardcoded-password-default
-  # "S108",   # hardcoded-temp-file
-  # "S110",   # allow broad except patterns (ML models can fail in many ways)
+  "S108",   # hardcoded-temp-file (needed for ML model caching and temp data)
+  "S110",   # allow broad except patterns (ML models can fail in many ways)
   # "S112",   # try-except-continue
-  # "S113",   # request-without-timeout
+  "S113",   # request-without-timeout (needed for ML model downloads)
   # "S201",   # flask-debug-true
-  # "S202",   # tarfile-unsafe-members
-  # "S301",   # pickle
+  "S202",   # tarfile-unsafe-members (needed for ML dataset extraction)
+  "S301",   # pickle (needed for ML model serialization and caching)
   # "S302",   # marshal
+  "S603",   # subprocess calls (needed for some ML tools)
   # "S303",   # md5
   # "S304",   # insecure-cipher
   # "S305",   # insecure-cipher-mode
@@ -671,8 +672,8 @@ ignore = [
   # "S324",   # insecure-hash-function
   # "S401",   # import-telnetlib
   # "S402",   # import-ftplib
-  # "S403",   # import-pickle
-  # "S404",   # import-subprocess
+  "S403",   # import-pickle (needed for ML model serialization)
+  "S404",   # import-subprocess (needed for ML tools and external processes)
   # "S405",   # import-xml-etree
   # "S406",   # import-xml-sax
   # "S407",   # import-xml-expat
@@ -687,13 +688,13 @@ ignore = [
   # "S503",   # ssl-bad-defaults
   # "S504",   # ssl-with-bad-version
   # "S505",   # weak-cryptographic-key
-  # "S506",   # yaml-load
+  "S506",   # yaml-load (needed for ML config files and model metadata)
   # "S507",   # ssh-no-host-key-verification
   # "S508",   # snmp-insecure-version
   # "S509",   # snmp-weak-cryptography
   # "S601",   # paramiko-calls
   # "S602",   # subprocess-popen-with-shell-equals-true
-  # "S603",   # subprocess calls (needed for some ML tools)
+  "S603",   # subprocess calls (needed for some ML tools)
   # "S604",   # call-with-shell-equals-true
   # "S605",   # start-process-with-a-shell
   # "S606",   # start-process-with-no-shell
@@ -706,14 +707,14 @@ ignore = [
   # ============================================================================
   # 🚨 FLAKE8-BLIND-EXCEPT (BLE) - Exception handling
   # ============================================================================
-  "BLE001", # allow catch-all Exception when justified
+  "BLE001", # allow catch-all Exception when justified (needed for ML model error handling)
 
   # ============================================================================
   # 📝 FLAKE8-ANNOTATIONS (ANN) - Type annotations
   # ============================================================================
   # "ANN001", # function arguments don't need types everywhere
-  # "ANN002", # missing type annotation for *args (gradual typing)
-  # "ANN003", # missing type annotation for **kwargs (gradual typing)
+  "ANN002", # missing type annotation for *args (gradual typing in ML frameworks)
+  "ANN003", # missing type annotation for **kwargs (gradual typing in ML frameworks)
   # "ANN101", # REMOVED: deprecated rule (no longer exists in Ruff)
   # "ANN102", # REMOVED: deprecated rule (no longer exists in Ruff)
   # "ANN201", # return types not required everywhere
@@ -736,13 +737,13 @@ ignore = [
   # "ANN219", # missing return type annotation for __reversed__
   # "ANN220", # missing return type annotation for __enter__
   # "ANN221", # missing return type annotation for __exit__
-  "ANN401", # allow Any type when needed
+  "ANN401", # allow Any type when needed (common with ML frameworks and dynamic tensors)
 
 
   # ============================================================================
   # 🖨️ FLAKE8-PRINT (T20) - Print statements
   # ============================================================================
-  "T201",   # allow print() in CLI scripts and debugging
+  "T201",   # allow print() in CLI scripts and debugging (needed for ML training logs and interactive notebooks)
   # "T203",   # pprint found
 
 
@@ -916,14 +917,14 @@ ignore = [
   # "PLR0206", # property with parameters
   # "PLR0402", # use from import instead of import (sometimes import is clearer)
   # "PLR0911", # too many return statements
-   "PLR0912", # too many branches
-  # "PLR0913", # too many arguments (ML functions need many params)
-   "PLR0915", # too many statements
+   "PLR0912", # too many branches (needed for ML model selection and complex data processing)
+  "PLR0913", # too many arguments (needed for ML model constructors and training functions)
+   "PLR0915", # too many statements (needed for complex ML pipelines and model architectures)
   # "PLR1701", # merge isinstance calls
   # "PLR1722", # use sys.exit() instead of exit()
   # "PLR1733", # unnecessary dictionary index lookup
   # "PLR1736", # unnecessary list index lookup
-   "PLR2004", # magic values (ML has lots of constants)
+   "PLR2004", # magic values (needed for ML hyperparameters, model dimensions, and constants)
   # "PLR2044", # line with empty comment
   # "PLR5501", # consider using elif instead of else if
 

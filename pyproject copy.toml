@@ -520,7 +520,7 @@ ignore = [
   # "B004",   # using hasattr(x, '__call__') to test if x is callable is unreliable
   # "B005",   # using .strip() with multi-character strings is misleading
   # "B006",   # do not use mutable data structures for argument defaults
-  "B007",   # loop control variable not used within the loop body (common in ML)
+  # "B007",   # loop control variable not used within the loop body (common in ML)
   # "B008",   # do not perform function calls in argument defaults
   # "B009",   # do not call getattr with a constant attribute value
   # "B010",   # do not call setattr with a constant attribute value
@@ -531,7 +531,7 @@ ignore = [
   # "B015",   # pointless comparison
   # "B016",   # cannot raise a literal
   # "B017",   # assertRaises(Exception) should be considered evil
-  "B018",   # found useless expression (sometimes needed for side effects)
+  # "B018",   # found useless expression (sometimes needed for side effects)
   # "B019",   # use of assert detected
   # "B020",   # loop control variable overrides iterable it iterates
   # "B021",   # f-string used as docstring
@@ -552,7 +552,7 @@ ignore = [
   # "B901",   # using return x in a generator function used to be syntactically invalid
   # "B902",   # blind except Exception: statement
   # "B903",   # data class should use __slots__
-  "B904",   # allow 'raise ...' without explicit 'from' (common in ML)
+  # "B904",   # allow 'raise ...' without explicit 'from' (common in ML)
   # "B905",   # zip() without an explicit strict= parameter
 
   # ============================================================================
@@ -580,19 +580,19 @@ ignore = [
   # ============================================================================
   # 🧠 MCCABE (C90) - Cyclomatic complexity
   # ============================================================================
-  "C901",   # function is too complex (ML functions can be complex)
+   "C901",   # function is too complex (ML functions can be complex)
 
   # ============================================================================
   # 📝 PYDOCSTYLE (D) - Documentation style
   # ============================================================================
-  "D100",   # missing docstring in public module
+  # "D100",   # missing docstring in public module
   # "D101",   # missing docstring in public class
-  "D102",   # missing docstring in public method
-  "D103",   # missing docstring in public function
-  "D104",   # missing docstring in public package
+  # "D102",   # missing docstring in public method
+  # "D103",   # missing docstring in public function
+  # "D104",   # missing docstring in public package
   # "D105",   # missing docstring in magic method
   # "D106",   # missing docstring in public nested class
-  "D107",   # missing docstring in __init__
+  # "D107",   # missing docstring in __init__
   # "D200",   # one-line docstring should fit on one line with quotes
   # "D201",   # no blank lines allowed before function docstring
   # "D202",   # no blank lines allowed after function docstring
@@ -633,7 +633,7 @@ ignore = [
   # ============================================================================
   # 🔒 FLAKE8-BANDIT (S) - Security issues
   # ============================================================================
-  "S101",   # allow assert statements (useful for debugging)
+  # "S101",   # allow assert statements (useful for debugging)
   # "S102",   # exec used
   # "S103",   # set-bad-file-permissions
   # "S104",   # hardcoded-bind-all-interfaces
@@ -641,7 +641,7 @@ ignore = [
   # "S106",   # hardcoded-password-funcarg
   # "S107",   # hardcoded-password-default
   # "S108",   # hardcoded-temp-file
-  "S110",   # allow broad except patterns (ML models can fail in many ways)
+  # "S110",   # allow broad except patterns (ML models can fail in many ways)
   # "S112",   # try-except-continue
   # "S113",   # request-without-timeout
   # "S201",   # flask-debug-true
@@ -693,7 +693,7 @@ ignore = [
   # "S509",   # snmp-weak-cryptography
   # "S601",   # paramiko-calls
   # "S602",   # subprocess-popen-with-shell-equals-true
-  "S603",   # subprocess calls (needed for some ML tools)
+  # "S603",   # subprocess calls (needed for some ML tools)
   # "S604",   # call-with-shell-equals-true
   # "S605",   # start-process-with-a-shell
   # "S606",   # start-process-with-no-shell
@@ -711,12 +711,12 @@ ignore = [
   # ============================================================================
   # 📝 FLAKE8-ANNOTATIONS (ANN) - Type annotations
   # ============================================================================
-  "ANN001", # function arguments don't need types everywhere
-  "ANN002", # missing type annotation for *args (gradual typing)
-  "ANN003", # missing type annotation for **kwargs (gradual typing)
+  # "ANN001", # function arguments don't need types everywhere
+  # "ANN002", # missing type annotation for *args (gradual typing)
+  # "ANN003", # missing type annotation for **kwargs (gradual typing)
   # "ANN101", # REMOVED: deprecated rule (no longer exists in Ruff)
   # "ANN102", # REMOVED: deprecated rule (no longer exists in Ruff)
-  "ANN201", # return types not required everywhere
+  # "ANN201", # return types not required everywhere
   # "ANN202", # missing return type annotation for private function
   # "ANN204", # missing return type annotation for special method
   # "ANN205", # missing return type annotation for staticmethod
@@ -772,11 +772,11 @@ ignore = [
   # ============================================================================
   # 🔄 FLAKE8-SIMPLIFY (SIM) - Code simplification
   # ============================================================================
-  "SIM102", # use ternary operator (sometimes if/else is clearer)
+  # "SIM102", # use ternary operator (sometimes if/else is clearer)
   # "SIM103", # return condition directly
   # "SIM106", # use ternary operator instead of if-else-block for simple variable assignments
   # "SIM108", # use ternary operator instead of if-else-block that assigns a boolean
-  "SIM110", # use any(...) instead of for loop AND all(...) instead of for loop (remapped from SIM111)
+  # "SIM110", # use any(...) instead of for loop AND all(...) instead of for loop (remapped from SIM111)
   # "SIM112", # use CAPITAL_ENVIRONMENT_VARIABLES
   # "SIM113", # use enumerate instead of manually incrementing a counter
   # "SIM114", # combine if branches using logical or operator
@@ -839,17 +839,11 @@ ignore = [
   # ============================================================================
   # 🔄 TRYCERATOPS (TRY) - Exception handling improvements
   # ============================================================================
-  "TRY003", # long exception messages are OK
-  # "TRY004", # prefer TypeError exception for invalid type
-  # "TRY100", # use logging.exception instead of logging.error
-  # "TRY101", # use raise from to specify exception cause
-  # "TRY200", # use raise without specifying exception name
-  # "TRY201", # use raise without specifying exception name
-  "TRY300", # don't require 'else' on 'try'
-  "TRY301", # don't require specific exception handling
-  # "TRY302", # useless try-except, consider removing or re-raising
-  "TRY400", # allow logging.error instead of logging.exception
-  "TRY401", # allow verbose logging
+  "TRY003", # Allow long exception messages (descriptive errors are helpful)
+  "TRY300", # Don't require 'else' blocks on try statements
+  "TRY301", # Don't require specific exception handling patterns
+  "TRY400", # Allow logging.error instead of logging.exception
+  "TRY401", # Allow verbose logging with exception objects
 
   # ============================================================================
   # 📁 FLAKE8-USE-PATHLIB (PTH) - Use pathlib instead of os.path
@@ -863,8 +857,8 @@ ignore = [
   # "PTH106", # os.rmdir() should be replaced by Path.rmdir()
   # "PTH107", # os.remove() should be replaced by Path.unlink()
   # "PTH108", # os.unlink() should be replaced by Path.unlink()
-  "PTH109", # prefer Path.cwd() (gradual migration)
-  "PTH110", # prefer Path.exists() (gradual migration)
+  "PTH109", # Allow os.getcwd() instead of Path.cwd() (gradual migration)
+  "PTH110", # Allow os.path.exists() instead of Path.exists() (gradual migration)
   # "PTH111", # os.path.expanduser() should be replaced by Path.expanduser()
   # "PTH112", # os.path.isdir() should be replaced by Path.is_dir()
   # "PTH113", # os.path.isfile() should be replaced by Path.is_file()
@@ -872,12 +866,12 @@ ignore = [
   # "PTH115", # os.path.readlink() should be replaced by Path.readlink()
   # "PTH116", # os.stat() should be replaced by Path.stat()
   # "PTH117", # os.path.isabs() should be replaced by Path.is_absolute()
-  "PTH118", # prefer Path '/' operator (gradual migration)
+  "PTH118", # Allow os.path.join() instead of Path / operator (gradual migration)
   # "PTH119", # os.path.basename() should be replaced by Path.name
   # "PTH120", # os.path.dirname() should be replaced by Path.parent
   # "PTH121", # os.path.samefile() should be replaced by Path.samefile()
   # "PTH122", # os.path.splitext() should be replaced by Path.suffix
-  "PTH123", # prefer Path.open() (gradual migration)
+  "PTH123", # Allow open() instead of Path.open() (gradual migration)
   # "PTH124", # os.path.isdir() should be replaced by Path.is_dir()
 
   # ============================================================================
@@ -886,7 +880,7 @@ ignore = [
   # "RUF001", # ambiguous unicode character in string
   # "RUF002", # ambiguous unicode character in docstring
   # "RUF003", # ambiguous unicode character in comment
-  "RUF005", # consider iterable unpacking instead of concatenation (sometimes explicit is clearer)
+  # "RUF005", # consider iterable unpacking instead of concatenation (sometimes explicit is clearer)
   # "RUF006", # store a reference to the return value of asyncio.create_task
   # "RUF007", # prefer itertools.pairwise() over zip() when iterating over successive pairs
   # "RUF008", # do not use mutable default values for dataclass fields
@@ -902,7 +896,7 @@ ignore = [
   # ============================================================================
   # "PERF101", # do not cast an iterable to list before iterating over it
   # "PERF102", # when using only the keys of a dict use the keys() method
-  "PERF203", # try-except within a loop incurs performance overhead (sometimes necessary in ML)
+  # "PERF203", # try-except within a loop incurs performance overhead (sometimes necessary in ML)
   # "PERF401", # use a list comprehension to create a transformed list
   # "PERF402", # use list or set comprehensions instead of for-loops
   # "PERF403", # use dict comprehensions instead of for-loops
@@ -920,37 +914,37 @@ ignore = [
   # "PLR0124", # name compared with itself
   # "PLR0133", # two constants compared
   # "PLR0206", # property with parameters
-  "PLR0402", # use from import instead of import (sometimes import is clearer)
-  "PLR0911", # too many return statements
-  "PLR0912", # too many branches
-  "PLR0913", # too many arguments (ML functions need many params)
-  "PLR0915", # too many statements
+  # "PLR0402", # use from import instead of import (sometimes import is clearer)
+  # "PLR0911", # too many return statements
+   "PLR0912", # too many branches
+  # "PLR0913", # too many arguments (ML functions need many params)
+   "PLR0915", # too many statements
   # "PLR1701", # merge isinstance calls
   # "PLR1722", # use sys.exit() instead of exit()
   # "PLR1733", # unnecessary dictionary index lookup
   # "PLR1736", # unnecessary list index lookup
-  "PLR2004", # magic values (ML has lots of constants)
+   "PLR2004", # magic values (ML has lots of constants)
   # "PLR2044", # line with empty comment
   # "PLR5501", # consider using elif instead of else if
 
   # PLW - Pylint Warning
   # "PLW0120", # else clause on loop without a break statement
-  "PLW0127", # self-assigning variable (sometimes used for type narrowing)
+  # "PLW0127", # self-assigning variable (sometimes used for type narrowing)
   # "PLW0129", # assert on string literal
   # "PLW0131", # named expression used without context
   # "PLW0133", # exception statement has no effect
   # "PLW0245", # super without brackets
   # "PLW0406", # import self
   # "PLW0602", # global variable not assigned
-  "PLW0603", # global variables (sometimes needed in ML)
+  # "PLW0603", # global variables (sometimes needed in ML)
   # "PLW0604", # global at module level
   # "PLW1508", # invalid envvar default
   # "PLW1509", # subprocess-popen-preexec-fn
-  "PLW1510", # subprocess.run without explicit check (sometimes not needed)
-  "PLW1514", # unspecified encoding in open (gradual migration to explicit encoding)
+  # "PLW1510", # subprocess.run without explicit check (sometimes not needed)
+  # "PLW1514", # unspecified encoding in open (gradual migration to explicit encoding)
   # "PLW1641", # eq-without-hash
   # "PLW2101", # useless-with-lock
-  "PLW2901", # for loop variable overwritten
+  # "PLW2901", # for loop variable overwritten
   # "PLW3301", # nested-min-max
 
   # PLE - Pylint Error
@@ -1181,6 +1175,44 @@ ignore-fully-untyped = false # Check all functions, even without types
 # 🔒 Security Settings
 [tool.ruff.lint.flake8-bandit]
 check-typed-exception = true  # Check exception handling
+
+# 📁 Per-file ignores - Different rules for different file types
+[tool.ruff.lint.per-file-ignores]
+# 🧪 Test files - Allow assert statements and missing docstrings
+"tests/**/*.py" = [
+  "S101",   # Allow assert statements in tests
+  "D103",   # Allow missing docstrings in test functions
+  "D102",   # Allow missing docstrings in test methods
+  "D107",   # Allow missing docstrings in test __init__
+  "T201",   # Allow print statements in tests for debugging
+]
+
+# 📓 Scripts and notebooks - Allow subprocess calls and missing docstrings
+"scripts/**/*.py" = [
+  "S603",   # Allow subprocess calls in scripts
+  "S607",   # Allow partial executable paths in scripts
+  "D103",   # Allow missing docstrings in script functions
+  "S101",   # Allow assert statements in scripts
+  "T201",   # Allow print statements in scripts for output
+]
+
+# 📓 Jupyter notebooks - Allow subprocess calls and other notebook-specific patterns
+"notebooks/**/*.ipynb" = [
+  "S603",   # Allow subprocess calls in notebooks
+  "S607",   # Allow partial executable paths in notebooks
+  "T201",   # Allow print statements in notebooks for interactive output
+]
+
+# 🏃 Run scripts - Allow subprocess calls
+"run_*.py" = [
+  "S603",   # Allow subprocess calls in run scripts
+  "T201",   # Allow print statements in run scripts for output
+]
+
+# 📦 Package init files - Allow missing docstrings
+"src/**/__init__.py" = [
+  "D104",   # Allow missing docstrings in package __init__.py
+]
 
 # 🎨 Code Formatting - How code looks
 [tool.ruff.format]
