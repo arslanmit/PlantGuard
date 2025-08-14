@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from .checkpoint_manager import CheckpointManager
+from .checkpoint_manager import CheckpointData, CheckpointManager
 from .config import TrainingConfig
 from .dataset_manager import DatasetManager
 from .error_handler import TrainingErrorHandler
@@ -769,8 +769,7 @@ class ProductionTrainer:
             training_state = asdict(self.state)
 
             # Save checkpoint using manager
-            checkpoint_path = self.checkpoint_manager.save_checkpoint(
-                model=self.model,
+            checkpoint_data = CheckpointData(
                 optimizer_state=self.training_components.get_state_dict().get("optimizer", {}),
                 scheduler_state=self.training_components.get_state_dict().get("scheduler"),
                 training_state=training_state,
@@ -781,6 +780,10 @@ class ProductionTrainer:
                 val_accuracy=val_accuracy,
                 training_time=self.state.total_training_time,
                 scaler_state=self.scaler.state_dict() if self.scaler else None,
+            )
+            checkpoint_path = self.checkpoint_manager.save_checkpoint(
+                model=self.model,
+                checkpoint_data=checkpoint_data,
             )
 
             if checkpoint_path:
@@ -1110,6 +1113,7 @@ class ProductionTrainer:
         """
         model_path = Path(model_path)
 
+        # Early validation checks
         if not model_path.exists():
             logger.error(f"Model file not found: {model_path}")
             return None
@@ -1131,61 +1135,85 @@ class ProductionTrainer:
                 self.model.eval()
 
             export_path = self.output_dir / f"exported_model.{export_format.lower()}"
+            export_success = self._perform_export(
+                export_format, export_path, checkpoint, self.model
+            )
 
-            if export_format.lower() == "pytorch":
-                # Export as PyTorch model
-                if self.model is None:
-                    logger.error("Cannot export model: model is None")
-                    return None
-
-                export_dict = {
-                    "model_state_dict": self.model.state_dict(),
-                    "config": checkpoint.get("config", asdict(self.config)),
-                    "class_names": checkpoint.get("class_names", getattr(self, "class_names", [])),
-                    "export_time": time.time(),
-                }
-                torch.save(export_dict, export_path)
-
-            elif export_format.lower() == "torchscript":
-                # Export as TorchScript
-                dummy_input = torch.randn(1, 3, 224, 224).to(self.device)
-                traced_model = torch.jit.trace(self.model, dummy_input)
-                traced_model.save(str(export_path))
-
-            elif export_format.lower() == "onnx":
-                # Export as ONNX
-                try:
-                    import torch.onnx as torch_onnx
-
-                    dummy_input = torch.randn(1, 3, 224, 224).to(self.device)
-                    if self.model is not None:
-                        torch_onnx.export(
-                            self.model,
-                            (dummy_input,),
-                            str(export_path),
-                            export_params=True,
-                            opset_version=11,
-                            do_constant_folding=True,
-                            input_names=["input"],
-                            output_names=["output"],
-                            dynamic_axes={
-                                "input": {0: "batch_size"},
-                                "output": {0: "batch_size"},
-                            },
-                        )
-                except ImportError:
-                    logger.error("ONNX export requires onnx package: pip install onnx")
-                    return None
+            if export_success:
+                logger.info(f"Model exported successfully: {export_path}")
+                return export_path
             else:
-                logger.error(f"Unsupported export format: {export_format}")
                 return None
-
-            logger.info(f"Model exported successfully: {export_path}")
-            return export_path
 
         except Exception:
             logger.exception("Model export failed")
             return None
+
+    def _perform_export(
+        self, export_format: str, export_path: Path, checkpoint: dict, model: torch.nn.Module | None
+    ) -> bool:
+        """Perform the actual model export based on format."""
+        format_lower = export_format.lower()
+
+        if format_lower == "pytorch":
+            return self._export_pytorch(export_path, checkpoint, model)
+        elif format_lower == "torchscript":
+            return self._export_torchscript(export_path, model)
+        elif format_lower == "onnx":
+            return self._export_onnx(export_path, model)
+        else:
+            logger.error(f"Unsupported export format: {export_format}")
+            return False
+
+    def _export_pytorch(
+        self, export_path: Path, checkpoint: dict, model: torch.nn.Module | None
+    ) -> bool:
+        """Export as PyTorch model."""
+        if model is None:
+            logger.error("Cannot export model: model is None")
+            return False
+
+        export_dict = {
+            "model_state_dict": model.state_dict(),
+            "config": checkpoint.get("config", asdict(self.config)),
+            "class_names": checkpoint.get("class_names", getattr(self, "class_names", [])),
+            "export_time": time.time(),
+        }
+        torch.save(export_dict, export_path)
+        return True
+
+    def _export_torchscript(self, export_path: Path, model: torch.nn.Module | None) -> bool:
+        """Export as TorchScript."""
+        dummy_input = torch.randn(1, 3, 224, 224).to(self.device)
+        traced_model = torch.jit.trace(model, dummy_input)
+        traced_model.save(str(export_path))
+        return True
+
+    def _export_onnx(self, export_path: Path, model: torch.nn.Module | None) -> bool:
+        """Export as ONNX."""
+        try:
+            import torch.onnx as torch_onnx
+
+            dummy_input = torch.randn(1, 3, 224, 224).to(self.device)
+            if model is not None:
+                torch_onnx.export(
+                    model,
+                    (dummy_input,),
+                    str(export_path),
+                    export_params=True,
+                    opset_version=11,
+                    do_constant_folding=True,
+                    input_names=["input"],
+                    output_names=["output"],
+                    dynamic_axes={
+                        "input": {0: "batch_size"},
+                        "output": {0: "batch_size"},
+                    },
+                )
+            return True
+        except ImportError:
+            logger.error("ONNX export requires onnx package: pip install onnx")
+            return False
 
     def get_training_summary(self) -> dict[str, Any]:
         """Get summary of training progress and results.
@@ -1353,8 +1381,7 @@ class ProductionTrainer:
             )
 
         try:
-            checkpoint_path = self.checkpoint_manager.save_checkpoint(
-                model=self.model,
+            checkpoint_data = CheckpointData(
                 optimizer_state=self.training_components.get_state_dict().get("optimizer", {}),
                 scheduler_state=self.training_components.get_state_dict().get("scheduler"),
                 training_state=asdict(self.state),
@@ -1365,6 +1392,10 @@ class ProductionTrainer:
                 val_accuracy=val_accuracy,
                 training_time=self.state.total_training_time,
                 scaler_state=self.scaler.state_dict() if self.scaler else None,
+            )
+            checkpoint_path = self.checkpoint_manager.save_checkpoint(
+                model=self.model,
+                checkpoint_data=checkpoint_data,
                 force_save=True,
             )
 
@@ -1472,158 +1503,185 @@ class ProductionTrainer:
             TrainingResult with training outcomes
         """
         if not self.setup_training():
-            return TrainingResult(
-                success=False,
-                final_epoch=0,
-                best_val_loss=float("inf"),
-                best_val_accuracy=0.0,
-                best_epoch=0,
-                total_training_time=0.0,
-                error_message="Training setup failed",
-            )
+            return self._create_failed_result("Training setup failed", 0.0)
 
         logger.info("Starting training with error recovery...")
         start_time = time.time()
 
         try:
-            # Training loop with error recovery
-            for epoch in range(self.state.epoch, self.config.epochs):
-                self.state.epoch = epoch
-                epoch_start_time = time.time()
-
-                try:
-                    # Train one epoch with error handling
-                    train_loss = self._train_epoch_with_recovery()
-
-                    # Validate with error handling
-                    val_loss, val_accuracy = self._validate_epoch_with_recovery()
-
-                    # Update learning rate
-                    if self.training_components:
-                        self.training_components.step_scheduler(val_loss)
-                        current_lr = self.training_components.get_current_lr()
-                    else:
-                        current_lr = self.config.learning_rate
-
-                    # Update training state
-                    self.state.train_losses.append(train_loss)
-                    self.state.val_losses.append(val_loss)
-                    self.state.val_accuracies.append(val_accuracy)
-                    self.state.learning_rates.append(current_lr)
-
-                    # Check for best model
-                    if val_loss < self.state.best_val_loss:
-                        self.state.best_val_loss = val_loss
-                        self.state.best_val_accuracy = val_accuracy
-                        self.state.best_epoch = epoch
-                        self._save_best_model()
-
-                    # Log metrics
-                    epoch_time = time.time() - epoch_start_time
-                    self._log_epoch_metrics(
-                        epoch,
-                        train_loss,
-                        val_loss,
-                        val_accuracy,
-                        current_lr,
-                        epoch_time,
-                    )
-
-                    # Save checkpoint with error handling
-                    if (epoch + 1) % self.config.save_every_n_epochs == 0:
-                        try:
-                            self._save_checkpoint_with_manager(epoch, val_loss, val_accuracy)
-                        except Exception as e:
-                            logger.warning(f"Checkpoint save failed: {e}")
-                            # Continue training even if checkpoint save fails
-
-                    # Check early stopping
-                    if self.training_components and self.training_components.check_early_stopping(
-                        val_loss, epoch
-                    ):
-                        logger.info(f"Early stopping triggered at epoch {epoch}")
-                        break
-
-                except Exception as e:
-                    # Handle epoch-level errors
-                    context = {
-                        "trainer": self,
-                        "model": self.model,
-                        "config": self.config,
-                        "epoch": epoch,
-                    }
-
-                    recovery_successful = self.error_handler.handle_error(
-                        e, context, epoch, self.state.step
-                    )
-
-                    if not recovery_successful:
-                        logger.error(
-                            f"Failed to recover from error at epoch {epoch}, stopping training"
-                        )
-                        raise
-                    else:
-                        logger.info(f"Recovered from error at epoch {epoch}, continuing training")
-                        continue
-
-            # Training completed
-            total_time = time.time() - start_time
-            self.state.total_training_time = total_time
-
-            logger.info(f"Training completed in {total_time:.2f} seconds")
-            logger.info(
-                f"Best validation loss: {self.state.best_val_loss:.6f} "
-                f"at epoch {self.state.best_epoch}"
-            )
-            logger.info(f"Best validation accuracy: {self.state.best_val_accuracy:.4f}")
-
-            # Save final state
-            self._save_training_state()
-
-            # Export error report
-            error_report_path = self.output_dir / "error_report.json"
-            self.error_handler.export_error_report(error_report_path)
-
-            return TrainingResult(
-                success=True,
-                final_epoch=self.state.epoch,
-                best_val_loss=self.state.best_val_loss,
-                best_val_accuracy=self.state.best_val_accuracy,
-                best_epoch=self.state.best_epoch,
-                total_training_time=total_time,
-                model_path=str(self.output_dir / "best_model.pt"),
-                training_history={
-                    "train_loss": self.state.train_losses,
-                    "val_loss": self.state.val_losses,
-                    "val_accuracy": self.state.val_accuracies,
-                    "learning_rate": self.state.learning_rates,
-                },
-            )
+            self._run_training_loop()
+            return self._create_success_result(start_time)
 
         except Exception as e:
             logger.exception("Training failed: %s", e)
-
-            # Export error report even on failure
-            try:
-                error_report_path = self.output_dir / "error_report.json"
-                self.error_handler.export_error_report(error_report_path)
-            except Exception as export_error:
-                logger.debug("Failed to export error report: %s", export_error)
-
-            return TrainingResult(
-                success=False,
-                final_epoch=self.state.epoch,
-                best_val_loss=self.state.best_val_loss,
-                best_val_accuracy=self.state.best_val_accuracy,
-                best_epoch=self.state.best_epoch,
-                total_training_time=time.time() - start_time,
-                error_message=str(e),
-            )
+            self._export_error_report_safe()
+            return self._create_failed_result(str(e), time.time() - start_time)
 
         finally:
-            # Cleanup
-            if self.writer:
-                self.writer.close()
+            self._cleanup_training()
+
+    def _run_training_loop(self) -> None:
+        """Run the main training loop with error recovery."""
+        for epoch in range(self.state.epoch, self.config.epochs):
+            self.state.epoch = epoch
+            epoch_start_time = time.time()
+
+            if self._process_epoch_with_recovery(epoch, epoch_start_time):
+                break  # Early stopping triggered
+
+    def _process_epoch_with_recovery(self, epoch: int, epoch_start_time: float) -> bool:
+        """Process a single epoch with error recovery.
+
+        Returns:
+            True if early stopping was triggered, False otherwise
+        """
+        try:
+            return self._process_single_epoch(epoch, epoch_start_time)
+        except Exception as e:
+            return self._handle_epoch_error(e, epoch)
+
+    def _process_single_epoch(self, epoch: int, epoch_start_time: float) -> bool:
+        """Process a single training epoch.
+
+        Returns:
+            True if early stopping was triggered, False otherwise
+        """
+        # Train and validate
+        train_loss = self._train_epoch_with_recovery()
+        val_loss, val_accuracy = self._validate_epoch_with_recovery()
+
+        # Update learning rate and state
+        current_lr = self._update_learning_rate(val_loss)
+        self._update_training_state(train_loss, val_loss, val_accuracy, current_lr)
+
+        # Check for best model and save if needed
+        self._check_and_save_best_model(val_loss, val_accuracy, epoch)
+
+        # Log metrics
+        epoch_time = time.time() - epoch_start_time
+        self._log_epoch_metrics(epoch, train_loss, val_loss, val_accuracy, current_lr, epoch_time)
+
+        # Save checkpoint if needed
+        self._save_checkpoint_if_needed(epoch, val_loss, val_accuracy)
+
+        # Check early stopping
+        return self._check_early_stopping(val_loss, epoch)
+
+    def _update_learning_rate(self, val_loss: float) -> float:
+        """Update learning rate and return current rate."""
+        if self.training_components:
+            self.training_components.step_scheduler(val_loss)
+            return self.training_components.get_current_lr()
+        return self.config.learning_rate
+
+    def _update_training_state(
+        self, train_loss: float, val_loss: float, val_accuracy: float, current_lr: float
+    ) -> None:
+        """Update training state with current metrics."""
+        self.state.train_losses.append(train_loss)
+        self.state.val_losses.append(val_loss)
+        self.state.val_accuracies.append(val_accuracy)
+        self.state.learning_rates.append(current_lr)
+
+    def _check_and_save_best_model(self, val_loss: float, val_accuracy: float, epoch: int) -> None:
+        """Check if current model is best and save if so."""
+        if val_loss < self.state.best_val_loss:
+            self.state.best_val_loss = val_loss
+            self.state.best_val_accuracy = val_accuracy
+            self.state.best_epoch = epoch
+            self._save_best_model()
+
+    def _save_checkpoint_if_needed(self, epoch: int, val_loss: float, val_accuracy: float) -> None:
+        """Save checkpoint if conditions are met."""
+        if (epoch + 1) % self.config.save_every_n_epochs == 0:
+            try:
+                self._save_checkpoint_with_manager(epoch, val_loss, val_accuracy)
+            except Exception as e:
+                logger.warning(f"Checkpoint save failed: {e}")
+
+    def _check_early_stopping(self, val_loss: float, epoch: int) -> bool:
+        """Check if early stopping should be triggered."""
+        if self.training_components and self.training_components.check_early_stopping(
+            val_loss, epoch
+        ):
+            logger.info(f"Early stopping triggered at epoch {epoch}")
+            return True
+        return False
+
+    def _handle_epoch_error(self, error: Exception, epoch: int) -> bool:
+        """Handle epoch-level errors with recovery."""
+        context = {
+            "trainer": self,
+            "model": self.model,
+            "config": self.config,
+            "epoch": epoch,
+        }
+
+        recovery_successful = self.error_handler.handle_error(
+            error, context, epoch, self.state.step
+        )
+
+        if not recovery_successful:
+            logger.error(f"Failed to recover from error at epoch {epoch}, stopping training")
+            raise error
+        else:
+            logger.info(f"Recovered from error at epoch {epoch}, continuing training")
+            return False  # Continue training
+
+    def _create_success_result(self, start_time: float) -> TrainingResult:
+        """Create a successful training result."""
+        total_time = time.time() - start_time
+        self.state.total_training_time = total_time
+
+        logger.info(f"Training completed in {total_time:.2f} seconds")
+        logger.info(
+            f"Best validation loss: {self.state.best_val_loss:.6f} at epoch {self.state.best_epoch}"
+        )
+        logger.info(f"Best validation accuracy: {self.state.best_val_accuracy:.4f}")
+
+        self._save_training_state()
+        self._export_error_report_safe()
+
+        return TrainingResult(
+            success=True,
+            final_epoch=self.state.epoch,
+            best_val_loss=self.state.best_val_loss,
+            best_val_accuracy=self.state.best_val_accuracy,
+            best_epoch=self.state.best_epoch,
+            total_training_time=total_time,
+            model_path=str(self.output_dir / "best_model.pt"),
+            training_history={
+                "train_loss": self.state.train_losses,
+                "val_loss": self.state.val_losses,
+                "val_accuracy": self.state.val_accuracies,
+                "learning_rate": self.state.learning_rates,
+            },
+        )
+
+    def _create_failed_result(self, error_message: str, training_time: float) -> TrainingResult:
+        """Create a failed training result."""
+        return TrainingResult(
+            success=False,
+            final_epoch=self.state.epoch,
+            best_val_loss=self.state.best_val_loss,
+            best_val_accuracy=self.state.best_val_accuracy,
+            best_epoch=self.state.best_epoch,
+            total_training_time=training_time,
+            error_message=error_message,
+        )
+
+    def _export_error_report_safe(self) -> None:
+        """Safely export error report."""
+        try:
+            error_report_path = self.output_dir / "error_report.json"
+            self.error_handler.export_error_report(error_report_path)
+        except Exception as export_error:
+            logger.debug("Failed to export error report: %s", export_error)
+
+    def _cleanup_training(self) -> None:
+        """Cleanup training resources."""
+        if self.writer:
+            self.writer.close()
 
     def get_error_summary(self) -> dict[str, Any]:
         """Get summary of training errors.

@@ -188,7 +188,7 @@ class ResourceManager:
 
         try:
             if platform.system() == "Darwin":  # macOS
-                result = subprocess.run(  # nosec B603 B607
+                result = subprocess.run(  # nosec S603 S607
                     ["sysctl", "-n", "machdep.cpu.brand_string"],
                     capture_output=True,
                     text=True,
@@ -478,7 +478,7 @@ class ResourceManager:
                 }
             )
         except ImportError:
-            pass
+            logger.debug("psutil not available, skipping system memory info")
 
         return usage
 
@@ -495,20 +495,15 @@ class ResourceManager:
         logger.info("Performed garbage collection")
 
 
-# Global resource manager instance
-_resource_manager: ResourceManager | None = None
-
-
 def get_resource_manager() -> ResourceManager:
     """Get the global resource manager instance.
 
     Returns:
         ResourceManager instance
     """
-    global _resource_manager
-    if _resource_manager is None:
-        _resource_manager = ResourceManager()
-    return _resource_manager
+    if not hasattr(get_resource_manager, "_instance"):
+        get_resource_manager._instance = ResourceManager()  # type: ignore[attr-defined]
+    return get_resource_manager._instance  # type: ignore[attr-defined,no-any-return]
 
 
 def detect_optimal_config(base_config: dict[str, Any] | None = None) -> dict[str, Any]:

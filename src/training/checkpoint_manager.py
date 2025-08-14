@@ -19,6 +19,22 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class CheckpointData:
+    """Data container for checkpoint saving."""
+
+    optimizer_state: dict[str, Any]
+    scheduler_state: dict[str, Any] | None
+    training_state: dict[str, Any]
+    config: dict[str, Any]
+    epoch: int
+    step: int
+    val_loss: float
+    val_accuracy: float
+    training_time: float
+    scaler_state: dict[str, Any] | None = None
+
+
+@dataclass
 class CheckpointMetadata:
     """Metadata for training checkpoints."""
 
@@ -76,69 +92,53 @@ class CheckpointManager:
     def save_checkpoint(
         self,
         model: torch.nn.Module,
-        optimizer_state: dict[str, Any],
-        scheduler_state: dict[str, Any] | None,
-        training_state: dict[str, Any],
-        config: dict[str, Any],
-        epoch: int,
-        step: int,
-        val_loss: float,
-        val_accuracy: float,
-        training_time: float,
-        scaler_state: dict[str, Any] | None = None,
+        checkpoint_data: CheckpointData,
         force_save: bool = False,
     ) -> Path | None:
         """Save training checkpoint.
 
         Args:
             model: PyTorch model
-            optimizer_state: Optimizer state dictionary
-            scheduler_state: Scheduler state dictionary
-            training_state: Training state dictionary
-            config: Training configuration
-            epoch: Current epoch
-            step: Current step
-            val_loss: Current validation loss
-            val_accuracy: Current validation accuracy
-            training_time: Total training time
-            scaler_state: Mixed precision scaler state
+            checkpoint_data: Container with all checkpoint data
             force_save: Force save even if conditions not met
 
         Returns:
             Path to saved checkpoint or None if not saved
         """
         # Check if we should save this checkpoint
-        if not force_save and not self._should_save_checkpoint(epoch, val_loss):
+        if not force_save and not self._should_save_checkpoint(
+            checkpoint_data.epoch, checkpoint_data.val_loss
+        ):
             return None
 
         try:
             # Generate checkpoint ID
-            checkpoint_id = f"epoch_{epoch:04d}_{int(time.time())}"
+            checkpoint_id = f"epoch_{checkpoint_data.epoch:04d}_{int(time.time())}"
             checkpoint_path = self.checkpoint_dir / f"{checkpoint_id}.pt"
 
             # Prepare checkpoint data
-            checkpoint_data = {
+            checkpoint_dict = {
                 "checkpoint_id": checkpoint_id,
-                "epoch": epoch,
-                "step": step,
+                "epoch": checkpoint_data.epoch,
+                "step": checkpoint_data.step,
                 "model_state_dict": model.state_dict(),
-                "optimizer_state_dict": optimizer_state,
-                "scheduler_state_dict": scheduler_state,
-                "training_state": training_state,
-                "config": config,
-                "val_loss": val_loss,
-                "val_accuracy": val_accuracy,
-                "training_time": training_time,
+                "optimizer_state_dict": checkpoint_data.optimizer_state,
+                "scheduler_state_dict": checkpoint_data.scheduler_state,
+                "training_state": checkpoint_data.training_state,
+                "config": checkpoint_data.config,
+                "val_loss": checkpoint_data.val_loss,
+                "val_accuracy": checkpoint_data.val_accuracy,
+                "training_time": checkpoint_data.training_time,
                 "timestamp": time.time(),
                 "pytorch_version": torch.__version__,
                 "device_type": str(next(model.parameters()).device),
             }
 
-            if scaler_state is not None:
-                checkpoint_data["scaler_state_dict"] = scaler_state
+            if checkpoint_data.scaler_state is not None:
+                checkpoint_dict["scaler_state_dict"] = checkpoint_data.scaler_state
 
             # Save checkpoint
-            torch.save(checkpoint_data, checkpoint_path)
+            torch.save(checkpoint_dict, checkpoint_path)
 
             # Calculate file size and checksum
             file_size = checkpoint_path.stat().st_size
@@ -147,17 +147,17 @@ class CheckpointManager:
             # Create metadata
             metadata = CheckpointMetadata(
                 checkpoint_id=checkpoint_id,
-                epoch=epoch,
-                step=step,
+                epoch=checkpoint_data.epoch,
+                step=checkpoint_data.step,
                 timestamp=time.time(),
-                model_architecture=config.get("model_architecture", "unknown"),
-                num_classes=config.get("num_classes", 0),
-                best_val_loss=val_loss,
-                best_val_accuracy=val_accuracy,
-                training_time=training_time,
+                model_architecture=checkpoint_data.config.get("model_architecture", "unknown"),
+                num_classes=checkpoint_data.config.get("num_classes", 0),
+                best_val_loss=checkpoint_data.val_loss,
+                best_val_accuracy=checkpoint_data.val_accuracy,
+                training_time=checkpoint_data.training_time,
                 file_size_bytes=file_size,
                 checksum=checksum,
-                config_hash=self._hash_config(config),
+                config_hash=self._hash_config(checkpoint_data.config),
                 pytorch_version=torch.__version__,
                 device_type=str(next(model.parameters()).device),
             )
@@ -172,8 +172,8 @@ class CheckpointManager:
             logger.info(
                 "Checkpoint saved: %s (epoch %d, val_loss: %.6f, size: %.1fMB)",
                 checkpoint_path,
-                epoch,
-                val_loss,
+                checkpoint_data.epoch,
+                checkpoint_data.val_loss,
                 file_size / 1024**2,
             )
 
@@ -202,7 +202,7 @@ class CheckpointManager:
             logger.info("Loading checkpoint: %s", checkpoint_path)
 
             # Load checkpoint
-            checkpoint = torch.load(checkpoint_path, map_location="cpu")
+            checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
 
             # Validate checkpoint
             if not self._validate_checkpoint_data(checkpoint):
@@ -325,7 +325,7 @@ class CheckpointManager:
 
             # Verify integrity
             try:
-                checkpoint = torch.load(checkpoint_path, map_location="cpu")
+                checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
                 if not self._validate_checkpoint_data(checkpoint):
                     logger.warning("Corrupted checkpoint detected: %s", checkpoint_id)
                     corrupted_ids.append(checkpoint_id)

@@ -354,43 +354,20 @@ class CheckpointErrorRecovery(ErrorRecoveryStrategy):
         """Attempt to recover from checkpoint errors."""
         logger.info("Attempting checkpoint error recovery...")
 
-        recovery_actions = []
+        recovery_actions: list[str] = []
 
         try:
             trainer = context.get("trainer")
-            if not trainer:
+            if not trainer or not hasattr(trainer, "checkpoint_manager"):
                 return False
 
-            # Try to find and load a different checkpoint
-            if hasattr(trainer, "checkpoint_manager"):
-                # Try latest checkpoint
-                latest_checkpoint = trainer.checkpoint_manager.find_latest_checkpoint()
-                if latest_checkpoint:
-                    try:
-                        checkpoint = trainer.checkpoint_manager.load_checkpoint(latest_checkpoint)
-                        if checkpoint:
-                            recovery_actions.append(
-                                f"Loaded alternative checkpoint: {latest_checkpoint}"
-                            )
-                            return True
-                    except Exception:
-                        logger.debug("Failed to load latest checkpoint for recovery")
+            # Try checkpoint recovery strategies
+            if self._try_checkpoint_recovery(trainer, recovery_actions):
+                error.recovery_actions = recovery_actions
+                return True
 
-                # Try best checkpoint
-                best_checkpoint = trainer.checkpoint_manager.find_best_checkpoint()
-                if best_checkpoint and best_checkpoint != latest_checkpoint:
-                    try:
-                        checkpoint = trainer.checkpoint_manager.load_checkpoint(best_checkpoint)
-                        if checkpoint:
-                            recovery_actions.append(f"Loaded best checkpoint: {best_checkpoint}")
-                            return True
-                    except Exception:
-                        logger.debug("Failed to load best checkpoint for recovery")
-
-                # Clean up corrupted checkpoints
-                corrupted_count = trainer.checkpoint_manager.cleanup_corrupted_checkpoints()
-                if corrupted_count > 0:
-                    recovery_actions.append(f"Cleaned up {corrupted_count} corrupted checkpoints")
+            # Clean up corrupted checkpoints
+            self._cleanup_corrupted_checkpoints(trainer, recovery_actions)
 
             # If all else fails, start fresh training
             recovery_actions.append("Starting fresh training (no valid checkpoints found)")
@@ -400,6 +377,43 @@ class CheckpointErrorRecovery(ErrorRecoveryStrategy):
         except Exception:
             logger.exception("Checkpoint recovery failed")
             return False
+
+    def _try_checkpoint_recovery(self, trainer: Any, recovery_actions: list[str]) -> bool:
+        """Try to recover using available checkpoints."""
+        # Try latest checkpoint
+        if self._try_load_checkpoint(trainer, "latest", recovery_actions):
+            return True
+
+        # Try best checkpoint
+        return self._try_load_checkpoint(trainer, "best", recovery_actions)
+
+    def _try_load_checkpoint(
+        self, trainer: Any, checkpoint_type: str, recovery_actions: list[str]
+    ) -> bool:
+        """Try to load a specific type of checkpoint."""
+        try:
+            if checkpoint_type == "latest":
+                checkpoint_path = trainer.checkpoint_manager.find_latest_checkpoint()
+                description = "alternative"
+            else:  # best
+                checkpoint_path = trainer.checkpoint_manager.find_best_checkpoint()
+                description = "best"
+
+            if checkpoint_path:
+                checkpoint = trainer.checkpoint_manager.load_checkpoint(checkpoint_path)
+                if checkpoint:
+                    recovery_actions.append(f"Loaded {description} checkpoint: {checkpoint_path}")
+                    return True
+        except Exception:
+            logger.debug(f"Failed to load {checkpoint_type} checkpoint for recovery")
+
+        return False
+
+    def _cleanup_corrupted_checkpoints(self, trainer: Any, recovery_actions: list[str]) -> None:
+        """Clean up corrupted checkpoints."""
+        corrupted_count = trainer.checkpoint_manager.cleanup_corrupted_checkpoints()
+        if corrupted_count > 0:
+            recovery_actions.append(f"Cleaned up {corrupted_count} corrupted checkpoints")
 
     def get_troubleshooting_suggestions(self, error: TrainingError) -> list[str]:
         """Get checkpoint error troubleshooting suggestions."""
@@ -535,33 +549,21 @@ class TrainingErrorHandler:
         """Categorize the error based on exception type and message."""
         error_message = str(exception).lower()
 
-        # Memory errors
-        if "memory" in error_message or "allocation" in error_message:
-            return ErrorCategory.MEMORY
+        # Define category mappings
+        category_keywords = {
+            ErrorCategory.MEMORY: ["memory", "allocation"],
+            ErrorCategory.DEVICE: ["cuda", "device", "gpu", "mps"],
+            ErrorCategory.DATA: ["dataloader", "dataset", "file not found"],
+            ErrorCategory.CHECKPOINT: ["checkpoint", "state_dict", "pickle"],
+            ErrorCategory.NETWORK: ["connection", "network", "timeout"],
+            ErrorCategory.FILESYSTEM: ["permission", "disk", "space", "io"],
+            ErrorCategory.CONFIGURATION: ["config", "parameter", "argument"],
+        }
 
-        # Device errors
-        if any(keyword in error_message for keyword in ["cuda", "device", "gpu", "mps"]):
-            return ErrorCategory.DEVICE
-
-        # Data errors
-        if any(keyword in error_message for keyword in ["dataloader", "dataset", "file not found"]):
-            return ErrorCategory.DATA
-
-        # Checkpoint errors
-        if any(keyword in error_message for keyword in ["checkpoint", "state_dict", "pickle"]):
-            return ErrorCategory.CHECKPOINT
-
-        # Network errors
-        if any(keyword in error_message for keyword in ["connection", "network", "timeout"]):
-            return ErrorCategory.NETWORK
-
-        # Filesystem errors
-        if any(keyword in error_message for keyword in ["permission", "disk", "space", "io"]):
-            return ErrorCategory.FILESYSTEM
-
-        # Configuration errors
-        if any(keyword in error_message for keyword in ["config", "parameter", "argument"]):
-            return ErrorCategory.CONFIGURATION
+        # Check each category
+        for category, keywords in category_keywords.items():
+            if any(keyword in error_message for keyword in keywords):
+                return category
 
         return ErrorCategory.UNKNOWN
 

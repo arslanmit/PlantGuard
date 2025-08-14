@@ -32,6 +32,7 @@ class ModelConfig:
     """Configuration for a plant disease model."""
 
     def __init__(self, config_dict: dict[str, Any]) -> None:
+        """Initialize ModelConfig from configuration dictionary."""
         self.name = config_dict["name"]
         self.type = config_dict["type"]  # "huggingface", "local", "custom"
         self.model_id = config_dict["model_id"]

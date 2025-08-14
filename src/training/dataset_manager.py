@@ -5,6 +5,7 @@ import logging
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from PIL import Image
 
@@ -388,11 +389,7 @@ class DatasetManager:
         random.seed(config.random_seed)
 
         # Create output directories
-        train_dir = output_dir / "train"
-        val_dir = output_dir / "val"
-
-        train_dir.mkdir(parents=True, exist_ok=True)
-        val_dir.mkdir(parents=True, exist_ok=True)
+        train_dir, val_dir = self._create_output_directories(output_dir)
 
         logger.info("Preparing dataset from %s to %s", source_dir, output_dir)
 
@@ -402,78 +399,115 @@ class DatasetManager:
                 if not class_dir.is_dir():
                     continue
 
-                class_name = class_dir.name
-                logger.info("Processing class: %s", class_name)
-
-                # Create class directories in train and val
-                (train_dir / class_name).mkdir(exist_ok=True)
-                (val_dir / class_name).mkdir(exist_ok=True)
-
-                # Get all valid image files
-                image_files: list[Path] = []
-                for ext in config.image_formats:
-                    image_files.extend(class_dir.glob(f"*{ext}"))
-                    image_files.extend(class_dir.glob(f"*{ext.upper()}"))
-
-                # Filter out corrupted files
-                valid_files = []
-                for img_file in image_files:
-                    try:
-                        with Image.open(img_file) as img:
-                            img.verify()
-                        valid_files.append(img_file)
-                    except OSError:
-                        logger.warning("Skipping corrupted file: %s", img_file)
-
-                if len(valid_files) < config.min_samples_per_class:
-                    logger.warning(
-                        "Class '%s' has only %d samples (minimum: %d)",
-                        class_name,
-                        len(valid_files),
-                        config.min_samples_per_class,
-                    )
-
-                # Shuffle files
-                random.shuffle(valid_files)
-
-                # Split into train and validation
-                split_idx = int(len(valid_files) * config.train_ratio)
-                train_files = valid_files[:split_idx]
-                val_files = valid_files[split_idx:]
-
-                # Copy files to respective directories
-                for img_file in train_files:
-                    shutil.copy2(img_file, train_dir / class_name / img_file.name)
-
-                for img_file in val_files:
-                    shutil.copy2(img_file, val_dir / class_name / img_file.name)
-
-                logger.info(
-                    "Class '%s': %d train, %d val", class_name, len(train_files), len(val_files)
-                )
+                self._process_class_directory(class_dir, train_dir, val_dir, config, random)
 
             # Save dataset configuration
-            config_file = output_dir / "dataset_config.json"
-            with config_file.open("w") as f:
-                json.dump(
-                    {
-                        "train_ratio": config.train_ratio,
-                        "val_ratio": config.val_ratio,
-                        "random_seed": config.random_seed,
-                        "min_samples_per_class": config.min_samples_per_class,
-                        "image_formats": config.image_formats,
-                        "quality_threshold": config.quality_threshold,
-                    },
-                    f,
-                    indent=2,
-                )
+            self._save_dataset_config(output_dir, config)
 
-            logger.info("Dataset preparation complete. Configuration saved to %s", config_file)
+            logger.info(
+                "Dataset preparation complete. Configuration saved to %s",
+                output_dir / "dataset_config.json",
+            )
             return True
 
         except Exception:
             logger.exception("Failed to prepare dataset")
             return False
+
+    def _create_output_directories(self, output_dir: Path) -> tuple[Path, Path]:
+        """Create train and validation output directories."""
+        train_dir = output_dir / "train"
+        val_dir = output_dir / "val"
+
+        train_dir.mkdir(parents=True, exist_ok=True)
+        val_dir.mkdir(parents=True, exist_ok=True)
+
+        return train_dir, val_dir
+
+    def _process_class_directory(
+        self, class_dir: Path, train_dir: Path, val_dir: Path, config: DatasetConfig, random: Any
+    ) -> None:
+        """Process a single class directory."""
+        class_name = class_dir.name
+        logger.info("Processing class: %s", class_name)
+
+        # Create class directories in train and val
+        (train_dir / class_name).mkdir(exist_ok=True)
+        (val_dir / class_name).mkdir(exist_ok=True)
+
+        # Get valid image files
+        valid_files = self._get_valid_image_files(class_dir, config)
+
+        if len(valid_files) < config.min_samples_per_class:
+            logger.warning(
+                "Class '%s' has only %d samples (minimum: %d)",
+                class_name,
+                len(valid_files),
+                config.min_samples_per_class,
+            )
+
+        # Split and copy files
+        train_files, val_files = self._split_files(valid_files, config.train_ratio, random)
+        self._copy_files(train_files, train_dir / class_name)
+        self._copy_files(val_files, val_dir / class_name)
+
+        logger.info("Class '%s': %d train, %d val", class_name, len(train_files), len(val_files))
+
+    def _get_valid_image_files(self, class_dir: Path, config: DatasetConfig) -> list[Path]:
+        """Get all valid image files from a class directory."""
+        # Get all image files
+        image_files: list[Path] = []
+        for ext in config.image_formats:
+            image_files.extend(class_dir.glob(f"*{ext}"))
+            image_files.extend(class_dir.glob(f"*{ext.upper()}"))
+
+        # Filter out corrupted files
+        valid_files = []
+        for img_file in image_files:
+            try:
+                with Image.open(img_file) as img:
+                    img.verify()
+                valid_files.append(img_file)
+            except OSError:
+                logger.warning("Skipping corrupted file: %s", img_file)
+
+        return valid_files
+
+    def _split_files(
+        self, files: list[Path], train_ratio: float, random: Any
+    ) -> tuple[list[Path], list[Path]]:
+        """Split files into train and validation sets."""
+        # Shuffle files
+        random.shuffle(files)
+
+        # Split into train and validation
+        split_idx = int(len(files) * train_ratio)
+        train_files = files[:split_idx]
+        val_files = files[split_idx:]
+
+        return train_files, val_files
+
+    def _copy_files(self, files: list[Path], dest_dir: Path) -> None:
+        """Copy files to destination directory."""
+        for img_file in files:
+            shutil.copy2(img_file, dest_dir / img_file.name)
+
+    def _save_dataset_config(self, output_dir: Path, config: DatasetConfig) -> None:
+        """Save dataset configuration to JSON file."""
+        config_file = output_dir / "dataset_config.json"
+        with config_file.open("w") as f:
+            json.dump(
+                {
+                    "train_ratio": config.train_ratio,
+                    "val_ratio": config.val_ratio,
+                    "random_seed": config.random_seed,
+                    "min_samples_per_class": config.min_samples_per_class,
+                    "image_formats": config.image_formats,
+                    "quality_threshold": config.quality_threshold,
+                },
+                f,
+                indent=2,
+            )
 
     def _analyze_split_dataset(
         self, dataset_dir: Path

@@ -297,7 +297,7 @@ class TrainingConfig:
             with open(json_path, encoding="utf-8") as f:
                 config_dict = json.load(f)
         except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON in {json_path}: {e}")
+            raise ValueError(f"Invalid JSON in {json_path}: {e}") from e
 
         return cls.from_dict(config_dict)
 
@@ -329,7 +329,7 @@ class TrainingConfig:
             with open(yaml_path, encoding="utf-8") as f:
                 config_dict = yaml.safe_load(f)
         except yaml.YAMLError as e:
-            raise ValueError(f"Invalid YAML in {yaml_path}: {e}")
+            raise ValueError(f"Invalid YAML in {yaml_path}: {e}") from e
 
         return cls.from_dict(config_dict)
 
@@ -354,7 +354,7 @@ class TrainingConfig:
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=indent, default=str)
 
-        logger.info(f"Configuration saved to {json_path}")
+        logger.info("Configuration saved to %s", json_path)
 
     def to_yaml(self, yaml_path: str | Path) -> None:
         """Save configuration to YAML file.
@@ -376,7 +376,7 @@ class TrainingConfig:
         with open(yaml_path, "w", encoding="utf-8") as f:
             yaml.dump(self.to_dict(), f, default_flow_style=False, indent=2)
 
-        logger.info(f"Configuration saved to {yaml_path}")
+        logger.info("Configuration saved to %s", yaml_path)
 
     def get_effective_batch_size(self) -> int:
         """Get effective batch size considering gradient accumulation.
@@ -583,4 +583,4 @@ def create_template_configs(output_dir: str | Path) -> None:
     for filename, config in templates.items():
         config.to_json(output_dir / filename)
 
-    logger.info(f"Created {len(templates)} template configurations in {output_dir}")
+    logger.info("Created %d template configurations in %s", len(templates), output_dir)

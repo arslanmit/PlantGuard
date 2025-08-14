@@ -11,12 +11,11 @@ from PIL import Image
 from transformers import AutoImageProcessor, AutoModelForImageClassification
 
 
-def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) -> dict[str, Any]:
-    """Test a Hugging Face model on test images."""
+def _load_model_and_processor(model_name: str) -> tuple[Any, Any, list[str]] | dict[str, str]:
+    """Load model, processor, and class labels."""
     print(f"🔄 Loading model: {model_name}")
 
     try:
-        # Load model and processor
         processor = AutoImageProcessor.from_pretrained(model_name)
         model = AutoModelForImageClassification.from_pretrained(model_name)
         model.eval()
@@ -32,9 +31,164 @@ def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) ->
             class_labels = [f"class_{i}" for i in range(model.config.num_labels)]
             print("⚠️  No class labels found, using indices")
 
+        return model, processor, class_labels
     except Exception as e:
         print(f"❌ Failed to load model {model_name}: {e}")
         return {"error": str(e)}
+
+
+def _predict_image(
+    image_path: Path, model: Any, processor: Any, class_labels: list[str]
+) -> tuple[str, float] | None:
+    """Make prediction on a single image."""
+    try:
+        with Image.open(image_path) as im:
+            image = im.convert("RGB")
+        inputs = processor(image, return_tensors="pt")
+        device = model.device
+        inputs = {k: v.to(device) for k, v in inputs.items()}
+
+        with torch.no_grad():
+            outputs = model(**inputs)
+            predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
+            predicted_class_id: int = int(predictions.argmax().item())
+            confidence: float = float(predictions.max().item())
+
+        predicted_label = class_labels[predicted_class_id]
+        return predicted_label, confidence
+    except Exception as e:
+        print(f"❌ Failed to process {image_path}: {e}")
+        return None
+
+
+def _analyze_prediction(
+    predicted_label: str, gt_plant: str, gt_disease: str, gt_status: str
+) -> tuple[bool, bool, bool]:
+    """Analyze prediction accuracy."""
+    pred_lower = predicted_label.lower()
+    gt_plant_lower = gt_plant.lower()
+    gt_disease_lower = gt_disease.lower()
+
+    # Check plant type match
+    plant_match = any(plant_word in pred_lower for plant_word in gt_plant_lower.split())
+
+    # Check disease match
+    if gt_disease_lower == "healthy":
+        disease_match = "healthy" in pred_lower
+    else:
+        disease_words = gt_disease_lower.replace(" ", "_").split("_")
+        disease_match = any(word in pred_lower for word in disease_words if len(word) > 2)
+
+    # Check status (healthy vs diseased)
+    pred_healthy = "healthy" in pred_lower
+    actual_healthy = gt_status == "healthy"
+    status_match = pred_healthy == actual_healthy
+
+    # Overall correctness
+    overall_correct = plant_match and (disease_match or status_match)
+
+    return plant_match, status_match, overall_correct
+
+
+def _process_sample_with_validation(
+    sample: dict, test_images_dir: str, model: Any, processor: Any, class_labels: list[str]
+) -> tuple[dict, bool, bool, bool] | None:
+    """Process a sample with full validation and return result."""
+    filename = sample.get("filename")
+    if not filename:
+        print("⚠️  Skipping sample with missing filename")
+        return None
+
+    base = Path(test_images_dir).resolve()
+    image_path = (base / filename).resolve()
+    if base != image_path and base not in image_path.parents:
+        print(f"⚠️  Skipping unsafe path: {filename}")
+        return None
+
+    if not image_path.exists():
+        return None
+
+    # Get ground truth
+    gt_plant = sample.get("plant")
+    gt_disease = sample.get("disease")
+    gt_status = sample.get("status")
+    if gt_plant is None or gt_disease is None or gt_status is None:
+        print(f"⚠️  Skipping sample with missing fields: {sample}")
+        return None
+
+    # Make prediction
+    prediction_result = _predict_image(image_path, model, processor, class_labels)
+    if prediction_result is None:
+        return None
+
+    predicted_label, confidence = prediction_result
+
+    # Analyze prediction
+    plant_match, status_match, overall_correct = _analyze_prediction(
+        predicted_label, gt_plant, gt_disease, gt_status
+    )
+
+    # Display results
+    overall_icon = "✅" if overall_correct else "❌"
+    plant_icon = "🌿" if plant_match else "❌"
+    status_icon = "💚" if status_match else "💔"
+
+    result = {
+        "filename": sample["filename"],
+        "ground_truth": f"{gt_plant} - {gt_disease} ({gt_status})",
+        "prediction": predicted_label,
+        "confidence": confidence,
+        "plant_match": plant_match,
+        "status_match": status_match,
+        "overall_correct": overall_correct,
+    }
+
+    print(f"{overall_icon} {sample['filename']} {plant_icon}{status_icon}")
+    print(f"   GT: {gt_plant} - {gt_disease} ({gt_status})")
+    print(f"   Pred: {predicted_label} (conf: {confidence:.3f})")
+    print()
+
+    return result, plant_match, status_match, overall_correct
+
+
+def _calculate_summary(
+    model_name: str,
+    model: Any,
+    results: list[dict],
+    correct_predictions: int,
+    plant_correct: int,
+    status_correct: int,
+) -> dict[str, Any]:
+    """Calculate final summary metrics."""
+    total = len(results)
+    if total == 0:
+        return {"error": "No valid predictions made"}
+
+    overall_accuracy = correct_predictions / total
+    plant_accuracy = plant_correct / total
+    status_accuracy = status_correct / total
+    avg_confidence = np.mean([r["confidence"] for r in results])
+
+    return {
+        "model_name": model_name,
+        "total_images": total,
+        "overall_accuracy": overall_accuracy,
+        "plant_accuracy": plant_accuracy,
+        "status_accuracy": status_accuracy,
+        "average_confidence": avg_confidence,
+        "num_classes": model.config.num_labels,
+        "results": results,
+    }
+
+
+def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) -> dict[str, Any]:
+    """Test a Hugging Face model on test images."""
+    # Load model and processor
+    model_result = _load_model_and_processor(model_name)
+    if isinstance(model_result, dict):  # Error case
+        return model_result
+
+    model, processor, class_labels = model_result
 
     # Load test metadata
     with open(metadata_path) as f:
@@ -50,122 +204,28 @@ def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) ->
     print("-" * 80)
 
     for sample in samples:
-        filename = sample.get("filename")
-        if not filename:
-            print("⚠️  Skipping sample with missing filename")
+        # Validate and process sample
+        sample_result = _process_sample_with_validation(
+            sample, test_images_dir, model, processor, class_labels
+        )
+
+        if sample_result is None:
             continue
 
-        base = Path(test_images_dir).resolve()
-        image_path = (base / filename).resolve()
-        if base != image_path and base not in image_path.parents:
-            print(f"⚠️  Skipping unsafe path: {filename}")
-            continue
+        result, plant_match, status_match, overall_correct = sample_result
+        results.append(result)
 
-        if not image_path.exists():
-            continue
+        # Update counters
+        if overall_correct:
+            correct_predictions += 1
+        if plant_match:
+            plant_correct += 1
+        if status_match:
+            status_correct += 1
 
-        try:
-            # Load and preprocess image
-            with Image.open(image_path) as im:
-                image = im.convert("RGB")
-            inputs = processor(image, return_tensors="pt")
-            device = model.device
-            inputs = {k: v.to(device) for k, v in inputs.items()}
-
-            # Get prediction
-            with torch.no_grad():
-                outputs = model(**inputs)
-                predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
-                predicted_class_id: int = int(predictions.argmax().item())
-                confidence: float = float(predictions.max().item())
-
-            predicted_label = class_labels[predicted_class_id]
-
-            # Ground truth
-            gt_plant = sample.get("plant")
-            gt_disease = sample.get("disease")
-            gt_status = sample.get("status")
-            if gt_plant is None or gt_disease is None or gt_status is None:
-                print(f"⚠️  Skipping sample with missing fields: {sample}")
-                continue
-
-            # Analyze prediction
-            pred_lower = predicted_label.lower()
-            gt_plant_lower = gt_plant.lower()
-            gt_disease_lower = gt_disease.lower()
-
-            # Check plant type match
-            plant_match = any(plant_word in pred_lower for plant_word in gt_plant_lower.split())
-
-            # Check disease match
-            if gt_disease_lower == "healthy":
-                disease_match = "healthy" in pred_lower
-            else:
-                disease_words = gt_disease_lower.replace(" ", "_").split("_")
-                disease_match = any(word in pred_lower for word in disease_words if len(word) > 2)
-
-            # Check status (healthy vs diseased)
-            pred_healthy = "healthy" in pred_lower
-            actual_healthy = gt_status == "healthy"
-            status_match = pred_healthy == actual_healthy
-
-            # Overall correctness
-            overall_correct = plant_match and (disease_match or status_match)
-
-            if overall_correct:
-                correct_predictions += 1
-            if plant_match:
-                plant_correct += 1
-            if status_match:
-                status_correct += 1
-
-            # Icons for display
-            overall_icon = "✅" if overall_correct else "❌"
-            plant_icon = "🌿" if plant_match else "❌"
-            status_icon = "💚" if status_match else "💔"
-
-            result = {
-                "filename": sample["filename"],
-                "ground_truth": f"{gt_plant} - {gt_disease} ({gt_status})",
-                "prediction": predicted_label,
-                "confidence": confidence,
-                "plant_match": plant_match,
-                "status_match": status_match,
-                "overall_correct": overall_correct,
-            }
-            results.append(result)
-
-            print(f"{overall_icon} {sample['filename']} {plant_icon}{status_icon}")
-            print(f"   GT: {gt_plant} - {gt_disease} ({gt_status})")
-            print(f"   Pred: {predicted_label} (conf: {confidence:.3f})")
-            print()
-
-        except Exception as e:
-            print(f"❌ Failed to process {image_path}: {e}")
-            continue
-
-    # Calculate metrics
-    total = len(results)
-    if total > 0:
-        overall_accuracy = correct_predictions / total
-        plant_accuracy = plant_correct / total
-        status_accuracy = status_correct / total
-        avg_confidence = np.mean([r["confidence"] for r in results])
-
-        summary = {
-            "model_name": model_name,
-            "total_images": total,
-            "overall_accuracy": overall_accuracy,
-            "plant_accuracy": plant_accuracy,
-            "status_accuracy": status_accuracy,
-            "average_confidence": avg_confidence,
-            "num_classes": model.config.num_labels,
-            "results": results,
-        }
-
-        return summary
-    else:
-        return {"error": "No valid predictions made"}
+    return _calculate_summary(
+        model_name, model, results, correct_predictions, plant_correct, status_correct
+    )
 
 
 def print_results(results: dict[str, Any]) -> None:

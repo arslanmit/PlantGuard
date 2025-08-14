@@ -23,6 +23,7 @@ class ModelNotLoadedError(RuntimeError):
     """Raised when a model-dependent operation is called before loading the model."""
 
     def __init__(self) -> None:
+        """Initialize ModelNotLoadedError."""
         super().__init__("Model not loaded. Call load_checkpoint() first.")
 
 
@@ -30,6 +31,7 @@ class ModelNoneError(RuntimeError):
     """Raised when model is unexpectedly None after load check."""
 
     def __init__(self) -> None:
+        """Initialize ModelNoneError."""
         super().__init__("Model reference is None")
 
 
@@ -37,6 +39,7 @@ class PredictionError(RuntimeError):
     """Raised when single-image prediction fails."""
 
     def __init__(self) -> None:
+        """Initialize PredictionError."""
         super().__init__("Prediction failed")
 
 
@@ -44,6 +47,7 @@ class BatchPredictionError(RuntimeError):
     """Raised when batch prediction fails."""
 
     def __init__(self) -> None:
+        """Initialize BatchPredictionError."""
         super().__init__("Batch prediction failed")
 
 
@@ -51,6 +55,7 @@ class LoadCheckpointError(RuntimeError):
     """Raised when loading a checkpoint fails."""
 
     def __init__(self) -> None:
+        """Initialize LoadCheckpointError."""
         super().__init__("Failed to load checkpoint")
 
 
@@ -58,6 +63,7 @@ class CheckpointNotFoundError(FileNotFoundError):
     """Raised when the checkpoint file cannot be found."""
 
     def __init__(self) -> None:
+        """Initialize CheckpointNotFoundError."""
         super().__init__("Checkpoint file not found")
 
 
@@ -65,6 +71,7 @@ class ImagePreprocessError(RuntimeError):
     """Raised when image preprocessing fails."""
 
     def __init__(self) -> None:
+        """Initialize ImagePreprocessError."""
         super().__init__("Image preprocessing failed")
 
 
@@ -72,6 +79,7 @@ class ClassMappingLoadError(RuntimeError):
     """Raised when class mapping file cannot be loaded."""
 
     def __init__(self) -> None:
+        """Initialize ClassMappingLoadError."""
         super().__init__("Failed to load class mapping")
 
 
@@ -79,6 +87,7 @@ class InvalidClassesError(KeyError):
     """Raised when classes format in mapping is invalid."""
 
     def __init__(self) -> None:
+        """Initialize InvalidClassesError."""
         super().__init__("Invalid classes format")
 
 
