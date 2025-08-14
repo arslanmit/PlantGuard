@@ -65,7 +65,8 @@ def main() -> None:
                             train_count = splits.get("train", 0)
                             val_count = splits.get("val", 0)
                             print(
-                                f"    {class_name}: {total} total (train: {train_count}, val: {val_count})"
+                                f"    {class_name}: {total} total "
+                                f"(train: {train_count}, val: {val_count})"
                             )
                 else:
                     # Single directory format: dict[str, int]
@@ -81,7 +82,8 @@ def main() -> None:
                         print(f"    - {corrupted_file}")
                 else:
                     print(
-                        f"    (showing first {MAX_CORRUPTED_FILES_TO_SHOW} of {len(info.corrupted_files)})"
+                        f"    (showing first {MAX_CORRUPTED_FILES_TO_SHOW} "
+                        f"of {len(info.corrupted_files)})"
                     )
                     for corrupted_file in info.corrupted_files[:MAX_CORRUPTED_FILES_TO_SHOW]:
                         print(f"    - {corrupted_file}")

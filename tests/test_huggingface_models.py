@@ -181,7 +181,9 @@ def print_results(results: dict[str, Any]) -> None:
     print("\n📊 SUMMARY STATISTICS")
     print(f"Total test images: {results['total_images']}")
     print(
-        f"Overall accuracy: {results['overall_accuracy']:.1%} ({int(results['overall_accuracy'] * results['total_images'])}/{results['total_images']})"
+        f"Overall accuracy: {results['overall_accuracy']:.1%} "
+        f"({int(results['overall_accuracy'] * results['total_images'])}"
+        f"/{results['total_images']})"
     )
     print(f"Plant type accuracy: {results['plant_accuracy']:.1%}")
     print(f"Health status accuracy: {results['status_accuracy']:.1%}")
@@ -238,7 +240,9 @@ def main() -> None:
             for result in valid_results:
                 short_model_name = result["model_name"].split("/")[-1]  # Short name
                 print(
-                    f"{short_model_name:30} | Overall: {result['overall_accuracy']:.1%} | Plant: {result['plant_accuracy']:.1%} | Status: {result['status_accuracy']:.1%}"
+                    f"{short_model_name:30} | Overall: {result['overall_accuracy']:.1%} "
+                    f"| Plant: {result['plant_accuracy']:.1%} "
+                    f"| Status: {result['status_accuracy']:.1%}"
                 )
 
             # Find best model

@@ -345,7 +345,8 @@ Configuration: config/models.json
             with st.spinner("Benchmarking models..."):
                 # This would run the benchmark from model_switcher.py
                 st.info(
-                    "Benchmark feature - run `python scripts/model_switching/model_switcher.py --benchmark` in terminal"
+                    "Benchmark feature - run "
+                    "`python scripts/model_switching/model_switcher.py --benchmark` in terminal"
                 )
 
 

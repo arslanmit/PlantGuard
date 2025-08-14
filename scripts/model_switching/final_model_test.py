@@ -148,11 +148,13 @@ def comprehensive_test() -> None:
     print("-" * 40)
     if healthy_results:
         print(
-            f"Healthy plants:  {healthy_correct:2}/{len(healthy_results):2} ({healthy_correct / len(healthy_results):.1%})"
+            f"Healthy plants:  {healthy_correct:2}/{len(healthy_results):2} "
+            f"({healthy_correct / len(healthy_results):.1%})"
         )
     if diseased_results:
         print(
-            f"Diseased plants: {diseased_correct:2}/{len(diseased_results):2} ({diseased_correct / len(diseased_results):.1%})"
+            f"Diseased plants: {diseased_correct:2}/{len(diseased_results):2} "
+            f"({diseased_correct / len(diseased_results):.1%})"
         )
 
     print("\n🎉 CONCLUSION:")

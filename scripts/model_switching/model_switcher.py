@@ -262,16 +262,20 @@ def main() -> None:
 
         print("\n💡 Quick Commands:")
         print(
-            "  python scripts/model_switching/model_switcher.py --list              # List all models"
+            "  python scripts/model_switching/model_switcher.py --list              "
+            "# List all models"
         )
         print(
-            "  python scripts/model_switching/model_switcher.py --switch vit_best   # Switch to best model"
+            "  python scripts/model_switching/model_switcher.py --switch vit_best   "
+            "# Switch to best model"
         )
         print(
-            "  python scripts/model_switching/model_switcher.py --quick-test        # Test current model"
+            "  python scripts/model_switching/model_switcher.py --quick-test        "
+            "# Test current model"
         )
         print(
-            "  python scripts/model_switching/model_switcher.py --benchmark         # Compare all models"
+            "  python scripts/model_switching/model_switcher.py --benchmark         "
+            "# Compare all models"
         )
 
 

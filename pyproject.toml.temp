@@ -180,219 +180,7 @@ plantguard-train = "src.training.production_trainer:main"  # Training CLI
 #   make fix     - Auto-fix what we can
 #   make dev     - Do both format + lint
 
-[tool.mypy]
-python_version = "3.11"           # 🐍 Python version we're using
-strict = false                    # 🎯 Gradual typing (not too strict while learning)
-
-# ⚠️ Warnings we want to see
-warn_return_any = true           # Warn when function returns 'Any' type
-warn_unused_configs = true       # Warn about unused MyPy settings
-warn_redundant_casts = true      # Warn about unnecessary type casts
-warn_unused_ignores = false      # Don't warn about unused # type: ignore
-warn_no_return = true            # Warn when function should return something
-warn_unreachable = true          # Warn about code that can't be reached
-strict_equality = true           # Strict checking for == and !=
-
-# 🏷️ Type annotation requirements
-disallow_untyped_defs = true     # Functions need type hints
-disallow_incomplete_defs = true  # All parameters need types
-check_untyped_defs = true        # Check functions even without types
-disallow_untyped_decorators = true  # Decorators need types
-no_implicit_optional = true      # Be explicit about Optional types
-
-# 📦 External libraries
-ignore_missing_imports = true    # Don't complain about missing library types
-
-# 🚫 Folders to skip (don't type-check these)
-exclude = [
-  "build/",           # Build artifacts
-  "dist/",            # Distribution files
-  ".venv/",           # Virtual environment
-  ".git/",            # Git files
-  "notebooks/",       # Jupyter notebooks (different rules)
-  "logs/",            # Log files
-  "runs/",            # TensorBoard runs
-  ".kiro/",           # Kiro IDE files
-  "data/raw/",        # Raw data files
-]
-
-# 🎯 Special rules for specific files/modules
-[[tool.mypy.overrides]]
-module = "src.ui.app_streamlit"
-disallow_untyped_decorators = false  # Streamlit decorators don't need types
-
-# 🚧 Work in progress - relax rules for new modules while we add types
-[[tool.mypy.overrides]]
-module = [
-  "src.core.model_manager",
-  "src.core.huggingface_vision",
-  "src.features.model_switching.model_manager",
-  "src.features.model_switching.huggingface_vision",
-]
-ignore_errors = true  # Skip type checking for now
-
-# 📦 External libraries - ignore missing type information
-[[tool.mypy.overrides]]
-module = [
-  # 🧠 AI/ML Libraries
-  "torch.*", "torchvision.*", "torchaudio.*", "torchmetrics.*",
-
-  # 👁️ Computer Vision
-  "cv2.*",
-
-  # 🎵 Audio Processing
-  "librosa.*", "soundfile.*", "speech_recognition.*",
-
-  # 🌐 Web Interface
-  "streamlit.*", "streamlit_webrtc.*",
-
-  # 🔗 Networking
-  "pycloudflared.*", "pyngrok.*",
-
-  # 🤖 ML Tools
-  "wandb.*", "optuna.*",
-]
-ignore_missing_imports = true
-
-# ============================================================================
-# 6️⃣ TESTING - Make sure everything works correctly
-# ============================================================================
-# 🎯 GOAL: Catch bugs and ensure PlantGuard works as expected
-#
-# 🚀 QUICK COMMANDS:
-#   make test     - Run all tests
-#   make coverage - See test coverage report
-
-# 🧪 Pytest - Testing framework (finds and runs tests)
-[tool.pytest.ini_options]
-minversion = "7.0"                    # Minimum pytest version
-
-# 🔧 Test options (what pytest does when running)
-addopts = [
-  "-ra",                              # Show summary of all test results
-  "--strict-markers",                 # Only allow defined test markers
-  "--strict-config",                  # Strict configuration checking
-  "--cov=src",                        # Measure code coverage for src/ folder
-  "--cov-report=term-missing:skip-covered",  # Show missing lines in terminal
-  "--cov-report=html:htmlcov",        # Generate HTML coverage report
-  "--cov-report=xml",                 # Generate XML coverage report
-  "--cov-fail-under=80",              # Fail if coverage is below 80%
-]
-
-# 📁 Where to find tests and how to recognize them
-testpaths = ["tests"]                 # Look for tests in tests/ folder
-python_files = ["test_*.py", "*_test.py"]     # Files that contain tests
-python_classes = ["Test*"]            # Test classes start with "Test"
-python_functions = ["test_*"]         # Test functions start with "test_"
-
-# 🏷️ Test markers (categories for organizing tests)
-markers = [
-  "slow: marks tests as slow (skip with: pytest -m 'not slow')",
-  "integration: marks tests as integration tests (test multiple components)",
-  "unit: marks tests as unit tests (test single functions)",
-  "gpu: marks tests that require GPU (skip if no GPU available)",
-  "model: marks tests that require trained models",
-]
-
-# ⚠️ Warning filters (what warnings to show/hide)
-filterwarnings = [
-  "error",                            # Treat warnings as errors (strict)
-  "ignore::UserWarning",              # Ignore user warnings (common in ML)
-  "ignore::DeprecationWarning",       # Ignore deprecation warnings
-  "ignore::PendingDeprecationWarning", # Ignore pending deprecation warnings
-]
-
-# 📊 Test Coverage - How much of our code is tested
-[tool.coverage.run]
-source = ["src"]                      # Measure coverage for src/ folder
-branch = true                         # Track branch coverage (if/else paths)
-
-# 🚫 Files to skip when measuring coverage
-omit = [
-  "*/tests/*",                        # Don't measure test files themselves
-  "*/test_*",                         # Skip test files
-  "*/__pycache__/*",                  # Skip Python cache files
-  "*/site-packages/*",                # Skip external libraries
-  "setup.py",                         # Skip setup script
-]
-
-[tool.coverage.report]
-# 🚫 Lines to exclude from coverage (code that doesn't need testing)
-exclude_lines = [
-  "pragma: no cover",                 # Explicit exclusion comment
-  "def __repr__",                     # String representation methods
-  "if self.debug:",                   # Debug-only code
-  "if settings.DEBUG",                # Debug settings
-  "raise AssertionError",             # Assertion errors
-  "raise NotImplementedError",        # Not implemented methods
-  "if 0:",                            # Dead code
-  "if __name__ == .__main__.:",       # Script entry points
-  "class .*\\bProtocol\\):",          # Protocol classes
-  "@(abc\\.)?abstractmethod",         # Abstract methods
-]
-
-show_missing = true                   # Show which lines aren't covered
-skip_covered = true                   # Don't show fully covered files
-
-[tool.coverage.html]
-directory = "htmlcov"                 # Where to put HTML coverage report
-
-# ============================================================================
-# 7️⃣ SECURITY - Keep PlantGuard safe from vulnerabilities
-# ============================================================================
-# 🎯 GOAL: Find potential security issues in code
-#
-# 🚀 QUICK COMMANDS:
-#   make security - Run security scan
-
-# 🔒 Bandit - Security linter (finds potential security issues)
-[tool.bandit]
-# 🚫 Folders to skip during security scan
-exclude_dirs = ["tests", "build", "dist", ".venv"]
-
-# 🚫 Security checks to skip (because they're OK for PlantGuard)
-skips = [
-  "B101",  # assert statements (OK for debugging and development)
-  "B601",  # shell injection (we control the shell commands)
-  "B614",  # PyTorch model loading (we trust our local model files)
-  "B615",  # Hugging Face downloads (managed through our model config)
-]
-
-# ============================================================================
-# 8️⃣ DEVELOPMENT WORKFLOW - Helpful tools and automation
-# ============================================================================
-
-# 🪝 Pre-commit Configuration Reference
-# =====================================
-# 💡 Pre-commit runs checks automatically before each git commit
-#
-# 🚀 SETUP:
-#   make setup  (installs pre-commit hooks automatically)
-#
-# 📝 To create .pre-commit-config.yaml manually:
-#
-# repos:
-#   - repo: https://github.com/astral-sh/ruff-pre-commit
-#     rev: v0.1.6
-#     hooks:
-#       - id: ruff
-#         args: [--fix]
-#       - id: ruff-format
-#   - repo: https://github.com/pre-commit/mirrors-mypy
-#     rev: v1.6.1
-#     hooks:
-#       - id: mypy
-#         additional_dependencies: [types-all]
-
-# ============================================================================
-# 9️⃣ PACKAGE BUILDING - How to create installable PlantGuard packages
-# ============================================================================
-# 🎯 GOAL: Configure how Python packages PlantGuard for distribution
-#
-# 🚀 QUICK COMMANDS:
-#   make build   - Build package for distribution
-#   pip install -e .  - Install PlantGuard in development mode
-
+# ⚡ RUFF - Super fast Python linter and formatter (replaces Black, isort, flake8)
 [tool.ruff]
 line-length = 100              # 📏 Max characters per line (ADHD-friendly: not too long)
 target-version = "py311"       # 🐍 Python version we support
@@ -617,7 +405,7 @@ ignore = [
   # "E273",   # tab after keyword
   # "E274",   # tab before keyword
   # "E275",   # missing whitespace after keyword
-  # "E501",   # line too long (we set line-length above)
+  "E501",   # line too long (we set line-length above)
   # "E502",   # the backslash is redundant between brackets
   # "E701",   # multiple statements on one line (colon)
   # "E702",   # multiple statements on one line (semicolon)
@@ -627,7 +415,7 @@ ignore = [
   # "E713",   # test for membership should be 'not in'
   # "E714",   # test for object identity should be 'is not'
   # "E721",   # do not compare types, use 'isinstance()'
-  # "E722",   # do not use bare 'except' (ML code needs flexible error handling)
+  "E722",   # do not use bare 'except' (ML code needs flexible error handling)
   # "E731",   # do not assign a lambda expression, use a def
   # "E741",   # ambiguous variable name 'l'
   # "E742",   # ambiguous variable name 'O'
@@ -1228,6 +1016,229 @@ check-typed-exception = true  # Check exception handling
 quote-style = "double"    # Use "double quotes"
 indent-style = "space"    # Use spaces, not tabs
 line-ending = "auto"      # Auto-detect line endings (Windows/Mac/Linux)
+
+# ============================================================================
+# 5️⃣ TYPE CHECKING - Catch bugs before they happen
+# ============================================================================
+# 🎯 GOAL: Find type-related bugs early (like using a string as a number)
+#
+# 🚀 QUICK COMMANDS:
+#   make type    - Check types
+#   make dev     - Includes type checking
+
+# 🔍 MyPy - Static type checker (finds bugs without running code)
+[tool.mypy]
+python_version = "3.11"           # 🐍 Python version we're using
+strict = false                    # 🎯 Gradual typing (not too strict while learning)
+
+# ⚠️ Warnings we want to see
+warn_return_any = true           # Warn when function returns 'Any' type
+warn_unused_configs = true       # Warn about unused MyPy settings
+warn_redundant_casts = true      # Warn about unnecessary type casts
+warn_unused_ignores = false      # Don't warn about unused # type: ignore
+warn_no_return = true            # Warn when function should return something
+warn_unreachable = true          # Warn about code that can't be reached
+strict_equality = true           # Strict checking for == and !=
+
+# 🏷️ Type annotation requirements
+disallow_untyped_defs = true     # Functions need type hints
+disallow_incomplete_defs = true  # All parameters need types
+check_untyped_defs = true        # Check functions even without types
+disallow_untyped_decorators = true  # Decorators need types
+no_implicit_optional = true      # Be explicit about Optional types
+
+# 📦 External libraries
+ignore_missing_imports = true    # Don't complain about missing library types
+
+# 🚫 Folders to skip (don't type-check these)
+exclude = [
+  "build/",           # Build artifacts
+  "dist/",            # Distribution files
+  ".venv/",           # Virtual environment
+  ".git/",            # Git files
+  "notebooks/",       # Jupyter notebooks (different rules)
+  "logs/",            # Log files
+  "runs/",            # TensorBoard runs
+  ".kiro/",           # Kiro IDE files
+  "data/raw/",        # Raw data files
+]
+
+# 🎯 Special rules for specific files/modules
+[[tool.mypy.overrides]]
+module = "src.ui.app_streamlit"
+disallow_untyped_decorators = false  # Streamlit decorators don't need types
+
+# 🚧 Work in progress - relax rules for new modules while we add types
+[[tool.mypy.overrides]]
+module = [
+  "src.core.model_manager",
+  "src.core.huggingface_vision",
+  "src.features.model_switching.model_manager",
+  "src.features.model_switching.huggingface_vision",
+]
+ignore_errors = true  # Skip type checking for now
+
+# 📦 External libraries - ignore missing type information
+[[tool.mypy.overrides]]
+module = [
+  # 🧠 AI/ML Libraries
+  "torch.*", "torchvision.*", "torchaudio.*", "torchmetrics.*",
+
+  # 👁️ Computer Vision
+  "cv2.*",
+
+  # 🎵 Audio Processing
+  "librosa.*", "soundfile.*", "speech_recognition.*",
+
+  # 🌐 Web Interface
+  "streamlit.*", "streamlit_webrtc.*",
+
+  # 🔗 Networking
+  "pycloudflared.*", "pyngrok.*",
+
+  # 🤖 ML Tools
+  "wandb.*", "optuna.*",
+]
+ignore_missing_imports = true
+
+# ============================================================================
+# 6️⃣ TESTING - Make sure everything works correctly
+# ============================================================================
+# 🎯 GOAL: Catch bugs and ensure PlantGuard works as expected
+#
+# 🚀 QUICK COMMANDS:
+#   make test     - Run all tests
+#   make coverage - See test coverage report
+
+# 🧪 Pytest - Testing framework (finds and runs tests)
+[tool.pytest.ini_options]
+minversion = "7.0"                    # Minimum pytest version
+
+# 🔧 Test options (what pytest does when running)
+addopts = [
+  "-ra",                              # Show summary of all test results
+  "--strict-markers",                 # Only allow defined test markers
+  "--strict-config",                  # Strict configuration checking
+  "--cov=src",                        # Measure code coverage for src/ folder
+  "--cov-report=term-missing:skip-covered",  # Show missing lines in terminal
+  "--cov-report=html:htmlcov",        # Generate HTML coverage report
+  "--cov-report=xml",                 # Generate XML coverage report
+  "--cov-fail-under=80",              # Fail if coverage is below 80%
+]
+
+# 📁 Where to find tests and how to recognize them
+testpaths = ["tests"]                 # Look for tests in tests/ folder
+python_files = ["test_*.py", "*_test.py"]     # Files that contain tests
+python_classes = ["Test*"]            # Test classes start with "Test"
+python_functions = ["test_*"]         # Test functions start with "test_"
+
+# 🏷️ Test markers (categories for organizing tests)
+markers = [
+  "slow: marks tests as slow (skip with: pytest -m 'not slow')",
+  "integration: marks tests as integration tests (test multiple components)",
+  "unit: marks tests as unit tests (test single functions)",
+  "gpu: marks tests that require GPU (skip if no GPU available)",
+  "model: marks tests that require trained models",
+]
+
+# ⚠️ Warning filters (what warnings to show/hide)
+filterwarnings = [
+  "error",                            # Treat warnings as errors (strict)
+  "ignore::UserWarning",              # Ignore user warnings (common in ML)
+  "ignore::DeprecationWarning",       # Ignore deprecation warnings
+  "ignore::PendingDeprecationWarning", # Ignore pending deprecation warnings
+]
+
+# 📊 Test Coverage - How much of our code is tested
+[tool.coverage.run]
+source = ["src"]                      # Measure coverage for src/ folder
+branch = true                         # Track branch coverage (if/else paths)
+
+# 🚫 Files to skip when measuring coverage
+omit = [
+  "*/tests/*",                        # Don't measure test files themselves
+  "*/test_*",                         # Skip test files
+  "*/__pycache__/*",                  # Skip Python cache files
+  "*/site-packages/*",                # Skip external libraries
+  "setup.py",                         # Skip setup script
+]
+
+[tool.coverage.report]
+# 🚫 Lines to exclude from coverage (code that doesn't need testing)
+exclude_lines = [
+  "pragma: no cover",                 # Explicit exclusion comment
+  "def __repr__",                     # String representation methods
+  "if self.debug:",                   # Debug-only code
+  "if settings.DEBUG",                # Debug settings
+  "raise AssertionError",             # Assertion errors
+  "raise NotImplementedError",        # Not implemented methods
+  "if 0:",                            # Dead code
+  "if __name__ == .__main__.:",       # Script entry points
+  "class .*\\bProtocol\\):",          # Protocol classes
+  "@(abc\\.)?abstractmethod",         # Abstract methods
+]
+
+show_missing = true                   # Show which lines aren't covered
+skip_covered = true                   # Don't show fully covered files
+
+[tool.coverage.html]
+directory = "htmlcov"                 # Where to put HTML coverage report
+
+# ============================================================================
+# 7️⃣ SECURITY - Keep PlantGuard safe from vulnerabilities
+# ============================================================================
+# 🎯 GOAL: Find potential security issues in code
+#
+# 🚀 QUICK COMMANDS:
+#   make security - Run security scan
+
+# 🔒 Bandit - Security linter (finds potential security issues)
+[tool.bandit]
+# 🚫 Folders to skip during security scan
+exclude_dirs = ["tests", "build", "dist", ".venv"]
+
+# 🚫 Security checks to skip (because they're OK for PlantGuard)
+skips = [
+  "B101",  # assert statements (OK for debugging and development)
+  "B601",  # shell injection (we control the shell commands)
+  "B614",  # PyTorch model loading (we trust our local model files)
+  "B615",  # Hugging Face downloads (managed through our model config)
+]
+
+# ============================================================================
+# 8️⃣ DEVELOPMENT WORKFLOW - Helpful tools and automation
+# ============================================================================
+
+# 🪝 Pre-commit Configuration Reference
+# =====================================
+# 💡 Pre-commit runs checks automatically before each git commit
+#
+# 🚀 SETUP:
+#   make setup  (installs pre-commit hooks automatically)
+#
+# 📝 To create .pre-commit-config.yaml manually:
+#
+# repos:
+#   - repo: https://github.com/astral-sh/ruff-pre-commit
+#     rev: v0.1.6
+#     hooks:
+#       - id: ruff
+#         args: [--fix]
+#       - id: ruff-format
+#   - repo: https://github.com/pre-commit/mirrors-mypy
+#     rev: v1.6.1
+#     hooks:
+#       - id: mypy
+#         additional_dependencies: [types-all]
+
+# ============================================================================
+# 9️⃣ PACKAGE BUILDING - How to create installable PlantGuard packages
+# ============================================================================
+# 🎯 GOAL: Configure how Python packages PlantGuard for distribution
+#
+# 🚀 QUICK COMMANDS:
+#   make build   - Build package for distribution
+#   pip install -e .  - Install PlantGuard in development mode
 
 # 📦 Setuptools - Python packaging tool
 [tool.setuptools]

@@ -549,7 +549,8 @@ class ProductionTrainer:
 
             logger.info(f"Training completed in {total_time:.2f} seconds")
             logger.info(
-                f"Best validation loss: {self.state.best_val_loss:.6f} at epoch {self.state.best_epoch}"
+                f"Best validation loss: {self.state.best_val_loss:.6f} "
+                f"at epoch {self.state.best_epoch}"
             )
             logger.info(f"Best validation accuracy: {self.state.best_val_accuracy:.4f}")
 
@@ -1571,7 +1572,8 @@ class ProductionTrainer:
 
             logger.info(f"Training completed in {total_time:.2f} seconds")
             logger.info(
-                f"Best validation loss: {self.state.best_val_loss:.6f} at epoch {self.state.best_epoch}"
+                f"Best validation loss: {self.state.best_val_loss:.6f} "
+                f"at epoch {self.state.best_epoch}"
             )
             logger.info(f"Best validation accuracy: {self.state.best_val_accuracy:.4f}")
 
