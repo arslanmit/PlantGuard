@@ -1,34 +1,55 @@
-# =========================
-# Build System Configuration
-# =========================
+# ============================================================================
+# 🌿 PlantGuard - AI Plant Disease Detection System
+# ============================================================================
+# This file configures the entire PlantGuard project
+#
+# 🚀 QUICK START:
+#   make setup    - Install everything
+#   make run      - Launch the app
+#   make dev      - Development workflow
+#   make help     - See all commands
+#
+# 📝 SECTIONS:
+#   1. Build System    - How Python packages the project
+#   2. Project Info    - Name, version, description
+#   3. Dependencies    - What libraries we need
+#   4. Code Quality    - Formatting and linting rules
+#   5. Testing         - How tests are run
+#   6. Type Checking   - Static type analysis
+# ============================================================================
+
+# ============================================================================
+# 1️⃣ BUILD SYSTEM - How Python packages this project
+# ============================================================================
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
-# =========================
-# Project Metadata
-# =========================
+# ============================================================================
+# 2️⃣ PROJECT INFORMATION - Basic project details
+# ============================================================================
 [project]
 name = "plantguard"
 version = "0.1.0"
-description = "Multimodal plant disease detection system with offline ML inference"
+description = "🌿 AI-powered plant disease detection with Vision Transformer, MobileNet, and ResNet50 models"
 authors = [{ name = "PlantGuard Team", email = "umit.arslan@outlook.com" }]
-license = "MIT"
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.11"
+
+# 🏷️ Keywords for package discovery
 keywords = [
-  "plant",
-  "disease",
-  "detection",
-  "machine-learning",
-  "multimodal",
-  "computer-vision",
-  "agriculture",
+  "plant-disease", "computer-vision", "machine-learning",
+  "agriculture", "ai", "pytorch", "streamlit", "multimodal"
 ]
+
+# 📋 Package classifiers (for PyPI)
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Science/Research",
   "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -37,330 +58,990 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Image Processing",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Operating System :: OS Independent",
+  "Environment :: Web Environment",
 ]
 
-# Core dependencies organized by category
+# ============================================================================
+# 3️⃣ DEPENDENCIES - What libraries PlantGuard needs to work
+# ============================================================================
+# 💡 TIP: All versions are in requirements.txt - this is just the minimum needed
+
 dependencies = [
-  # Deep Learning Framework
-  "torch>=2.1.0",
-  "torchvision>=0.16.0",
-  "torchaudio>=2.1.0",
-  "torchmetrics>=1.2.0",
+  # 🧠 AI/ML Core - The brain of PlantGuard
+  "torch>=2.1.0",           # PyTorch - main ML framework
+  "torchvision>=0.16.0",    # Computer vision models
+  "torchaudio>=2.1.0",      # Audio processing
+  "torchmetrics>=1.2.0",    # ML metrics and evaluation
 
-  # Data Science & ML
-  "numpy>=1.24.0",
-  "pandas>=2.1.0",
-  "scikit-learn>=1.3.0",
+  # 📊 Data Processing - Handle numbers and data
+  "numpy>=1.24.0",          # Fast arrays and math
+  "pandas>=2.1.0",          # Data tables and analysis
+  "scikit-learn>=1.3.0",    # Traditional ML algorithms
 
-  # Computer Vision & Image Processing
-  "opencv-python-headless>=4.8.0",
-  "Pillow>=10.0.0",
+  # 👁️ Computer Vision - See and understand images
+  "opencv-python-headless>=4.8.0",  # Image processing (no GUI)
+  "Pillow>=10.0.0",                  # Image loading and basic editing
 
-  # NLP & Transformers
-  "transformers>=4.34.0",
-  "accelerate>=0.24.0",
-  "datasets>=2.14.0",
+  # 🤗 Hugging Face - Pre-trained AI models
+  "transformers>=4.34.0",   # Vision Transformer, BERT, etc.
+  "accelerate>=0.24.0",     # Fast model loading
+  "datasets>=2.14.0",       # Dataset handling
 
-  # Audio Processing
-  "librosa>=0.10.1",
-  "soundfile>=0.12.1",
-  "SpeechRecognition>=3.10.0",
+  # 🎵 Audio Processing - Hear and understand speech
+  "librosa>=0.10.1",        # Audio analysis
+  "soundfile>=0.12.1",      # Audio file reading/writing
+  "SpeechRecognition>=3.10.0",  # Speech-to-text
 
-  # Web UI & Deployment
-  "streamlit>=1.27.0",
-  "streamlit-webrtc>=0.47.0",
-  "pycloudflared>=0.2.0",
-  "pyngrok>=7.0.0",
+  # 🌐 Web Interface - The app you see in your browser
+  "streamlit>=1.27.0",      # Main web framework
+  "streamlit-webrtc>=0.47.0",  # Real-time audio/video
+  "pycloudflared>=0.2.0",   # HTTPS tunnels for microphone
+  "pyngrok>=7.0.0",         # Alternative tunneling
 
-  # Utilities
-  "python-dotenv>=1.0.0",
-  "tensorboard>=2.14.0",
+  # 🛠️ Utilities - Helper tools
+  "python-dotenv>=1.0.0",   # Environment variables (.env files)
+  "tensorboard>=2.14.0",    # Training visualization
 ]
+
+# ============================================================================
+# 📦 OPTIONAL DEPENDENCIES - Extra features you can install
+# ============================================================================
+# 💡 USAGE:
+#   pip install plantguard[dev]      - Development tools
+#   pip install plantguard[jupyter]  - Notebook support
+#   pip install plantguard[all]      - Everything
+#
+# 🚀 QUICK INSTALL: make setup (installs everything automatically)
 
 [project.optional-dependencies]
-# Development tools
+
+# 🛠️ Development Tools - For coding and maintaining PlantGuard
 dev = [
-  "ruff>=0.1.0",
-  "mypy>=1.6.0",
-  "pytest>=7.4.0",
-  "pytest-cov>=4.1.0",
-  "pytest-mock>=3.12.0",
-  "bandit>=1.7.5",
-  "safety>=3.0.0",
-  "pre-commit>=3.0.0",
+  "ruff>=0.1.0",           # ⚡ Super fast Python linter & formatter
+  "mypy>=1.6.0",           # 🔍 Type checking (catches bugs early)
+  "pytest>=7.4.0",        # 🧪 Testing framework
+  "pytest-cov>=4.1.0",    # 📊 Test coverage reports
+  "pytest-mock>=3.12.0",  # 🎭 Mock objects for testing
+  "bandit>=1.7.5",        # 🔒 Security vulnerability scanner
+  "safety>=3.0.0",        # 🛡️ Check for known security issues
+  "pre-commit>=3.0.0",    # 🪝 Git hooks for code quality
 ]
 
-# Documentation tools
-docs = ["sphinx>=7.0.0", "sphinx-rtd-theme>=2.0.0", "myst-parser>=2.0.0"]
+# 📚 Documentation Tools - Generate beautiful docs
+docs = [
+  "sphinx>=7.0.0",         # 📖 Documentation generator
+  "sphinx-rtd-theme>=2.0.0",  # 🎨 Read the Docs theme
+  "myst-parser>=2.0.0",    # 📝 Markdown support in Sphinx
+]
 
-# Jupyter and analysis tools
+# 📓 Jupyter & Analysis - Interactive development
 jupyter = [
-  "jupyter>=1.0.0",
-  "ipykernel>=6.25.0",
-  "matplotlib>=3.7.0",
-  "seaborn>=0.12.0",
+  "jupyter>=1.0.0",        # 📓 Jupyter notebooks
+  "ipykernel>=6.25.0",     # 🐍 Python kernel for notebooks
+  "matplotlib>=3.7.0",     # 📈 Plotting and visualization
+  "seaborn>=0.12.0",       # 🎨 Beautiful statistical plots
+  "plotly>=5.0.0",         # 📊 Interactive plots
 ]
 
-# Training and experimentation
-training = ["wandb>=0.15.0", "optuna>=3.3.0", "tensorboard>=2.14.0"]
+# 🤖 ML Training & Experiments - Advanced ML features
+training = [
+  "wandb>=0.15.0",         # 📊 Experiment tracking (Weights & Biases)
+  "optuna>=3.3.0",        # 🎯 Hyperparameter optimization
+  "tensorboard>=2.14.0",   # 📈 Training visualization (already in main deps)
+]
 
-# All optional dependencies
-all = ["plantguard[dev,docs,jupyter,training]"]
+# 🎯 Quick Install Options
+all = ["plantguard[dev,docs,jupyter,training]"]  # Everything
+basic = ["plantguard[jupyter]"]                  # Just notebooks
+full-dev = ["plantguard[dev,docs,jupyter]"]      # Development without ML extras
 
+# 🔗 Project Links - Where to find more info
 [project.urls]
-Homepage = "https://github.com/arslanmit/PlantGuard"
-Repository = "https://github.com/arslanmit/PlantGuard"
-Issues = "https://github.com/arslanmit/PlantGuard/issues"
-Documentation = "https://github.com/arslanmit/PlantGuard/wiki"
-Changelog = "https://github.com/arslanmit/PlantGuard/releases"
+"🏠 Homepage" = "https://github.com/arslanmit/PlantGuard"
+"📂 Source Code" = "https://github.com/arslanmit/PlantGuard"
+"🐛 Bug Reports" = "https://github.com/arslanmit/PlantGuard/issues"
+"📖 Documentation" = "https://github.com/arslanmit/PlantGuard/wiki"
+"📋 Changelog" = "https://github.com/arslanmit/PlantGuard/releases"
+"🚀 Try in Colab" = "https://colab.research.google.com/github/arslanmit/PlantGuard/blob/main/notebooks/PlantGuard.ipynb"
 
+# 🖥️ Command Line Tools - Run PlantGuard from terminal
 [project.scripts]
-plantguard = "plantguard.cli:main"
-plantguard-train = "plantguard.training:main"
+plantguard = "src.plantguard_bot:main"           # Main CLI interface
+plantguard-train = "src.training.production_trainer:main"  # Training CLI
 
-# =========================
-# Ruff Configuration - Modern Python Linter & Formatter
-# =========================
+# ============================================================================
+# 4️⃣ CODE QUALITY - Keep code clean and consistent
+# ============================================================================
+# 🎯 GOAL: Make code readable, consistent, and bug-free
+#
+# 🚀 QUICK COMMANDS:
+#   make format  - Auto-fix formatting
+#   make lint    - Check for issues
+#   make fix     - Auto-fix what we can
+#   make dev     - Do both format + lint
+
+# ⚡ RUFF - Super fast Python linter and formatter (replaces Black, isort, flake8)
 [tool.ruff]
-line-length = 100
-target-version = "py311"  # Support Python 3.11+ for broader compatibility
-fix = true
-show-fixes = true
-output-format = "grouped"
+line-length = 100              # 📏 Max characters per line (ADHD-friendly: not too long)
+target-version = "py311"       # 🐍 Python version we support
+fix = true                     # 🔧 Auto-fix issues when possible
+show-fixes = true              # 📝 Show what was fixed
+output-format = "grouped"      # 📊 Group similar issues together
 
+# 🔍 What Ruff checks for (the rules we follow)
+# 💡 TIP: Add # before any rule to deactivate it, remove # to activate
 [tool.ruff.lint]
-# Comprehensive rule selection for high code quality
 select = [
-  # Core Python rules
-  "E", # pycodestyle errors
-  "F", # pyflakes
-  #"W", # pycodestyle warnings
-  "I", # isort - import sorting
+  # ============================================================================
+  # 🐍 CORE PYTHON RULES - The absolute basics everyone should follow
+  # ============================================================================
+  "E",   # pycodestyle errors (spacing, indentation, line length)
+  "F",   # pyflakes (unused imports, undefined variables, syntax errors)
+  "I",   # isort (organize imports nicely by category)
 
-  # Code quality and best practices
-  "B",   # flake8-bugbear - common bugs
-  "A",   # flake8-builtins - builtin shadowing
-  "C4",  # flake8-comprehensions
-  "PIE", # flake8-pie - misc improvements
-  "SIM", # flake8-simplify
-  "UP",  # pyupgrade - modern Python syntax
+  # ============================================================================
+  # 🐛 BUG PREVENTION - Catch common Python mistakes and gotchas
+  # ============================================================================
+  "B",   # flake8-bugbear (common Python gotchas and anti-patterns)
+  "A",   # flake8-builtins (don't shadow built-ins like 'list', 'dict')
+  "C4",  # flake8-comprehensions (better list/dict comprehensions)
+  "PIE", # flake8-pie (miscellaneous improvements and simplifications)
+  "SIM", # flake8-simplify (simpler, more readable code patterns)
+  "UP",  # pyupgrade (modern Python syntax, f-strings, type hints)
 
-  # Type annotations and documentation
-  "ANN", # flake8-annotations
-  "D",   # pydocstyle - docstring conventions
+  # ============================================================================
+  # 📝 DOCUMENTATION & TYPE SAFETY - Make code self-documenting
+  # ============================================================================
+  "ANN", # flake8-annotations (type hints for functions and variables)
+  "D",   # pydocstyle (docstring style and completeness)
 
-  # Security and error handling
-  "S",   # flake8-bandit - security
-  "BLE", # flake8-blind-except
-  "TRY", # tryceratops - exception handling
+  # ============================================================================
+  # 🔒 SECURITY & ERROR HANDLING - Keep code safe and robust
+  # ============================================================================
+  "S",   # flake8-bandit (security vulnerabilities and unsafe patterns)
+  "BLE", # flake8-blind-except (catch specific exceptions, not bare except)
+  "TRY", # tryceratops (better exception handling patterns)
 
-  # Code complexity and maintainability
-  "C90", # mccabe - complexity
-  "PLR", # pylint refactor
-  "PLW", # pylint warnings
-  "PLE", # pylint errors
+  # ============================================================================
+  # 🧠 CODE COMPLEXITY - Keep it simple and maintainable (ADHD-friendly!)
+  # ============================================================================
+  "C90", # mccabe (cyclomatic complexity - how many paths through functions)
+  "PLR", # pylint refactor (code structure, complexity, design issues)
+  "PLW", # pylint warnings (potential bugs, unused variables, etc.)
+  "PLE", # pylint errors (definite bugs and errors)
 
-  # Modern Python practices
-  "PTH", # flake8-use-pathlib
-  "RUF", # ruff-specific rules
+  # ============================================================================
+  # 🚀 MODERN PYTHON - Use the latest best practices and features
+  # ============================================================================
+  "PTH", # flake8-use-pathlib (use pathlib.Path instead of os.path)
+  "RUF", # ruff-specific rules (unique to Ruff linter)
 
-  # Performance
-  "PERF", # perflint
+  # ============================================================================
+  # ⚡ PERFORMANCE - Make code faster and more efficient
+  # ============================================================================
+  "PERF", # perflint (performance improvements and optimizations)
 
-  # Import organization
-  "TID", # flake8-tidy-imports
+  # ============================================================================
+  # 📦 IMPORT & CODE ORGANIZATION - Clean, organized, readable code
+  # ============================================================================
+  "TID", # flake8-tidy-imports (import organization and banned imports)
 
-  # Logging and print statements
-  "G",   # flake8-logging-format
-  "T20", # flake8-print
+  # ============================================================================
+  # 🖨️ LOGGING & OUTPUT - Proper logging instead of print statements
+  # ============================================================================
+  "G",   # flake8-logging-format (proper logging format and usage)
+  "T20", # flake8-print (discourage print(), encourage logging)
+
+  # ============================================================================
+  # 🔧 ADDITIONAL RULE CATEGORIES - Expand as needed
+  # ============================================================================
+  # 💡 Add more rule categories here as they become available
+  # Check https://docs.astral.sh/ruff/rules/ for the latest rules
+
+  # 🎯 ASYNC & CONCURRENCY - Async/await patterns
+  # "ASYNC", # flake8-async (async/await best practices) - Future rule category
+
+  # 🔄 REFACTORING - Code improvement suggestions
+  # "FURB", # refurb (modernize and improve Python code) - Available in newer Ruff versions
+
+  # 🧪 TESTING - Test code quality
+  # "PT",  # flake8-pytest-style (pytest best practices)
+
+  # 📊 DATA SCIENCE - NumPy, Pandas, etc.
+  # "NPY", # numpy-specific rules - Future rule category
+  # "PD",  # pandas-vet (pandas best practices) - Available in some Ruff versions
+
+  # 🌐 WEB DEVELOPMENT - Django, Flask, etc.
+  # "DJ",  # flake8-django (Django best practices) - Available in some Ruff versions
+
+  # 🔐 CRYPTOGRAPHY - Secure crypto usage
+  # "CRYPT", # cryptography best practices - Future rule category
+
+  # 📝 DOCUMENTATION GENERATION - Sphinx, etc.
+  # "DOC", # documentation generation rules - Future rule category
+
+  # 🎨 CODE STYLE - Additional style rules
+  # "COM", # flake8-commas (trailing commas) - Available in some Ruff versions
+  # "Q",   # flake8-quotes (quote style consistency) - Available in some Ruff versions
+
+  # 🔍 CODE ANALYSIS - Advanced analysis
+  # "ERA", # eradicate (commented-out code) - Available in some Ruff versions
+  # "FBT", # flake8-boolean-trap (boolean trap anti-pattern) - Available in some Ruff versions
+
+  # 🏗️ ARCHITECTURE - Code architecture patterns
+  # "ARG", # flake8-unused-arguments (unused function arguments) - Available in some Ruff versions
+  # "PTH", # Already included above - pathlib usage
+
+  # 🔄 COMPATIBILITY - Python version compatibility
+  # "YTT", # flake8-2020 (Python 2/3 compatibility) - Available in some Ruff versions
+
+  # ============================================================================
+  # 📋 RULE ACTIVATION EXAMPLES - How to control individual rules
+  # ============================================================================
+  #
+  # 🎯 TO ACTIVATE A SPECIFIC RULE CATEGORY:
+  # Just add it to the list above, like: "PT",  # pytest rules
+  #
+  # 🎯 TO ACTIVATE ONLY SPECIFIC RULES FROM A CATEGORY:
+  # Instead of "B", use specific codes like:
+  # "B001", "B002", "B007",  # only these bugbear rules
+  #
+  # 🎯 TO DEACTIVATE A RULE CATEGORY:
+  # Add # before it: # "D",  # disable all docstring rules
+  #
+  # 🎯 EXAMPLES OF GRANULAR CONTROL:
+  # "E501",    # line too long (if you want only this E rule)
+  # "F401",    # unused import (if you want only this F rule)
+  # "B007",    # unused loop variable (if you want only this B rule)
+  # "ANN001",  # missing type annotation (if you want only this ANN rule)
+  #
+  # 🎯 MIX AND MATCH:
+  # You can combine categories and specific rules:
+  # "E",       # all pycodestyle errors
+  # "F401",    # but only this specific pyflakes rule
+  # "B007",    # and only this specific bugbear rule
 ]
 
-# Ignore rules that don't fit this project (grouped by plugin)
+# 🚫 Rules we ignore (because they don't fit PlantGuard or are too strict)
+# 💡 TIP: Add # before any rule to activate it, remove # to deactivate
 ignore = [
-  # pycodestyle (E)
-  "E203",  # whitespace before ':' — conflicts with Black
-  "E501",  # line length — Black handles wrapping
-  # pydocstyle (D)
-  "D100",  # missing docstring in public module
-  "D102",  # missing docstring in public method
-  "D103",  # missing docstring in public function
-  "D104",  # missing docstring in public package
-  "D107",  # missing docstring in __init__
+  # ============================================================================
+  # 📏 PYCODESTYLE ERRORS (E) - Code formatting and style
+  # ============================================================================
+  # "E101",   # indentation contains mixed spaces and tabs
+  # "E111",   # indentation is not a multiple of four
+  # "E112",   # expected an indented block
+  # "E113",   # unexpected indentation
+  # "E114",   # indentation is not a multiple of four (comment)
+  # "E115",   # expected an indented block (comment)
+  # "E116",   # unexpected indentation (comment)
+  # "E117",   # over-indented
+  # "E121",   # continuation line under-indented for hanging indent
+  # "E122",   # continuation line missing indentation or outdented
+  # "E123",   # closing bracket does not match indentation of opening bracket's line
+  # "E124",   # closing bracket does not match visual indentation
+  # "E125",   # continuation line with same indent as next logical line
+  # "E126",   # continuation line over-indented for hanging indent
+  # "E127",   # continuation line over-indented for visual indent
+  # "E128",   # continuation line under-indented for visual indent
+  # "E129",   # visually indented line with same indent as next logical line
+  # "E131",   # continuation line unaligned for hanging indent
+  # "E133",   # closing bracket is missing indentation
+  # "E201",   # whitespace after '('
+  # "E202",   # whitespace before ')'
+  # "E203",   # whitespace before ':' (conflicts with formatter)
+  # "E204",   # whitespace after ','
+  # "E211",   # whitespace before '('
+  # "E212",   # whitespace before ']'
+  # "E213",   # whitespace before ':'
+  # "E214",   # whitespace before ']'
+  # "E215",   # whitespace before '}'
+  # "E221",   # multiple spaces before operator
+  # "E222",   # multiple spaces after operator
+  # "E223",   # tab before operator
+  # "E224",   # tab after operator
+  # "E225",   # missing whitespace around operator
+  # "E226",   # missing whitespace around arithmetic operator
+  # "E227",   # missing whitespace around bitwise or shift operator
+  # "E228",   # missing whitespace around modulo operator
+  # "E231",   # missing whitespace after ','
+  # "E241",   # multiple spaces after ','
+  # "E242",   # tab after ','
+  # "E251",   # unexpected spaces around keyword / parameter equals
+  # "E261",   # at least two spaces before inline comment
+  # "E262",   # inline comment should start with '# '
+  # "E265",   # block comment should start with '# '
+  # "E266",   # too many leading '#' for block comment
+  # "E271",   # multiple spaces after keyword
+  # "E272",   # multiple spaces before keyword
+  # "E273",   # tab after keyword
+  # "E274",   # tab before keyword
+  # "E275",   # missing whitespace after keyword
+  "E501",   # line too long (we set line-length above)
+  # "E502",   # the backslash is redundant between brackets
+  # "E701",   # multiple statements on one line (colon)
+  # "E702",   # multiple statements on one line (semicolon)
+  # "E703",   # statement ends with a semicolon
+  # "E711",   # comparison to None should be 'if cond is None:'
+  # "E712",   # comparison to True should be 'if cond is True:' or 'if cond:'
+  # "E713",   # test for membership should be 'not in'
+  # "E714",   # test for object identity should be 'is not'
+  # "E721",   # do not compare types, use 'isinstance()'
+  "E722",   # do not use bare 'except' (ML code needs flexible error handling)
+  # "E731",   # do not assign a lambda expression, use a def
+  # "E741",   # ambiguous variable name 'l'
+  # "E742",   # ambiguous variable name 'O'
+  # "E743",   # ambiguous variable name 'I'
 
-  # flake8-bugbear (B)
-  "B904",  # allow 'raise ...' without explicit 'from'
+  # ============================================================================
+  # 🔥 PYFLAKES (F) - Logical errors and unused code
+  # ============================================================================
+  # "F401",   # module imported but unused
+  # "F402",   # import module from line N shadowed by loop variable
+  # "F403",   # 'from module import *' used; unable to detect undefined names
+  # "F404",   # future import(s) name after other statements
+  # "F405",   # name may be undefined, or defined from star imports: module
+  # "F501",   # invalid % format string
+  # "F502",   # % format expected mapping but got sequence
+  # "F503",   # % format expected sequence but got mapping
+  # "F504",   # % format unused named arguments
+  # "F505",   # % format missing named arguments
+  # "F506",   # % format mixed positional and named arguments
+  # "F507",   # % format mismatch of placeholder and argument count
+  # "F508",   # % format with * specifier requires sequence
+  # "F509",   # % format with unsupported format character
+  # "F521",   # .format(...) invalid format string
+  # "F522",   # .format(...) unused named arguments
+  # "F523",   # .format(...) unused positional arguments
+  # "F524",   # .format(...) missing named arguments
+  # "F525",   # .format(...) mixing automatic and manual numbering
+  # "F541",   # f-string is missing placeholders
+  # "F601",   # dictionary key name repeated
+  # "F602",   # dictionary key variable name repeated
+  # "F621",   # too many expressions on the left hand side of an augmented assignment
+  # "F622",   # two or more starred expressions in an assignment (SyntaxError)
+  # "F631",   # assertion test is a tuple, which are always True
+  # "F632",   # use ==/!= to compare str, bytes, and int literals
+  # "F633",   # use of >> is invalid with print function
+  # "F634",   # if test is a tuple, which is always True
+  # "F701",   # a break statement outside of a while or for loop
+  # "F702",   # a continue statement outside of a while or for loop
+  # "F704",   # a yield expression outside of a function
+  # "F706",   # a return statement outside of a function/method
+  # "F707",   # an except: block as not the last exception handler
+  # "F722",   # syntax error in forward annotation
+  # "F811",   # redefinition of unused name from line N
+  "F821",   # undefined name (can happen with dynamic imports)
+  # "F822",   # undefined name name in __all__
+  "F823",   # local variable referenced before assignment
+  # "F831",   # duplicate argument name in function definition
+  "F841",   # unused variables (common during development)
+  # "F901",   # raise NotImplemented should be raise NotImplementedError
 
-  # flake8-logging-format (G)
-  "G004",  # allow f-strings in logging
+  # ============================================================================
+  # 🐛 FLAKE8-BUGBEAR (B) - Common Python gotchas and bugs
+  # ============================================================================
+  # "B002",   # Python does not support the unary prefix increment
+  # "B003",   # assigning to os.environ doesn't clear the environment
+  # "B004",   # using hasattr(x, '__call__') to test if x is callable is unreliable
+  # "B005",   # using .strip() with multi-character strings is misleading
+  # "B006",   # do not use mutable data structures for argument defaults
+  "B007",   # loop control variable not used within the loop body (common in ML)
+  # "B008",   # do not perform function calls in argument defaults
+  # "B009",   # do not call getattr with a constant attribute value
+  # "B010",   # do not call setattr with a constant attribute value
+  # "B011",   # do not call assert False since python -O removes these calls
+  # "B012",   # use of break, continue or return inside finally blocks
+  # "B013",   # a length-one tuple literal is redundant
+  # "B014",   # exception handler is an exception group
+  # "B015",   # pointless comparison
+  # "B016",   # cannot raise a literal
+  # "B017",   # assertRaises(Exception) should be considered evil
+  "B018",   # found useless expression (sometimes needed for side effects)
+  # "B019",   # use of assert detected
+  # "B020",   # loop control variable overrides iterable it iterates
+  # "B021",   # f-string used as docstring
+  # "B022",   # no arguments passed to contextmanager
+  # "B023",   # function definition does not bind loop variable
+  # "B024",   # abstract base class with no abstract methods
+  # "B025",   # duplicate try block exception handler
+  # "B026",   # star-arg unpacking after a keyword argument is strongly discouraged
+  # "B027",   # empty method in an abstract base class
+  # "B028",   # no explicit stacklevel keyword argument found
+  # "B029",   # using except (...): with an empty tuple does not catch anything
+  # "B030",   # except handlers should only be exception classes or tuples of exception classes
+  # "B031",   # using itertools.groupby without explicitly sorting first
+  # "B032",   # possible unintentional type annotation (use =)
+  # "B033",   # duplicate value in set
+  # "B034",   # re.sub called with positional arguments
+  # "B035",   # found except clause that may not bind an exception
+  # "B901",   # using return x in a generator function used to be syntactically invalid
+  # "B902",   # blind except Exception: statement
+  # "B903",   # data class should use __slots__
+  "B904",   # allow 'raise ...' without explicit 'from' (common in ML)
+  # "B905",   # zip() without an explicit strict= parameter
 
-  # Security / flake8-bandit (S)
-  "S101",  # allow assert in non-critical code
+  # ============================================================================
+  # 🔤 FLAKE8-BUILTINS (A) - Builtin shadowing
+  # ============================================================================
+  # "A001",   # variable is shadowing a python builtin
+  # "A002",   # argument is shadowing a python builtin
+  # "A003",   # class attribute is shadowing a python builtin
+  # "A004",   # import is shadowing a python builtin
+  # "A005",   # module is shadowing a python builtin
+  # "A006",   # variable is shadowing a python builtin in a nested scope
 
-  "S110",  # allow broad except patterns where intentional
-  "S603",  # subprocess check handled by code review
-  "S607",  # partial/relative path in subprocess allowed
+  # ============================================================================
+  # 🔄 FLAKE8-COMPREHENSIONS (C4) - List/dict comprehension improvements
+  # ============================================================================
+  # "C400",   # unnecessary generator (rewrite as a list comprehension)
+  # "C401",   # unnecessary generator (rewrite as a set comprehension)
+  # "C402",   # unnecessary generator (rewrite as a dict comprehension)
+  # "C403",   # unnecessary list comprehension (rewrite as a set comprehension)
+  # "C404",   # unnecessary list comprehension (rewrite as a dict comprehension)
+  # "C405",   # unnecessary literal (rewrite as a set literal)
+  # "C406",   # unnecessary literal (rewrite as a dict literal)
+  # "C408",   # unnecessary dict call (rewrite as a literal)
+  # "C409",   # unnecessary list passed to tuple() (rewrite as a tuple literal)
+  # "C410",   # unnecessary list passed to list() (remove the outer call to list())
+  # "C411",   # unnecessary list call (remove the outer call to list())
+  # "C413",   # unnecessary reversed call around sorted()
+  # "C414",   # unnecessary double cast
+  # "C415",   # unnecessary subscript reversal of iterable
+  # "C416",   # unnecessary list comprehension (rewrite using list())
+  # "C417",   # unnecessary map usage (rewrite using a generator expression)
+  # "C418",   # unnecessary dict literal passed to dict() (remove the outer call)
+  # "C419",   # unnecessary list comprehension
 
-  # flake8-annotations (ANN)
-  "ANN001", # arg annotations not required everywhere
-  "ANN201", # return annotations not required everywhere
-  "ANN401",
+  # ============================================================================
+  # 🧠 MCCABE (C90) - Cyclomatic complexity
+  # ============================================================================
+  "C901",   # function is too complex (ML functions can be complex)
 
-  # flake8-blind-except (BLE)
+  # ============================================================================
+  # 📝 PYDOCSTYLE (D) - Documentation style
+  # ============================================================================
+  "D100",   # missing docstring in public module
+  # "D101",   # missing docstring in public class
+  "D102",   # missing docstring in public method
+  "D103",   # missing docstring in public function
+  "D104",   # missing docstring in public package
+  # "D105",   # missing docstring in magic method
+  # "D106",   # missing docstring in public nested class
+  "D107",   # missing docstring in __init__
+  # "D200",   # one-line docstring should fit on one line with quotes
+  # "D201",   # no blank lines allowed before function docstring
+  # "D202",   # no blank lines allowed after function docstring
+  # "D203",   # 1 blank line required before class docstring
+  # "D204",   # 1 blank line required after class docstring
+  # "D205",   # 1 blank line required between summary line and description
+  # "D206",   # docstring should be indented with spaces, not tabs
+  # "D207",   # docstring is under-indented
+  # "D208",   # docstring is over-indented
+  # "D209",   # multi-line docstring closing quotes should be on a separate line
+  # "D210",   # no whitespaces allowed surrounding docstring text
+  # "D211",   # no blank lines allowed before class docstring
+  # "D212",   # multi-line docstring summary should start at the first line
+  # "D213",   # multi-line docstring summary should start at the second line
+  # "D214",   # section is over-indented
+  # "D215",   # section underline is over-indented
+  # "D300",   # use """triple double quotes"""
+  # "D301",   # use r""" if any backslashes in a docstring
+  # "D400",   # first line should end with a period
+  # "D401",   # first line should be in imperative mood
+  # "D402",   # first line should not be the function's signature
+  # "D403",   # first word of the first line should be properly capitalized
+  # "D404",   # first word of the docstring should not be This
+  # "D405",   # section name should be properly capitalized
+  # "D406",   # section name should end with a newline
+  # "D407",   # missing dashed underline after section
+  # "D408",   # section underline should be in the line following the section's name
+  # "D409",   # section underline should match the length of its name
+  # "D410",   # missing blank line after section
+  # "D411",   # missing blank line before section
+  # "D412",   # no blank lines allowed between a section header and its content
+  # "D413",   # missing blank line after last section
+  # "D414",   # section has no content
+  # "D415",   # first line should end with a period, question mark, or exclamation point
+  # "D416",   # section name should end with a colon
+  # "D417",   # missing argument descriptions in the docstring
+
+  # ============================================================================
+  # 🔒 FLAKE8-BANDIT (S) - Security issues
+  # ============================================================================
+  "S101",   # allow assert statements (useful for debugging)
+  # "S102",   # exec used
+  # "S103",   # set-bad-file-permissions
+  # "S104",   # hardcoded-bind-all-interfaces
+  # "S105",   # hardcoded-password-string
+  # "S106",   # hardcoded-password-funcarg
+  # "S107",   # hardcoded-password-default
+  # "S108",   # hardcoded-temp-file
+  # "S110",   # try-except-pass
+  "S110",   # allow broad except patterns (ML models can fail in many ways)
+  # "S112",   # try-except-continue
+  # "S113",   # request-without-timeout
+  # "S201",   # flask-debug-true
+  # "S202",   # tarfile-unsafe-members
+  # "S301",   # pickle
+  # "S302",   # marshal
+  # "S303",   # md5
+  # "S304",   # insecure-cipher
+  # "S305",   # insecure-cipher-mode
+  # "S306",   # insecure-cipher-mode-ecb
+  # "S307",   # insecure-cipher-mode-cbc
+  # "S308",   # mark-safe
+  # "S310",   # urllib-urlopen
+  # "S311",   # random
+  # "S312",   # telnetlib
+  # "S313",   # xml-bad-cElementTree
+  # "S314",   # xml-bad-ElementTree
+  # "S315",   # xml-bad-expatreader
+  # "S316",   # xml-bad-expatbuilder
+  # "S317",   # xml-bad-sax
+  # "S318",   # xml-bad-minidom
+  # "S319",   # xml-bad-pulldom
+  # "S320",   # xml-bad-etree
+  # "S321",   # ftplib
+  # "S322",   # input
+  # "S323",   # unverified-context
+  # "S324",   # insecure-hash-function
+  # "S401",   # import-telnetlib
+  # "S402",   # import-ftplib
+  # "S403",   # import-pickle
+  # "S404",   # import-subprocess
+  # "S405",   # import-xml-etree
+  # "S406",   # import-xml-sax
+  # "S407",   # import-xml-expat
+  # "S408",   # import-xml-minidom
+  # "S409",   # import-xml-pulldom
+  # "S410",   # import-lxml
+  # "S411",   # import-xmlrpclib
+  # "S412",   # import-httpoxy
+  # "S413",   # import-pycrypto
+  # "S501",   # request-with-no-cert-validation
+  # "S502",   # ssl-insecure-version
+  # "S503",   # ssl-bad-defaults
+  # "S504",   # ssl-with-bad-version
+  # "S505",   # weak-cryptographic-key
+  # "S506",   # yaml-load
+  # "S507",   # ssh-no-host-key-verification
+  # "S508",   # snmp-insecure-version
+  # "S509",   # snmp-weak-cryptography
+  # "S601",   # paramiko-calls
+  # "S602",   # subprocess-popen-with-shell-equals-true
+  "S603",   # subprocess calls (needed for some ML tools)
+  # "S604",   # call-with-shell-equals-true
+  # "S605",   # start-process-with-a-shell
+  # "S606",   # start-process-with-no-shell
+  "S607",   # partial paths in subprocess (common in ML)
+  # "S608",   # hardcoded-sql-expression
+  # "S609",   # unix-command-wildcard-injection
+  # "S701",   # jinja2-autoescape-false
+  # "S702",   # use-of-mako-templates
+
+  # ============================================================================
+  # 🚨 FLAKE8-BLIND-EXCEPT (BLE) - Exception handling
+  # ============================================================================
   "BLE001", # allow catch-all Exception when justified
 
-  # Refactor / pylint-style (PLR/PLW)
-  "PLR0911",
+  # ============================================================================
+  # 📝 FLAKE8-ANNOTATIONS (ANN) - Type annotations
+  # ============================================================================
+  "ANN001", # function arguments don't need types everywhere
+  "ANN002", # missing type annotation for *args (gradual typing)
+  "ANN003", # missing type annotation for **kwargs (gradual typing)
+  "ANN101", # missing type annotation for self in method (not needed)
+  "ANN102", # missing type annotation for cls in classmethod (not needed)
+  "ANN201", # return types not required everywhere
+  # "ANN202", # missing return type annotation for private function
+  # "ANN204", # missing return type annotation for special method
+  # "ANN205", # missing return type annotation for staticmethod
+  # "ANN206", # missing return type annotation for classmethod
+  "ANN401", # allow Any type when needed
+
+  # ============================================================================
+  # 🖨️ FLAKE8-PRINT (T20) - Print statements
+  # ============================================================================
+  "T201",   # allow print() in CLI scripts and debugging
+  # "T203",   # pprint found
+
+  # ============================================================================
+  # 📊 FLAKE8-LOGGING-FORMAT (G) - Logging format
+  # ============================================================================
+  # "G001",   # logging .format() string
+  # "G002",   # logging % string
+  # "G003",   # logging + string
+  "G004",   # allow f-strings in logging (more readable)
+  # "G010",   # logging warn instead of warning
+  # "G101",   # logging extra not a dict
+  # "G201",   # logging .exception(...) should be logging.exception(...)
+  # "G202",   # logging .exception(...) should be logging.exception(...)
+
+  # ============================================================================
+  # 🔄 FLAKE8-PIE (PIE) - Miscellaneous improvements
+  # ============================================================================
+  # "PIE790", # unnecessary pass statement
+  # "PIE794", # duplicate class field definition
+  # "PIE796", # prefer unique enums
+  # "PIE800", # unnecessary spread **
+  # "PIE804", # unnecessary dict kwargs
+  # "PIE807", # prefer list() over useless lambda
+  # "PIE810", # single starts-with/ends-with
+
+  # ============================================================================
+  # 🔄 FLAKE8-SIMPLIFY (SIM) - Code simplification
+  # ============================================================================
+  "SIM102", # use ternary operator (sometimes if/else is clearer)
+  # "SIM103", # return condition directly
+  # "SIM106", # use ternary operator instead of if-else-block for simple variable assignments
+  # "SIM108", # use ternary operator instead of if-else-block that assigns a boolean
+  "SIM110", # use any(...) instead of for loop (sometimes explicit loops are clearer)
+  "SIM111", # use all(...) instead of for loop (sometimes explicit loops are clearer)
+  # "SIM112", # use CAPITAL_ENVIRONMENT_VARIABLES
+  # "SIM113", # use enumerate instead of manually incrementing a counter
+  # "SIM114", # combine if branches using logical or operator
+  # "SIM115", # use context handler for opening files
+  # "SIM116", # use dict.get(key, "default") instead of conditional assignment
+  # "SIM117", # use a single with-statement with multiple contexts instead of nested with-statements
+  # "SIM118", # use key in dict instead of key in dict.keys()
+  # "SIM201", # use != instead of not ==
+  # "SIM202", # use == instead of not !=
+  # "SIM208", # use != instead of not ==
+  # "SIM210", # use bool(...) instead of True if ... else False
+  # "SIM211", # use bool(...) instead of False if ... else True
+  # "SIM212", # use value if condition else other_value instead of other_value if not condition else value
+  # "SIM220", # use False instead of a == b and a != b
+  # "SIM221", # use True instead of a == b or a != b
+  # "SIM222", # use True instead of ... or True
+  # "SIM223", # use False instead of ... and False
+  # "SIM300", # yoda condition detected
+  # "SIM401", # use dict.get(key, "default") instead of conditional assignment
+
+  # ============================================================================
+  # 🚀 PYUPGRADE (UP) - Modern Python syntax
+  # ============================================================================
+  # "UP001",  # use {} instead of format()
+  # "UP003",  # use {} instead of format()
+  # "UP004",  # use {} instead of format()
+  # "UP005",  # use {} instead of format()
+  # "UP006",  # use {} instead of format()
+  # "UP007",  # use {} instead of format()
+  # "UP008",  # use super() instead of super(__class__, self)
+  # "UP009",  # use UTF-8 encoding declaration
+  # "UP010",  # use {} instead of format()
+  # "UP011",  # use {} instead of format()
+  # "UP012",  # use {} instead of format()
+  # "UP013",  # use {} instead of format()
+  # "UP014",  # use {} instead of format()
+  # "UP015",  # use {} instead of format()
+  # "UP017",  # use datetime.timezone.utc
+  # "UP018",  # use {} instead of format()
+  # "UP019",  # use {} instead of format()
+  # "UP020",  # use {} instead of format()
+  # "UP021",  # use {} instead of format()
+  # "UP022",  # use {} instead of format()
+  # "UP023",  # use {} instead of format()
+  # "UP024",  # use {} instead of format()
+  # "UP025",  # use {} instead of format()
+  # "UP026",  # use {} instead of format()
+  # "UP027",  # use {} instead of format()
+  # "UP028",  # use {} instead of format()
+  # "UP029",  # use {} instead of format()
+  # "UP030",  # use implicit references for positional format fields
+  # "UP031",  # use format specifiers instead of percent format
+  # "UP032",  # use f-string instead of format call
+  # "UP033",  # use {} instead of format()
+  # "UP034",  # use {} instead of format()
+  # "UP035",  # use {} instead of format()
+  # "UP036",  # use {} instead of format()
+  # "UP037",  # use {} instead of format()
+
+  # ============================================================================
+  # 🔄 TRYCERATOPS (TRY) - Exception handling improvements
+  # ============================================================================
+  "TRY003", # long exception messages are OK
+  # "TRY004", # prefer TypeError exception for invalid type
+  # "TRY100", # use logging.exception instead of logging.error
+  # "TRY101", # use raise from to specify exception cause
+  # "TRY200", # use raise without specifying exception name
+  # "TRY201", # use raise without specifying exception name
+  # "TRY300", # consider moving this statement to an else block
+  "TRY300", # don't require 'else' on 'try'
+  "TRY301", # don't require specific exception handling
+  # "TRY302", # useless try-except, consider removing or re-raising
+  "TRY400", # allow logging.error instead of logging.exception
+  "TRY401", # allow verbose logging
+
+  # ============================================================================
+  # 📁 FLAKE8-USE-PATHLIB (PTH) - Use pathlib instead of os.path
+  # ============================================================================
+  # "PTH100", # os.path.abspath() should be replaced by Path.resolve()
+  # "PTH101", # os.chmod() should be replaced by Path.chmod()
+  # "PTH102", # os.mkdir() should be replaced by Path.mkdir()
+  # "PTH103", # os.makedirs() should be replaced by Path.mkdir(parents=True)
+  # "PTH104", # os.rename() should be replaced by Path.rename()
+  # "PTH105", # os.replace() should be replaced by Path.replace()
+  # "PTH106", # os.rmdir() should be replaced by Path.rmdir()
+  # "PTH107", # os.remove() should be replaced by Path.unlink()
+  # "PTH108", # os.unlink() should be replaced by Path.unlink()
+  "PTH109", # prefer Path.cwd() (gradual migration)
+  "PTH110", # prefer Path.exists() (gradual migration)
+  # "PTH111", # os.path.expanduser() should be replaced by Path.expanduser()
+  # "PTH112", # os.path.isdir() should be replaced by Path.is_dir()
+  # "PTH113", # os.path.isfile() should be replaced by Path.is_file()
+  # "PTH114", # os.path.islink() should be replaced by Path.is_symlink()
+  # "PTH115", # os.path.readlink() should be replaced by Path.readlink()
+  # "PTH116", # os.stat() should be replaced by Path.stat()
+  # "PTH117", # os.path.isabs() should be replaced by Path.is_absolute()
+  "PTH118", # prefer Path '/' operator (gradual migration)
+  # "PTH119", # os.path.basename() should be replaced by Path.name
+  # "PTH120", # os.path.dirname() should be replaced by Path.parent
+  # "PTH121", # os.path.samefile() should be replaced by Path.samefile()
+  # "PTH122", # os.path.splitext() should be replaced by Path.suffix
+  "PTH123", # prefer Path.open() (gradual migration)
+  # "PTH124", # os.path.isdir() should be replaced by Path.is_dir()
+
+  # ============================================================================
+  # 🔧 RUFF-SPECIFIC (RUF) - Ruff-specific rules
+  # ============================================================================
+  # "RUF001", # ambiguous unicode character in string
+  # "RUF002", # ambiguous unicode character in docstring
+  # "RUF003", # ambiguous unicode character in comment
+  "RUF005", # consider iterable unpacking instead of concatenation (sometimes explicit is clearer)
+  # "RUF006", # store a reference to the return value of asyncio.create_task
+  # "RUF007", # prefer itertools.pairwise() over zip() when iterating over successive pairs
+  # "RUF008", # do not use mutable default values for dataclass fields
+  # "RUF009", # do not perform function call in dataclass defaults
+  # "RUF010", # use explicit conversion flag
+  # "RUF011", # ruff-static-key-dict-comprehension
+  # "RUF012", # mutable class attributes should be annotated with typing.ClassVar
+  # "RUF013", # PEP 484 prohibits implicit Optional
+  # "RUF100", # unused noqa directive
+
+  # ============================================================================
+  # ⚡ PERFLINT (PERF) - Performance improvements
+  # ============================================================================
+  # "PERF101", # do not cast an iterable to list before iterating over it
+  # "PERF102", # when using only the keys of a dict use the keys() method
+  "PERF203", # try-except within a loop incurs performance overhead (sometimes necessary in ML)
+  # "PERF401", # use a list comprehension to create a transformed list
+  # "PERF402", # use list or set comprehensions instead of for-loops
+  # "PERF403", # use dict comprehensions instead of for-loops
+
+  # ============================================================================
+  # 📦 FLAKE8-TIDY-IMPORTS (TID) - Import organization
+  # ============================================================================
+  # "TID251", # banned imports
+  # "TID252", # prefer absolute imports over relative imports
+
+  # ============================================================================
+  # 🧠 PYLINT (PL) - Code structure and logic
+  # ============================================================================
+  # PLR - Pylint Refactor
+  # "PLR0124", # name compared with itself
+  # "PLR0133", # two constants compared
+  # "PLR0206", # property with parameters
+  "PLR0402", # use from import instead of import (sometimes import is clearer)
+  "PLR0911", # too many return statements
   "PLR0912", # too many branches
-  "PLR0913", # too many arguments
+  "PLR0913", # too many arguments (ML functions need many params)
   "PLR0915", # too many statements
-  "PLR2004", # magic values in comparisons
-  "PLW2901",
-  "PLW0603", # global-statement used for assignment
+  # "PLR1701", # merge isinstance calls
+  # "PLR1722", # use sys.exit() instead of exit()
+  # "PLR1733", # unnecessary dictionary index lookup
+  # "PLR1736", # unnecessary list index lookup
+  "PLR2004", # magic values (ML has lots of constants)
+  # "PLR2044", # line with empty comment
+  # "PLR5501", # consider using elif instead of else if
 
-  # mccabe (C)
-  "C901",   # function too complex (handled by reviews)
+  # PLW - Pylint Warning
+  # "PLW0120", # else clause on loop without a break statement
+  "PLW0127", # self-assigning variable (sometimes used for type narrowing)
+  # "PLW0129", # assert on string literal
+  # "PLW0131", # named expression used without context
+  # "PLW0133", # exception statement has no effect
+  # "PLW0245", # super without brackets
+  # "PLW0406", # import self
+  # "PLW0602", # global variable not assigned
+  "PLW0603", # global variables (sometimes needed in ML)
+  # "PLW0604", # global at module level
+  # "PLW1508", # invalid envvar default
+  # "PLW1509", # subprocess-popen-preexec-fn
+  "PLW1510", # subprocess.run without explicit check (sometimes not needed)
+  "PLW1514", # unspecified encoding in open (gradual migration to explicit encoding)
+  # "PLW1641", # eq-without-hash
+  # "PLW2101", # useless-with-lock
+  # "PLW2901", # redefined-loop-name
+  "PLW2901", # for loop variable overwritten
+  # "PLW3301", # nested-min-max
 
-  # tryceratops (TRY)
-  "TRY003", # long exception message outside exception class
-  "TRY300", # prefer 'else' on 'try' — not enforced
-  "TRY301",
-  "TRY400", # prefer logging.exception — we allow logging.error
-  "TRY401",
+  # PLE - Pylint Error
+  # "PLE0101", # return in __init__
+  # "PLE0116", # continue in finally
+  # "PLE0117", # nonlocal without binding
+  # "PLE0118", # used prior global declaration
+  # "PLE0241", # duplicate bases
+  # "PLE0302", # unexpected special method signature
+  # "PLE0307", # invalid str return type
+  # "PLE0604", # invalid object in all
+  # "PLE0605", # invalid format for all
+  # "PLE1142", # await outside async function
+  # "PLE1205", # too many arguments for logging format string
+  # "PLE1206", # not enough arguments for logging format string
+  # "PLE1300", # unsupported format character
+  # "PLE1307", # bad string format type
+  # "PLE1310", # bad str strip arg
+  # "PLE1507", # invalid envvar value
+  # "PLE1700", # yield from in async generator
+  # "PLE2502", # contains duplicate key
+  # "PLE2510", # invalid unpack sequence
+  # "PLE2512", # invalid star expression target
+  # "PLE2513", # invalid star expression target
+  # "PLE2514", # invalid star expression target
+  # "PLE2515", # invalid star expression target
 
-  # pathlib (PTH)
-  "PTH109", # prefer Path.cwd()
-  "PTH110", # prefer Path.exists()
-  "PTH118", # prefer Path '/' operator over os.path.join
-  "PTH123", # prefer Path.open() over built-in open()
-
-  # pyflakes (F)
-  "F841",   # assigned but unused variable (ok in notebooks/tests)
-
-  # print statements (T)
-  "T201",   # allow print in CLIs and quick scripts
-
-  "SIM102",
-  "F823",
-  "F821"
+  # ============================================================================
+  # 🔧 ADDITIONAL CATEGORIES (Add more as needed)
+  # ============================================================================
+  # Add more rule categories here as Ruff adds new plugins
+  # Check https://docs.astral.sh/ruff/rules/ for the latest rules
 ]
 
-# Import sorting configuration
+# 📦 Import Organization - Keep imports clean and organized
 [tool.ruff.lint.isort]
+# 🏠 Our code (PlantGuard modules)
 known-first-party = ["plantguard", "src"]
+
+# 🌐 External libraries we use (organized by category for ADHD-friendly reading)
 known-third-party = [
-  "torch",
-  "torchvision",
-  "torchaudio",
-  "torchmetrics",
-  "numpy",
-  "pandas",
-  "sklearn",
-  "cv2",
-  "PIL",
-  "transformers",
-  "datasets",
-  "accelerate",
-  "librosa",
-  "soundfile",
-  "speech_recognition",
-  "streamlit",
-  "streamlit_webrtc",
-  "matplotlib",
-  "seaborn",
-  "plotly",
-  "pytest",
-  "wandb",
-  "optuna",
+  # 🧠 AI/ML Core
+  "torch", "torchvision", "torchaudio", "torchmetrics",
+
+  # 📊 Data Science
+  "numpy", "pandas", "sklearn",
+
+  # 👁️ Computer Vision
+  "cv2", "PIL",
+
+  # 🤗 Hugging Face
+  "transformers", "datasets", "accelerate",
+
+  # 🎵 Audio
+  "librosa", "soundfile", "speech_recognition",
+
+  # 🌐 Web Interface
+  "streamlit", "streamlit_webrtc",
+
+  # 📈 Visualization
+  "matplotlib", "seaborn", "plotly",
+
+  # 🧪 Testing & ML Tools
+  "pytest", "wandb", "optuna",
 ]
+
+# 📋 Import order (top to bottom in files)
 section-order = [
-  "future",
-  "standard-library",
-  "third-party",
-  "first-party",
-  "local-folder",
+  "future",          # from __future__ import ...
+  "standard-library", # Built-in Python modules (os, sys, etc.)
+  "third-party",     # External packages (torch, numpy, etc.)
+  "first-party",     # Our PlantGuard code
+  "local-folder",    # Relative imports (from . import ...)
 ]
-split-on-trailing-comma = true
-force-single-line = false
 
-# Docstring configuration
+split-on-trailing-comma = true  # Split long import lists nicely
+force-single-line = false       # Allow multiple imports per line when short
+
+# 📝 Documentation Style - How we write docstrings
 [tool.ruff.lint.pydocstyle]
-convention = "google" # Use Google-style docstrings
+convention = "google"  # Use Google-style docstrings (clear and readable)
 
-# Complexity limits
+# 🧠 Complexity Limits - Keep functions simple (ADHD-friendly!)
 [tool.ruff.lint.mccabe]
-max-complexity = 10
+max-complexity = 10    # Max cyclomatic complexity (how many paths through a function)
 
 [tool.ruff.lint.pylint]
-max-args = 8        # Increased for ML models
-max-branches = 12
-max-returns = 6
-max-statements = 50
+max-args = 8          # Max function arguments (ML functions need more params)
+max-branches = 12     # Max if/elif branches
+max-returns = 6       # Max return statements
+max-statements = 50   # Max lines in a function
 
-# Quote style
+# 📝 Quote Style - Consistent string quotes
 [tool.ruff.lint.flake8-quotes]
-inline-quotes = "double"
-multiline-quotes = "double"
-docstring-quotes = "double"
-avoid-escape = true
+inline-quotes = "double"      # Use "double quotes" for strings
+multiline-quotes = "double"   # Use """double quotes""" for multi-line
+docstring-quotes = "double"   # Use """double quotes""" for docstrings
+avoid-escape = true           # Avoid escaping quotes when possible
 
-# Type annotation enforcement
+# 🏷️ Type Annotations - Gradual typing approach
 [tool.ruff.lint.flake8-annotations]
-mypy-init-return = true
-suppress-dummy-args = true
-allow-star-arg-any = false
-ignore-fully-untyped = false
+mypy-init-return = true       # __init__ methods should return None
+suppress-dummy-args = true    # Don't require types for *args, **kwargs
+allow-star-arg-any = false    # Require specific types for *args
+ignore-fully-untyped = false # Check all functions, even without types
 
-# Security configuration
+# 🔒 Security Settings
 [tool.ruff.lint.flake8-bandit]
-check-typed-exception = true
+check-typed-exception = true  # Check exception handling
 
-# Formatter configuration
+# 🎨 Code Formatting - How code looks
 [tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-line-ending = "auto"
+quote-style = "double"    # Use "double quotes"
+indent-style = "space"    # Use spaces, not tabs
+line-ending = "auto"      # Auto-detect line endings (Windows/Mac/Linux)
 
-# =========================
-# MyPy - Static Type Checking
-# =========================
+# ============================================================================
+# 5️⃣ TYPE CHECKING - Catch bugs before they happen
+# ============================================================================
+# 🎯 GOAL: Find type-related bugs early (like using a string as a number)
+#
+# 🚀 QUICK COMMANDS:
+#   make type    - Check types
+#   make dev     - Includes type checking
+
+# 🔍 MyPy - Static type checker (finds bugs without running code)
 [tool.mypy]
-python_version = "3.11"
-strict = false                     # Gradual typing approach
-warn_return_any = true
-warn_unused_configs = true
-warn_redundant_casts = true
-warn_unused_ignores = false
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-ignore_missing_imports = true
+python_version = "3.11"           # 🐍 Python version we're using
+strict = false                    # 🎯 Gradual typing (not too strict while learning)
 
-# Exclude patterns
+# ⚠️ Warnings we want to see
+warn_return_any = true           # Warn when function returns 'Any' type
+warn_unused_configs = true       # Warn about unused MyPy settings
+warn_redundant_casts = true      # Warn about unnecessary type casts
+warn_unused_ignores = false      # Don't warn about unused # type: ignore
+warn_no_return = true            # Warn when function should return something
+warn_unreachable = true          # Warn about code that can't be reached
+strict_equality = true           # Strict checking for == and !=
+
+# 🏷️ Type annotation requirements
+disallow_untyped_defs = true     # Functions need type hints
+disallow_incomplete_defs = true  # All parameters need types
+check_untyped_defs = true        # Check functions even without types
+disallow_untyped_decorators = true  # Decorators need types
+no_implicit_optional = true      # Be explicit about Optional types
+
+# 📦 External libraries
+ignore_missing_imports = true    # Don't complain about missing library types
+
+# 🚫 Folders to skip (don't type-check these)
 exclude = [
-  "build/",
-  "dist/",
-  ".venv/",
-  ".git/",
-  "notebooks/",
-  "logs/",
-  "runs/",
-  ".kiro/",
-  "data/raw"
-
-
+  "build/",           # Build artifacts
+  "dist/",            # Distribution files
+  ".venv/",           # Virtual environment
+  ".git/",            # Git files
+  "notebooks/",       # Jupyter notebooks (different rules)
+  "logs/",            # Log files
+  "runs/",            # TensorBoard runs
+  ".kiro/",           # Kiro IDE files
+  "data/raw/",        # Raw data files
 ]
 
-# File-specific overrides
+# 🎯 Special rules for specific files/modules
 [[tool.mypy.overrides]]
 module = "src.ui.app_streamlit"
-disallow_untyped_decorators = false  # Allow @st.cache_resource without type annotations
+disallow_untyped_decorators = false  # Streamlit decorators don't need types
 
-# Temporarily relax strictness for newly-added core modules while stabilizing types
+# 🚧 Work in progress - relax rules for new modules while we add types
 [[tool.mypy.overrides]]
 module = [
   "src.core.model_manager",
@@ -368,109 +1049,148 @@ module = [
   "src.features.model_switching.model_manager",
   "src.features.model_switching.huggingface_vision",
 ]
-ignore_errors = true
+ignore_errors = true  # Skip type checking for now
 
-# Third-party library stubs
+# 📦 External libraries - ignore missing type information
 [[tool.mypy.overrides]]
 module = [
-  "torch.*",
-  "torchvision.*",
-  "torchaudio.*",
-  "torchmetrics.*",
+  # 🧠 AI/ML Libraries
+  "torch.*", "torchvision.*", "torchaudio.*", "torchmetrics.*",
+
+  # 👁️ Computer Vision
   "cv2.*",
-  "librosa.*",
-  "soundfile.*",
-  "streamlit.*",
-  "streamlit_webrtc.*",
-  "pycloudflared.*",
-  "pyngrok.*",
-  "speech_recognition.*",
-  "wandb.*",
-  "optuna.*",
+
+  # 🎵 Audio Processing
+  "librosa.*", "soundfile.*", "speech_recognition.*",
+
+  # 🌐 Web Interface
+  "streamlit.*", "streamlit_webrtc.*",
+
+  # 🔗 Networking
+  "pycloudflared.*", "pyngrok.*",
+
+  # 🤖 ML Tools
+  "wandb.*", "optuna.*",
 ]
 ignore_missing_imports = true
 
-# =========================
-# Pytest - Testing Framework
-# =========================
+# ============================================================================
+# 6️⃣ TESTING - Make sure everything works correctly
+# ============================================================================
+# 🎯 GOAL: Catch bugs and ensure PlantGuard works as expected
+#
+# 🚀 QUICK COMMANDS:
+#   make test     - Run all tests
+#   make coverage - See test coverage report
+
+# 🧪 Pytest - Testing framework (finds and runs tests)
 [tool.pytest.ini_options]
-minversion = "7.0"
+minversion = "7.0"                    # Minimum pytest version
+
+# 🔧 Test options (what pytest does when running)
 addopts = [
-  "-ra",
-  "--strict-markers",
-  "--strict-config",
-  "--cov=src",
-  "--cov-report=term-missing:skip-covered",
-  "--cov-report=html:htmlcov",
-  "--cov-report=xml",
-  "--cov-fail-under=80",
-]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-markers = [
-  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-  "integration: marks tests as integration tests",
-  "unit: marks tests as unit tests",
-  "gpu: marks tests that require GPU",
-]
-filterwarnings = [
-  "error",
-  "ignore::UserWarning",
-  "ignore::DeprecationWarning",
-  "ignore::PendingDeprecationWarning",
+  "-ra",                              # Show summary of all test results
+  "--strict-markers",                 # Only allow defined test markers
+  "--strict-config",                  # Strict configuration checking
+  "--cov=src",                        # Measure code coverage for src/ folder
+  "--cov-report=term-missing:skip-covered",  # Show missing lines in terminal
+  "--cov-report=html:htmlcov",        # Generate HTML coverage report
+  "--cov-report=xml",                 # Generate XML coverage report
+  "--cov-fail-under=80",              # Fail if coverage is below 80%
 ]
 
-# =========================
-# Coverage Configuration
-# =========================
+# 📁 Where to find tests and how to recognize them
+testpaths = ["tests"]                 # Look for tests in tests/ folder
+python_files = ["test_*.py", "*_test.py"]     # Files that contain tests
+python_classes = ["Test*"]            # Test classes start with "Test"
+python_functions = ["test_*"]         # Test functions start with "test_"
+
+# 🏷️ Test markers (categories for organizing tests)
+markers = [
+  "slow: marks tests as slow (skip with: pytest -m 'not slow')",
+  "integration: marks tests as integration tests (test multiple components)",
+  "unit: marks tests as unit tests (test single functions)",
+  "gpu: marks tests that require GPU (skip if no GPU available)",
+  "model: marks tests that require trained models",
+]
+
+# ⚠️ Warning filters (what warnings to show/hide)
+filterwarnings = [
+  "error",                            # Treat warnings as errors (strict)
+  "ignore::UserWarning",              # Ignore user warnings (common in ML)
+  "ignore::DeprecationWarning",       # Ignore deprecation warnings
+  "ignore::PendingDeprecationWarning", # Ignore pending deprecation warnings
+]
+
+# 📊 Test Coverage - How much of our code is tested
 [tool.coverage.run]
-source = ["src"]
-branch = true
+source = ["src"]                      # Measure coverage for src/ folder
+branch = true                         # Track branch coverage (if/else paths)
+
+# 🚫 Files to skip when measuring coverage
 omit = [
-  "*/tests/*",
-  "*/test_*",
-  "*/__pycache__/*",
-  "*/site-packages/*",
-  "setup.py",
+  "*/tests/*",                        # Don't measure test files themselves
+  "*/test_*",                         # Skip test files
+  "*/__pycache__/*",                  # Skip Python cache files
+  "*/site-packages/*",                # Skip external libraries
+  "setup.py",                         # Skip setup script
 ]
 
 [tool.coverage.report]
+# 🚫 Lines to exclude from coverage (code that doesn't need testing)
 exclude_lines = [
-  "pragma: no cover",
-  "def __repr__",
-  "if self.debug:",
-  "if settings.DEBUG",
-  "raise AssertionError",
-  "raise NotImplementedError",
-  "if 0:",
-  "if __name__ == .__main__.:",
-  "class .*\\bProtocol\\):",
-  "@(abc\\.)?abstractmethod",
+  "pragma: no cover",                 # Explicit exclusion comment
+  "def __repr__",                     # String representation methods
+  "if self.debug:",                   # Debug-only code
+  "if settings.DEBUG",                # Debug settings
+  "raise AssertionError",             # Assertion errors
+  "raise NotImplementedError",        # Not implemented methods
+  "if 0:",                            # Dead code
+  "if __name__ == .__main__.:",       # Script entry points
+  "class .*\\bProtocol\\):",          # Protocol classes
+  "@(abc\\.)?abstractmethod",         # Abstract methods
 ]
-show_missing = true
-skip_covered = true
+
+show_missing = true                   # Show which lines aren't covered
+skip_covered = true                   # Don't show fully covered files
 
 [tool.coverage.html]
-directory = "htmlcov"
+directory = "htmlcov"                 # Where to put HTML coverage report
 
-# =========================
-# Bandit - Security Linting
-# =========================
+# ============================================================================
+# 7️⃣ SECURITY - Keep PlantGuard safe from vulnerabilities
+# ============================================================================
+# 🎯 GOAL: Find potential security issues in code
+#
+# 🚀 QUICK COMMANDS:
+#   make security - Run security scan
+
+# 🔒 Bandit - Security linter (finds potential security issues)
 [tool.bandit]
+# 🚫 Folders to skip during security scan
 exclude_dirs = ["tests", "build", "dist", ".venv"]
+
+# 🚫 Security checks to skip (because they're OK for PlantGuard)
 skips = [
-  "B101",  # assert_used
-  "B601",  # shell_injection
-  "B614",  # pytorch_load (acceptable for local trusted weights)
-  "B615",  # huggingface_unsafe_download (managed via model config)
+  "B101",  # assert statements (OK for debugging and development)
+  "B601",  # shell injection (we control the shell commands)
+  "B614",  # PyTorch model loading (we trust our local model files)
+  "B615",  # Hugging Face downloads (managed through our model config)
 ]
 
-# =========================
-# Pre-commit Configuration Reference
-# =========================
-# Create .pre-commit-config.yaml with:
+# ============================================================================
+# 8️⃣ DEVELOPMENT WORKFLOW - Helpful tools and automation
+# ============================================================================
+
+# 🪝 Pre-commit Configuration Reference
+# =====================================
+# 💡 Pre-commit runs checks automatically before each git commit
+#
+# 🚀 SETUP:
+#   make setup  (installs pre-commit hooks automatically)
+#
+# 📝 To create .pre-commit-config.yaml manually:
+#
 # repos:
 #   - repo: https://github.com/astral-sh/ruff-pre-commit
 #     rev: v0.1.6
@@ -484,16 +1204,48 @@ skips = [
 #       - id: mypy
 #         additional_dependencies: [types-all]
 
-# =========================
-# Setuptools Configuration
-# =========================
+# ============================================================================
+# 9️⃣ PACKAGE BUILDING - How to create installable PlantGuard packages
+# ============================================================================
+# 🎯 GOAL: Configure how Python packages PlantGuard for distribution
+#
+# 🚀 QUICK COMMANDS:
+#   make build   - Build package for distribution
+#   pip install -e .  - Install PlantGuard in development mode
+
+# 📦 Setuptools - Python packaging tool
 [tool.setuptools]
-package-dir = { "" = "src" }
+package-dir = { "" = "src" }          # Source code is in src/ folder
 
 [tool.setuptools.packages.find]
-where = ["src"]
-include = ["plantguard*"]
-exclude = ["tests*"]
+where = ["src"]                       # Look for packages in src/
+include = ["plantguard*"]             # Include all plantguard packages
+exclude = ["tests*"]                  # Don't include test packages
 
 [tool.setuptools.package-data]
-plantguard = ["py.typed", "*.json", "*.yaml", "*.yml"]
+plantguard = [
+  "py.typed",                         # Type information file
+  "*.json",                           # Configuration files
+  "*.yaml", "*.yml",                  # YAML configuration files
+]
+
+# ============================================================================
+# 🎉 END OF CONFIGURATION
+# ============================================================================
+#
+# 🚀 QUICK START REMINDER:
+#   make setup   - Install everything
+#   make run     - Launch PlantGuard
+#   make dev     - Development workflow
+#   make help    - See all available commands
+#
+# 📚 LEARN MORE:
+#   - README.md - Full documentation
+#   - Makefile - All available commands
+#   - requirements.txt - Exact dependency versions
+#
+# 🐛 HAVING ISSUES?
+#   make status  - Check project health
+#   make clean   - Clean up temporary files
+#   make fresh   - Fresh installation
+# ============================================================================

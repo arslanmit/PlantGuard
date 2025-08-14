@@ -153,7 +153,8 @@ class ResourceManager:
                 mps_available = min(available_gb * 0.7, mps_total)
 
                 logger.info(
-                    f"MPS Memory (estimated): {mps_available:.1f}GB available / {mps_total:.1f}GB total"
+                    f"MPS Memory (estimated): {mps_available:.1f}GB available / "
+                    f"{mps_total:.1f}GB total"
                 )
                 return mps_total, mps_available
             except ImportError:
@@ -421,9 +422,10 @@ class ResourceManager:
         logger.info(f"Device: {resource_info.device_type} ({resource_info.device_name})")
         logger.info(f"Memory: {resource_info.available_memory:.1f}GB available")
         logger.info(f"CPU: {resource_info.cpu_name} ({resource_info.cpu_count} cores)")
-        logger.info(
-            f"Mixed Precision: {'Supported' if resource_info.mixed_precision_supported else 'Not supported'}"
+        mixed_precision_status = (
+            "Supported" if resource_info.mixed_precision_supported else "Not supported"
         )
+        logger.info(f"Mixed Precision: {mixed_precision_status}")
 
         logger.info("=== Configuration Optimizations ===")
 

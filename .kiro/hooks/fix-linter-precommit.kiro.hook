@@ -4,7 +4,7 @@
   "description": "Automatically runs linting tools (ruff, mypy) and pre-commit hooks to fix code quality issues and ensure all problems are resolved before committing",
   "version": "1",
   "when": {
-    "type": "fileEdited",
+    "type": "userTriggered",
     "patterns": [
       "*.py",
       "pyproject.toml",

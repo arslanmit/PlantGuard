@@ -202,7 +202,8 @@ class ProductionTrainer:
         resource_info = self.resource_manager.detect_resources()
         if resource_info.available_memory < 2.0:  # Require at least 2GB
             logger.error(
-                f"Insufficient memory: {resource_info.available_memory:.1f}GB available (minimum: 2GB)"
+                f"Insufficient memory: {resource_info.available_memory:.1f}GB available "
+                f"(minimum: 2GB)"
             )
             return False
 
@@ -224,9 +225,8 @@ class ProductionTrainer:
         # Log device information
         if self.device.type == "cuda":
             logger.info(f"CUDA device: {torch.cuda.get_device_name(self.device)}")
-            logger.info(
-                f"CUDA memory: {torch.cuda.get_device_properties(self.device).total_memory / 1024**3:.1f}GB"
-            )
+            cuda_memory_gb = torch.cuda.get_device_properties(self.device).total_memory / 1024**3
+            logger.info(f"CUDA memory: {cuda_memory_gb:.1f}GB")
         elif self.device.type == "mps":
             logger.info("Using Apple Silicon GPU (MPS)")
 
@@ -1154,11 +1154,11 @@ class ProductionTrainer:
             elif export_format.lower() == "onnx":
                 # Export as ONNX
                 try:
-                    import torch.onnx
+                    import torch.onnx as torch_onnx
 
                     dummy_input = torch.randn(1, 3, 224, 224).to(self.device)
                     if self.model is not None:
-                        torch.onnx.export(
+                        torch_onnx.export(
                             self.model,
                             (dummy_input,),
                             str(export_path),
