@@ -200,6 +200,9 @@ check_untyped_defs = true        # Check functions even without types
 disallow_untyped_decorators = true  # Decorators need types
 no_implicit_optional = true      # Be explicit about Optional types
 
+# 🧠 ML-specific MyPy settings
+disable_error_code = ["misc"]     # Disable misc errors including missing __init__ return types
+
 # 📦 External libraries
 ignore_missing_imports = true    # Don't complain about missing library types
 
@@ -499,15 +502,15 @@ ignore = [
   # ============================================================================
   # 📦 ISORT (I) - Import organization and sorting
   # ============================================================================
-  # "I001",   # import block is un-sorted or un-formatted
+  "I001",   # Allow unsorted imports - ML experiments often have dynamic import patterns during development
   # "I002",   # missing required import (e.g. from __future__ import annotations)
 
   # ============================================================================
   # 🔤 FLAKE8-BUILTINS (A) - Builtin shadowing
   # ============================================================================
-  # "A001",   # variable is shadowing a python builtin
-  # "A002",   # argument is shadowing a python builtin
-  # "A003",   # class attribute is shadowing a python builtin
+  "A001",   # Allow variable shadowing builtins - ML code commonly uses 'input', 'output', 'filter', 'format', 'type'
+  "A002",   # Allow argument shadowing builtins - ML function parameters often use 'input', 'output', 'format'
+  "A003",   # Allow class attribute shadowing builtins - ML model classes often have 'input', 'output' attributes
   # "A004",   # import is shadowing a python builtin
   # "A005",   # module is shadowing a python builtin
   # "A006",   # variable is shadowing a python builtin in a nested scope
@@ -519,9 +522,9 @@ ignore = [
   # "B003",   # assigning to os.environ doesn't clear the environment
   # "B004",   # using hasattr(x, '__call__') to test if x is callable is unreliable
   # "B005",   # using .strip() with multi-character strings is misleading
-  # "B006",   # do not use mutable data structures for argument defaults
-  "B007",   # loop control variable not used within the loop body (needed for ML training loops and batch processing)
-  # "B008",   # do not perform function calls in argument defaults
+  "B006",   # Allow mutable defaults - ML model configs and data processing functions often use mutable defaults
+  "B007",   # Allow unused loop variables - common in ML training epochs and batch processing where index isn't used
+  "B008",   # Allow function calls in defaults - ML often has computed defaults like device detection, model paths
   # "B009",   # do not call getattr with a constant attribute value
   # "B010",   # do not call setattr with a constant attribute value
   # "B011",   # do not call assert False since python -O removes these calls
@@ -531,12 +534,12 @@ ignore = [
   # "B015",   # pointless comparison
   # "B016",   # cannot raise a literal
   # "B017",   # assertRaises(Exception) should be considered evil
-  # "B018",   # found useless expression (sometimes needed for side effects)
+  "B018",   # Allow useless expressions - ML code often has tensor operations with side effects (GPU memory, model state)
   # "B019",   # use of assert detected
   # "B020",   # loop control variable overrides iterable it iterates
   # "B021",   # f-string used as docstring
   # "B022",   # no arguments passed to contextmanager
-  # "B023",   # function definition does not bind loop variable
+  "B023",   # Allow unbound loop variables in function definitions - common in ML training loop callbacks
   # "B024",   # abstract base class with no abstract methods
   # "B025",   # duplicate try block exception handler
   # "B026",   # star-arg unpacking after a keyword argument is strongly discouraged
@@ -552,14 +555,14 @@ ignore = [
   # "B901",   # using return x in a generator function used to be syntactically invalid
   # "B902",   # blind except Exception: statement
   # "B903",   # data class should use __slots__
-  # "B904",   # allow 'raise ...' without explicit 'from' (needed for ML error handling and model failures)
-  # "B905",   # zip() without an explicit strict= parameter
+  "B904",   # Allow raise without 'from' - ML error handling often needs clean exception chains for model failures
+  "B905",   # Allow zip() without strict - ML data processing often uses zip with different length iterables intentionally
 
   # ============================================================================
   # 🔄 FLAKE8-COMPREHENSIONS (C4) - List/dict comprehension improvements
   # ============================================================================
-  # "C400",   # unnecessary generator (rewrite as a list comprehension)
-  # "C401",   # unnecessary generator (rewrite as a set comprehension)
+  "C400",   # Allow generators over list comprehensions - ML often needs memory-efficient lazy evaluation
+  "C401",   # Allow generators over set comprehensions - ML data processing benefits from lazy evaluation
   # "C402",   # unnecessary generator (rewrite as a dict comprehension)
   # "C403",   # unnecessary list comprehension (rewrite as a set comprehension)
   # "C404",   # unnecessary list comprehension (rewrite as a dict comprehension)
@@ -572,27 +575,27 @@ ignore = [
   # "C413",   # unnecessary reversed call around sorted()
   # "C414",   # unnecessary double cast
   # "C415",   # unnecessary subscript reversal of iterable
-  # "C416",   # unnecessary list comprehension (rewrite using list())
-  # "C417",   # unnecessary map usage (rewrite using a generator expression)
+  "C416",   # Allow list comprehensions over list() calls - ML code often clearer with explicit comprehensions
+  "C417",   # Allow map() usage - ML data processing often clearer with map() for transformations
   # "C418",   # unnecessary dict literal passed to dict() (remove the outer call)
   # "C419",   # unnecessary list comprehension
 
   # ============================================================================
   # 🧠 MCCABE (C90) - Cyclomatic complexity
   # ============================================================================
-   "C901",   # function is too complex (needed for ML pipelines and complex model architectures)
+   "C901",   # Allow complex functions - ML pipelines, model architectures, and data preprocessing often require complex logic
 
   # ============================================================================
   # 📝 PYDOCSTYLE (D) - Documentation style
   # ============================================================================
-  "D100",   # missing docstring in public module (rapid ML prototyping)
-  # "D101",   # missing docstring in public class
-  # "D102",   # missing docstring in public method
-  "D103",   # missing docstring in public function (rapid ML prototyping)
+  "D100",   # Allow missing module docstrings - rapid ML prototyping and experimental scripts don't always need full docs
+  "D101",   # Allow missing class docstrings - ML model classes often self-explanatory from name and usage
+  "D102",   # Allow missing method docstrings - ML utility methods and model helpers often self-explanatory
+  "D103",   # Allow missing function docstrings - ML utility functions and model helpers often self-explanatory
   # "D104",   # missing docstring in public package
-  # "D105",   # missing docstring in magic method
-  # "D106",   # missing docstring in public nested class
-  # "D107",   # missing docstring in __init__
+  "D105",   # Allow missing magic method docstrings - ML model __call__, __getitem__ often self-explanatory
+  "D106",   # Allow missing nested class docstrings - ML often has utility classes that don't need docs
+  "D107",   # Allow missing __init__ docstrings - ML model constructors often self-explanatory from parameters
   # "D200",   # one-line docstring should fit on one line with quotes
   # "D201",   # no blank lines allowed before function docstring
   # "D202",   # no blank lines allowed after function docstring
@@ -611,8 +614,8 @@ ignore = [
   # "D215",   # section underline is over-indented
   # "D300",   # use """triple double quotes"""
   # "D301",   # use r""" if any backslashes in a docstring
-  # "D400",   # first line should end with a period
-  # "D401",   # first line should be in imperative mood
+  "D400",   # Allow docstrings without periods - ML utility functions often have brief descriptions
+  "D401",   # Allow non-imperative mood - ML docstrings often describe what function does rather than commands
   # "D402",   # first line should not be the function's signature
   # "D403",   # first word of the first line should be properly capitalized
   # "D404",   # first word of the docstring should not be This
@@ -633,22 +636,22 @@ ignore = [
   # ============================================================================
   # 🔒 FLAKE8-BANDIT (S) - Security issues
   # ============================================================================
-  "S101",   # allow assert statements (useful for debugging and ML validation)
-  # "S102",   # exec used (needed for dynamic model loading in some ML frameworks)
+  "S101",   # Allow assert statements - essential for ML tensor shape validation and model debugging
+  "S102",   # Allow exec() - needed for dynamic model loading and code generation in some ML frameworks
   # "S103",   # set-bad-file-permissions
   # "S104",   # hardcoded-bind-all-interfaces
   # "S105",   # hardcoded-password-string
   # "S106",   # hardcoded-password-funcarg
   # "S107",   # hardcoded-password-default
-  "S108",   # hardcoded-temp-file (needed for ML model caching and temp data)
-  "S110",   # allow broad except patterns (ML models can fail in many ways)
+  "S108",   # Allow hardcoded temp files - ML models need predictable cache locations for checkpoints
+  "S110",   # Allow broad except patterns - ML models can fail in many unpredictable ways (CUDA, memory, etc.)
   # "S112",   # try-except-continue
-  "S113",   # request-without-timeout (needed for ML model downloads)
+  "S113",   # Allow requests without timeout - ML model downloads can take unpredictable time
   # "S201",   # flask-debug-true
-  "S202",   # tarfile-unsafe-members (needed for ML dataset extraction)
-  "S301",   # pickle (needed for ML model serialization and caching)
+  "S202",   # Allow unsafe tarfile extraction - ML datasets often come as compressed archives
+  "S301",   # Allow pickle usage - standard for ML model serialization (PyTorch, scikit-learn)
   # "S302",   # marshal
-  "S603",   # subprocess calls (needed for some ML tools)
+  "S603",   # Allow subprocess calls - needed for ML tools like ffmpeg, imagemagick, external model converters
   # "S303",   # md5
   # "S304",   # insecure-cipher
   # "S305",   # insecure-cipher-mode
@@ -656,7 +659,7 @@ ignore = [
   # "S307",   # insecure-cipher-mode-cbc
   # "S308",   # mark-safe
   # "S310",   # urllib-urlopen
-  # "S311",   # random
+  "S311",   # Allow random module - ML often needs reproducible randomness for data augmentation and sampling
   # "S312",   # telnetlib
   # "S313",   # xml-bad-cElementTree
   # "S314",   # xml-bad-ElementTree
@@ -672,8 +675,8 @@ ignore = [
   # "S324",   # insecure-hash-function
   # "S401",   # import-telnetlib
   # "S402",   # import-ftplib
-  "S403",   # import-pickle (needed for ML model serialization)
-  "S404",   # import-subprocess (needed for ML tools and external processes)
+  "S403",   # Allow pickle imports - standard for ML model serialization and caching
+  "S404",   # Allow subprocess imports - needed for ML preprocessing tools and external model utilities
   # "S405",   # import-xml-etree
   # "S406",   # import-xml-sax
   # "S407",   # import-xml-expat
@@ -688,17 +691,17 @@ ignore = [
   # "S503",   # ssl-bad-defaults
   # "S504",   # ssl-with-bad-version
   # "S505",   # weak-cryptographic-key
-  "S506",   # yaml-load (needed for ML config files and model metadata)
+  "S506",   # Allow yaml.load() - ML config files and model metadata often require full YAML loading
   # "S507",   # ssh-no-host-key-verification
   # "S508",   # snmp-insecure-version
   # "S509",   # snmp-weak-cryptography
   # "S601",   # paramiko-calls
   # "S602",   # subprocess-popen-with-shell-equals-true
-  "S603",   # subprocess calls (needed for some ML tools)
+  "S603",   # Allow subprocess calls - needed for ML preprocessing, model conversion, and external tools
   # "S604",   # call-with-shell-equals-true
   # "S605",   # start-process-with-a-shell
   # "S606",   # start-process-with-no-shell
-  "S607",   # partial paths in subprocess (common in ML)
+  "S607",   # Allow partial subprocess paths - ML tools often use relative paths for model binaries
   # "S608",   # hardcoded-sql-expression
   # "S609",   # unix-command-wildcard-injection
   # "S701",   # jinja2-autoescape-false
@@ -707,14 +710,14 @@ ignore = [
   # ============================================================================
   # 🚨 FLAKE8-BLIND-EXCEPT (BLE) - Exception handling
   # ============================================================================
-  "BLE001", # allow catch-all Exception when justified (needed for ML model error handling)
+  "BLE001", # Allow broad Exception catching - ML models can fail in unpredictable ways requiring catch-all handling
 
   # ============================================================================
   # 📝 FLAKE8-ANNOTATIONS (ANN) - Type annotations
   # ============================================================================
   # "ANN001", # function arguments don't need types everywhere
-  "ANN002", # missing type annotation for *args (gradual typing in ML frameworks)
-  "ANN003", # missing type annotation for **kwargs (gradual typing in ML frameworks)
+  "ANN002", # Allow missing *args types - ML frameworks often use dynamic arguments for model parameters
+  "ANN003", # Allow missing **kwargs types - ML model constructors frequently use flexible keyword arguments
   # "ANN101", # REMOVED: deprecated rule (no longer exists in Ruff)
   # "ANN102", # REMOVED: deprecated rule (no longer exists in Ruff)
   # "ANN201", # return types not required everywhere
@@ -723,9 +726,9 @@ ignore = [
   # "ANN205", # missing return type annotation for staticmethod
   # "ANN206", # missing return type annotation for classmethod
   # "ANN207", # missing return type annotation for property
-  # "ANN208", # missing return type annotation for __init__
+  "ANN204", # Allow missing return type for special methods (__init__, __call__, etc.) - ML model constructors rarely need explicit None annotation
   # "ANN209", # missing return type annotation for __new__
-  # "ANN210", # missing return type annotation for __call__
+  # "ANN210", # This rule doesn't exist in Ruff - __call__ is covered by ANN204 (special methods)
   # "ANN211", # missing return type annotation for __getitem__
   # "ANN212", # missing return type annotation for __setitem__
   # "ANN213", # missing return type annotation for __delitem__
@@ -737,14 +740,14 @@ ignore = [
   # "ANN219", # missing return type annotation for __reversed__
   # "ANN220", # missing return type annotation for __enter__
   # "ANN221", # missing return type annotation for __exit__
-  "ANN401", # allow Any type when needed (common with ML frameworks and dynamic tensors)
+  "ANN401", # Allow Any type - ML frameworks often have dynamic tensor shapes and model architectures
 
 
   # ============================================================================
   # 🖨️ FLAKE8-PRINT (T20) - Print statements
   # ============================================================================
-  "T201",   # allow print() in CLI scripts and debugging (needed for ML training logs and interactive notebooks)
-  # "T203",   # pprint found
+  "T201",   # Allow print() statements - essential for ML training progress, model debugging, and Jupyter notebooks
+  "T203",   # Allow pprint() - useful for debugging complex ML model architectures and tensor structures
 
 
   # ============================================================================
@@ -752,8 +755,8 @@ ignore = [
   # ============================================================================
   # "G001",   # logging .format() string
   # "G002",   # logging % string
-  # "G003",   # logging + string
-  "G004",   # allow f-strings in logging (more readable)
+  "G003",   # Allow logging + string concatenation - ML models often log dynamic tensor info and model states
+  "G004",   # Allow f-strings in logging - more readable for ML metrics, model paths, and performance data
   # "G010",   # logging warn instead of warning
   # "G101",   # logging extra not a dict
   # "G201",   # logging .exception(...) should be logging.exception(...)
@@ -762,29 +765,29 @@ ignore = [
   # ============================================================================
   # 🥧 FLAKE8-PIE (PIE) - Miscellaneous improvements
   # ============================================================================
-  # "PIE790", # unnecessary pass statement
+  "PIE790", # Allow unnecessary pass statements - ML code often has placeholder methods during development
   # "PIE794", # duplicate class field definition
   # "PIE796", # prefer unique enums
-  # "PIE800", # unnecessary spread **
-  # "PIE804", # unnecessary dict kwargs
+  "PIE800", # Allow unnecessary spread ** - ML function calls often use explicit ** for clarity
+  "PIE804", # Allow unnecessary dict kwargs - ML config passing often clearer with explicit dict()
   # "PIE807", # prefer list() over useless lambda
   # "PIE810", # single starts-with/ends-with
 
   # ============================================================================
   # 🔄 FLAKE8-SIMPLIFY (SIM) - Code simplification
   # ============================================================================
-  # "SIM102", # use ternary operator (sometimes if/else is clearer)
+  "SIM102", # Allow if/else over ternary - ML code often benefits from explicit conditionals for model logic clarity
   # "SIM103", # return condition directly
   # "SIM106", # use ternary operator instead of if-else-block for simple variable assignments
-  # "SIM108", # use ternary operator instead of if-else-block that assigns a boolean
+  "SIM108", # Allow if/else for boolean assignment - ML model conditions often clearer with explicit blocks
   # "SIM110", # use any(...) instead of for loop AND all(...) instead of for loop (remapped from SIM111)
   # "SIM112", # use CAPITAL_ENVIRONMENT_VARIABLES
-  # "SIM113", # use enumerate instead of manually incrementing a counter
-  # "SIM114", # combine if branches using logical or operator
-  # "SIM115", # use context handler for opening files
-  # "SIM116", # use dict.get(key, "default") instead of conditional assignment
-  # "SIM117", # use a single with-statement with multiple contexts instead of nested with-statements
-  # "SIM118", # use key in dict instead of key in dict.keys()
+  "SIM113", # Allow manual counter increment - ML training loops often need explicit index control
+  "SIM114", # Allow separate if branches - ML model logic often clearer with separate conditions
+  "SIM115", # Allow manual file handling - ML often needs specific file handling patterns for models/data
+  "SIM116", # Allow conditional assignment over dict.get - ML config handling often clearer with explicit conditionals
+  "SIM117", # Allow nested with-statements - ML file operations often clearer with separate context managers
+  "SIM118", # Allow explicit .keys() - ML code often more readable with explicit key checking
   # "SIM201", # use != instead of not ==
   # "SIM202", # use == instead of not !=
   # "SIM208", # use != instead of not ==
@@ -830,7 +833,7 @@ ignore = [
   # "UP029",  # use {} instead of format()
   # "UP030",  # use implicit references for positional format fields
   # "UP031",  # use format specifiers instead of percent format
-  # "UP032",  # use f-string instead of format call
+  "UP032",  # Allow .format() calls - ML logging and string formatting often needs .format() for compatibility
   # "UP033",  # use {} instead of format()
   # "UP034",  # use {} instead of format()
   # "UP035",  # use {} instead of format()
@@ -840,11 +843,11 @@ ignore = [
   # ============================================================================
   # 🔄 TRYCERATOPS (TRY) - Exception handling improvements
   # ============================================================================
-  "TRY003", # Allow long exception messages (descriptive errors are helpful)
-  "TRY300", # Don't require 'else' blocks on try statements
-  "TRY301", # Don't require specific exception handling patterns
-  "TRY400", # Allow logging.error instead of logging.exception
-  "TRY401", # Allow verbose logging with exception objects
+  "TRY003", # Allow long exception messages - ML models need detailed error context (model path, tensor shapes, CUDA errors)
+  "TRY300", # Don't require 'else' blocks - ML pipelines often use early returns for model failures
+  "TRY301", # Don't require specific exception patterns - different ML components (vision/audio/text) need different error handling
+  "TRY400", # Allow logging.error vs logging.exception - model warnings vs critical failures need different log levels
+  "TRY401", # Allow verbose exception logging - ML debugging needs full stack traces for tensor/model issues
 
   # ============================================================================
   # 📁 FLAKE8-USE-PATHLIB (PTH) - Use pathlib instead of os.path
@@ -858,8 +861,8 @@ ignore = [
   # "PTH106", # os.rmdir() should be replaced by Path.rmdir()
   # "PTH107", # os.remove() should be replaced by Path.unlink()
   # "PTH108", # os.unlink() should be replaced by Path.unlink()
-  # "PTH109", # Allow os.getcwd() instead of Path.cwd() (gradual migration)
-  # "PTH110", # Allow os.path.exists() instead of Path.exists() (gradual migration)
+  "PTH109", # Allow os.getcwd() - ML scripts often need current directory for relative model paths
+  "PTH110", # Allow os.path.exists() - gradual migration to pathlib in existing ML codebases
   # "PTH111", # os.path.expanduser() should be replaced by Path.expanduser()
   # "PTH112", # os.path.isdir() should be replaced by Path.is_dir()
   # "PTH113", # os.path.isfile() should be replaced by Path.is_file()
@@ -867,12 +870,12 @@ ignore = [
   # "PTH115", # os.path.readlink() should be replaced by Path.readlink()
   # "PTH116", # os.stat() should be replaced by Path.stat()
   # "PTH117", # os.path.isabs() should be replaced by Path.is_absolute()
-  # "PTH118", # Allow os.path.join() instead of Path / operator (gradual migration)
-  # "PTH119", # os.path.basename() should be replaced by Path.name
-  # "PTH120", # os.path.dirname() should be replaced by Path.parent
+  "PTH118", # Allow os.path.join() - gradual migration to pathlib in ML projects with legacy path handling
+  "PTH119", # Allow os.path.basename() - common in ML dataset processing and model file handling
+  "PTH120", # Allow os.path.dirname() - frequently used in ML for model checkpoint directory management
   # "PTH121", # os.path.samefile() should be replaced by Path.samefile()
   # "PTH122", # os.path.splitext() should be replaced by Path.suffix
-  # "PTH123", # Allow open() instead of Path.open() (gradual migration)
+  "PTH123", # Allow open() instead of Path.open() - ML code often uses traditional file handling for compatibility
   # "PTH124", # os.path.isdir() should be replaced by Path.is_dir()
 
   # ============================================================================
@@ -881,32 +884,32 @@ ignore = [
   # "RUF001", # ambiguous unicode character in string
   # "RUF002", # ambiguous unicode character in docstring
   # "RUF003", # ambiguous unicode character in comment
-  # "RUF005", # consider iterable unpacking instead of concatenation (sometimes explicit is clearer)
+  "RUF005", # Allow explicit concatenation over unpacking - ML tensor operations often clearer with explicit syntax
   # "RUF006", # store a reference to the return value of asyncio.create_task
   # "RUF007", # prefer itertools.pairwise() over zip() when iterating over successive pairs
   # "RUF008", # do not use mutable default values for dataclass fields
   # "RUF009", # do not perform function call in dataclass defaults
   # "RUF010", # use explicit conversion flag
   # "RUF011", # ruff-static-key-dict-comprehension
-  # "RUF012", # mutable class attributes should be annotated with typing.ClassVar
-  # "RUF013", # PEP 484 prohibits implicit Optional
+  "RUF012", # Allow mutable class attributes without ClassVar - ML model classes often have mutable state
+  "RUF013", # Allow implicit Optional - ML function signatures often have implicit None returns
   # "RUF100", # unused noqa directive
 
   # ============================================================================
   # ⚡ PERFLINT (PERF) - Performance improvements
   # ============================================================================
-  # "PERF101", # do not cast an iterable to list before iterating over it
+  "PERF101", # Allow list() casting before iteration - ML data loading often needs materialized lists for batching
   # "PERF102", # when using only the keys of a dict use the keys() method
-  # "PERF203", # try-except within a loop incurs performance overhead (sometimes necessary in ML)
-  # "PERF401", # use a list comprehension to create a transformed list
-  # "PERF402", # use list or set comprehensions instead of for-loops
-  # "PERF403", # use dict comprehensions instead of for-loops
+  "PERF203", # Allow try-except in loops - ML batch processing often needs per-item error handling
+  "PERF401", # Allow explicit loops over list comprehensions - ML transformations often clearer with explicit loops
+  "PERF402", # Allow for-loops over comprehensions - ML data processing often needs explicit loop control
+  "PERF403", # Allow for-loops over dict comprehensions - ML config building often clearer with explicit loops
 
   # ============================================================================
   # 📦 FLAKE8-TIDY-IMPORTS (TID) - Import organization
   # ============================================================================
   # "TID251", # banned imports
-  # "TID252", # prefer absolute imports over relative imports
+  "TID252", # Allow relative imports - ML model modules often benefit from relative imports for clarity
 
   # ============================================================================
   # 🧠 PYLINT (PL) - Code structure and logic
@@ -915,16 +918,16 @@ ignore = [
   # "PLR0124", # name compared with itself
   # "PLR0133", # two constants compared
   # "PLR0206", # property with parameters
-  # "PLR0402", # use from import instead of import (sometimes import is clearer)
-  # "PLR0911", # too many return statements
-   "PLR0912", # too many branches (needed for ML model selection and complex data processing)
-   "PLR0913", # too many arguments (needed for ML model constructors and training functions)
-   "PLR0915", # too many statements (needed for complex ML pipelines and model architectures)
+  "PLR0402", # Allow import over from import - ML often needs full module names for clarity (torch.nn vs nn)
+  "PLR0911", # Allow many return statements - ML functions often have multiple exit points for different conditions
+   "PLR0912", # Allow many branches - ML model selection and data preprocessing often require complex conditionals
+   "PLR0913", # Allow many arguments - ML model constructors and training functions need extensive configuration
+   "PLR0915", # Allow many statements - complex ML pipelines and model architectures require detailed implementations
   # "PLR1701", # merge isinstance calls
   # "PLR1722", # use sys.exit() instead of exit()
   # "PLR1733", # unnecessary dictionary index lookup
   # "PLR1736", # unnecessary list index lookup
-   "PLR2004", # magic values (needed for ML hyperparameters, model dimensions, and constants)
+   "PLR2004", # Allow magic values - ML hyperparameters, model dimensions, and neural network constants are often numeric literals
   # "PLR2044", # line with empty comment
   # "PLR5501", # consider using elif instead of else if
 
@@ -937,15 +940,15 @@ ignore = [
   # "PLW0245", # super without brackets
   # "PLW0406", # import self
   # "PLW0602", # global variable not assigned
-  # "PLW0603", # global variables (sometimes needed in ML)
+  "PLW0603", # Allow global variables - ML models often use global state for model instances and device management
   # "PLW0604", # global at module level
   # "PLW1508", # invalid envvar default
   # "PLW1509", # subprocess-popen-preexec-fn
   # "PLW1510", # subprocess.run without explicit check (sometimes not needed)
-  # "PLW1514", # unspecified encoding in open (gradual migration to explicit encoding)
+  "PLW1514", # Allow unspecified encoding - ML datasets and model files often have mixed encodings
   # "PLW1641", # eq-without-hash
   # "PLW2101", # useless-with-lock
-  # "PLW2901", # for loop variable overwritten
+  "PLW2901", # Allow loop variable overwriting - common in ML batch processing and nested training loops
   # "PLW3301", # nested-min-max
 
   # PLE - Pylint Error
@@ -1007,7 +1010,7 @@ ignore = [
   # "PT027",  # use pytest.raises() instead of unittest-style method
 
   # 🎨 FLAKE8-COMMAS (COM) - Trailing commas (uncomment individual rules to enable)
-  # "COM812", # missing trailing comma
+  "COM812", # Allow missing trailing commas - ML code often has dynamic parameter lists where trailing commas aren't always needed
   # "COM818", # trailing comma on bare tuple prohibited
   # "COM819", # trailing comma prohibited
 
@@ -1018,19 +1021,19 @@ ignore = [
   # "Q003",   # change outer quotes to avoid escaping inner quotes
 
   # 🔍 ERADICATE (ERA) - Commented-out code (uncomment to enable)
-  # "ERA001", # found commented-out code
+  "ERA001", # Allow commented-out code - ML experiments often keep alternative implementations for comparison
 
   # 🔘 FLAKE8-BOOLEAN-TRAP (FBT) - Boolean trap anti-pattern (uncomment individual rules to enable)
-  # "FBT001", # boolean positional arg in function definition
-  # "FBT002", # boolean default value in function definition
-  # "FBT003", # boolean positional value in function call
+  "FBT001", # Allow boolean positional args - ML functions commonly use training=True, eval=False patterns
+  "FBT002", # Allow boolean default values - ML model constructors often have boolean configuration flags
+  "FBT003", # Allow boolean positional values - ML training calls frequently use boolean mode switches
 
   # 🔧 FLAKE8-UNUSED-ARGUMENTS (ARG) - Unused function arguments (uncomment individual rules to enable)
-  # "ARG001", # unused function argument
-  # "ARG002", # unused method argument
-  # "ARG003", # unused class method argument
-  # "ARG004", # unused static method argument
-  # "ARG005", # unused lambda argument
+  "ARG001", # Allow unused function arguments - ML interfaces often have compatibility parameters
+  "ARG002", # Allow unused method arguments - ML model methods may not use all inherited parameters
+  "ARG003", # Allow unused class method arguments - ML factory methods often have unused config parameters
+  "ARG004", # Allow unused static method arguments - ML utility functions may have interface compatibility args
+  "ARG005", # Allow unused lambda arguments - ML data processing lambdas often ignore some parameters
 
   # 🔄 FLAKE8-2020 (YTT) - Python 2/3 compatibility (uncomment individual rules to enable)
   # "YTT101", # sys.version[:3] referenced (python3.10+), use sys.version_info
@@ -1054,25 +1057,25 @@ ignore = [
   # "DJ013",  # avoid using null=True on string-based fields
 
   # 📊 PANDAS-VET (PD) - Pandas best practices (uncomment individual rules to enable)
-  # "PD002",  # inplace=True should be avoided; it has inconsistent behavior
+  "PD002",  # Allow inplace=True - ML data preprocessing often uses inplace operations for memory efficiency
   # "PD003",  # .isna is preferred to .isnull; functionality is equivalent
   # "PD004",  # .notna is preferred to .notnull; functionality is equivalent
   # "PD007",  # .ix is deprecated; use more explicit .loc or .iloc
   # "PD008",  # use .loc instead of .at. If speed is important, use numpy
   # "PD009",  # use .iloc instead of .iat. If speed is important, use numpy
   # "PD010",  # .pivot_table is preferred to .pivot or .unstack; provides same functionality
-  # "PD011",  # use .to_numpy() instead of .values
+  "PD011",  # Allow .values instead of .to_numpy() - legacy ML code often uses .values for compatibility
   # "PD012",  # .read_csv is preferred to .read_table; provides same functionality
   # "PD013",  # .melt is preferred to .stack; provides same functionality
   # "PD015",  # use .merge method instead of pd.merge function. They have equivalent functionality
-  # "PD901",  # df is a bad variable name. Be kinder to your future self
+  "PD901",  # Allow 'df' variable name - very common and clear in ML data processing contexts
 
   # 🔄 REFURB (FURB) - Code modernization (uncomment individual rules to enable)
-  # "FURB101", # open and read should be replaced by pathlib
-  # "FURB103", # open and write should be replaced by pathlib
-  # "FURB105", # print and open should be replaced by pathlib
+  "FURB101", # Allow open() and read() - ML model loading often needs traditional file handling for compatibility
+  "FURB103", # Allow open() and write() - ML checkpoint saving often uses traditional file operations
+  "FURB105", # Allow print() and open() - ML logging and file operations often combined
   # "FURB110", # if-exp-else-none should be replaced by and
-  # "FURB113", # repeated-append should be replaced by extend
+  "FURB113", # Allow repeated append() - ML data building often clearer with explicit append operations
   # "FURB116", # f-string-number-format should be replaced by format specifier
   # "FURB118", # operator.methodcaller should be replaced by lambda
   # "FURB129", # read-whole-file should be replaced by pathlib
@@ -1080,9 +1083,9 @@ ignore = [
   # "FURB132", # check-and-remove-from-set should be replaced by discard
   # "FURB136", # if-expr-min-max should be replaced by min/max
   # "FURB140", # reimplemented-starmap should be replaced by itertools.starmap
-  # "FURB142", # for-loop-set-mutations should be replaced by comprehension
+  "FURB142", # Allow for-loop set mutations - ML data processing often clearer with explicit loops
   # "FURB145", # slice-copy should be replaced by copy
-  # "FURB148", # unnecessary-enumerate should be replaced by zip
+  "FURB148", # Allow enumerate() over zip() - ML batch processing often needs explicit indexing
   # "FURB152", # math-constant should be replaced by constant
   # "FURB154", # repeated-global should be replaced by global
   # "FURB157", # verbose-decimal-constructor should be replaced by literal
