@@ -202,3 +202,4 @@ runs/
 data/models/*
 /data/plantvillage_dummy
 /data/raw/plantvillage
+~/.kaggle/kaggle.json
