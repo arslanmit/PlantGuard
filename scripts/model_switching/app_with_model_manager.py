@@ -157,11 +157,8 @@ def main() -> None:
                             st.image(img, caption=img_path.name, use_column_width=True)
 
                             if st.button("Analyze", key=f"sample_{i}"):
-                                # Convert Path to file-like object for processing
-                                with open(img_path, "rb") as f:
-                                    image_bytes = f.read()
-                                # Process the image directly
-                                img_for_analysis = Image.open(img_path)
+                                # TODO: Add actual analysis logic here
+                                st.info("Analysis functionality to be implemented")
                         except Exception as e:
                             st.warning(f"Could not load image {img_path}: {e}")
                             continue

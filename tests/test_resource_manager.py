@@ -414,7 +414,7 @@ class TestGlobalFunctions:
         """Test detect_optimal_config without base configuration."""
         mock_optimize.return_value = {"device": "cuda", "batch_size": 32}
 
-        result = detect_optimal_config()
+        detect_optimal_config()
 
         # Should be called with default auto config
         expected_config = {

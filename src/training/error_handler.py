@@ -533,7 +533,6 @@ class TrainingErrorHandler:
 
     def _categorize_error(self, exception: Exception) -> ErrorCategory:
         """Categorize the error based on exception type and message."""
-        exception_type = type(exception).__name__.lower()
         error_message = str(exception).lower()
 
         # Memory errors

@@ -530,30 +530,6 @@ select = [
 # 🔄 CATEGORY vs INDIVIDUAL: Use "E" to ignore all pycodestyle, or "E501" for specific rules
 ignore = [
   # ============================================================================
-  # 🎯 CATEGORY vs INDIVIDUAL CONTROL EXAMPLES
-  # ============================================================================
-  # 💡 You can ignore entire categories OR specific individual rules:
-  #
-  # 🔄 CATEGORY EXAMPLES (ignore ALL rules in a category):
-  # "E",      # Ignore ALL pycodestyle errors
-  # "F",      # Ignore ALL pyflakes rules
-  # "B",      # Ignore ALL bugbear rules
-  # "ANN",    # Ignore ALL annotation rules
-  # "D",      # Ignore ALL docstring rules
-  #
-  # 🎯 INDIVIDUAL EXAMPLES (ignore specific rules only):
-  # "E501",   # Ignore only line too long
-  # "F841",   # Ignore only unused variables
-  # "B007",   # Ignore only unused loop variables
-  # "ANN001", # Ignore only missing function argument annotations
-  # "D100",   # Ignore only missing module docstrings
-  #
-  # 🚀 MIX AND MATCH:
-  # You can combine both! Enable category in SELECT, then ignore specific rules here.
-  # Example: SELECT has "E" (all pycodestyle), IGNORE has "E501" (except line length)
-  # Result: All pycodestyle rules EXCEPT line length checking!
-
-  # ============================================================================
   # � ISORT S(I) - Import organization and sorting
   # ============================================================================
   # "I001",   # import block is un-sorted or un-formatted
@@ -577,7 +553,7 @@ ignore = [
   # "B004",   # using hasattr(x, '__call__') to test if x is callable is unreliable
   # "B005",   # using .strip() with multi-character strings is misleading
   # "B006",   # do not use mutable data structures for argument defaults
-  "B007",   # loop control variable not used within the loop body (common in ML)
+  # "B007",   # loop control variable not used within the loop body (common in ML)
   # "B008",   # do not perform function calls in argument defaults
   # "B009",   # do not call getattr with a constant attribute value
   # "B010",   # do not call setattr with a constant attribute value
@@ -588,7 +564,7 @@ ignore = [
   # "B015",   # pointless comparison
   # "B016",   # cannot raise a literal
   # "B017",   # assertRaises(Exception) should be considered evil
-  "B018",   # found useless expression (sometimes needed for side effects)
+  # "B018",   # found useless expression (sometimes needed for side effects)
   # "B019",   # use of assert detected
   # "B020",   # loop control variable overrides iterable it iterates
   # "B021",   # f-string used as docstring
@@ -609,7 +585,7 @@ ignore = [
   # "B901",   # using return x in a generator function used to be syntactically invalid
   # "B902",   # blind except Exception: statement
   # "B903",   # data class should use __slots__
-  "B904",   # allow 'raise ...' without explicit 'from' (common in ML)
+  # "B904",   # allow 'raise ...' without explicit 'from' (common in ML)
   # "B905",   # zip() without an explicit strict= parameter
 
   # ============================================================================
@@ -642,14 +618,14 @@ ignore = [
   # ============================================================================
   # 📝 PYDOCSTYLE (D) - Documentation style
   # ============================================================================
-  "D100",   # missing docstring in public module
+  # "D100",   # missing docstring in public module
   # "D101",   # missing docstring in public class
-  "D102",   # missing docstring in public method
-  "D103",   # missing docstring in public function
-  "D104",   # missing docstring in public package
+  # "D102",   # missing docstring in public method
+  # "D103",   # missing docstring in public function
+  # "D104",   # missing docstring in public package
   # "D105",   # missing docstring in magic method
   # "D106",   # missing docstring in public nested class
-  "D107",   # missing docstring in __init__
+  # "D107",   # missing docstring in __init__
   # "D200",   # one-line docstring should fit on one line with quotes
   # "D201",   # no blank lines allowed before function docstring
   # "D202",   # no blank lines allowed after function docstring
@@ -690,7 +666,7 @@ ignore = [
   # ============================================================================
   # 🔒 FLAKE8-BANDIT (S) - Security issues
   # ============================================================================
-  "S101",   # allow assert statements (useful for debugging)
+  # "S101",   # allow assert statements (useful for debugging)
   # "S102",   # exec used
   # "S103",   # set-bad-file-permissions
   # "S104",   # hardcoded-bind-all-interfaces
@@ -698,7 +674,7 @@ ignore = [
   # "S106",   # hardcoded-password-funcarg
   # "S107",   # hardcoded-password-default
   # "S108",   # hardcoded-temp-file
-  "S110",   # allow broad except patterns (ML models can fail in many ways)
+  # "S110",   # allow broad except patterns (ML models can fail in many ways)
   # "S112",   # try-except-continue
   # "S113",   # request-without-timeout
   # "S201",   # flask-debug-true
@@ -750,11 +726,11 @@ ignore = [
   # "S509",   # snmp-weak-cryptography
   # "S601",   # paramiko-calls
   # "S602",   # subprocess-popen-with-shell-equals-true
-  "S603",   # subprocess calls (needed for some ML tools)
+  # "S603",   # subprocess calls (needed for some ML tools)
   # "S604",   # call-with-shell-equals-true
   # "S605",   # start-process-with-a-shell
   # "S606",   # start-process-with-no-shell
-  "S607",   # partial paths in subprocess (common in ML)
+  # "S607",   # partial paths in subprocess (common in ML)
   # "S608",   # hardcoded-sql-expression
   # "S609",   # unix-command-wildcard-injection
   # "S701",   # jinja2-autoescape-false
@@ -763,28 +739,46 @@ ignore = [
   # ============================================================================
   # 🚨 FLAKE8-BLIND-EXCEPT (BLE) - Exception handling
   # ============================================================================
-  "BLE001", # allow catch-all Exception when justified
+  # "BLE001", # allow catch-all Exception when justified
 
   # ============================================================================
   # 📝 FLAKE8-ANNOTATIONS (ANN) - Type annotations
   # ============================================================================
-  "ANN001", # function arguments don't need types everywhere
-  "ANN002", # missing type annotation for *args (gradual typing)
-  "ANN003", # missing type annotation for **kwargs (gradual typing)
+  # "ANN001", # function arguments don't need types everywhere
+  # "ANN002", # missing type annotation for *args (gradual typing)
+  # "ANN003", # missing type annotation for **kwargs (gradual typing)
   # "ANN101", # REMOVED: deprecated rule (no longer exists in Ruff)
   # "ANN102", # REMOVED: deprecated rule (no longer exists in Ruff)
-  "ANN201", # return types not required everywhere
+  # "ANN201", # return types not required everywhere
   # "ANN202", # missing return type annotation for private function
   # "ANN204", # missing return type annotation for special method
   # "ANN205", # missing return type annotation for staticmethod
   # "ANN206", # missing return type annotation for classmethod
-  "ANN401", # allow Any type when needed
+  # "ANN207", # missing return type annotation for property
+  # "ANN208", # missing return type annotation for __init__
+  # "ANN209", # missing return type annotation for __new__
+  # "ANN210", # missing return type annotation for __call__
+  # "ANN211", # missing return type annotation for __getitem__
+  # "ANN212", # missing return type annotation for __setitem__
+  # "ANN213", # missing return type annotation for __delitem__
+  # "ANN214", # missing return type annotation for __iter__
+  # "ANN215", # missing return type annotation for __next__
+  # "ANN216", # missing return type annotation for __len__
+  # "ANN217", # missing return type annotation for __contains__
+  # "ANN218", # missing return type annotation for __bool__
+  # "ANN219", # missing return type annotation for __reversed__
+  # "ANN220", # missing return type annotation for __enter__
+  # "ANN221", # missing return type annotation for __exit__
+  # "ANN401", # allow Any type when needed
+
 
   # ============================================================================
   # 🖨️ FLAKE8-PRINT (T20) - Print statements
   # ============================================================================
-  "T201",   # allow print() in CLI scripts and debugging
+  # "T201",   # allow print() in CLI scripts and debugging
+  # "T202",
   # "T203",   # pprint found
+
 
   # ============================================================================
   # 📊 FLAKE8-LOGGING-FORMAT (G) - Logging format
@@ -812,11 +806,11 @@ ignore = [
   # ============================================================================
   # 🔄 FLAKE8-SIMPLIFY (SIM) - Code simplification
   # ============================================================================
-  "SIM102", # use ternary operator (sometimes if/else is clearer)
+  # "SIM102", # use ternary operator (sometimes if/else is clearer)
   # "SIM103", # return condition directly
   # "SIM106", # use ternary operator instead of if-else-block for simple variable assignments
   # "SIM108", # use ternary operator instead of if-else-block that assigns a boolean
-  "SIM110", # use any(...) instead of for loop AND all(...) instead of for loop (remapped from SIM111)
+  # "SIM110", # use any(...) instead of for loop AND all(...) instead of for loop (remapped from SIM111)
   # "SIM112", # use CAPITAL_ENVIRONMENT_VARIABLES
   # "SIM113", # use enumerate instead of manually incrementing a counter
   # "SIM114", # combine if branches using logical or operator
