@@ -496,7 +496,7 @@ class CheckpointManager:
             SHA256 checksum as hex string
         """
         sha256_hash = hashlib.sha256()
-        with open(file_path, "rb") as f:
+        with file_path.open("rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
                 sha256_hash.update(chunk)
         return sha256_hash.hexdigest()
@@ -519,7 +519,7 @@ class CheckpointManager:
             return
 
         try:
-            with open(self.metadata_file, encoding="utf-8") as f:
+            with self.metadata_file.open(encoding="utf-8") as f:
                 metadata_dict = json.load(f)
 
             self.metadata = {}
@@ -539,7 +539,7 @@ class CheckpointManager:
             for checkpoint_id, metadata in self.metadata.items():
                 metadata_dict[checkpoint_id] = asdict(metadata)
 
-            with open(self.metadata_file, "w", encoding="utf-8") as f:
+            with self.metadata_file.open("w", encoding="utf-8") as f:
                 json.dump(metadata_dict, f, indent=2, default=str)
 
         except Exception as e:

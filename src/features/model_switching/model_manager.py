@@ -84,7 +84,7 @@ class PlantGuardModelManager:
             self.create_default_config()
 
         try:
-            with open(self.config_path, encoding="utf-8") as f:
+            with self.config_path.open(encoding="utf-8") as f:
                 config_data = json.load(f)
 
             self.models_config = {}
@@ -144,7 +144,7 @@ class PlantGuardModelManager:
         self.config_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Save default config
-        with open(self.config_path, "w", encoding="utf-8") as f:
+        with self.config_path.open("w", encoding="utf-8") as f:
             json.dump(default_config, f, indent=2)
 
         logger.info("Created default model config: %s", self.config_path)
@@ -394,7 +394,7 @@ class PlantGuardModelManager:
 
         try:
             # Load current config
-            with open(self.config_path, encoding="utf-8") as f:
+            with self.config_path.open(encoding="utf-8") as f:
                 config_data = json.load(f)
 
             # Apply updates
@@ -403,7 +403,7 @@ class PlantGuardModelManager:
                     config_data["models"][model_id][key] = value
 
             # Save updated config
-            with open(self.config_path, "w", encoding="utf-8") as f:
+            with self.config_path.open("w", encoding="utf-8") as f:
                 json.dump(config_data, f, indent=2)
 
             # Reload configs

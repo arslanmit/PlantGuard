@@ -191,7 +191,7 @@ def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) ->
     model, processor, class_labels = model_result
 
     # Load test metadata
-    with open(metadata_path) as f:
+    with metadata_path.open() as f:
         metadata = json.load(f)
 
     results = []

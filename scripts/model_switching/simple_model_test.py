@@ -103,7 +103,7 @@ def main() -> None:
         return
 
     # Load test metadata
-    with open("data/pictures/sample_images_metadata.json") as f:
+    with Path("data/pictures/sample_images_metadata.json").open() as f:
         metadata = json.load(f)
 
     # Test each image

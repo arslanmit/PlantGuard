@@ -87,7 +87,7 @@ def test_with_imagenet_model(model_path: str) -> None:
     vision_adapter.load_checkpoint(str(model_path))
 
     # Test on all 21 images
-    with open("data/pictures/sample_images_metadata.json") as f:
+    with Path("data/pictures/sample_images_metadata.json").open() as f:
         metadata = json.load(f)
 
     results = []

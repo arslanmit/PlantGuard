@@ -734,7 +734,7 @@ class TrainingErrorHandler:
 
         import json
 
-        with open(output_file, "w") as f:
+        with output_file.open("w") as f:
             json.dump(report, f, indent=2, default=str)
 
         logger.info(f"Error report exported to: {output_file}")

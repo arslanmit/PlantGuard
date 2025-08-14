@@ -9,6 +9,7 @@ import platform
 import subprocess  # nosec B404  # nosec B404
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import torch
@@ -196,7 +197,7 @@ class ResourceManager:
                 )
                 cpu_name = result.stdout.strip()
             elif platform.system() == "Linux":
-                with open("/proc/cpuinfo") as f:
+                with Path("/proc/cpuinfo").open() as f:
                     for line in f:
                         if line.startswith("model name"):
                             cpu_name = line.split(":")[1].strip()

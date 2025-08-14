@@ -858,8 +858,8 @@ ignore = [
   # "PTH106", # os.rmdir() should be replaced by Path.rmdir()
   # "PTH107", # os.remove() should be replaced by Path.unlink()
   # "PTH108", # os.unlink() should be replaced by Path.unlink()
-  "PTH109", # Allow os.getcwd() instead of Path.cwd() (gradual migration)
-  "PTH110", # Allow os.path.exists() instead of Path.exists() (gradual migration)
+  # "PTH109", # Allow os.getcwd() instead of Path.cwd() (gradual migration)
+  # "PTH110", # Allow os.path.exists() instead of Path.exists() (gradual migration)
   # "PTH111", # os.path.expanduser() should be replaced by Path.expanduser()
   # "PTH112", # os.path.isdir() should be replaced by Path.is_dir()
   # "PTH113", # os.path.isfile() should be replaced by Path.is_file()
@@ -867,12 +867,12 @@ ignore = [
   # "PTH115", # os.path.readlink() should be replaced by Path.readlink()
   # "PTH116", # os.stat() should be replaced by Path.stat()
   # "PTH117", # os.path.isabs() should be replaced by Path.is_absolute()
-  "PTH118", # Allow os.path.join() instead of Path / operator (gradual migration)
+  # "PTH118", # Allow os.path.join() instead of Path / operator (gradual migration)
   # "PTH119", # os.path.basename() should be replaced by Path.name
   # "PTH120", # os.path.dirname() should be replaced by Path.parent
   # "PTH121", # os.path.samefile() should be replaced by Path.samefile()
   # "PTH122", # os.path.splitext() should be replaced by Path.suffix
-  "PTH123", # Allow open() instead of Path.open() (gradual migration)
+   "PTH123", # Allow open() instead of Path.open() (gradual migration)
   # "PTH124", # os.path.isdir() should be replaced by Path.is_dir()
 
   # ============================================================================
@@ -918,7 +918,7 @@ ignore = [
   # "PLR0402", # use from import instead of import (sometimes import is clearer)
   # "PLR0911", # too many return statements
    "PLR0912", # too many branches (needed for ML model selection and complex data processing)
-  "PLR0913", # too many arguments (needed for ML model constructors and training functions)
+   "PLR0913", # too many arguments (needed for ML model constructors and training functions)
    "PLR0915", # too many statements (needed for complex ML pipelines and model architectures)
   # "PLR1701", # merge isinstance calls
   # "PLR1722", # use sys.exit() instead of exit()

@@ -294,7 +294,7 @@ class TrainingConfig:
             raise FileNotFoundError(f"Configuration file not found: {json_path}")
 
         try:
-            with open(json_path, encoding="utf-8") as f:
+            with json_path.open(encoding="utf-8") as f:
                 config_dict = json.load(f)
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON in {json_path}: {e}") from e
@@ -326,7 +326,7 @@ class TrainingConfig:
             raise FileNotFoundError(f"Configuration file not found: {yaml_path}")
 
         try:
-            with open(yaml_path, encoding="utf-8") as f:
+            with yaml_path.open(encoding="utf-8") as f:
                 config_dict = yaml.safe_load(f)
         except yaml.YAMLError as e:
             raise ValueError(f"Invalid YAML in {yaml_path}: {e}") from e
@@ -351,7 +351,7 @@ class TrainingConfig:
         json_path = Path(json_path)
         json_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(json_path, "w", encoding="utf-8") as f:
+        with json_path.open("w", encoding="utf-8") as f:
             json.dump(self.to_dict(), f, indent=indent, default=str)
 
         logger.info("Configuration saved to %s", json_path)
@@ -373,7 +373,7 @@ class TrainingConfig:
         yaml_path = Path(yaml_path)
         yaml_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(yaml_path, "w", encoding="utf-8") as f:
+        with yaml_path.open("w", encoding="utf-8") as f:
             yaml.dump(self.to_dict(), f, default_flow_style=False, indent=2)
 
         logger.info("Configuration saved to %s", yaml_path)

@@ -360,7 +360,7 @@ class ProductionTrainer:
             # Save class names for later use
             self.class_names = train_dataset.classes
             class_to_idx_file = self.output_dir / "class_to_idx.json"
-            with open(class_to_idx_file, "w") as f:
+            with class_to_idx_file.open("w") as f:
                 json.dump(train_dataset.class_to_idx, f, indent=2)
 
             logger.info("Data loaders setup completed")
@@ -831,7 +831,7 @@ class ProductionTrainer:
     def _save_training_state(self) -> None:
         """Save final training state."""
         state_file = self.output_dir / "training_state.json"
-        with open(state_file, "w") as f:
+        with state_file.open("w") as f:
             json.dump(asdict(self.state), f, indent=2, default=str)
 
         logger.info(f"Training state saved: {state_file}")

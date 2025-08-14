@@ -146,7 +146,7 @@ class TestDatasetManager:
         img.save(class_dir / "valid.jpg")
 
         # Create a corrupted file
-        with open(class_dir / "corrupted.jpg", "w") as f:
+        with (class_dir / "corrupted.jpg").open("w") as f:
             f.write("not an image")
 
         result = dataset_manager.validate_dataset(dataset_dir)
@@ -177,7 +177,7 @@ class TestDatasetManager:
         config_file = output_dir / "dataset_config.json"
         assert config_file.exists()
 
-        with open(config_file) as f:
+        with config_file.open() as f:
             saved_config = json.load(f)
         assert saved_config["train_ratio"] == 0.8
         assert saved_config["random_seed"] == 42
