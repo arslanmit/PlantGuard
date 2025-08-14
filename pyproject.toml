@@ -189,7 +189,8 @@ show-fixes = true              # 📝 Show what was fixed
 output-format = "grouped"      # 📊 Group similar issues together
 
 # 🔍 What Ruff checks for (the rules we follow)
-# 💡 TIP: Add # before any rule to deactivate it, remove # to activate
+# 💡 TIP: Add # before any CATEGORY rule to deactivate it, remove # to activate
+# 🎯 CATEGORY CONTROL: Use broad categories here, fine-tune with individual rules in ignore section
 [tool.ruff.lint]
 select = [
   # ============================================================================
@@ -253,47 +254,35 @@ select = [
   "T20", # flake8-print (discourage print(), encourage logging)
 
   # ============================================================================
-  # 🔧 ADDITIONAL RULE CATEGORIES - Expand as needed
+  # 🔧 ADDITIONAL RULE CATEGORIES - Future-ready and optional
   # ============================================================================
-  # 💡 Add more rule categories here as they become available
-  # Check https://docs.astral.sh/ruff/rules/ for the latest rules
-
-  # 🎯 ASYNC & CONCURRENCY - Async/await patterns
-  # "ASYNC", # flake8-async (async/await best practices) - Future rule category
-
-  # 🔄 REFACTORING - Code improvement suggestions
-  # "FURB", # refurb (modernize and improve Python code) - Available in newer Ruff versions
+  # 💡 Add # before any category to deactivate it, remove # to activate
 
   # 🧪 TESTING - Test code quality
   # "PT",  # flake8-pytest-style (pytest best practices)
 
-  # 📊 DATA SCIENCE - NumPy, Pandas, etc.
-  # "NPY", # numpy-specific rules - Future rule category
-  # "PD",  # pandas-vet (pandas best practices) - Available in some Ruff versions
-
-  # 🌐 WEB DEVELOPMENT - Django, Flask, etc.
-  # "DJ",  # flake8-django (Django best practices) - Available in some Ruff versions
-
-  # 🔐 CRYPTOGRAPHY - Secure crypto usage
-  # "CRYPT", # cryptography best practices - Future rule category
-
-  # 📝 DOCUMENTATION GENERATION - Sphinx, etc.
-  # "DOC", # documentation generation rules - Future rule category
-
   # 🎨 CODE STYLE - Additional style rules
-  # "COM", # flake8-commas (trailing commas) - Available in some Ruff versions
-  # "Q",   # flake8-quotes (quote style consistency) - Available in some Ruff versions
+  # "COM", # flake8-commas (trailing commas)
+  # "Q",   # flake8-quotes (quote style consistency)
 
   # 🔍 CODE ANALYSIS - Advanced analysis
-  # "ERA", # eradicate (commented-out code) - Available in some Ruff versions
-  # "FBT", # flake8-boolean-trap (boolean trap anti-pattern) - Available in some Ruff versions
+  # "ERA", # eradicate (commented-out code detection)
+  # "FBT", # flake8-boolean-trap (boolean trap anti-pattern)
+  # "ARG", # flake8-unused-arguments (unused function arguments)
 
-  # 🏗️ ARCHITECTURE - Code architecture patterns
-  # "ARG", # flake8-unused-arguments (unused function arguments) - Available in some Ruff versions
-  # "PTH", # Already included above - pathlib usage
+  # 🔄 COMPATIBILITY & MODERNIZATION
+  # "YTT", # flake8-2020 (Python 2/3 compatibility)
+  # "FURB", # refurb (code modernization and improvements)
 
-  # 🔄 COMPATIBILITY - Python version compatibility
-  # "YTT", # flake8-2020 (Python 2/3 compatibility) - Available in some Ruff versions
+  # 🌐 FRAMEWORK-SPECIFIC
+  # "DJ",  # flake8-django (Django best practices)
+  # "PD",  # pandas-vet (Pandas best practices)
+
+  # � FUTURE CAATEGORIES - Add as they become available
+  # "ASYNC", # flake8-async (async/await best practices)
+  # "NPY",   # numpy-specific rules
+  # "CRYPT", # cryptography best practices
+  # "DOC",   # documentation generation rules
 
   # ============================================================================
   # 📋 RULE ACTIVATION EXAMPLES - How to control individual rules
@@ -309,22 +298,49 @@ select = [
   # 🎯 TO DEACTIVATE A RULE CATEGORY:
   # Add # before it: # "D",  # disable all docstring rules
   #
-  # 🎯 EXAMPLES OF GRANULAR CONTROL:
-  # "E501",    # line too long (if you want only this E rule)
-  # "F401",    # unused import (if you want only this F rule)
-  # "B007",    # unused loop variable (if you want only this B rule)
-  # "ANN001",  # missing type annotation (if you want only this ANN rule)
+  # 🎯 CATEGORY CONTROL EXAMPLES:
+  # "E",     # Enable ALL pycodestyle rules
+  # "F",     # Enable ALL pyflakes rules
+  # "B",     # Enable ALL bugbear rules
   #
-  # 🎯 MIX AND MATCH:
-  # You can combine categories and specific rules:
-  # "E",       # all pycodestyle errors
-  # "F401",    # but only this specific pyflakes rule
-  # "B007",    # and only this specific bugbear rule
+  # Then in ignore section, disable specific ones you don't want:
+  # "E501",  # Disable line too long
+  # "F841",  # Disable unused variables
+  # "B007",  # Disable unused loop variables
+  #
+  # 🚀 RESULT: You get the category but with exceptions!
 ]
 
 # 🚫 Rules we ignore (because they don't fit PlantGuard or are too strict)
 # 💡 TIP: Add # before any rule to activate it, remove # to deactivate
+# 🎯 COMPLETE CONTROL: Both CATEGORY and INDIVIDUAL rules for maximum flexibility
+# 📋 CURRENT STATUS: Rules without # are currently IGNORED, rules with # are currently ACTIVE
+# 🔄 CATEGORY vs INDIVIDUAL: Use "E" to ignore all pycodestyle, or "E501" for specific rules
 ignore = [
+  # ============================================================================
+  # 🎯 CATEGORY vs INDIVIDUAL CONTROL EXAMPLES
+  # ============================================================================
+  # 💡 You can ignore entire categories OR specific individual rules:
+  #
+  # 🔄 CATEGORY EXAMPLES (ignore ALL rules in a category):
+  # "E",      # Ignore ALL pycodestyle errors
+  # "F",      # Ignore ALL pyflakes rules
+  # "B",      # Ignore ALL bugbear rules
+  # "ANN",    # Ignore ALL annotation rules
+  # "D",      # Ignore ALL docstring rules
+  #
+  # 🎯 INDIVIDUAL EXAMPLES (ignore specific rules only):
+  # "E501",   # Ignore only line too long
+  # "F841",   # Ignore only unused variables
+  # "B007",   # Ignore only unused loop variables
+  # "ANN001", # Ignore only missing function argument annotations
+  # "D100",   # Ignore only missing module docstrings
+  #
+  # 🚀 MIX AND MATCH:
+  # You can combine both! Enable category in SELECT, then ignore specific rules here.
+  # Example: SELECT has "E" (all pycodestyle), IGNORE has "E501" (except line length)
+  # Result: All pycodestyle rules EXCEPT line length checking!
+
   # ============================================================================
   # 📏 PYCODESTYLE ERRORS (E) - Code formatting and style
   # ============================================================================
