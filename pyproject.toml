@@ -342,6 +342,18 @@ ignore = [
   # Result: All pycodestyle rules EXCEPT line length checking!
 
   # ============================================================================
+  # ⚠️ DEPRECATED & REMAPPED RULES - Important updates
+  # ============================================================================
+  # 🚫 REMOVED RULES (no longer exist in Ruff):
+  # "ANN101", # missing type annotation for self - DEPRECATED
+  # "ANN102", # missing type annotation for cls - DEPRECATED
+  #
+  # 🔄 REMAPPED RULES (consolidated into other rules):
+  # "SIM111", # remapped to SIM110 (both any() and all() suggestions)
+  #
+  # 💡 These rules are automatically handled by Ruff and don't need to be specified
+
+  # ============================================================================
   # 📏 PYCODESTYLE ERRORS (E) - Code formatting and style
   # ============================================================================
   # "E101",   # indentation contains mixed spaces and tabs
@@ -667,8 +679,8 @@ ignore = [
   "ANN001", # function arguments don't need types everywhere
   "ANN002", # missing type annotation for *args (gradual typing)
   "ANN003", # missing type annotation for **kwargs (gradual typing)
-  "ANN101", # missing type annotation for self in method (not needed)
-  "ANN102", # missing type annotation for cls in classmethod (not needed)
+  # "ANN101", # REMOVED: deprecated rule (no longer exists in Ruff)
+  # "ANN102", # REMOVED: deprecated rule (no longer exists in Ruff)
   "ANN201", # return types not required everywhere
   # "ANN202", # missing return type annotation for private function
   # "ANN204", # missing return type annotation for special method
@@ -712,8 +724,7 @@ ignore = [
   # "SIM103", # return condition directly
   # "SIM106", # use ternary operator instead of if-else-block for simple variable assignments
   # "SIM108", # use ternary operator instead of if-else-block that assigns a boolean
-  "SIM110", # use any(...) instead of for loop (sometimes explicit loops are clearer)
-  "SIM111", # use all(...) instead of for loop (sometimes explicit loops are clearer)
+  "SIM110", # use any(...) instead of for loop AND all(...) instead of for loop (remapped from SIM111)
   # "SIM112", # use CAPITAL_ENVIRONMENT_VARIABLES
   # "SIM113", # use enumerate instead of manually incrementing a counter
   # "SIM114", # combine if branches using logical or operator
