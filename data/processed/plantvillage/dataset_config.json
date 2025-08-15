@@ -1,0 +1,12 @@
+{
+  "train_ratio": 0.8,
+  "val_ratio": 0.2,
+  "random_seed": 42,
+  "min_samples_per_class": 10,
+  "image_formats": [
+    ".jpg",
+    ".jpeg",
+    ".png"
+  ],
+  "quality_threshold": 0.95
+}

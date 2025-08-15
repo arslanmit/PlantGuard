@@ -290,6 +290,28 @@ train:
 	fi
 	@echo "$(GREEN)✅ Model training complete$(NC)"
 
+# Train models with improved pipeline and better hyperparameters
+train-improved:
+	@echo "$(BLUE)🤖 Training PlantGuard models (improved)...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@mkdir -p $(RUNS_DIR)
+	@echo "$(YELLOW)Checking dataset availability...$(NC)"
+	@if [ -d "data/processed/plantvillage/train" ] && [ -d "data/processed/plantvillage/val" ]; then \
+		echo "$(GREEN)✅ Real PlantVillage dataset found$(NC)"; \
+		$(PY) scripts/train_vision_model_improved.py --data_dir data/processed/plantvillage --epochs 50 --batch_size 32 --learning_rate 0.0001; \
+	elif [ -d "data/PlantVillage/train" ] && [ -d "data/PlantVillage/val" ]; then \
+		echo "$(GREEN)✅ Legacy PlantVillage dataset found$(NC)"; \
+		$(PY) scripts/train_vision_model_improved.py --data_dir data/PlantVillage --epochs 50 --batch_size 32 --learning_rate 0.0001; \
+	elif [ -d "data/plantvillage_dummy_improved/train" ] && [ -d "data/plantvillage_dummy_improved/val" ]; then \
+		echo "$(GREEN)✅ Improved dummy dataset found$(NC)"; \
+		$(PY) scripts/train_vision_model_improved.py --data_dir data/plantvillage_dummy_improved --epochs 15 --batch_size 16 --learning_rate 0.0001; \
+	else \
+		echo "$(YELLOW)⚠️  No dataset found. Creating improved dummy dataset for testing...$(NC)"; \
+		$(PY) scripts/setup_better_dummy_dataset.py --output_dir data/plantvillage_dummy_improved --num_classes 8 --samples_per_class 60; \
+		$(PY) scripts/train_vision_model_improved.py --data_dir data/plantvillage_dummy_improved --epochs 15 --batch_size 16 --learning_rate 0.0001; \
+	fi
+	@echo "$(GREEN)✅ Improved model training complete$(NC)"
+
 # Setup dataset (real PlantVillage or dummy for testing)
 setup-dataset:
 	@echo "$(BLUE)📊 Setting up training dataset...$(NC)"
