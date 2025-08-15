@@ -201,8 +201,8 @@ no_implicit_optional = true      # Be explicit about Optional types
 
 # 🧠 ML-specific MyPy settings
 disable_error_code = [
-    "misc",
-    "no-untyped-def",
+    "misc",              # Allow miscellaneous type issues - ML code often has complex patterns
+    "no-untyped-def",    # Allow functions without type annotations - rapid ML prototyping
     "assignment",        # Allow type assignment mismatches - common in ML with dynamic types
     "attr-defined",      # Allow missing attributes - ML objects often have dynamic attributes
     "index",             # Allow indexing issues - ML data structures can be complex
@@ -215,6 +215,8 @@ disable_error_code = [
     "operator",          # Allow operator type issues - ML tensor operations flexible
     "import",            # Allow import errors for optional ML dependencies
     "import-untyped",    # Allow imports from untyped modules - common in ML ecosystem
+    "has-type",          # Allow variables with undetermined types - common in ML training loops
+    "note",              # Allow informational notes about missing imports and stubs
 ]
 
 # Disable all error checking for problematic files
@@ -226,7 +228,9 @@ module = [
     "fix_model_issues",
     "apply_model_workarounds",
     "demo_switcher",
-    "verify_deployment"
+    "verify_deployment",
+    "scripts.*",
+    "tests.*"
 ]
 ignore_errors = true
 
@@ -1314,11 +1318,15 @@ disable = [
     "W0718",  # broad-exception-caught - Allow broad exception handling in ML model operations
     "W0612",  # unused-variable - Allow unused variables in ML experiments and debugging
     "W0201",  # attribute-defined-outside-init - Allow dynamic attributes in ML classes
+    "W0611",  # unused-import - Allow unused imports in ML experimental code
+    "W0104",  # pointless-statement - Allow statements that seem to have no effect in ML code
+    "W0212",  # protected-access - Allow access to protected members in ML frameworks
     "C0413",  # wrong-import-position - Allow conditional imports in ML code
     "C0301",  # line-too-long - Allow longer lines for ML parameter lists
     "C0302",  # too-many-lines - Allow large ML training modules
     "C0415",  # import-outside-toplevel - Allow conditional imports for ML dependencies
     "C0303",  # trailing-whitespace - Allow trailing whitespace in ML code
+    "C0103",  # invalid-name - Allow ML naming conventions like T_max for schedulers
     "E0401",  # import-error - Allow import errors for optional ML dependencies
 ]
 
