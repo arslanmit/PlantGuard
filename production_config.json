@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0",
+  "environment": "production",
+  "created": "2025-08-16T00:10:56.898681",
+  "model": {
+    "primary_model": "data/models/vision_resnet50.pt",
+    "fallback_models": [
+      "data/models/best_model.pt",
+      "data/models/latest_model.pt"
+    ],
+    "class_mapping": "data/knowledge_base/plantvillage_classes.json",
+    "confidence_threshold": 0.15,
+    "calibration_factor": 2.5
+  },
+  "inference": {
+    "device": "auto",
+    "batch_size": 1,
+    "image_size": [
+      224,
+      224
+    ],
+    "preprocessing": {
+      "normalize_mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "normalize_std": [
+        0.229,
+        0.224,
+        0.225
+      ]
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "rotation": {
+      "max_size_mb": 10,
+      "backup_count": 5,
+      "archive_after_days": 7,
+      "delete_after_days": 30
+    },
+    "files": {
+      "app": "logs/app.log",
+      "model": "logs/model.log",
+      "errors": "logs/errors.log"
+    }
+  },
+  "performance": {
+    "enable_caching": true,
+    "cache_size": 100,
+    "enable_ensemble": false,
+    "ensemble_models": 3,
+    "timeout_seconds": 30
+  },
+  "monitoring": {
+    "health_check_interval": 300,
+    "log_predictions": true,
+    "track_confidence": true,
+    "alert_low_confidence": 0.05
+  },
+  "security": {
+    "max_image_size_mb": 50,
+    "allowed_formats": [
+      "jpg",
+      "jpeg",
+      "png"
+    ],
+    "sanitize_inputs": true
+  }
+}
