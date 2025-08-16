@@ -1,10 +1,10 @@
 """PlantGuard Streamlit application for multimodal plant disease detection."""
 
+import json
+import subprocess  # nosec B404: subprocess is required for TensorBoard integration
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-import json
-import subprocess  # nosec B404: subprocess is required for TensorBoard integration
 import numpy as np
 import soundfile as sf
 import streamlit as st
@@ -784,32 +784,36 @@ with tab4:
             st.markdown(f"[Open http://localhost:{6006}](http://localhost:{6006})")
 
         if launch_tb:
-            try:
-                # Using shlex.quote to properly escape paths and arguments
-                import shutil
-                import shlex
+            # Add this function definition before the main code
+            def launch_tensorboard(runs_dir, tb_port):
+                """Launch TensorBoard with the specified log directory and port."""
+                try:
+                    # Using shlex.quote to properly escape paths and arguments
+                    import shlex
+                    import shutil
 
-                # Get full path to tensorboard executable
-                tensorboard_path = shutil.which("tensorboard")
-                if not tensorboard_path:
-                    st.error("TensorBoard not found in PATH")
-                    return
+                    # Get full path to tensorboard executable
+                    tensorboard_path = shutil.which("tensorboard")
+                    if not tensorboard_path:
+                        st.error("TensorBoard not found in PATH")
+                        return False
 
-                cmd = [tensorboard_path, "--logdir", shlex.quote(str(runs_dir)), "--port", str(int(tb_port)), "--reload_interval", "1"]
+                    cmd = [tensorboard_path, "--logdir", shlex.quote(str(runs_dir)), "--port", str(int(tb_port)), "--reload_interval", "1"]
 
-                # Use full path and proper argument handling
-                subprocess.Popen(  # nosec B603: shell=False, inputs are sanitized
-                    cmd,
-                    shell=False,  # Safer than shell=True
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-                st.success(f"TensorBoard launched at http://localhost:{int(tb_port)}")
-                st.markdown(f"[Open TensorBoard](http://localhost:{int(tb_port)})")
-            except FileNotFoundError:
-                st.error("TensorBoard not found. Install with: pip install tensorboard")
-            except Exception as e:
-                st.error(f"Failed to launch TensorBoard: {e!s}")
+                    # Use full path and proper argument handling
+                    subprocess.Popen(  # nosec B603: shell=False, inputs are sanitized
+                        cmd,
+                        shell=False,  # Safer than shell=True
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    )
+                    st.success(f"TensorBoard launched at http://localhost:{int(tb_port)}")
+                    st.markdown(f"[Open TensorBoard](http://localhost:{int(tb_port)})")
+                    return True
+                except FileNotFoundError:
+                    st.error("TensorBoard not found. Install with: pip install tensorboard")
+                    return False
+
 
 # Footer with improved styling
 st.markdown("---")
