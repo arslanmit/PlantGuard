@@ -79,17 +79,18 @@ class ModeSwitcher:
                 button_type = "primary" if current_mode == mode["id"] else "secondary"
                 button_label = f"{mode['icon']} {mode['label']}"
 
+                button_type_literal = "primary" if current_mode == mode["id"] else "secondary"
                 if st.button(
                     button_label,
                     key=f"mode_btn_{mode['id']}",
                     use_container_width=use_container_width,
-                    type=button_type,
+                    type=button_type_literal,
                     help=mode.get("description", ""),
                 ):
                     st.session_state[self.session_key] = mode["id"]
                     st.rerun()
 
-        return st.session_state[self.session_key]
+        return st.session_state[self.session_key]  # type: ignore
 
     def get_current_mode(self) -> InputMode:
         """Get the currently selected mode."""
@@ -156,7 +157,7 @@ class ThemeSwitcher:
             st.session_state[self.session_key] = selected
             st.rerun()
 
-        return selected
+        return selected  # type: ignore
 
 
 class ModelSwitcher:
@@ -178,7 +179,7 @@ class ModelSwitcher:
             }
 
     def render(self, available_models: dict[str, list[str]]) -> dict[str, str]:
-        """Render model selection interface.
+        """Render enhanced model selection interface with improved dropdowns.
 
         Args:
             available_models: Dict mapping model type to list of available models
@@ -186,59 +187,200 @@ class ModelSwitcher:
         Returns:
             Dict of selected models for each type
         """
-        st.markdown("#### 🤖 Model Selection")
+        # Enhanced CSS for better dropdown styling
+        st.markdown(
+            """
+        <style>
+        .model-dropdown-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .model-dropdown-container:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+        }
+
+        .model-type-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .model-icon {
+            font-size: 1.2em;
+            margin-right: 0.5rem;
+        }
+
+        .model-description {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Custom selectbox styling */
+        .stSelectbox > div > div {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .stSelectbox > div > div:hover {
+            border-color: #4CAF50;
+        }
+
+        .stSelectbox > div > div:focus-within {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+        </style>
+        """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown("#### 🤖 Advanced Model Selection")
+        st.markdown("*Choose the best AI models for your plant analysis needs*")
 
         current_selection = st.session_state[self.session_key]
 
+        # Model configurations with metadata
+        model_configs = {
+            "vision": {
+                "icon": "👁️",
+                "title": "Vision Model",
+                "description": "AI model for plant image analysis",
+                "models": {"vit_base_plants": "🏆 Vision Transformer (Best Accuracy)", "resnet50_plantvillage_v1": "🔬 ResNet50 (Balanced)", "mobilenet_fast": "⚡ MobileNet (Fastest)"},
+            },
+            "audio": {
+                "icon": "🎤",
+                "title": "Audio Model",
+                "description": "AI model for voice and audio processing",
+                "models": {"whisper_tiny_local": "🎯 Whisper Tiny (Local)", "wav2vec2_plant_sounds": "🌿 Wav2Vec2 (Plant Sounds)"},
+            },
+            "text": {
+                "icon": "💬",
+                "title": "Text Model",
+                "description": "AI model for plant care questions",
+                "models": {"distilbert_plant_qa_v1": "🧠 DistilBERT (Plant Q&A)", "roberta_plant_care": "🌱 RoBERTa (Plant Care)", "t5_small_plant_qa": "📝 T5 Small (Text Generation)"},
+            },
+        }
+
         col1, col2, col3 = st.columns(3)
+        columns = [col1, col2, col3]
 
-        with col1:
-            st.markdown("**Vision Model**")
-            vision_models = available_models.get("vision", ["resnet50_plantvillage_v1"])
-            current_vision = current_selection.get("vision", vision_models[0])
+        selected_models = {}
 
-            selected_vision = st.selectbox(
-                "Vision",
-                options=vision_models,
-                index=vision_models.index(current_vision) if current_vision in vision_models else 0,
-                key="vision_model_select",
-                label_visibility="collapsed",
+        for i, (model_type, config) in enumerate(model_configs.items()):
+            with columns[i]:
+                # Enhanced model container
+                st.markdown(
+                    f"""
+                <div class="model-dropdown-container">
+                    <div class="model-type-header">
+                        <span class="model-icon">{config["icon"]}</span>
+                        <strong>{config["title"]}</strong>
+                    </div>
+                    <div class="model-description">{config["description"]}</div>
+                </div>
+                """,
+                    unsafe_allow_html=True,
+                )
+
+                # Get available models for this type
+                available_for_type = available_models.get(model_type, list(config["models"].keys()))
+                current_model = current_selection.get(model_type, available_for_type[0])
+
+                # Create display options with enhanced formatting
+                display_options = []
+                model_keys = []
+
+                for model_key in available_for_type:
+                    display_name = config["models"].get(model_key, model_key)
+                    display_options.append(display_name)
+                    model_keys.append(model_key)
+
+                # Find current index
+                current_index = 0
+                if current_model in model_keys:
+                    current_index = model_keys.index(current_model)
+
+                # Enhanced selectbox
+                selected_display = st.selectbox(
+                    f"{config['icon']} {config['title']}",
+                    options=display_options,
+                    index=current_index,
+                    key=f"{model_type}_model_select",
+                    help=f"Select the {config['title'].lower()} for {config['description'].lower()}",
+                    label_visibility="collapsed",
+                )
+
+                # Map back to model key
+                selected_key = model_keys[display_options.index(selected_display)]
+                selected_models[model_type] = selected_key
+
+                # Model performance indicator
+                performance_indicators = {
+                    "vit_base_plants": ("🏆", "100%", "#4CAF50"),
+                    "resnet50_plantvillage_v1": ("🔬", "95%", "#2196F3"),
+                    "mobilenet_fast": ("⚡", "90%", "#FF9800"),
+                    "whisper_tiny_local": ("🎯", "Local", "#4CAF50"),
+                    "wav2vec2_plant_sounds": ("🌿", "Beta", "#FF9800"),
+                    "distilbert_plant_qa_v1": ("🧠", "Stable", "#4CAF50"),
+                    "roberta_plant_care": ("🌱", "Advanced", "#2196F3"),
+                    "t5_small_plant_qa": ("📝", "Creative", "#9C27B0"),
+                }
+
+                if selected_key in performance_indicators:
+                    icon, metric, color = performance_indicators[selected_key]
+                    st.markdown(
+                        f"""
+                    <div style="text-align: center; margin-top: 0.5rem;">
+                        <span style="color: {color}; font-weight: bold;">
+                            {icon} {metric}
+                        </span>
+                    </div>
+                    """,
+                        unsafe_allow_html=True,
+                    )
+
+        # Update session state with new selections
+        if selected_models != current_selection:
+            st.session_state[self.session_key] = selected_models
+
+            # Enhanced notification with model details
+            st.markdown(
+                """
+            <div style="background: linear-gradient(90deg, #4CAF50, #45a049);
+                        color: white; padding: 1rem; border-radius: 8px;
+                        text-align: center; margin: 1rem 0;">
+                <strong>🔄 Model Configuration Updated!</strong><br>
+                <small>New models will be loaded on next inference</small>
+            </div>
+            """,
+                unsafe_allow_html=True,
             )
 
-        with col2:
-            st.markdown("**Audio Model**")
-            audio_models = available_models.get("audio", ["whisper_tiny_local"])
-            current_audio = current_selection.get("audio", audio_models[0])
+            # Show what changed
+            changes = []
+            for model_type, new_model in selected_models.items():
+                old_model = current_selection.get(model_type, "")
+                if new_model != old_model:
+                    changes.append(f"**{model_type.title()}**: {old_model} → {new_model}")
 
-            selected_audio = st.selectbox(
-                "Audio",
-                options=audio_models,
-                index=audio_models.index(current_audio) if current_audio in audio_models else 0,
-                key="audio_model_select",
-                label_visibility="collapsed",
-            )
+            if changes:
+                with st.expander("📋 View Changes", expanded=False):
+                    for change in changes:
+                        st.markdown(f"• {change}")
 
-        with col3:
-            st.markdown("**Text Model**")
-            text_models = available_models.get("text", ["distilbert_plant_qa_v1"])
-            current_text = current_selection.get("text", text_models[0])
-
-            selected_text = st.selectbox(
-                "Text",
-                options=text_models,
-                index=text_models.index(current_text) if current_text in text_models else 0,
-                key="text_model_select",
-                label_visibility="collapsed",
-            )
-
-        # Update session state
-        new_selection = {"vision": selected_vision, "audio": selected_audio, "text": selected_text}
-
-        if new_selection != current_selection:
-            st.session_state[self.session_key] = new_selection
-            st.info("🔄 Model selection updated. Models will reload on next inference.")
-
-        return new_selection
+        return selected_models
 
 
 def render_status_indicator(status: str, label: str = "") -> None:

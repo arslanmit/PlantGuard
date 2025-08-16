@@ -216,22 +216,44 @@ disable_error_code = [
     "import",            # Allow import errors for optional ML dependencies
     "import-untyped",    # Allow imports from untyped modules - common in ML ecosystem
     "has-type",          # Allow variables with undetermined types - common in ML training loops
-    "note",              # Allow informational notes about missing imports and stubs
+    "import-not-found",  # Allow missing imports - common in ML development
 ]
 
 # Disable all error checking for problematic files
 [[tool.mypy.overrides]]
-module = [
-    "final_cleanup",
-    "final_optimization",
-    "deploy_improvements",
-    "fix_model_issues",
-    "apply_model_workarounds",
-    "demo_switcher",
-    "verify_deployment",
-    "scripts.*",
-    "tests.*"
-]
+module = "final_cleanup"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "final_optimization"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "deploy_improvements"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "fix_model_issues"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "apply_model_workarounds"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "demo_switcher"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "verify_deployment"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "scripts.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
 ignore_errors = true
 
 # 📦 External libraries

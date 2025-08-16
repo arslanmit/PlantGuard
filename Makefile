@@ -46,11 +46,11 @@ endif
 
 .DEFAULT_GOAL := help
 
-.PHONY: help start setup install run switcher model-switcher dev test clean
+.PHONY: help start setup install run switcher run-all model-switcher dev test clean
 .PHONY: format lint check fix train notebook
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
-.PHONY: reset fresh restart debug profile
+.PHONY: reset fresh stop restart debug profile validate
 .PHONY: qa
 
 help:
@@ -58,8 +58,9 @@ help:
 	@echo ""
 	@echo "$(GREEN)🚀 Getting Started$(NC)"
 	@echo "  $(BLUE)start$(NC)          - First-time setup + launch app"
-	@echo "  $(BLUE)run$(NC)            - Launch PlantGuard app"
+	@echo "  $(BLUE)run$(NC)            - Launch PlantGuard main app (port 8501)"
 	@echo "  $(BLUE)switcher$(NC)       - Launch Model Switcher UI (port 8502)"
+	@echo "  $(BLUE)run-all$(NC)        - Launch both main app and switcher"
 	@echo "  $(BLUE)setup$(NC)          - Install dependencies & configure"
 	@echo "  $(BLUE)notebook$(NC)       - Open Jupyter for development"
 	@echo ""
@@ -84,11 +85,14 @@ help:
 	@echo "  $(BLUE)debug$(NC)          - Debug model performance"
 	@echo ""
 	@echo "$(GREEN)🔧 Maintenance$(NC)"
+	@echo "  $(BLUE)stop$(NC)           - Stop all running applications"
+	@echo "  $(BLUE)restart$(NC)        - Restart main application"
 	@echo "  $(BLUE)clean$(NC)          - Clean temporary files"
 	@echo "  $(BLUE)reset$(NC)          - Reset environment"
 	@echo "  $(BLUE)fresh$(NC)          - Fresh install (clean + setup)"
 	@echo "  $(BLUE)update$(NC)         - Update dependencies"
 	@echo "  $(BLUE)status$(NC)         - Check project health"
+	@echo "  $(BLUE)validate$(NC)       - Validate app configurations"
 	@echo ""
 	@echo "$(GREEN)📊 Information$(NC)"
 	@echo "  $(BLUE)info$(NC)           - Project overview"
@@ -97,9 +101,12 @@ help:
 	@echo ""
 	@echo "$(YELLOW)💡 Examples:$(NC)"
 	@echo "  $(CYAN)make start$(NC)     - New user? Start here!"
+	@echo "  $(CYAN)make run$(NC)       - Launch main app for plant detection"
+	@echo "  $(CYAN)make switcher$(NC)  - Launch model management interface"
+	@echo "  $(CYAN)make run-all$(NC)   - Run both apps simultaneously"
 	@echo "  $(CYAN)make dev$(NC)       - Quick code check before commit"
 	@echo "  $(CYAN)make train$(NC)     - Train your models"
-	@echo "  $(CYAN)make clean$(NC)     - Clean up when things get messy"
+	@echo "  $(CYAN)make stop$(NC)      - Stop all running applications"
 
 # ========== Getting Started ==========
 
@@ -112,6 +119,7 @@ start:
 	else \
 		echo "$(GREEN)✅ Virtual environment found$(NC)"; \
 	fi
+	@echo "$(CYAN)🎯 Launching main application...$(NC)"
 	@make run
 
 # Complete environment setup
@@ -147,15 +155,17 @@ install: deps
 
 # ========== Application Commands ==========
 
-# Launch PlantGuard app
+# Launch PlantGuard app with enhanced UI
 run:
-	@echo "$(BLUE)🚀 Starting PlantGuard...$(NC)"
+	@echo "$(BLUE)🚀 Starting PlantGuard with Enhanced UI...$(NC)"
 	@if [ ! -x $(PY) ]; then \
 		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
 		make setup; \
 	fi
 	@echo "$(GREEN)🌿 PlantGuard is starting at http://localhost:8501$(NC)"
-	@$(PY) run_local.py
+	@echo "$(CYAN)✨ Features: Multimodal Detection, Advanced Model Selection, Professional Layout$(NC)"
+	@echo "$(CYAN)📱 For microphone support, use HTTPS (ngrok/cloudflare tunnel)$(NC)"
+	@$(PY) -m streamlit run src/ui/app_streamlit.py --server.port 8501 --server.headless true --server.enableCORS false --server.enableXsrfProtection false
 
 # Launch Model Switcher UI (Streamlit)
 switcher:
@@ -164,8 +174,24 @@ switcher:
 		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
 		make setup; \
 	fi
-	@echo "$(GREEN)🌿 Model Switcher is starting at http://localhost:8502$(NC)"
-	@$(PY) -m streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502
+	@echo "$(GREEN)🔧 Model Switcher is starting at http://localhost:8502$(NC)"
+	@echo "$(CYAN)✨ Features: Model Management, Performance Testing, Configuration$(NC)"
+	@$(PY) -m streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502 --server.headless true --server.enableCORS false --server.enableXsrfProtection false
+
+# Launch both main app and model switcher simultaneously
+run-all:
+	@echo "$(BLUE)🚀 Starting PlantGuard with both Main App and Model Switcher...$(NC)"
+	@if [ ! -x $(PY) ]; then \
+		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
+		make setup; \
+	fi
+	@echo "$(GREEN)🌿 PlantGuard Main App: http://localhost:8501$(NC)"
+	@echo "$(GREEN)🔧 Model Switcher: http://localhost:8502$(NC)"
+	@echo "$(CYAN)✨ Running both applications in parallel...$(NC)"
+	@echo "$(YELLOW)💡 Press Ctrl+C to stop both applications$(NC)"
+	@$(PY) -m streamlit run src/ui/app_streamlit.py --server.port 8501 --server.headless true --server.enableCORS false --server.enableXsrfProtection false & \
+	$(PY) -m streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502 --server.headless true --server.enableCORS false --server.enableXsrfProtection false & \
+	wait
 
 # Alias
 model-switcher: switcher
@@ -458,6 +484,15 @@ status:
 	@[ -d $(TESTS_DIR) ] && echo "$(GREEN)✅ Tests directory$(NC)" || echo "$(RED)❌ Tests directory missing$(NC)"
 	@[ -d $(DATA_DIR) ] && echo "$(GREEN)✅ Data directory$(NC)" || echo "$(RED)❌ Data directory missing$(NC)"
 
+# Validate application configurations
+validate:
+	@echo "$(BLUE)🔍 Validating PlantGuard applications...$(NC)"
+	@if [ ! -x $(PY) ]; then \
+		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
+		make setup; \
+	fi
+	@$(PY) scripts/validate_apps.py
+
 # ========== Information ==========
 
 # Project overview
@@ -477,7 +512,7 @@ info:
 	@echo ""
 	@echo "$(GREEN)Quick Commands:$(NC)"
 	@echo "  $(CYAN)make start$(NC)  - First-time setup and launch"
-	@echo "  $(CYAN)make run$(NC)    - Launch the application"
+	@echo "  $(CYAN)make run$(NC)    - Launch with Enhanced Rotated UI"
 	@echo "  $(CYAN)make dev$(NC)    - Development workflow"
 	@echo "  $(CYAN)make train$(NC)  - Train ML models"
 
@@ -519,10 +554,16 @@ profile:
 	@$(PY) -c "import pstats; p = pstats.Stats('profile.stats'); p.sort_stats('cumulative').print_stats(10)"
 	@echo "$(GREEN)✅ Profiling complete$(NC)"
 
+# Stop all running Streamlit processes
+stop:
+	@echo "$(BLUE)� Stoppring all PlantGuard applications...$(NC)"
+	@pkill -f "streamlit" || true
+	@echo "$(GREEN)✅ All applications stopped$(NC)"
+
 # Restart application (useful during development)
 restart:
 	@echo "$(BLUE)🔄 Restarting PlantGuard...$(NC)"
-	@pkill -f "streamlit" || true
+	@make stop
 	@sleep 2
 	@make run
 

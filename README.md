@@ -37,9 +37,10 @@ PlantGuard is a production-ready multimodal AI system for plant disease detectio
 - [x] **Plant type detection** and health status classification
 - [x] **Model checkpoint loading/saving** with comprehensive error handling
 
-#### **Enhanced User Interface** ✅
-- [x] **Main PlantGuard app** with three functional tabs (Image, Voice, Text)
-- [x] **Model Switcher UI** - Dedicated interface for model management and testing
+#### **Enhanced Dual-Interface System** ✅
+- [x] **Main PlantGuard app** (`make run`) - Primary detection interface with three functional tabs (Image, Voice, Text)
+- [x] **Model Switcher UI** (`make switcher`) - Dedicated interface for model management and testing
+- [x] **Simultaneous operation** (`make run-all`) - Run both applications concurrently on different ports
 - [x] **Real-time model switching** without application restart
 - [x] **Real-time microphone recording** via `streamlit-webrtc`
 - [x] **Image upload and analysis** with confidence scoring and detailed results
@@ -48,6 +49,7 @@ PlantGuard is a production-ready multimodal AI system for plant disease detectio
 - [x] **Model caching** with `@st.cache_resource` for performance
 - [x] **Responsive design** with proper error handling and user feedback
 - [x] **Sample image testing** with pre-loaded test images
+- [x] **Application management** - Start, stop, restart, and validate configurations
 
 #### **Training Infrastructure** ✅
 - [x] **Complete training pipeline** for ResNet50 vision model
@@ -134,6 +136,17 @@ make run
 # Launch Model Switcher (separate interface)
 make switcher
 # Opens at http://localhost:8502
+
+# Launch both applications simultaneously
+make run-all
+# Main app: http://localhost:8501
+# Switcher: http://localhost:8502
+
+# Validate configuration before running
+make validate
+
+# Stop all running applications
+make stop
 ```
 
 ### **Method 2: Google Colab (Cloud Development)**
@@ -204,7 +217,9 @@ The PlantGuard Makefile has been completely redesigned to be intuitive and user-
 ```bash
 # Getting started (most common)
 make start           # First-time setup + launch app (new users start here!)
-make run             # Launch PlantGuard Streamlit app
+make run             # Launch PlantGuard main app (port 8501)
+make switcher        # Launch Model Switcher UI (port 8502)
+make run-all         # Launch both applications simultaneously
 make setup           # Install dependencies & configure environment
 
 # Development workflow (daily use)
@@ -213,6 +228,12 @@ make format          # Auto-format code with Ruff
 make lint            # Check code quality
 make test            # Run tests
 make fix             # Auto-fix common issues
+make validate        # Validate app configurations and imports
+
+# Application management
+make stop            # Stop all running Streamlit applications
+make restart         # Restart main application
+make validate        # Validate application configurations
 
 # Machine learning & datasets
 make train           # Train PlantGuard models
