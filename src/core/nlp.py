@@ -59,9 +59,7 @@ class TextAdapter:
         # Simple knowledge base responses
         responses = {
             "powdery mildew": (
-                "Powdery mildew is a fungal disease that appears as white, powdery spots on "
-                "leaves. Treatment includes improving air circulation, reducing humidity, and "
-                "applying fungicidal sprays."
+                "Powdery mildew is a fungal disease that appears as white, powdery spots on leaves. Treatment includes improving air circulation, reducing humidity, and applying fungicidal sprays."
             ),
             "blight": (
                 "Blight diseases cause rapid browning and death of plant tissues. Remove "
@@ -69,20 +67,10 @@ class TextAdapter:
                 "drainage and avoid overhead watering."
             ),
             "rust": (
-                "Rust appears as orange or reddish spots on leaves. Remove infected leaves, "
-                "improve air circulation, and apply fungicidal treatments. Water at soil "
-                "level to avoid wetting leaves."
+                "Rust appears as orange or reddish spots on leaves. Remove infected leaves, improve air circulation, and apply fungicidal treatments. Water at soil level to avoid wetting leaves."
             ),
-            "bacterial spot": (
-                "Bacterial spot causes dark, water-soaked lesions on leaves and fruits. "
-                "Remove infected plant parts, avoid overhead watering, and apply "
-                "copper-based bactericides."
-            ),
-            "healthy": (
-                "Your plant appears healthy! Continue with regular care including proper "
-                "watering, adequate sunlight, and good air circulation to maintain plant "
-                "health."
-            ),
+            "bacterial spot": ("Bacterial spot causes dark, water-soaked lesions on leaves and fruits. Remove infected plant parts, avoid overhead watering, and apply copper-based bactericides."),
+            "healthy": ("Your plant appears healthy! Continue with regular care including proper watering, adequate sunlight, and good air circulation to maintain plant health."),
         }
 
         # Find relevant response

@@ -70,9 +70,7 @@ class TestDatasetConfig:
 
     def test_custom_values(self) -> None:
         """Test custom configuration values."""
-        config = DatasetConfig(
-            train_ratio=0.7, val_ratio=0.3, random_seed=123, min_samples_per_class=5
-        )
+        config = DatasetConfig(train_ratio=0.7, val_ratio=0.3, random_seed=123, min_samples_per_class=5)
 
         assert config.train_ratio == 0.7
         assert config.val_ratio == 0.3
@@ -118,9 +116,7 @@ class TestDatasetManager:
         assert result.valid_files == 0
         assert len(result.errors) > 0
 
-    def test_validate_dataset_valid(
-        self, dataset_manager: DatasetManager, sample_dataset: Path
-    ) -> None:
+    def test_validate_dataset_valid(self, dataset_manager: DatasetManager, sample_dataset: Path) -> None:
         """Test dataset validation with valid dataset."""
         result = dataset_manager.validate_dataset(sample_dataset)
 
@@ -133,9 +129,7 @@ class TestDatasetManager:
         assert result.class_counts["healthy"] == 5
         assert result.class_counts["diseased"] == 5
 
-    def test_validate_dataset_with_corrupted_file(
-        self, dataset_manager: DatasetManager, temp_dir: Path
-    ) -> None:
+    def test_validate_dataset_with_corrupted_file(self, dataset_manager: DatasetManager, temp_dir: Path) -> None:
         """Test dataset validation with corrupted files."""
         dataset_dir = temp_dir / "corrupted_dataset"
         class_dir = dataset_dir / "test_class"
@@ -156,9 +150,7 @@ class TestDatasetManager:
         assert len(result.corrupted_files) == 1
         assert "corrupted.jpg" in str(result.corrupted_files[0])
 
-    def test_prepare_dataset(
-        self, dataset_manager: DatasetManager, sample_dataset: Path, temp_dir: Path
-    ) -> None:
+    def test_prepare_dataset(self, dataset_manager: DatasetManager, sample_dataset: Path, temp_dir: Path) -> None:
         """Test dataset preparation with train/val split."""
         output_dir = temp_dir / "prepared"
         config = DatasetConfig(train_ratio=0.8, random_seed=42)
@@ -182,9 +174,7 @@ class TestDatasetManager:
         assert saved_config["train_ratio"] == 0.8
         assert saved_config["random_seed"] == 42
 
-    def test_prepare_dataset_nonexistent_source(
-        self, dataset_manager: DatasetManager, temp_dir: Path
-    ) -> None:
+    def test_prepare_dataset_nonexistent_source(self, dataset_manager: DatasetManager, temp_dir: Path) -> None:
         """Test dataset preparation with non-existent source."""
         output_dir = temp_dir / "prepared"
         config = DatasetConfig()
@@ -206,9 +196,7 @@ class TestDatasetManager:
         assert info.class_distribution["diseased"] == 5
         assert info.dataset_size_mb > 0
 
-    def test_analyze_dataset_with_splits(
-        self, dataset_manager: DatasetManager, temp_dir: Path
-    ) -> None:
+    def test_analyze_dataset_with_splits(self, dataset_manager: DatasetManager, temp_dir: Path) -> None:
         """Test dataset analysis with train/val splits."""
         dataset_dir = temp_dir / "split_dataset"
         train_dir = dataset_dir / "train" / "healthy"

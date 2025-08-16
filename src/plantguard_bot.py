@@ -48,9 +48,7 @@ class PlantGuardBot:
     def vision_adapter(self) -> VisionAdapter:
         """Lazy loading of vision adapter."""
         if self._vision_adapter is None:
-            self._vision_adapter = VisionAdapter(
-                model_path=self.config.vision_model_path, device=str(self.device)
-            )
+            self._vision_adapter = VisionAdapter(model_path=self.config.vision_model_path, device=str(self.device))
         return self._vision_adapter
 
     @property
@@ -67,9 +65,7 @@ class PlantGuardBot:
             self._text_adapter = TextAdapter(knowledge_base_path=self.config.knowledge_base_path)
         return self._text_adapter
 
-    def analyze_plant(
-        self, image: Image.Image, audio_path: str | None = None, text_query: str = ""
-    ) -> dict[str, Any]:
+    def analyze_plant(self, image: Image.Image, audio_path: str | None = None, text_query: str = "") -> dict[str, Any]:
         """Main analysis method combining all modalities.
 
         Args:

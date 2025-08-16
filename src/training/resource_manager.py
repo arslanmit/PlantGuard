@@ -153,10 +153,7 @@ class ResourceManager:
                 mps_total = min(total_gb * 0.7, 32.0)  # Assume max 32GB or 70% of system
                 mps_available = min(available_gb * 0.7, mps_total)
 
-                logger.info(
-                    f"MPS Memory (estimated): {mps_available:.1f}GB available / "
-                    f"{mps_total:.1f}GB total"
-                )
+                logger.info(f"MPS Memory (estimated): {mps_available:.1f}GB available / {mps_total:.1f}GB total")
                 return mps_total, mps_available
             except ImportError:
                 logger.warning("psutil not available, using default MPS memory estimates")
@@ -171,9 +168,7 @@ class ResourceManager:
                 total_gb = memory.total / (1024**3)
                 available_gb = memory.available / (1024**3)
 
-                logger.info(
-                    f"System Memory: {available_gb:.1f}GB available / {total_gb:.1f}GB total"
-                )
+                logger.info(f"System Memory: {available_gb:.1f}GB available / {total_gb:.1f}GB total")
                 return total_gb, available_gb
             except ImportError:
                 logger.warning("psutil not available, using default memory estimates")
@@ -298,11 +293,7 @@ class ResourceManager:
         # Ensure power of 2 for better performance
         optimal_batch_size = self._round_to_power_of_2(optimal_batch_size)
 
-        logger.info(
-            f"Calculated optimal batch size: {optimal_batch_size} "
-            f"(Memory per sample: {memory_per_sample_mb:.1f}MB, "
-            f"Usable memory: {usable_memory_mb:.1f}MB)"
-        )
+        logger.info(f"Calculated optimal batch size: {optimal_batch_size} (Memory per sample: {memory_per_sample_mb:.1f}MB, Usable memory: {usable_memory_mb:.1f}MB)")
 
         return optimal_batch_size
 
@@ -423,9 +414,7 @@ class ResourceManager:
         logger.info(f"Device: {resource_info.device_type} ({resource_info.device_name})")
         logger.info(f"Memory: {resource_info.available_memory:.1f}GB available")
         logger.info(f"CPU: {resource_info.cpu_name} ({resource_info.cpu_count} cores)")
-        mixed_precision_status = (
-            "Supported" if resource_info.mixed_precision_supported else "Not supported"
-        )
+        mixed_precision_status = "Supported" if resource_info.mixed_precision_supported else "Not supported"
         logger.info(f"Mixed Precision: {mixed_precision_status}")
 
         logger.info("=== Configuration Optimizations ===")

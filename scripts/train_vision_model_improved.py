@@ -12,13 +12,13 @@ from pathlib import Path
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 from torchvision import datasets, transforms
 from tqdm import tqdm
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from core.models import PlantDiseaseResNet50
+from training.monitor import TrainingMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -72,8 +72,12 @@ class ImprovedPlantVillageTrainer:
         self.val_losses: list[float] = []
         self.val_accuracies: list[float] = []
 
-    def train_epoch(self) -> float:
-        """Train for one epoch with improved progress tracking."""
+    def train_epoch(self, monitor: TrainingMonitor | None = None) -> float:
+        """Train for one epoch with improved progress tracking.
+
+        Args:
+            monitor: Optional TrainingMonitor for batch-level progress updates
+        """
         self.model.train()
         running_loss = 0.0
         correct = 0
@@ -106,6 +110,16 @@ class ImprovedPlantVillageTrainer:
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
+            # Batch-level progress update
+            if monitor is not None:
+                batch_acc = (predicted == labels).float().mean().item() * 100.0
+                monitor.update_batch_progress(
+                    loss=float(loss.item()),
+                    accuracy=batch_acc,
+                    learning_rate=self.optimizer.param_groups[0]["lr"],
+                    batch_size=labels.size(0),
+                )
+
             # Update progress bar
             current_acc = 100 * correct / total
             progress_bar.set_postfix(
@@ -121,12 +135,21 @@ class ImprovedPlantVillageTrainer:
 
         return avg_loss, train_acc
 
-    def validate(self) -> tuple[float, float]:
-        """Validate the model with improved metrics."""
+    def validate(self) -> tuple[float, float, list[int], list[int], torch.Tensor | None, torch.Tensor | None, torch.Tensor | None]:
+        """Validate the model with improved metrics and collect predictions.
+
+        Returns:
+            avg_loss, accuracy, y_true_all, y_pred_all, sample_images, sample_outputs, sample_targets
+        """
         self.model.eval()
         running_loss = 0.0
         correct = 0
         total = 0
+        y_true_all: list[int] = []
+        y_pred_all: list[int] = []
+        sample_images: torch.Tensor | None = None
+        sample_outputs: torch.Tensor | None = None
+        sample_targets: torch.Tensor | None = None
 
         with torch.no_grad():
             progress_bar = tqdm(self.val_loader, desc="Validation")
@@ -144,6 +167,16 @@ class ImprovedPlantVillageTrainer:
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
+                # Collect predictions for confusion matrix
+                y_true_all.extend(labels.detach().cpu().tolist())
+                y_pred_all.extend(predicted.detach().cpu().tolist())
+
+                # Save first batch for sample predictions
+                if sample_images is None:
+                    sample_images = images.detach().cpu()
+                    sample_outputs = outputs.detach().cpu()
+                    sample_targets = labels.detach().cpu()
+
                 # Update progress bar
                 accuracy = 100 * correct / total
                 progress_bar.set_postfix(
@@ -156,7 +189,7 @@ class ImprovedPlantVillageTrainer:
         avg_loss = running_loss / len(self.val_loader)
         accuracy = 100 * correct / total
 
-        return avg_loss, accuracy
+        return avg_loss, accuracy, y_true_all, y_pred_all, sample_images, sample_outputs, sample_targets
 
     def should_stop_early(self, val_loss: float) -> bool:
         """Check if training should stop early based on validation loss."""
@@ -197,20 +230,24 @@ class ImprovedPlantVillageTrainer:
         num_epochs: int,
         save_dir: Path,
         class_names: list[str],
-        writer: SummaryWriter,
+        monitor: TrainingMonitor,
     ) -> None:
         """Train the model with improved monitoring and early stopping."""
         logger.info("Starting improved training for %d epochs", num_epochs)
         logger.info("Early stopping patience: %d epochs", self.patience)
 
+        # Setup monitor tracking
+        monitor.setup_progress_tracking(total_epochs=num_epochs, steps_per_epoch=len(self.train_loader))
+
         for epoch in range(num_epochs):
             start_time = time.time()
 
             # Train for one epoch
-            train_loss, train_acc = self.train_epoch()
+            monitor.start_epoch_tracking(epoch)
+            train_loss, train_acc = self.train_epoch(monitor=monitor)
 
             # Validate
-            val_loss, val_acc = self.validate()
+            val_loss, val_acc, y_true_all, y_pred_all, sample_images, sample_outputs, sample_targets = self.validate()
 
             # Update learning rate
             self.scheduler.step()
@@ -220,12 +257,37 @@ class ImprovedPlantVillageTrainer:
             self.val_losses.append(val_loss)
             self.val_accuracies.append(val_acc)
 
-            # TensorBoard logging
-            writer.add_scalar("Loss/Train", train_loss, epoch)
-            writer.add_scalar("Loss/Validation", val_loss, epoch)
-            writer.add_scalar("Accuracy/Train", train_acc, epoch)
-            writer.add_scalar("Accuracy/Validation", val_acc, epoch)
-            writer.add_scalar("Learning_Rate", self.scheduler.get_last_lr()[0], epoch)
+            # TrainingMonitor logging
+            monitor.log_metrics(
+                {
+                    "Loss/Train": float(train_loss),
+                    "Loss/Validation": float(val_loss),
+                    "Accuracy/Train": float(train_acc),
+                    "Accuracy/Validation": float(val_acc),
+                },
+                step=epoch,
+                epoch=epoch,
+            )
+
+            # Log learning rate and histograms
+            monitor.log_learning_rate(self.optimizer, step=epoch)
+            monitor.log_histograms(self.model, step=epoch, log_gradients=False)
+
+            # Log confusion matrix and sample predictions
+            if y_true_all and y_pred_all:
+                try:
+                    monitor.log_confusion_matrix(y_true_all, y_pred_all, class_names, step=epoch)
+                except Exception as e:
+                    logger.warning("Failed to log confusion matrix: %s", e)
+
+            if sample_images is not None and sample_outputs is not None and sample_targets is not None:
+                try:
+                    monitor.log_sample_predictions(sample_images, sample_outputs, sample_targets, class_names, step=epoch)
+                except Exception as e:
+                    logger.warning("Failed to log sample predictions: %s", e)
+
+            # Finish epoch tracking
+            monitor.finish_epoch_tracking(val_loss=float(val_loss), val_accuracy=float(val_acc), learning_rate=self.scheduler.get_last_lr()[0])
 
             # Save best model
             is_best = val_acc > self.best_val_acc
@@ -348,6 +410,13 @@ def main() -> None:
     parser.add_argument("--patience", type=int, default=10, help="Early stopping patience")
     parser.add_argument("--device", type=str, default="auto", help="Device to use (cpu/cuda/auto)")
     parser.add_argument("--num_workers", type=int, default=4, help="Number of data loader workers")
+    parser.add_argument("--log_dir", type=str, default="runs", help="Directory to store training runs and reports")
+    parser.add_argument("--tensorboard_port", type=int, default=6006, help="Port for TensorBoard server")
+    parser.add_argument("--launch_tensorboard", action="store_true", help="Auto-launch TensorBoard during training")
+    # Control use of ImageNet pretrained weights
+    parser.add_argument("--pretrained", dest="pretrained", action="store_true", help="Use ImageNet pretrained weights")
+    parser.add_argument("--no-pretrained", dest="pretrained", action="store_false", help="Do not use pretrained weights")
+    parser.set_defaults(pretrained=True)
 
     args = parser.parse_args()
 
@@ -370,11 +439,15 @@ def main() -> None:
     save_dir = Path(args.save_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
 
-    # Create TensorBoard writer
-    timestamp = int(time.time())
-    log_dir = Path("runs") / f"plantguard_vision_improved_{timestamp}"
-    writer = SummaryWriter(log_dir)
-    logger.info("TensorBoard logs will be saved to: %s", log_dir)
+    # Create TrainingMonitor
+    experiment_name = "plantguard_vision_improved"
+    monitor = TrainingMonitor(
+        experiment_name=experiment_name,
+        log_dir=args.log_dir,
+        auto_launch_tensorboard=args.launch_tensorboard,
+        tensorboard_port=args.tensorboard_port,
+    )
+    logger.info("Training logs will be saved to: %s", monitor.experiment_dir)
 
     try:
         # Create data loaders
@@ -387,7 +460,7 @@ def main() -> None:
         logger.info("Class names saved to %s", class_names_path)
 
         # Create model
-        model = PlantDiseaseResNet50(num_classes=len(class_names), pretrained=True)
+        model = PlantDiseaseResNet50(num_classes=len(class_names), pretrained=args.pretrained)
 
         # Create improved trainer
         trainer = ImprovedPlantVillageTrainer(
@@ -401,13 +474,47 @@ def main() -> None:
         )
 
         # Train model
-        trainer.train(args.epochs, save_dir, class_names, writer)
+        trainer.train(args.epochs, save_dir, class_names, monitor)
+
+        # Generate comprehensive training report
+        try:
+            hyperparameters = {
+                "epochs": args.epochs,
+                "batch_size": args.batch_size,
+                "learning_rate": args.learning_rate,
+                "weight_decay": args.weight_decay,
+                "patience": args.patience,
+                "optimizer": "AdamW",
+                "scheduler": "CosineAnnealingLR",
+            }
+            dataset_info = {
+                "num_train_samples": len(train_loader.dataset),
+                "num_val_samples": len(val_loader.dataset),
+                "num_classes": len(class_names),
+                "class_names": class_names,
+            }
+            model_info = {"architecture": "PlantDiseaseResNet50"}
+            system_info = {"device": str(device)}
+
+            generated = monitor.save_training_report(
+                model=model,
+                model_info=model_info,
+                dataset_info=dataset_info,
+                hyperparameters=hyperparameters,
+                system_info=system_info,
+            )
+            logger.info("Training report generated: %s", {k: str(v) for k, v in generated.items()})
+        except Exception:
+            logger.exception("Failed to generate training report")
 
     except Exception:
         logger.exception("Training failed")
         raise
     finally:
-        writer.close()
+        try:
+            monitor.close()
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":

@@ -113,9 +113,7 @@ class MemoryErrorRecovery(ErrorRecoveryStrategy):
         ]
 
         error_msg = error.message.lower()
-        return error.category == ErrorCategory.MEMORY or any(
-            keyword in error_msg for keyword in memory_keywords
-        )
+        return error.category == ErrorCategory.MEMORY or any(keyword in error_msg for keyword in memory_keywords)
 
     def recover(self, error: TrainingError, context: dict[str, Any]) -> bool:
         """Attempt to recover from memory errors."""
@@ -191,9 +189,7 @@ class DeviceErrorRecovery(ErrorRecoveryStrategy):
         ]
 
         error_msg = error.message.lower()
-        return error.category == ErrorCategory.DEVICE or any(
-            keyword in error_msg for keyword in device_keywords
-        )
+        return error.category == ErrorCategory.DEVICE or any(keyword in error_msg for keyword in device_keywords)
 
     def recover(self, error: TrainingError, context: dict[str, Any]) -> bool:
         """Attempt to recover from device errors."""
@@ -228,9 +224,7 @@ class DeviceErrorRecovery(ErrorRecoveryStrategy):
                 # Adjust batch size for CPU training
                 if hasattr(config, "batch_size") and config.batch_size > 32:
                     config.batch_size = min(32, config.batch_size)
-                    recovery_actions.append(
-                        f"Reduced batch size for CPU training: {config.batch_size}"
-                    )
+                    recovery_actions.append(f"Reduced batch size for CPU training: {config.batch_size}")
 
                 recovery_actions.append("Switched to CPU training")
                 error.recovery_actions = recovery_actions
@@ -273,9 +267,7 @@ class DataErrorRecovery(ErrorRecoveryStrategy):
         ]
 
         error_msg = error.message.lower()
-        return error.category == ErrorCategory.DATA or any(
-            keyword in error_msg for keyword in data_keywords
-        )
+        return error.category == ErrorCategory.DATA or any(keyword in error_msg for keyword in data_keywords)
 
     def recover(self, error: TrainingError, context: dict[str, Any]) -> bool:
         """Attempt to recover from data errors."""
@@ -346,9 +338,7 @@ class CheckpointErrorRecovery(ErrorRecoveryStrategy):
         ]
 
         error_msg = error.message.lower()
-        return error.category == ErrorCategory.CHECKPOINT or any(
-            keyword in error_msg for keyword in checkpoint_keywords
-        )
+        return error.category == ErrorCategory.CHECKPOINT or any(keyword in error_msg for keyword in checkpoint_keywords)
 
     def recover(self, error: TrainingError, context: dict[str, Any]) -> bool:
         """Attempt to recover from checkpoint errors."""
@@ -387,9 +377,7 @@ class CheckpointErrorRecovery(ErrorRecoveryStrategy):
         # Try best checkpoint
         return self._try_load_checkpoint(trainer, "best", recovery_actions)
 
-    def _try_load_checkpoint(
-        self, trainer: Any, checkpoint_type: str, recovery_actions: list[str]
-    ) -> bool:
+    def _try_load_checkpoint(self, trainer: Any, checkpoint_type: str, recovery_actions: list[str]) -> bool:
         """Try to load a specific type of checkpoint."""
         try:
             if checkpoint_type == "latest":
@@ -612,9 +600,7 @@ class TrainingErrorHandler:
         error.recovery_attempted = True
 
         # Find applicable recovery strategies
-        applicable_strategies = [
-            strategy for strategy in self.recovery_strategies if strategy.can_handle(error)
-        ]
+        applicable_strategies = [strategy for strategy in self.recovery_strategies if strategy.can_handle(error)]
 
         if not applicable_strategies:
             logger.warning(f"No recovery strategies available for error: {error.error_id}")
@@ -627,9 +613,7 @@ class TrainingErrorHandler:
 
                 if strategy.recover(error, context):
                     error.recovery_successful = True
-                    error.troubleshooting_suggestions = strategy.get_troubleshooting_suggestions(
-                        error
-                    )
+                    error.troubleshooting_suggestions = strategy.get_troubleshooting_suggestions(error)
 
                     logger.info(f"Recovery successful using {type(strategy).__name__}")
                     return True
@@ -740,9 +724,7 @@ class TrainingErrorHandler:
         logger.info(f"Error report exported to: {output_file}")
 
 
-def create_error_handler(
-    log_dir: Path | None = None, enable_notifications: bool = False
-) -> TrainingErrorHandler:
+def create_error_handler(log_dir: Path | None = None, enable_notifications: bool = False) -> TrainingErrorHandler:
     """Create a training error handler.
 
     Args:

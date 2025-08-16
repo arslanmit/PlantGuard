@@ -119,9 +119,7 @@ class DatasetManager:
             target_dir.mkdir(parents=True, exist_ok=True)
 
             # Download dataset using Kaggle API
-            kaggle.api.dataset_download_files(
-                "abdallahalidev/plantvillage-dataset", path=str(target_dir), unzip=True
-            )
+            kaggle.api.dataset_download_files("abdallahalidev/plantvillage-dataset", path=str(target_dir), unzip=True)
 
             logger.info("PlantVillage dataset downloaded to %s", target_dir)
             return True
@@ -161,9 +159,7 @@ class DatasetManager:
 
         # Check direct structure
         for class_dir in dataset_dir.iterdir():
-            if class_dir.is_dir() and any(
-                expected in class_dir.name for expected in expected_classes
-            ):
+            if class_dir.is_dir() and any(expected in class_dir.name for expected in expected_classes):
                 found_classes += 1
 
         # Check if there are subdirectories that might contain the classes
@@ -171,9 +167,7 @@ class DatasetManager:
             for subdir in dataset_dir.iterdir():
                 if subdir.is_dir():
                     for class_dir in subdir.iterdir():
-                        if class_dir.is_dir() and any(
-                            expected in class_dir.name for expected in expected_classes
-                        ):
+                        if class_dir.is_dir() and any(expected in class_dir.name for expected in expected_classes):
                             found_classes += 1
 
         # Consider valid if we found at least 3 expected classes
@@ -213,9 +207,7 @@ class DatasetManager:
         else:
             return True, warnings
 
-    def _validate_split_dataset(
-        self, dataset_dir: Path
-    ) -> tuple[int, int, list[str], dict[str, int], list[str]]:
+    def _validate_split_dataset(self, dataset_dir: Path) -> tuple[int, int, list[str], dict[str, int], list[str]]:
         """Validate dataset with train/val split structure.
 
         Returns:
@@ -259,9 +251,7 @@ class DatasetManager:
 
         return total_files, valid_files, corrupted_files, class_counts, warnings
 
-    def _validate_single_dataset(
-        self, dataset_dir: Path
-    ) -> tuple[int, int, list[str], dict[str, int], list[str]]:
+    def _validate_single_dataset(self, dataset_dir: Path) -> tuple[int, int, list[str], dict[str, int], list[str]]:
         """Validate dataset with single directory structure.
 
         Returns:
@@ -330,21 +320,14 @@ class DatasetManager:
         has_splits = (dataset_dir / "train").exists() and (dataset_dir / "val").exists()
 
         if has_splits:
-            total_files, valid_files, corrupted_files, class_counts, warnings = (
-                self._validate_split_dataset(dataset_dir)
-            )
+            total_files, valid_files, corrupted_files, class_counts, warnings = self._validate_split_dataset(dataset_dir)
         else:
-            total_files, valid_files, corrupted_files, class_counts, warnings = (
-                self._validate_single_dataset(dataset_dir)
-            )
+            total_files, valid_files, corrupted_files, class_counts, warnings = self._validate_single_dataset(dataset_dir)
 
         # Check for classes with too few samples
         for class_name, count in class_counts.items():
             if count < MIN_SAMPLES_PER_CLASS:
-                warnings.append(
-                    f"Class '{class_name}' has only {count} samples "
-                    f"(minimum: {MIN_SAMPLES_PER_CLASS})"
-                )
+                warnings.append(f"Class '{class_name}' has only {count} samples (minimum: {MIN_SAMPLES_PER_CLASS})")
 
         # Check if we have any classes at all
         if not class_counts:
@@ -424,9 +407,7 @@ class DatasetManager:
 
         return train_dir, val_dir
 
-    def _process_class_directory(
-        self, class_dir: Path, train_dir: Path, val_dir: Path, config: DatasetConfig, random: Any
-    ) -> None:
+    def _process_class_directory(self, class_dir: Path, train_dir: Path, val_dir: Path, config: DatasetConfig, random: Any) -> None:
         """Process a single class directory."""
         class_name = class_dir.name
         logger.info("Processing class: %s", class_name)
@@ -473,9 +454,7 @@ class DatasetManager:
 
         return valid_files
 
-    def _split_files(
-        self, files: list[Path], train_ratio: float, random: Any
-    ) -> tuple[list[Path], list[Path]]:
+    def _split_files(self, files: list[Path], train_ratio: float, random: Any) -> tuple[list[Path], list[Path]]:
         """Split files into train and validation sets."""
         # Shuffle files
         random.shuffle(files)
@@ -509,9 +488,7 @@ class DatasetManager:
                 indent=2,
             )
 
-    def _analyze_split_dataset(
-        self, dataset_dir: Path
-    ) -> tuple[dict[str, dict[str, int]], int, int, int, list[str]]:
+    def _analyze_split_dataset(self, dataset_dir: Path) -> tuple[dict[str, dict[str, int]], int, int, int, list[str]]:
         """Analyze dataset with train/val split structure.
 
         Returns:
@@ -621,17 +598,13 @@ class DatasetManager:
         has_splits = (dataset_dir / "train").exists() and (dataset_dir / "val").exists()
 
         if has_splits:
-            split_class_distribution, total_samples, train_samples, val_samples, corrupted_files = (
-                self._analyze_split_dataset(dataset_dir)
-            )
+            split_class_distribution, total_samples, train_samples, val_samples, corrupted_files = self._analyze_split_dataset(dataset_dir)
             # Convert nested dict to flat dict by summing train and val
             flat_class_distribution: dict[str, int] = {}
             for class_name, counts in split_class_distribution.items():
                 flat_class_distribution[class_name] = counts.get("train", 0) + counts.get("val", 0)
         else:
-            flat_class_distribution, total_samples, corrupted_files = self._analyze_single_dataset(
-                dataset_dir
-            )
+            flat_class_distribution, total_samples, corrupted_files = self._analyze_single_dataset(dataset_dir)
             train_samples = 0
             val_samples = 0
 

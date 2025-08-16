@@ -59,17 +59,13 @@ def comprehensive_test() -> None:
         gt_status = sample["status"]
 
         # Check matches
-        plant_match = (
-            plant_type.lower() in gt_plant.lower() or gt_plant.lower() in plant_type.lower()
-        )
+        plant_match = plant_type.lower() in gt_plant.lower() or gt_plant.lower() in plant_type.lower()
 
         if gt_disease.lower() == "healthy":
             disease_match = adapter.is_healthy(raw_class)
         else:
             disease_words = gt_disease.lower().replace(" ", "_").split("_")
-            disease_match = any(
-                word in raw_class.lower() for word in disease_words if len(word) > 2
-            )
+            disease_match = any(word in raw_class.lower() for word in disease_words if len(word) > 2)
 
         status_match = adapter.is_healthy(raw_class) == (gt_status == "healthy")
         perfect_match = plant_match and disease_match and status_match
@@ -147,15 +143,9 @@ def comprehensive_test() -> None:
     print("\n🏥 Health Status Performance:")
     print("-" * 40)
     if healthy_results:
-        print(
-            f"Healthy plants:  {healthy_correct:2}/{len(healthy_results):2} "
-            f"({healthy_correct / len(healthy_results):.1%})"
-        )
+        print(f"Healthy plants:  {healthy_correct:2}/{len(healthy_results):2} ({healthy_correct / len(healthy_results):.1%})")
     if diseased_results:
-        print(
-            f"Diseased plants: {diseased_correct:2}/{len(diseased_results):2} "
-            f"({diseased_correct / len(diseased_results):.1%})"
-        )
+        print(f"Diseased plants: {diseased_correct:2}/{len(diseased_results):2} ({diseased_correct / len(diseased_results):.1%})")
 
     print("\n🎉 CONCLUSION:")
     if perfect_matches == total:

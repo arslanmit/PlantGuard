@@ -11,8 +11,8 @@ src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
 # Import after path setup
-from src.ui.app import main  # noqa: E402
-from src.utils.logging import setup_logger  # noqa: E402
+from src.ui.app import main
+from src.utils.logging import setup_logger
 
 # Configure logging
 logger = setup_logger("plantguard", log_file="logs/app.log")

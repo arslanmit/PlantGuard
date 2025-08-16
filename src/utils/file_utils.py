@@ -30,9 +30,7 @@ class FileManager:
         Returns:
             Path to temporary file
         """
-        with tempfile.NamedTemporaryFile(
-            suffix=suffix, prefix=prefix, dir=self.temp_dir, delete=False
-        ) as temp_file:
+        with tempfile.NamedTemporaryFile(suffix=suffix, prefix=prefix, dir=self.temp_dir, delete=False) as temp_file:
             temp_path = temp_file.name
 
         self._temp_files.append(temp_path)

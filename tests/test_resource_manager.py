@@ -49,9 +49,7 @@ class TestResourceManager:
     @patch("torch.backends.mps.is_available", return_value=False)
     @patch("torch.get_num_threads", return_value=8)
     @patch("platform.processor", return_value="Intel Core i7")
-    def test_detect_device_cpu(
-        self, mock_processor: Any, mock_threads: Any, mock_mps: Any, mock_cuda: Any
-    ) -> None:
+    def test_detect_device_cpu(self, mock_processor: Any, mock_threads: Any, mock_mps: Any, mock_cuda: Any) -> None:
         """Test CPU device detection."""
         manager = ResourceManager()
         device_type, device_name, device_count = manager._detect_device()
@@ -63,9 +61,7 @@ class TestResourceManager:
     @patch("torch.cuda.is_available", return_value=True)
     @patch("torch.cuda.get_device_properties")
     @patch("torch.cuda.memory_allocated", return_value=1024**3)  # 1GB
-    def test_get_memory_info_cuda(
-        self, mock_allocated: Any, mock_properties: Any, mock_available: Any
-    ) -> None:
+    def test_get_memory_info_cuda(self, mock_allocated: Any, mock_properties: Any, mock_available: Any) -> None:
         """Test CUDA memory information retrieval."""
         # Mock device properties
         mock_props = MagicMock()
@@ -109,9 +105,7 @@ class TestResourceManager:
 
     @patch("torch.cuda.is_available", return_value=True)
     @patch("torch.cuda.get_device_capability", return_value=(7, 5))  # Compute capability 7.5
-    def test_check_mixed_precision_support_cuda(
-        self, mock_capability: Any, mock_available: Any
-    ) -> None:
+    def test_check_mixed_precision_support_cuda(self, mock_capability: Any, mock_available: Any) -> None:
         """Test mixed precision support check for CUDA."""
         manager = ResourceManager()
         supported = manager._check_mixed_precision_support("cuda")
@@ -119,9 +113,7 @@ class TestResourceManager:
 
     @patch("torch.cuda.is_available", return_value=True)
     @patch("torch.cuda.get_device_capability", return_value=(6, 1))  # Compute capability 6.1
-    def test_check_mixed_precision_support_cuda_old(
-        self, mock_capability: Any, mock_available: Any
-    ) -> None:
+    def test_check_mixed_precision_support_cuda_old(self, mock_capability: Any, mock_available: Any) -> None:
         """Test mixed precision support check for old CUDA."""
         manager = ResourceManager()
         supported = manager._check_mixed_precision_support("cuda")
@@ -264,9 +256,7 @@ class TestResourceManager:
     @patch.object(ResourceManager, "detect_resources")
     @patch.object(ResourceManager, "get_optimal_batch_size", return_value=32)
     @patch.object(ResourceManager, "get_optimal_num_workers", return_value=4)
-    def test_optimize_training_config(
-        self, mock_workers: Any, mock_batch: Any, mock_detect: Any
-    ) -> None:
+    def test_optimize_training_config(self, mock_workers: Any, mock_batch: Any, mock_detect: Any) -> None:
         """Test training configuration optimization."""
         mock_resource_info = ResourceInfo(
             device_type="cuda",
@@ -339,9 +329,7 @@ class TestResourceManager:
     @patch("torch.cuda.memory_allocated", return_value=1024**3)  # 1GB
     @patch("torch.cuda.memory_reserved", return_value=2 * 1024**3)  # 2GB
     @patch("torch.cuda.get_device_properties")
-    def test_get_memory_usage_cuda(
-        self, mock_props: Any, mock_reserved: Any, mock_allocated: Any, mock_available: Any
-    ) -> None:
+    def test_get_memory_usage_cuda(self, mock_props: Any, mock_reserved: Any, mock_allocated: Any, mock_available: Any) -> None:
         """Test memory usage retrieval for CUDA."""
         mock_device_props = MagicMock()
         mock_device_props.total_memory = 8 * (1024**3)  # 8GB

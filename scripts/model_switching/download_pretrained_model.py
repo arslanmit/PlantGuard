@@ -123,10 +123,7 @@ def test_with_imagenet_model(model_path: str) -> None:
 
     # Summary
     plant_correct = sum(1 for r in results if r["plant_match"])
-    print(
-        f"📊 Plant type accuracy: {plant_correct}/{len(results)} "
-        f"({plant_correct / len(results):.1%})"
-    )
+    print(f"📊 Plant type accuracy: {plant_correct}/{len(results)} ({plant_correct / len(results):.1%})")
 
 
 def main() -> None:

@@ -3,6 +3,8 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import json
+import subprocess  # nosec B404: subprocess is required for TensorBoard integration
 import numpy as np
 import soundfile as sf
 import streamlit as st
@@ -446,7 +448,7 @@ st.markdown("## 🌿 Plant Analysis Tools")
 st.markdown("*Use the tools below to analyze your plants with AI-powered detection*")
 
 # Main content tabs with improved design
-tab1, tab2, tab3 = st.tabs(["🖼️ Vision Analysis", "🎤 Audio Processing", "💬 Text Q&A"])
+tab1, tab2, tab3, tab4 = st.tabs(["🖼️ Vision Analysis", "🎤 Audio Processing", "💬 Text Q&A", "📚 Training"])
 
 # Vision Analysis Tab
 with tab1:
@@ -686,6 +688,128 @@ with tab3:
             if st.button(f"💡 {sample_q}", key=f"sample_{i}", help="Click to use this question"):
                 st.session_state.user_question = sample_q
                 st.rerun()
+
+# Training Tab
+with tab4:
+    st.subheader("📚 Training Runs & Reports")
+    st.info("Select a training run to view its artifacts, metrics, and open TensorBoard.")
+
+    # Base runs directory
+    default_runs_dir = Path("runs")
+    runs_dir_str = st.text_input("Runs directory", value=str(default_runs_dir), help="Directory where TrainingMonitor stores experiment runs")
+    runs_dir = Path(runs_dir_str)
+
+    # Discover runs: directories containing training_report.json
+    def discover_runs(base: Path) -> list[Path]:
+        if not base.exists():
+            return []
+        candidates = [p for p in base.iterdir() if p.is_dir() and (p / "training_report.json").exists()]
+        # Sort by modification time (newest first)
+        return sorted(candidates, key=lambda p: p.stat().st_mtime, reverse=True)
+
+    runs = discover_runs(runs_dir)
+    if not runs:
+        st.warning("No training runs found yet. After running training with TrainingMonitor, artifacts will appear here.")
+    else:
+        run_names = [r.name for r in runs]
+        selected_index = 0
+        selected_run_name = st.selectbox("Select a run", run_names, index=selected_index)
+        selected_run = runs[run_names.index(selected_run_name)]
+
+        # Load report
+        report_path = selected_run / "training_report.json"
+        report = {}
+        try:
+            report = json.loads(report_path.read_text()) if report_path.exists() else {}
+        except Exception as e:
+            st.error(f"Failed to read training_report.json: {e!s}")
+
+        # Paths to artifacts
+        curves_path = selected_run / "training_curves.png"
+        arch_path = selected_run / "model_architecture.png"
+        html_report_path = selected_run / "comprehensive_report.html"
+        text_summary_path = selected_run / "training_summary.txt"
+
+        # Summary metrics
+        col_a, col_b, col_c = st.columns(3)
+        with col_a:
+            st.metric("Best Val Acc", f"{report.get('best_metrics', {}).get('Accuracy/Validation', 'N/A')}")
+        with col_b:
+            st.metric("Best Val Loss", f"{report.get('best_metrics', {}).get('Loss/Validation', 'N/A')}")
+        with col_c:
+            duration = report.get("total_duration", None)
+            st.metric("Duration", f"{duration:.1f}s" if isinstance(duration, (int, float)) else "N/A")
+
+        # Visualizations
+        vis_col1, vis_col2 = st.columns(2)
+        with vis_col1:
+            st.markdown("### 📈 Training Curves")
+            if curves_path.exists():
+                st.image(str(curves_path), use_container_width=True)
+            else:
+                st.info("training_curves.png not found for this run")
+
+        with vis_col2:
+            st.markdown("### 🧠 Model Architecture")
+            if arch_path.exists():
+                st.image(str(arch_path), use_container_width=True)
+            else:
+                st.info("model_architecture.png not found for this run")
+
+        # Downloads
+        st.markdown("### 📄 Reports & Downloads")
+        dl_cols = st.columns(4)
+        with dl_cols[0]:
+            if report_path.exists():
+                st.download_button("Download JSON", data=report_path.read_bytes(), file_name=report_path.name, mime="application/json")
+        with dl_cols[1]:
+            if text_summary_path.exists():
+                st.download_button("Download Summary", data=text_summary_path.read_bytes(), file_name=text_summary_path.name, mime="text/plain")
+        with dl_cols[2]:
+            if html_report_path.exists():
+                st.download_button("Download HTML", data=html_report_path.read_bytes(), file_name=html_report_path.name, mime="text/html")
+        with dl_cols[3]:
+            if curves_path.exists():
+                st.download_button("Download Curves", data=curves_path.read_bytes(), file_name=curves_path.name, mime="image/png")
+
+        st.markdown("---")
+        st.markdown("### 📊 TensorBoard")
+        st.caption("Launch TensorBoard to view detailed logs, histograms, and confusion matrices.")
+        tb_col1, tb_col2, tb_col3 = st.columns([2, 1, 2])
+        with tb_col1:
+            tb_port = st.number_input("Port", min_value=1024, max_value=65535, value=6006, step=1)
+        with tb_col2:
+            launch_tb = st.button("🚀 Launch TensorBoard", use_container_width=True)
+        with tb_col3:
+            st.markdown(f"[Open http://localhost:{6006}](http://localhost:{6006})")
+
+        if launch_tb:
+            try:
+                # Using shlex.quote to properly escape paths and arguments
+                import shutil
+                import shlex
+
+                # Get full path to tensorboard executable
+                tensorboard_path = shutil.which("tensorboard")
+                if not tensorboard_path:
+                    st.error("TensorBoard not found in PATH")
+                    return
+
+                cmd = [tensorboard_path, "--logdir", shlex.quote(str(runs_dir)), "--port", str(int(tb_port)), "--reload_interval", "1"]
+
+                # Use full path and proper argument handling
+                subprocess.Popen(  # nosec B603: shell=False, inputs are sanitized
+                    cmd,
+                    shell=False,  # Safer than shell=True
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
+                st.success(f"TensorBoard launched at http://localhost:{int(tb_port)}")
+                st.markdown(f"[Open TensorBoard](http://localhost:{int(tb_port)})")
+            except FileNotFoundError:
+                st.error("TensorBoard not found. Install with: pip install tensorboard")
+            except Exception as e:
+                st.error(f"Failed to launch TensorBoard: {e!s}")
 
 # Footer with improved styling
 st.markdown("---")

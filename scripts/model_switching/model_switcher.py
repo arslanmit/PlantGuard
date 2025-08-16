@@ -22,13 +22,7 @@ def list_models(manager: "PlantGuardModelManager") -> None:
     print("=" * 60)
 
     for model in models:
-        status = (
-            "🟢 CURRENT"
-            if model["is_current"]
-            else "⚪ Available"
-            if model["enabled"]
-            else "🔴 Disabled"
-        )
+        status = "🟢 CURRENT" if model["is_current"] else "⚪ Available" if model["enabled"] else "🔴 Disabled"
         accuracy = f"{model['accuracy']:.1%}" if model["accuracy"] > 0 else "Unknown"
 
         print(f"\n📋 {model['id']}")
@@ -203,9 +197,7 @@ def main() -> None:
     parser.add_argument("--list", "-l", action="store_true", help="List available models")
     parser.add_argument("--switch", "-s", type=str, help="Switch to model by ID")
     parser.add_argument("--test", "-t", type=str, help="Test current model on image")
-    parser.add_argument(
-        "--quick-test", "-q", action="store_true", help="Quick test on sample images"
-    )
+    parser.add_argument("--quick-test", "-q", action="store_true", help="Quick test on sample images")
     parser.add_argument("--benchmark", "-b", action="store_true", help="Benchmark all models")
     parser.add_argument("--current", "-c", action="store_true", help="Show current model info")
 
@@ -261,22 +253,10 @@ def main() -> None:
             print("🤖 No model currently loaded")
 
         print("\n💡 Quick Commands:")
-        print(
-            "  python scripts/model_switching/model_switcher.py --list              "
-            "# List all models"
-        )
-        print(
-            "  python scripts/model_switching/model_switcher.py --switch vit_best   "
-            "# Switch to best model"
-        )
-        print(
-            "  python scripts/model_switching/model_switcher.py --quick-test        "
-            "# Test current model"
-        )
-        print(
-            "  python scripts/model_switching/model_switcher.py --benchmark         "
-            "# Compare all models"
-        )
+        print("  python scripts/model_switching/model_switcher.py --list              # List all models")
+        print("  python scripts/model_switching/model_switcher.py --switch vit_best   # Switch to best model")
+        print("  python scripts/model_switching/model_switcher.py --quick-test        # Test current model")
+        print("  python scripts/model_switching/model_switcher.py --benchmark         # Compare all models")
 
 
 if __name__ == "__main__":

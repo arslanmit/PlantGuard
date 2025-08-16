@@ -37,9 +37,7 @@ def _load_model_and_processor(model_name: str) -> tuple[Any, Any, list[str]] | d
         return {"error": str(e)}
 
 
-def _predict_image(
-    image_path: Path, model: Any, processor: Any, class_labels: list[str]
-) -> tuple[str, float] | None:
+def _predict_image(image_path: Path, model: Any, processor: Any, class_labels: list[str]) -> tuple[str, float] | None:
     """Make prediction on a single image."""
     try:
         with Image.open(image_path) as im:
@@ -61,9 +59,7 @@ def _predict_image(
         return None
 
 
-def _analyze_prediction(
-    predicted_label: str, gt_plant: str, gt_disease: str, gt_status: str
-) -> tuple[bool, bool, bool]:
+def _analyze_prediction(predicted_label: str, gt_plant: str, gt_disease: str, gt_status: str) -> tuple[bool, bool, bool]:
     """Analyze prediction accuracy."""
     pred_lower = predicted_label.lower()
     gt_plant_lower = gt_plant.lower()
@@ -90,9 +86,7 @@ def _analyze_prediction(
     return plant_match, status_match, overall_correct
 
 
-def _process_sample_with_validation(
-    sample: dict, test_images_dir: str, model: Any, processor: Any, class_labels: list[str]
-) -> tuple[dict, bool, bool, bool] | None:
+def _process_sample_with_validation(sample: dict, test_images_dir: str, model: Any, processor: Any, class_labels: list[str]) -> tuple[dict, bool, bool, bool] | None:
     """Process a sample with full validation and return result."""
     filename = sample.get("filename")
     if not filename:
@@ -124,9 +118,7 @@ def _process_sample_with_validation(
     predicted_label, confidence = prediction_result
 
     # Analyze prediction
-    plant_match, status_match, overall_correct = _analyze_prediction(
-        predicted_label, gt_plant, gt_disease, gt_status
-    )
+    plant_match, status_match, overall_correct = _analyze_prediction(predicted_label, gt_plant, gt_disease, gt_status)
 
     # Display results
     overall_icon = "✅" if overall_correct else "❌"
@@ -205,9 +197,7 @@ def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) ->
 
     for sample in samples:
         # Validate and process sample
-        sample_result = _process_sample_with_validation(
-            sample, test_images_dir, model, processor, class_labels
-        )
+        sample_result = _process_sample_with_validation(sample, test_images_dir, model, processor, class_labels)
 
         if sample_result is None:
             continue
@@ -223,9 +213,7 @@ def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) ->
         if status_match:
             status_correct += 1
 
-    return _calculate_summary(
-        model_name, model, results, correct_predictions, plant_correct, status_correct
-    )
+    return _calculate_summary(model_name, model, results, correct_predictions, plant_correct, status_correct)
 
 
 def print_results(results: dict[str, Any]) -> None:
@@ -240,11 +228,7 @@ def print_results(results: dict[str, Any]) -> None:
 
     print("\n📊 SUMMARY STATISTICS")
     print(f"Total test images: {results['total_images']}")
-    print(
-        f"Overall accuracy: {results['overall_accuracy']:.1%} "
-        f"({int(results['overall_accuracy'] * results['total_images'])}"
-        f"/{results['total_images']})"
-    )
+    print(f"Overall accuracy: {results['overall_accuracy']:.1%} ({int(results['overall_accuracy'] * results['total_images'])}/{results['total_images']})")
     print(f"Plant type accuracy: {results['plant_accuracy']:.1%}")
     print(f"Health status accuracy: {results['status_accuracy']:.1%}")
     print(f"Average confidence: {results['average_confidence']:.3f}")
@@ -299,11 +283,7 @@ def main() -> None:
         if valid_results:
             for result in valid_results:
                 short_model_name = result["model_name"].split("/")[-1]  # Short name
-                print(
-                    f"{short_model_name:30} | Overall: {result['overall_accuracy']:.1%} "
-                    f"| Plant: {result['plant_accuracy']:.1%} "
-                    f"| Status: {result['status_accuracy']:.1%}"
-                )
+                print(f"{short_model_name:30} | Overall: {result['overall_accuracy']:.1%} | Plant: {result['plant_accuracy']:.1%} | Status: {result['status_accuracy']:.1%}")
 
             # Find best model
             best_model = max(valid_results, key=lambda x: x["overall_accuracy"])

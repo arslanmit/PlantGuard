@@ -73,10 +73,7 @@ class OptimizerFactory:
                 momentum=config.momentum,
             )
         else:
-            raise ValueError(
-                f"Unsupported optimizer: {optimizer_name}. "
-                f"Supported optimizers: adam, adamw, sgd, rmsprop"
-            )
+            raise ValueError(f"Unsupported optimizer: {optimizer_name}. Supported optimizers: adam, adamw, sgd, rmsprop")
 
         logger.info(f"Created {optimizer_name.upper()} optimizer with lr={config.learning_rate}")
         return optimizer
@@ -115,10 +112,7 @@ class SchedulerFactory:
                 step_size=scheduler_config.step_size,
                 gamma=scheduler_config.gamma,
             )
-            logger.info(
-                f"Created StepLR scheduler: step_size={scheduler_config.step_size}, "
-                f"gamma={scheduler_config.gamma}"
-            )
+            logger.info(f"Created StepLR scheduler: step_size={scheduler_config.step_size}, gamma={scheduler_config.gamma}")
 
         elif scheduler_type == "exponential":
             scheduler = ExponentialLR(
@@ -133,10 +127,7 @@ class SchedulerFactory:
                 T_max=scheduler_config.T_max,
                 eta_min=scheduler_config.eta_min,
             )
-            logger.info(
-                f"Created CosineAnnealingLR scheduler: T_max={scheduler_config.T_max}, "
-                f"eta_min={scheduler_config.eta_min}"
-            )
+            logger.info(f"Created CosineAnnealingLR scheduler: T_max={scheduler_config.T_max}, eta_min={scheduler_config.eta_min}")
 
         elif scheduler_type == "plateau":
             scheduler = ReduceLROnPlateau(
@@ -145,10 +136,7 @@ class SchedulerFactory:
                 factor=scheduler_config.factor,
                 patience=scheduler_config.patience,
             )
-            logger.info(
-                f"Created ReduceLROnPlateau scheduler: factor={scheduler_config.factor}, "
-                f"patience={scheduler_config.patience}"
-            )
+            logger.info(f"Created ReduceLROnPlateau scheduler: factor={scheduler_config.factor}, patience={scheduler_config.patience}")
 
         elif scheduler_type == "linear":
             scheduler = LinearLR(
@@ -157,16 +145,10 @@ class SchedulerFactory:
                 end_factor=scheduler_config.eta_min / float(optimizer.param_groups[0]["lr"]),
                 total_iters=scheduler_config.T_max,
             )
-            logger.info(
-                f"Created LinearLR scheduler: total_iters={scheduler_config.T_max}, "
-                f"end_factor={scheduler_config.eta_min}"
-            )
+            logger.info(f"Created LinearLR scheduler: total_iters={scheduler_config.T_max}, end_factor={scheduler_config.eta_min}")
 
         else:
-            raise ValueError(
-                f"Unsupported scheduler: {scheduler_type}. "
-                f"Supported schedulers: step, exponential, cosine, plateau, linear, none"
-            )
+            raise ValueError(f"Unsupported scheduler: {scheduler_type}. Supported schedulers: step, exponential, cosine, plateau, linear, none")
 
         return scheduler
 
@@ -189,10 +171,7 @@ class EarlyStopping:
         # Determine if we want to maximize or minimize the metric
         self.is_better = self._is_better_max if config.mode == "max" else self._is_better_min
 
-        logger.info(
-            f"Early stopping initialized: monitor={config.monitor}, "
-            f"patience={config.patience}, min_delta={config.min_delta}, mode={config.mode}"
-        )
+        logger.info(f"Early stopping initialized: monitor={config.monitor}, patience={config.patience}, min_delta={config.min_delta}, mode={config.mode}")
 
     def _is_better_min(self, score: float, best_score: float) -> bool:
         """Check if score is better when minimizing."""
@@ -228,16 +207,11 @@ class EarlyStopping:
             logger.info(f"Early stopping: new best score = {score:.6f} at epoch {epoch}")
         else:
             self.counter += 1
-            logger.info(
-                f"Early stopping: no improvement for {self.counter}/{self.config.patience} epochs"
-            )
+            logger.info(f"Early stopping: no improvement for {self.counter}/{self.config.patience} epochs")
 
             if self.counter >= self.config.patience:
                 self.should_stop = True
-                logger.info(
-                    f"Early stopping triggered! Best score: {self.best_score:.6f} "
-                    f"at epoch {self.best_epoch}"
-                )
+                logger.info(f"Early stopping triggered! Best score: {self.best_score:.6f} at epoch {self.best_epoch}")
                 return True
 
         return False

@@ -306,9 +306,7 @@ def main() -> None:
                         "Status": status_icon,
                         "Model": model["name"],
                         "Type": model["type"],
-                        "Accuracy": f"{model['accuracy']:.1%}"
-                        if model["accuracy"] > 0
-                        else "Unknown",
+                        "Accuracy": f"{model['accuracy']:.1%}" if model["accuracy"] > 0 else "Unknown",
                         "Description": model["description"],
                     }
                 )
@@ -341,10 +339,7 @@ Configuration: config/models.json
         if st.button("🏁 Run Quick Benchmark"):
             with st.spinner("Benchmarking models..."):
                 # This would run the benchmark from model_switcher.py
-                st.info(
-                    "Benchmark feature - run "
-                    "`python scripts/model_switching/model_switcher.py --benchmark` in terminal"
-                )
+                st.info("Benchmark feature - run `python scripts/model_switching/model_switcher.py --benchmark` in terminal")
 
 
 if __name__ == "__main__":

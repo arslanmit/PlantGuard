@@ -20,9 +20,7 @@ class HuggingFaceVisionAdapter:
     using models from Hugging Face Hub.
     """
 
-    def __init__(
-        self, model_name: str = "Abhiram4/PlantDiseaseDetectorVit2", device: str = "cpu"
-    ) -> None:
+    def __init__(self, model_name: str = "Abhiram4/PlantDiseaseDetectorVit2", device: str = "cpu") -> None:
         """Initialize HuggingFaceVisionAdapter.
 
         Args:
@@ -55,9 +53,7 @@ class HuggingFaceVisionAdapter:
 
             # Load processor and model with revision pinning for security
             self.processor = AutoImageProcessor.from_pretrained(self.model_name, revision="main")  # type: ignore # nosec B615
-            self.model = AutoModelForImageClassification.from_pretrained(
-                self.model_name, revision="main"
-            )  # type: ignore # nosec B615
+            self.model = AutoModelForImageClassification.from_pretrained(self.model_name, revision="main")  # type: ignore # nosec B615
             self.model.to(self.device)  # type: ignore
             self.model.eval()  # type: ignore
 

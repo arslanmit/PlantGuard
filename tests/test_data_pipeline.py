@@ -158,9 +158,7 @@ class TestStratifiedSplit:
     def test_stratified_split(self, temp_dataset_dir: Path) -> None:
         """Test stratified train/validation split."""
         dataset = PlantVillageDataset(temp_dataset_dir)
-        train_dataset, val_dataset = create_stratified_split(
-            dataset, train_ratio=0.8, random_state=42
-        )
+        train_dataset, val_dataset = create_stratified_split(dataset, train_ratio=0.8, random_state=42)
 
         # Check split sizes
         total_size = len(dataset)

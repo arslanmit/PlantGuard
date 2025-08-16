@@ -45,11 +45,7 @@ def split_dataset(
         logger.info("Processing class: %s", class_name)
 
         # Get all image files
-        image_files = (
-            list(class_dir.glob("*.jpg"))
-            + list(class_dir.glob("*.jpeg"))
-            + list(class_dir.glob("*.png"))
-        )
+        image_files = list(class_dir.glob("*.jpg")) + list(class_dir.glob("*.jpeg")) + list(class_dir.glob("*.png"))
 
         if not image_files:
             logger.warning("No images found in %s", class_dir)
@@ -125,9 +121,7 @@ def main() -> None:
     parser.add_argument("--source_dir", type=str, required=True, help="Source dataset directory")
     parser.add_argument("--output_dir", type=str, required=True, help="Output directory")
     parser.add_argument("--train_ratio", type=float, default=0.8, help="Training set ratio")
-    parser.add_argument(
-        "--validate_only", action="store_true", help="Only validate existing dataset"
-    )
+    parser.add_argument("--validate_only", action="store_true", help="Only validate existing dataset")
 
     args = parser.parse_args()
 

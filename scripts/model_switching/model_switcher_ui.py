@@ -20,9 +20,7 @@ def get_model_manager() -> "PlantGuardModelManager":
     return PlantGuardModelManager(autoload_default=False)
 
 
-def process_image(
-    image: Image.Image, image_name: str, manager: "PlantGuardModelManager", current_model_info: dict
-) -> None:
+def process_image(image: Image.Image, image_name: str, manager: "PlantGuardModelManager", current_model_info: dict) -> None:
     """Process an image and display results."""
     # Display image
     st.image(image, caption=f"Testing: {image_name}", use_container_width=True)
@@ -209,20 +207,12 @@ def main() -> None:
         if models:
             model_data = []
             for model in models:
-                status = (
-                    "🟢 Current"
-                    if model["is_current"]
-                    else "⚪ Available"
-                    if model["enabled"]
-                    else "🔴 Disabled"
-                )
+                status = "🟢 Current" if model["is_current"] else "⚪ Available" if model["enabled"] else "🔴 Disabled"
                 model_data.append(
                     {
                         "Model": model["name"],
                         "Type": model["type"],
-                        "Accuracy": f"{model['accuracy']:.1%}"
-                        if model["accuracy"] > 0
-                        else "Unknown",
+                        "Accuracy": f"{model['accuracy']:.1%}" if model["accuracy"] > 0 else "Unknown",
                         "Status": status,
                     }
                 )

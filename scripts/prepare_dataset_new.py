@@ -25,9 +25,7 @@ def main() -> None:
         default="data/processed/plantvillage",
         help="Output directory for prepared dataset",
     )
-    parser.add_argument(
-        "--train-ratio", type=float, default=0.8, help="Ratio of data for training (default: 0.8)"
-    )
+    parser.add_argument("--train-ratio", type=float, default=0.8, help="Ratio of data for training (default: 0.8)")
     parser.add_argument(
         "--random-seed",
         type=int,

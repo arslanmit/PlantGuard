@@ -170,10 +170,7 @@ class TrainingConfig:
         """Validate model-related parameters."""
         valid_architectures = ["resnet50", "resnet18", "resnet34", "resnet101", "resnet152"]
         if self.model_architecture not in valid_architectures:
-            raise ValueError(
-                f"Invalid architecture: {self.model_architecture}. "
-                f"Must be one of {valid_architectures}"
-            )
+            raise ValueError(f"Invalid architecture: {self.model_architecture}. Must be one of {valid_architectures}")
 
         if self.num_classes <= 0:
             raise ValueError("num_classes must be positive")
@@ -197,9 +194,7 @@ class TrainingConfig:
 
         valid_optimizers = ["adam", "sgd", "adamw", "rmsprop"]
         if self.optimizer.lower() not in valid_optimizers:
-            raise ValueError(
-                f"Invalid optimizer: {self.optimizer}. Must be one of {valid_optimizers}"
-            )
+            raise ValueError(f"Invalid optimizer: {self.optimizer}. Must be one of {valid_optimizers}")
 
         if not 0 <= self.momentum <= 1:
             raise ValueError("momentum must be between 0 and 1")
@@ -214,9 +209,7 @@ class TrainingConfig:
         """Validate resource-related parameters."""
         valid_devices = ["auto", "cpu", "cuda", "mps"]
         if self.device not in valid_devices and not self.device.startswith("cuda:"):
-            raise ValueError(
-                f"Invalid device: {self.device}. Must be one of {valid_devices} or 'cuda:N'"
-            )
+            raise ValueError(f"Invalid device: {self.device}. Must be one of {valid_devices} or 'cuda:N'")
 
         if self.num_workers < 0:
             raise ValueError("num_workers must be non-negative")
@@ -266,12 +259,8 @@ class TrainingConfig:
         if "early_stopping" in config_dict and isinstance(config_dict["early_stopping"], dict):
             config_dict["early_stopping"] = EarlyStoppingConfig(**config_dict["early_stopping"])
 
-        if "data_augmentation" in config_dict and isinstance(
-            config_dict["data_augmentation"], dict
-        ):
-            config_dict["data_augmentation"] = DataAugmentationConfig(
-                **config_dict["data_augmentation"]
-            )
+        if "data_augmentation" in config_dict and isinstance(config_dict["data_augmentation"], dict):
+            config_dict["data_augmentation"] = DataAugmentationConfig(**config_dict["data_augmentation"])
 
         return cls(**config_dict)
 
@@ -317,9 +306,7 @@ class TrainingConfig:
             ValueError: If YAML is invalid or configuration is invalid
         """
         if not YAML_AVAILABLE:
-            raise ImportError(
-                "PyYAML is required for YAML support. Install with: pip install PyYAML"
-            )
+            raise ImportError("PyYAML is required for YAML support. Install with: pip install PyYAML")
 
         yaml_path = Path(yaml_path)
         if not yaml_path.exists():
@@ -366,9 +353,7 @@ class TrainingConfig:
             ImportError: If PyYAML is not installed
         """
         if not YAML_AVAILABLE:
-            raise ImportError(
-                "PyYAML is required for YAML support. Install with: pip install PyYAML"
-            )
+            raise ImportError("PyYAML is required for YAML support. Install with: pip install PyYAML")
 
         yaml_path = Path(yaml_path)
         yaml_path.parent.mkdir(parents=True, exist_ok=True)
@@ -401,9 +386,7 @@ class TrainingConfig:
         # Check batch size vs gradient accumulation
         effective_batch_size = self.get_effective_batch_size()
         if effective_batch_size > 512:
-            warnings.append(
-                f"Large effective batch size ({effective_batch_size}) may hurt performance"
-            )
+            warnings.append(f"Large effective batch size ({effective_batch_size}) may hurt performance")
 
         # Check learning rate vs batch size
         if self.learning_rate > 0.01 and self.batch_size < 64:
@@ -411,9 +394,7 @@ class TrainingConfig:
 
         # Check early stopping vs epochs
         if self.early_stopping.enabled and self.early_stopping.patience >= self.epochs:
-            warnings.append(
-                "Early stopping patience is >= total epochs, early stopping may not trigger"
-            )
+            warnings.append("Early stopping patience is >= total epochs, early stopping may not trigger")
 
         return warnings
 
@@ -558,9 +539,7 @@ def load_config(config_path: str | Path) -> TrainingConfig:
     elif suffix in [".yaml", ".yml"]:
         return TrainingConfig.from_yaml(config_path)
     else:
-        raise ValueError(
-            f"Unsupported configuration format: {suffix}. Supported formats: .json, .yaml, .yml"
-        )
+        raise ValueError(f"Unsupported configuration format: {suffix}. Supported formats: .json, .yaml, .yml")
 
 
 def create_template_configs(output_dir: str | Path) -> None:

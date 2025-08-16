@@ -331,9 +331,7 @@ def main() -> None:
     """Main training function."""
     parser = argparse.ArgumentParser(description="Train PlantGuard vision model")
     parser.add_argument("--data_dir", type=str, required=True, help="Path to dataset directory")
-    parser.add_argument(
-        "--save_dir", type=str, default="data/models", help="Directory to save models"
-    )
+    parser.add_argument("--save_dir", type=str, default="data/models", help="Directory to save models")
     parser.add_argument("--epochs", type=int, default=50, help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size")
     parser.add_argument("--learning_rate", type=float, default=0.001, help="Learning rate")
@@ -370,9 +368,7 @@ def main() -> None:
 
     try:
         # Create data loaders
-        train_loader, val_loader, class_names = create_data_loaders(
-            data_dir, args.batch_size, args.num_workers
-        )
+        train_loader, val_loader, class_names = create_data_loaders(data_dir, args.batch_size, args.num_workers)
 
         # Save class names
         class_names_path = save_dir / "class_names.json"

@@ -56,9 +56,7 @@ def normalize_class_name(class_name: str) -> str:
     return mappings.get(class_name, class_name)
 
 
-def map_prediction_to_ground_truth(
-    prediction: str, ground_truth_plant: str, ground_truth_disease: str
-) -> str:
+def map_prediction_to_ground_truth(prediction: str, ground_truth_plant: str, ground_truth_disease: str) -> str:
     """Map model prediction to expected ground truth format."""
     # If prediction contains plant name, use it directly
     if "___" in prediction:
@@ -110,9 +108,7 @@ def _load_and_initialize_model(
     return vision_adapter, model_info
 
 
-def _process_single_image(
-    sample: dict[str, Any], test_images_dir: str, vision_adapter: VisionAdapter
-) -> dict[str, Any] | None:
+def _process_single_image(sample: dict[str, Any], test_images_dir: str, vision_adapter: VisionAdapter) -> dict[str, Any] | None:
     """Process a single test image and return evaluation result."""
     image_path = Path(test_images_dir) / sample["filename"]
 
@@ -171,9 +167,7 @@ def _process_single_image(
         logger.exception("Failed to process %s", image_path)
         return None
     else:
-        logger.info(
-            "Processed %s: %s (conf: %.3f)", sample["filename"], predicted_class, confidence
-        )
+        logger.info("Processed %s: %s (conf: %.3f)", sample["filename"], predicted_class, confidence)
         return result
 
 
@@ -195,9 +189,7 @@ def _calculate_metrics(
     # Detailed classification report
     try:
         # Use string literal to satisfy some type stubs that expect str for zero_division
-        class_report = classification_report(
-            ground_truths, predictions, output_dict=True, zero_division="warn"
-        )
+        class_report = classification_report(ground_truths, predictions, output_dict=True, zero_division="warn")
     except ValueError as e:
         logger.warning("Could not generate classification report: %s", e)
         class_report = {}
@@ -313,17 +305,9 @@ def _print_plant_wise_performance(detailed: list[dict[str, Any]]) -> None:
 
 def _print_health_status_performance(detailed: list[dict[str, Any]]) -> None:
     """Print health status performance breakdown."""
-    sum(
-        1
-        for r in detailed
-        if r["ground_truth"]["status"] == "healthy" and r["evaluation"]["status_correct"]
-    )
+    sum(1 for r in detailed if r["ground_truth"]["status"] == "healthy" and r["evaluation"]["status_correct"])
     healthy_total = sum(1 for r in detailed if r["ground_truth"]["status"] == "healthy")
-    sum(
-        1
-        for r in detailed
-        if r["ground_truth"]["status"] == "diseased" and r["evaluation"]["status_correct"]
-    )
+    sum(1 for r in detailed if r["ground_truth"]["status"] == "diseased" and r["evaluation"]["status_correct"])
     diseased_total = sum(1 for r in detailed if r["ground_truth"]["status"] == "diseased")
 
     if healthy_total > 0:

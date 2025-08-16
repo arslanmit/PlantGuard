@@ -47,9 +47,7 @@ class ModelConfig:
 class PlantGuardModelManager:
     """Unified model manager for easy switching between different models."""
 
-    def __init__(
-        self, config_path: str = "config/models.json", autoload_default: bool = True
-    ) -> None:
+    def __init__(self, config_path: str = "config/models.json", autoload_default: bool = True) -> None:
         """Initialize the model manager.
 
         Args:
@@ -165,8 +163,7 @@ class PlantGuardModelManager:
                     "description": config.description,
                     "accuracy": config.accuracy,
                     "enabled": config.enabled,
-                    "is_current": model_id
-                    == (self.current_model.name if self.current_model else None),
+                    "is_current": model_id == (self.current_model.name if self.current_model else None),
                 }
             )
         return models
@@ -218,17 +215,13 @@ class PlantGuardModelManager:
                 self.model_id = model_id
                 self.device = device
                 self.processor = AutoImageProcessor.from_pretrained(model_id, revision="main")  # nosec B615
-                self.model = AutoModelForImageClassification.from_pretrained(
-                    model_id, revision="main"
-                )  # nosec B615
+                self.model = AutoModelForImageClassification.from_pretrained(model_id, revision="main")  # nosec B615
                 self.model.to(device)
                 self.model.eval()
 
                 # Extract class names
                 if hasattr(self.model.config, "id2label"):
-                    self.class_names = [
-                        self.model.config.id2label[i] for i in range(self.model.config.num_labels)
-                    ]
+                    self.class_names = [self.model.config.id2label[i] for i in range(self.model.config.num_labels)]
                 else:
                     self.class_names = [f"class_{i}" for i in range(self.model.config.num_labels)]
 
@@ -250,9 +243,7 @@ class PlantGuardModelManager:
             def get_class_names(self) -> list[str]:
                 return self.class_names.copy()
 
-        device_str = (
-            config.device_preference if config.device_preference != "auto" else str(self.device)
-        )
+        device_str = config.device_preference if config.device_preference != "auto" else str(self.device)
         device = torch.device(device_str)
 
         return HuggingFaceAdapter(config.model_id, device)
@@ -267,9 +258,7 @@ class PlantGuardModelManager:
         sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
         from src.core.vision import VisionAdapter
 
-        device_str = (
-            config.device_preference if config.device_preference != "auto" else str(self.device)
-        )
+        device_str = config.device_preference if config.device_preference != "auto" else str(self.device)
         adapter = VisionAdapter(device=device_str)
         adapter.load_checkpoint(config.model_id)
         return adapter
@@ -329,9 +318,7 @@ class PlantGuardModelManager:
             "confidence_percentage": f"{confidence:.1%}",
             "raw_prediction": predicted_class,
             "model_info": metadata,
-            "recommendation": self._get_recommendation(
-                confidence, metadata["confidence_threshold"]
-            ),
+            "recommendation": self._get_recommendation(confidence, metadata["confidence_threshold"]),
         }
 
     def _get_recommendation(self, confidence: float, threshold: float) -> str:
@@ -373,9 +360,7 @@ class PlantGuardModelManager:
             "accuracy": self.current_model.accuracy,
             "confidence_threshold": self.current_model.confidence_threshold,
             "device": str(self.device),
-            "num_classes": len(self.current_adapter.get_class_names())
-            if self.current_adapter
-            else 0,
+            "num_classes": len(self.current_adapter.get_class_names()) if self.current_adapter else 0,
         }
 
     def update_model_config(self, model_id: str, updates: dict[str, Any]) -> bool:

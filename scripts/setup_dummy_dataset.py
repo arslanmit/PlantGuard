@@ -122,9 +122,7 @@ def main() -> None:
         help="Number of samples per class",
     )
     parser.add_argument("--train_ratio", type=float, default=0.8, help="Ratio of training samples")
-    parser.add_argument(
-        "--random_seed", type=int, default=42, help="Random seed for reproducibility"
-    )
+    parser.add_argument("--random_seed", type=int, default=42, help="Random seed for reproducibility")
 
     args = parser.parse_args()
 

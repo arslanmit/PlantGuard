@@ -106,9 +106,7 @@ class CheckpointManager:
             Path to saved checkpoint or None if not saved
         """
         # Check if we should save this checkpoint
-        if not force_save and not self._should_save_checkpoint(
-            checkpoint_data.epoch, checkpoint_data.val_loss
-        ):
+        if not force_save and not self._should_save_checkpoint(checkpoint_data.epoch, checkpoint_data.val_loss):
             return None
 
         try:
@@ -213,9 +211,7 @@ class CheckpointManager:
             if not self._verify_checkpoint_integrity(checkpoint_path, checkpoint):
                 logger.warning("Checkpoint integrity check failed, but proceeding")
 
-            logger.info(
-                "Checkpoint loaded successfully: epoch %s", checkpoint.get("epoch", "unknown")
-            )
+            logger.info("Checkpoint loaded successfully: epoch %s", checkpoint.get("epoch", "unknown"))
             return checkpoint  # type: ignore[no-any-return]
 
         except Exception:
@@ -464,9 +460,7 @@ class CheckpointManager:
 
         return True
 
-    def _verify_checkpoint_integrity(
-        self, checkpoint_path: Path, checkpoint: dict[str, Any]
-    ) -> bool:
+    def _verify_checkpoint_integrity(self, checkpoint_path: Path, checkpoint: dict[str, Any]) -> bool:
         """Verify checkpoint file integrity using checksum.
 
         Args:

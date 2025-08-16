@@ -58,9 +58,7 @@ class PlantVillageDataset(Dataset):
         self.class_to_idx = self.dataset.class_to_idx
         self.samples = self.dataset.samples
 
-        logger.info(
-            "Loaded dataset with %d samples and %d classes", len(self.samples), len(self.classes)
-        )
+        logger.info("Loaded dataset with %d samples and %d classes", len(self.samples), len(self.classes))
 
     def __len__(self) -> int:
         """Return the total number of samples."""
@@ -271,9 +269,7 @@ def create_data_loaders(
     )
 
     # Create stratified split
-    train_subset, val_subset = create_stratified_split(
-        train_dataset, train_ratio=train_ratio, random_state=random_state
-    )
+    train_subset, val_subset = create_stratified_split(train_dataset, train_ratio=train_ratio, random_state=random_state)
 
     # Update validation dataset to use validation subset indices
     if isinstance(val_subset, Subset):

@@ -148,9 +148,7 @@ class TestTrainingConfig:
 
     def test_compatibility_warnings(self) -> None:
         """Test configuration compatibility warnings."""
-        config = TrainingConfig(
-            mixed_precision=True, device="cpu", batch_size=1024, learning_rate=0.1
-        )
+        config = TrainingConfig(mixed_precision=True, device="cpu", batch_size=1024, learning_rate=0.1)
         warnings = config.validate_compatibility()
         assert len(warnings) > 0
         assert any("Mixed precision" in warning for warning in warnings)

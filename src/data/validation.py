@@ -65,16 +65,8 @@ class ImageValidator:
 
     def _check_image_dimensions(self, img: Image.Image, result: dict[str, Any]) -> bool:
         """Check if image dimensions are within acceptable range."""
-        if (
-            img.size[0] < self.MIN_IMAGE_SIZE[0]
-            or img.size[1] < self.MIN_IMAGE_SIZE[1]
-            or img.size[0] > self.MAX_IMAGE_SIZE[0]
-            or img.size[1] > self.MAX_IMAGE_SIZE[1]
-        ):
-            error_msg = (
-                f"Invalid dimensions {img.size}, must be between "
-                f"{self.MIN_IMAGE_SIZE} and {self.MAX_IMAGE_SIZE}"
-            )
+        if img.size[0] < self.MIN_IMAGE_SIZE[0] or img.size[1] < self.MIN_IMAGE_SIZE[1] or img.size[0] > self.MAX_IMAGE_SIZE[0] or img.size[1] > self.MAX_IMAGE_SIZE[1]:
+            error_msg = f"Invalid dimensions {img.size}, must be between {self.MIN_IMAGE_SIZE} and {self.MAX_IMAGE_SIZE}"
             result["error_message"] = error_msg
             self._raise_if_strict(error_msg)
             return False
@@ -155,9 +147,7 @@ class ImageValidator:
             result["file_size_mb"] = int(file_size_mb)
 
             if file_size_mb > self.MAX_FILE_SIZE_MB:
-                error_msg = (
-                    f"File size {file_size_mb:.1f}MB exceeds limit {self.MAX_FILE_SIZE_MB}MB"
-                )
+                error_msg = f"File size {file_size_mb:.1f}MB exceeds limit {self.MAX_FILE_SIZE_MB}MB"
                 result["error_message"] = error_msg
                 self._raise_if_strict(error_msg)
 
@@ -178,16 +168,8 @@ class ImageValidator:
 
                 # Check image dimensions
                 width, height = img.size
-                if (
-                    width < self.MIN_IMAGE_SIZE[0]
-                    or height < self.MIN_IMAGE_SIZE[1]
-                    or width > self.MAX_IMAGE_SIZE[0]
-                    or height > self.MAX_IMAGE_SIZE[1]
-                ):
-                    error_msg = (
-                        f"Invalid dimensions {img.size}, must be between "
-                        f"{self.MIN_IMAGE_SIZE} and {self.MAX_IMAGE_SIZE}"
-                    )
+                if width < self.MIN_IMAGE_SIZE[0] or height < self.MIN_IMAGE_SIZE[1] or width > self.MAX_IMAGE_SIZE[0] or height > self.MAX_IMAGE_SIZE[1]:
+                    error_msg = f"Invalid dimensions {img.size}, must be between {self.MIN_IMAGE_SIZE} and {self.MAX_IMAGE_SIZE}"
                     result["error_message"] = error_msg
                     self._raise_if_strict(error_msg)
                     return result
@@ -241,12 +223,7 @@ class ImageValidator:
             result = self.validate_image_file(image_path)
             validation_details.append(result)
 
-            if (
-                result["exists"]
-                and result["valid_format"]
-                and result["readable"]
-                and result["size_valid"]
-            ):
+            if result["exists"] and result["valid_format"] and result["readable"] and result["size_valid"]:
                 valid_images.append(str(image_path))
             else:
                 invalid_images.append(str(image_path))
@@ -371,9 +348,7 @@ class DatasetAnalyzer:
 
         return analysis
 
-    def analyze_image_properties(
-        self, data_dir: str | Path, sample_size: int | None = 1000
-    ) -> dict[str, Any]:
+    def analyze_image_properties(self, data_dir: str | Path, sample_size: int | None = 1000) -> dict[str, Any]:
         """Analyze image properties like dimensions, file sizes, and color distributions.
 
         Args:
@@ -537,9 +512,7 @@ class DataIntegrityChecker:
 
         return result
 
-    def check_class_consistency(
-        self, data_dir: str | Path, min_samples_per_class: int = 10
-    ) -> dict[str, Any]:
+    def check_class_consistency(self, data_dir: str | Path, min_samples_per_class: int = 10) -> dict[str, Any]:
         """Check consistency of classes and minimum sample requirements.
 
         Args:
@@ -573,11 +546,7 @@ class DataIntegrityChecker:
             }
 
         class_counts = dict(class_counts_raw)
-        insufficient_classes = [
-            class_name
-            for class_name, count in class_counts.items()
-            if count < min_samples_per_class
-        ]
+        insufficient_classes = [class_name for class_name, count in class_counts.items() if count < min_samples_per_class]
 
         result = {
             "consistent": len(insufficient_classes) == 0,
@@ -592,9 +561,7 @@ class DataIntegrityChecker:
 
         return result
 
-    def run_full_integrity_check(
-        self, data_dir: str | Path, min_samples_per_class: int = 10
-    ) -> dict[str, Any]:
+    def run_full_integrity_check(self, data_dir: str | Path, min_samples_per_class: int = 10) -> dict[str, Any]:
         """Run comprehensive data integrity check.
 
         Args:
@@ -611,18 +578,10 @@ class DataIntegrityChecker:
 
         # Check image validation
         validator = ImageValidator(strict_mode=False)
-        validation_check = (
-            validator.validate_dataset_directory(data_dir)
-            if structure_check.get("valid_structure", False)
-            else {}
-        )
+        validation_check = validator.validate_dataset_directory(data_dir) if structure_check.get("valid_structure", False) else {}
 
         # Check class consistency
-        consistency_check = (
-            self.check_class_consistency(data_dir, min_samples_per_class)
-            if structure_check.get("valid_structure", False)
-            else {}
-        )
+        consistency_check = self.check_class_consistency(data_dir, min_samples_per_class) if structure_check.get("valid_structure", False) else {}
 
         # Overall integrity status
         validation_rate = validation_check.get("validation_rate", 0)
@@ -631,11 +590,7 @@ class DataIntegrityChecker:
         else:
             validation_rate_ok = False
 
-        overall_valid = (
-            bool(structure_check.get("valid_structure", False))
-            and validation_rate_ok
-            and bool(consistency_check.get("consistent", False))
-        )
+        overall_valid = bool(structure_check.get("valid_structure", False)) and validation_rate_ok and bool(consistency_check.get("consistent", False))
 
         result = {
             "overall_valid": overall_valid,
@@ -652,9 +607,7 @@ class DataIntegrityChecker:
         return result
 
 
-def generate_data_report(
-    data_dir: str | Path, output_path: str | Path | None = None
-) -> dict[str, Any]:
+def generate_data_report(data_dir: str | Path, output_path: str | Path | None = None) -> dict[str, Any]:
     """Generate comprehensive data quality report.
 
     Args:

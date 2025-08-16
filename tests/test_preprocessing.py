@@ -48,9 +48,7 @@ def test_different_preprocessing() -> None:
                 transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             ]
         ),
-        "No normalization": transforms.Compose(
-            [transforms.Resize((224, 224)), transforms.ToTensor()]
-        ),
+        "No normalization": transforms.Compose([transforms.Resize((224, 224)), transforms.ToTensor()]),
         "Different normalization": transforms.Compose(
             [
                 transforms.Resize((224, 224)),

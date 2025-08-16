@@ -44,7 +44,7 @@ def _run_all_tests() -> bool:
     """Run all tests with coverage."""
     return run_command(
         [
-            "python",
+            sys.executable,
             "-m",
             "pytest",
             "tests/",
@@ -59,22 +59,18 @@ def _run_all_tests() -> bool:
 
 def _run_unit_tests() -> bool:
     """Run unit tests only."""
-    return run_command(
-        ["python", "-m", "pytest", "tests/", "-v", "-m", "unit"], "Running unit tests"
-    )
+    return run_command([sys.executable, "-m", "pytest", "tests/", "-v", "-m", "unit"], "Running unit tests")
 
 
 def _run_fast_tests() -> bool:
     """Run tests without coverage."""
-    return run_command(
-        ["python", "-m", "pytest", "tests/", "-v", "--tb=short"], "Running tests (fast mode)"
-    )
+    return run_command([sys.executable, "-m", "pytest", "tests/", "-v", "--tb=short"], "Running tests (fast mode)")
 
 
 def _generate_coverage() -> bool:
     """Generate coverage report."""
     success = run_command(
-        ["python", "-m", "pytest", "tests/", "--cov=src", "--cov-report=html"],
+        [sys.executable, "-m", "pytest", "tests/", "--cov=src", "--cov-report=html"],
         "Generating coverage report",
     )
     if success:

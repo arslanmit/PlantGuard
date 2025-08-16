@@ -254,7 +254,8 @@ ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = "tests.*"
-ignore_errors = true
+disallow_untyped_defs = false
+check_untyped_defs = false
 
 # 📦 External libraries
 ignore_missing_imports = true    # Don't complain about missing library types
@@ -783,14 +784,12 @@ ignore = [
   # ============================================================================
   # 📝 FLAKE8-ANNOTATIONS (ANN) - Type annotations
   # ============================================================================
-  # "ANN001", # function arguments don't need types everywhere
+   "ANN001", # function arguments don't need types everywhere
   "ANN002", # Allow missing *args types - ML frameworks often use dynamic arguments for model parameters
   "ANN003", # Allow missing **kwargs types - ML model constructors frequently use flexible keyword arguments
   "ANN201", # Allow missing return type annotations - ML test functions and scripts often don't need explicit return types
-  # "ANN101", # REMOVED: deprecated rule (no longer exists in Ruff)
-  # "ANN102", # REMOVED: deprecated rule (no longer exists in Ruff)
   # "ANN201", # return types not required everywhere
-  # "ANN202", # missing return type annotation for private function
+   "ANN202", # missing return type annotation for private function
   # "ANN204", # missing return type annotation for special method
   # "ANN205", # missing return type annotation for staticmethod
   # "ANN206", # missing return type annotation for classmethod
@@ -847,7 +846,7 @@ ignore = [
   # ============================================================================
   "SIM102", # Allow if/else over ternary - ML code often benefits from explicit conditionals for model logic clarity
   # "SIM103", # return condition directly
-  # "SIM106", # use ternary operator instead of if-else-block for simple variable assignments
+  "SIM105",
   "SIM108", # Allow if/else for boolean assignment - ML model conditions often clearer with explicit blocks
   # "SIM110", # use any(...) instead of for loop AND all(...) instead of for loop (remapped from SIM111)
   # "SIM112", # use CAPITAL_ENVIRONMENT_VARIABLES
@@ -908,6 +907,7 @@ ignore = [
   # "UP035",  # use {} instead of format()
   # "UP036",  # use {} instead of format()
   # "UP037",  # use {} instead of format()
+  "UP038",  # use {} instead of format()
 
   # ============================================================================
   # 🔄 TRYCERATOPS (TRY) - Exception handling improvements
@@ -973,7 +973,7 @@ ignore = [
   "PERF401", # Allow explicit loops over list comprehensions - ML transformations often clearer with explicit loops
   "PERF402", # Allow for-loops over comprehensions - ML data processing often needs explicit loop control
   "PERF403", # Allow for-loops over dict comprehensions - ML config building often clearer with explicit loops
-
+  "F706", #
   # ============================================================================
   # 📦 FLAKE8-TIDY-IMPORTS (TID) - Import organization
   # ============================================================================
@@ -1018,7 +1018,7 @@ ignore = [
   # "PLW1641", # eq-without-hash
   # "PLW2101", # useless-with-lock
   "PLW2901", # Allow loop variable overwriting - common in ML batch processing and nested training loops
-  # "PLW3301", # nested-min-max
+   "PLW3301", # nested-min-max
 
   # PLE - Pylint Error
   # "PLE0101", # return in __init__

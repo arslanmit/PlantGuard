@@ -312,9 +312,7 @@ def test_new_adapter() -> None:
     for img_path in test_images:
         if Path(img_path).exists():
             image = Image.open(img_path)
-            raw_class, readable_name, confidence, plant_type = adapter.predict_with_readable_name(
-                image
-            )
+            raw_class, readable_name, confidence, plant_type = adapter.predict_with_readable_name(image)
 
             logger.info("🌿 %s", Path(img_path).name)
             logger.info("   Plant: %s", plant_type)
@@ -328,9 +326,7 @@ def update_main_app() -> None:
     logger.info("To integrate into your main app:")
     logger.info("1. Replace VisionAdapter with HuggingFaceVisionAdapter in your app")
     logger.info("2. Update imports in src/ui/app.py:")
-    logger.info(
-        "   from src.core.huggingface_vision import HuggingFaceVisionAdapter  # shim remains valid"
-    )
+    logger.info("   from src.core.huggingface_vision import HuggingFaceVisionAdapter  # shim remains valid")
     logger.info("3. Initialize with: adapter = HuggingFaceVisionAdapter()")
     logger.info("4. The API is the same, so existing code should work!")
 

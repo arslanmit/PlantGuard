@@ -47,7 +47,7 @@ endif
 .DEFAULT_GOAL := help
 
 .PHONY: help start setup install run switcher run-all model-switcher dev test clean
-.PHONY: format lint check fix train notebook benchmark
+.PHONY: format lint check fix train monitor-training notebook benchmark
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
 .PHONY: reset fresh stop restart debug profile validate
@@ -75,6 +75,7 @@ help:
 	@echo ""
 	@echo "$(GREEN)🤖 Machine Learning$(NC)"
 	@echo "  $(BLUE)train$(NC)          - Train plant disease models"
+	@echo "  $(BLUE)monitor-training$(NC) - Launch TensorBoard for training monitoring"
 	@echo "  $(BLUE)benchmark$(NC)      - Quick benchmark all available models (moved from UI)"
 	@echo "  $(BLUE)setup-dataset$(NC)  - Show dataset status and setup options"
 	@echo "  $(BLUE)download-dataset$(NC) - Download PlantVillage dataset from Kaggle"
@@ -350,6 +351,19 @@ train-improved:
 		$(PY) scripts/train_vision_model_improved.py --data_dir data/plantvillage_dummy_improved --epochs 15 --batch_size 16 --learning_rate 0.0001; \
 	fi
 	@echo "$(GREEN)✅ Improved model training complete$(NC)"
+
+# Monitor training with TensorBoard
+monitor-training:
+	@echo "$(BLUE)📊 Launching TensorBoard for training monitoring...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@if [ ! -d "$(RUNS_DIR)" ]; then \
+		echo "$(YELLOW)⚠️  No training runs found. Run 'make train' first.$(NC)"; \
+		mkdir -p $(RUNS_DIR); \
+	fi
+	@echo "$(CYAN)Starting TensorBoard server...$(NC)"
+	@echo "$(YELLOW)📈 TensorBoard will open in your browser at http://localhost:6006$(NC)"
+	@echo "$(YELLOW)Press Ctrl+C to stop TensorBoard$(NC)"
+	@$(PY) -m tensorboard.main --logdir=$(RUNS_DIR) --port=6006 --reload_interval=1
 
 # Setup dataset (real PlantVillage or dummy for testing)
 setup-dataset:

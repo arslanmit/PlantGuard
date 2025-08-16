@@ -8,10 +8,10 @@ src_path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
 # Import after path setup
-from src.utils.config import Config  # noqa: E402
-from src.utils.error_handling import ErrorHandler  # noqa: E402
-from src.utils.file_utils import FileManager  # noqa: E402
-from src.utils.logging import setup_logger  # noqa: E402
+from src.utils.config import Config
+from src.utils.error_handling import ErrorHandler
+from src.utils.file_utils import FileManager
+from src.utils.logging import setup_logger
 
 
 def test_imports() -> None:

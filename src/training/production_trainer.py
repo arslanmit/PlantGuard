@@ -78,9 +78,7 @@ class ProductionTrainer:
         """
         self.config = config
         self.dataset_manager = dataset_manager or DatasetManager()
-        self.output_dir = (
-            Path(output_dir or "runs") / f"{config.experiment_name}_{int(time.time())}"
-        )
+        self.output_dir = Path(output_dir or "runs") / f"{config.experiment_name}_{int(time.time())}"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize components
@@ -190,9 +188,7 @@ class ProductionTrainer:
 
             free_space_gb = shutil.disk_usage(self.output_dir).free / (1024**3)
             if free_space_gb < 1.0:
-                logger.error(
-                    f"Insufficient disk space: {free_space_gb:.1f}GB available (minimum: 1GB)"
-                )
+                logger.error(f"Insufficient disk space: {free_space_gb:.1f}GB available (minimum: 1GB)")
                 return False
             logger.info(f"Disk space check passed: {free_space_gb:.1f}GB available")
         except Exception as e:
@@ -201,10 +197,7 @@ class ProductionTrainer:
         # Check memory availability
         resource_info = self.resource_manager.detect_resources()
         if resource_info.available_memory < 2.0:  # Require at least 2GB
-            logger.error(
-                f"Insufficient memory: {resource_info.available_memory:.1f}GB available "
-                f"(minimum: 2GB)"
-            )
+            logger.error(f"Insufficient memory: {resource_info.available_memory:.1f}GB available (minimum: 2GB)")
             return False
 
         logger.info("Prerequisites validation passed")
@@ -272,9 +265,7 @@ class ProductionTrainer:
             # Log model information
             total_params = sum(p.numel() for p in self.model.parameters())
             trainable_params = sum(p.numel() for p in self.model.parameters() if p.requires_grad)
-            logger.info(
-                f"Model created: {total_params:,} total parameters, {trainable_params:,} trainable"
-            )
+            logger.info(f"Model created: {total_params:,} total parameters, {trainable_params:,} trainable")
 
             return True
 
@@ -393,14 +384,9 @@ class ProductionTrainer:
                 transform_list.append(transforms.RandomVerticalFlip())
 
             if self.config.data_augmentation.rotation > 0:
-                transform_list.append(
-                    transforms.RandomRotation(self.config.data_augmentation.rotation)
-                )
+                transform_list.append(transforms.RandomRotation(self.config.data_augmentation.rotation))
 
-            if (
-                self.config.data_augmentation.brightness > 0
-                or self.config.data_augmentation.contrast > 0
-            ):
+            if self.config.data_augmentation.brightness > 0 or self.config.data_augmentation.contrast > 0:
                 transform_list.append(
                     transforms.ColorJitter(
                         brightness=self.config.data_augmentation.brightness,
@@ -528,18 +514,14 @@ class ProductionTrainer:
 
                 # Log metrics
                 epoch_time = time.time() - epoch_start_time
-                self._log_epoch_metrics(
-                    epoch, train_loss, val_loss, val_accuracy, current_lr, epoch_time
-                )
+                self._log_epoch_metrics(epoch, train_loss, val_loss, val_accuracy, current_lr, epoch_time)
 
                 # Save checkpoint
                 if (epoch + 1) % self.config.save_every_n_epochs == 0:
                     self._save_checkpoint_with_manager(epoch, val_loss, val_accuracy)
 
                 # Check early stopping
-                if self.training_components and self.training_components.check_early_stopping(
-                    val_loss, epoch
-                ):
+                if self.training_components and self.training_components.check_early_stopping(val_loss, epoch):
                     logger.info(f"Early stopping triggered at epoch {epoch}")
                     break
 
@@ -548,10 +530,7 @@ class ProductionTrainer:
             self.state.total_training_time = total_time
 
             logger.info(f"Training completed in {total_time:.2f} seconds")
-            logger.info(
-                f"Best validation loss: {self.state.best_val_loss:.6f} "
-                f"at epoch {self.state.best_epoch}"
-            )
+            logger.info(f"Best validation loss: {self.state.best_val_loss:.6f} at epoch {self.state.best_epoch}")
             logger.info(f"Best validation accuracy: {self.state.best_val_accuracy:.4f}")
 
             # Save final state
@@ -626,9 +605,7 @@ class ProductionTrainer:
                     # Gradient clipping
                     if self.config.gradient_clip_norm is not None:
                         self.scaler.unscale_(self.training_components.optimizer)
-                        torch.nn.utils.clip_grad_norm_(
-                            self.model.parameters(), self.config.gradient_clip_norm
-                        )
+                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip_norm)
 
                     self.scaler.step(self.training_components.optimizer)
                     self.scaler.update()
@@ -645,9 +622,7 @@ class ProductionTrainer:
                 if (batch_idx + 1) % self.config.gradient_accumulation_steps == 0:
                     # Gradient clipping
                     if self.config.gradient_clip_norm is not None:
-                        torch.nn.utils.clip_grad_norm_(
-                            self.model.parameters(), self.config.gradient_clip_norm
-                        )
+                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip_norm)
 
                     self.training_components.step_optimizer()
                     self.training_components.zero_grad()
@@ -720,14 +695,7 @@ class ProductionTrainer:
     ) -> None:
         """Log metrics for the epoch."""
         # Console logging
-        logger.info(
-            f"Epoch {epoch + 1}/{self.config.epochs} - "
-            f"Train Loss: {train_loss:.6f}, "
-            f"Val Loss: {val_loss:.6f}, "
-            f"Val Acc: {val_accuracy:.4f}, "
-            f"LR: {learning_rate:.8f}, "
-            f"Time: {epoch_time:.2f}s"
-        )
+        logger.info(f"Epoch {epoch + 1}/{self.config.epochs} - Train Loss: {train_loss:.6f}, Val Loss: {val_loss:.6f}, Val Acc: {val_accuracy:.4f}, LR: {learning_rate:.8f}, Time: {epoch_time:.2f}s")
 
         # TensorBoard logging
         if self.writer:
@@ -757,9 +725,7 @@ class ProductionTrainer:
 
         logger.info(f"Best model saved: {best_model_path}")
 
-    def _save_checkpoint_with_manager(
-        self, epoch: int, val_loss: float, val_accuracy: float
-    ) -> None:
+    def _save_checkpoint_with_manager(self, epoch: int, val_loss: float, val_accuracy: float) -> None:
         """Save training checkpoint using checkpoint manager."""
         if self.model is None or self.training_components is None:
             return
@@ -899,11 +865,7 @@ class ProductionTrainer:
                 logger.info("Training components state restored from checkpoint")
 
             # Restore scaler state
-            if (
-                self.scaler is not None
-                and "scaler_state_dict" in checkpoint
-                and checkpoint["scaler_state_dict"]
-            ):
+            if self.scaler is not None and "scaler_state_dict" in checkpoint and checkpoint["scaler_state_dict"]:
                 self.scaler.load_state_dict(checkpoint["scaler_state_dict"])
                 logger.info("Mixed precision scaler state restored from checkpoint")
 
@@ -976,10 +938,7 @@ class ProductionTrainer:
                 checkpoint_value = checkpoint_config[param]
                 current_value = getattr(self.config, param)
                 if checkpoint_value != current_value:
-                    logger.error(
-                        f"Config mismatch for {param}: checkpoint={checkpoint_value}, "
-                        f"current={current_value}"
-                    )
+                    logger.error(f"Config mismatch for {param}: checkpoint={checkpoint_value}, current={current_value}")
                     return False
 
         logger.info("Checkpoint validation passed")
@@ -1041,9 +1000,7 @@ class ProductionTrainer:
             if "epoch" in checkpoint:
                 results["training_epoch"] = checkpoint["epoch"]
 
-            logger.info(
-                f"Model evaluation completed: accuracy={val_accuracy:.4f}, loss={val_loss:.6f}"
-            )
+            logger.info(f"Model evaluation completed: accuracy={val_accuracy:.4f}, loss={val_loss:.6f}")
             return results
 
         except Exception as e:
@@ -1090,9 +1047,7 @@ class ProductionTrainer:
         cm = confusion_matrix(y_true, y_pred)
 
         # Calculate classification report
-        class_names = getattr(
-            self, "class_names", [f"class_{i}" for i in range(self.config.num_classes)]
-        )
+        class_names = getattr(self, "class_names", [f"class_{i}" for i in range(self.config.num_classes)])
         report = classification_report(y_true, y_pred, target_names=class_names, output_dict=True)
 
         return {
@@ -1135,9 +1090,7 @@ class ProductionTrainer:
                 self.model.eval()
 
             export_path = self.output_dir / f"exported_model.{export_format.lower()}"
-            export_success = self._perform_export(
-                export_format, export_path, checkpoint, self.model
-            )
+            export_success = self._perform_export(export_format, export_path, checkpoint, self.model)
 
             if export_success:
                 logger.info(f"Model exported successfully: {export_path}")
@@ -1149,9 +1102,7 @@ class ProductionTrainer:
             logger.exception("Model export failed")
             return None
 
-    def _perform_export(
-        self, export_format: str, export_path: Path, checkpoint: dict, model: torch.nn.Module | None
-    ) -> bool:
+    def _perform_export(self, export_format: str, export_path: Path, checkpoint: dict, model: torch.nn.Module | None) -> bool:
         """Perform the actual model export based on format."""
         format_lower = export_format.lower()
 
@@ -1165,9 +1116,7 @@ class ProductionTrainer:
             logger.error(f"Unsupported export format: {export_format}")
             return False
 
-    def _export_pytorch(
-        self, export_path: Path, checkpoint: dict, model: torch.nn.Module | None
-    ) -> bool:
+    def _export_pytorch(self, export_path: Path, checkpoint: dict, model: torch.nn.Module | None) -> bool:
         """Export as PyTorch model."""
         if model is None:
             logger.error("Cannot export model: model is None")
@@ -1435,9 +1384,7 @@ class ProductionTrainer:
                     "retry_count": retry_count,
                 }
 
-                recovery_successful = self.error_handler.handle_error(
-                    e, context, self.state.epoch, self.state.step
-                )
+                recovery_successful = self.error_handler.handle_error(e, context, self.state.epoch, self.state.step)
 
                 if not recovery_successful and retry_count >= max_retries:
                     logger.error("Failed to recover from training epoch error after all retries")
@@ -1466,9 +1413,7 @@ class ProductionTrainer:
                 return self._validate_epoch()
             except Exception as e:
                 retry_count += 1
-                logger.warning(
-                    f"Validation epoch failed (attempt {retry_count}/{max_retries}): {e}"
-                )
+                logger.warning(f"Validation epoch failed (attempt {retry_count}/{max_retries}): {e}")
 
                 # Handle the error
                 context = {
@@ -1479,9 +1424,7 @@ class ProductionTrainer:
                     "retry_count": retry_count,
                 }
 
-                recovery_successful = self.error_handler.handle_error(
-                    e, context, self.state.epoch, self.state.step
-                )
+                recovery_successful = self.error_handler.handle_error(e, context, self.state.epoch, self.state.step)
 
                 if not recovery_successful and retry_count >= max_retries:
                     logger.error("Failed to recover from validation epoch error after all retries")
@@ -1574,9 +1517,7 @@ class ProductionTrainer:
             return self.training_components.get_current_lr()
         return self.config.learning_rate
 
-    def _update_training_state(
-        self, train_loss: float, val_loss: float, val_accuracy: float, current_lr: float
-    ) -> None:
+    def _update_training_state(self, train_loss: float, val_loss: float, val_accuracy: float, current_lr: float) -> None:
         """Update training state with current metrics."""
         self.state.train_losses.append(train_loss)
         self.state.val_losses.append(val_loss)
@@ -1601,9 +1542,7 @@ class ProductionTrainer:
 
     def _check_early_stopping(self, val_loss: float, epoch: int) -> bool:
         """Check if early stopping should be triggered."""
-        if self.training_components and self.training_components.check_early_stopping(
-            val_loss, epoch
-        ):
+        if self.training_components and self.training_components.check_early_stopping(val_loss, epoch):
             logger.info(f"Early stopping triggered at epoch {epoch}")
             return True
         return False
@@ -1617,9 +1556,7 @@ class ProductionTrainer:
             "epoch": epoch,
         }
 
-        recovery_successful = self.error_handler.handle_error(
-            error, context, epoch, self.state.step
-        )
+        recovery_successful = self.error_handler.handle_error(error, context, epoch, self.state.step)
 
         if not recovery_successful:
             logger.error(f"Failed to recover from error at epoch {epoch}, stopping training")
@@ -1634,9 +1571,7 @@ class ProductionTrainer:
         self.state.total_training_time = total_time
 
         logger.info(f"Training completed in {total_time:.2f} seconds")
-        logger.info(
-            f"Best validation loss: {self.state.best_val_loss:.6f} at epoch {self.state.best_epoch}"
-        )
+        logger.info(f"Best validation loss: {self.state.best_val_loss:.6f} at epoch {self.state.best_epoch}")
         logger.info(f"Best validation accuracy: {self.state.best_val_accuracy:.4f}")
 
         self._save_training_state()
@@ -1715,6 +1650,4 @@ class ProductionTrainer:
             "epoch": self.state.epoch,
         }
 
-        return self.error_handler.handle_error(
-            exception, context, self.state.epoch, self.state.step
-        )
+        return self.error_handler.handle_error(exception, context, self.state.epoch, self.state.step)
