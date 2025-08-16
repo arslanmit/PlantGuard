@@ -565,8 +565,8 @@ with tab2:
             if st.session_state.audio_buf:
                 with st.spinner("🎧 Processing audio..."):
                     try:
-                        audio = np.concatenate(st.session_state.audio_buf, axis=0)
-                        sf.write("mic.wav", audio, 48000)
+                        audio_data = np.concatenate(st.session_state.audio_buf, axis=0)
+                        sf.write("mic.wav", audio_data, 48000)
                         text = audio_adapter.transcribe("mic.wav")
 
                         st.markdown("### 📝 Transcription Results")

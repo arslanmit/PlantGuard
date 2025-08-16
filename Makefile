@@ -47,7 +47,7 @@ endif
 .DEFAULT_GOAL := help
 
 .PHONY: help start setup install run switcher run-all model-switcher dev test clean
-.PHONY: format lint check fix train notebook
+.PHONY: format lint check fix train notebook benchmark
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
 .PHONY: reset fresh stop restart debug profile validate
@@ -75,6 +75,7 @@ help:
 	@echo ""
 	@echo "$(GREEN)🤖 Machine Learning$(NC)"
 	@echo "  $(BLUE)train$(NC)          - Train plant disease models"
+	@echo "  $(BLUE)benchmark$(NC)      - Quick benchmark all available models (moved from UI)"
 	@echo "  $(BLUE)setup-dataset$(NC)  - Show dataset status and setup options"
 	@echo "  $(BLUE)download-dataset$(NC) - Download PlantVillage dataset from Kaggle"
 	@echo "  $(BLUE)prepare-dataset$(NC) - Prepare dataset with train/val splits"
@@ -104,6 +105,7 @@ help:
 	@echo "  $(CYAN)make run$(NC)       - Launch main app for plant detection"
 	@echo "  $(CYAN)make switcher$(NC)  - Launch model management interface"
 	@echo "  $(CYAN)make run-all$(NC)   - Run both apps simultaneously"
+	@echo "  $(CYAN)make benchmark$(NC) - Compare all model performance"
 	@echo "  $(CYAN)make dev$(NC)       - Quick code check before commit"
 	@echo "  $(CYAN)make train$(NC)     - Train your models"
 	@echo "  $(CYAN)make stop$(NC)      - Stop all running applications"
@@ -166,6 +168,17 @@ run:
 	@echo "$(CYAN)✨ Features: Multimodal Detection, Advanced Model Selection, Professional Layout$(NC)"
 	@echo "$(CYAN)📱 For microphone support, use HTTPS (ngrok/cloudflare tunnel)$(NC)"
 	@$(PY) -m streamlit run src/ui/app_streamlit.py --server.port 8501 --server.headless true --server.enableCORS false --server.enableXsrfProtection false
+
+# Quick benchmark all available models (moved from UI button)
+benchmark:
+	@echo "$(BLUE)🏁 Running model benchmark...$(NC)"
+	@if [ ! -x $(PY) ]; then \
+		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
+		make setup; \
+	fi
+	@echo "$(CYAN)📊 Benchmarking all enabled models on test dataset...$(NC)"
+	@echo "$(YELLOW)💡 This tests all enabled models on sample images and compares performance$(NC)"
+	@PYTHONPATH=. $(PY) scripts/model_switching/model_switcher.py --benchmark
 
 # Launch Model Switcher UI (Streamlit)
 switcher:
