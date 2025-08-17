@@ -5,6 +5,7 @@ This module contains the VisionAdapter class for plant disease detection using R
 
 import json
 import logging
+import time
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, NoReturn, cast
@@ -302,6 +303,116 @@ class VisionAdapter:
             self.is_loaded = False
             self.model = None
             self.class_names = []
+            raise LoadCheckpointError() from error
+
+    def load_from_registry(self, model_id: str) -> None:
+        """Load model from the model registry.
+
+        Args:
+            model_id: Model ID in the registry
+
+        Raises:
+            LoadCheckpointError: If model loading fails
+        """
+        try:
+            # Import here to avoid circular imports
+            from training.model_registry import ModelRegistry
+
+            registry = ModelRegistry()
+            model_info = registry.get_model(model_id)
+
+            if not model_info:
+                raise LoadCheckpointError()
+
+            # Load the model checkpoint
+            self.load_checkpoint(str(model_info.model_path))
+
+            # Load additional metadata if available
+            if hasattr(model_info, "metadata") and model_info.metadata:
+                metadata = model_info.metadata
+
+                # Update class mapping if available in metadata
+                if "class_names" in metadata:
+                    self.class_names = metadata["class_names"]
+
+                # Load class mapping file if specified
+                if "class_mapping_path" in metadata:
+                    mapping_path = metadata["class_mapping_path"]
+                    if Path(mapping_path).exists():
+                        self.load_class_mapping(mapping_path)
+
+            logger.info("Model loaded from registry: %s", model_id)
+
+        except Exception as error:
+            logger.exception("Failed to load model from registry: %s", model_id)
+            raise LoadCheckpointError() from error
+
+    def is_compatible_with_registry_format(self, model_path: str) -> bool:
+        """Check if a model file is compatible with the new registry format.
+
+        Args:
+            model_path: Path to model checkpoint
+
+        Returns:
+            True if compatible with new format, False if legacy format
+        """
+        try:
+            checkpoint_path = Path(model_path)
+            if not checkpoint_path.exists():
+                return False
+
+            # Try to load checkpoint metadata
+            try:
+                checkpoint = torch.load(model_path, map_location="cpu", weights_only=True)
+            except TypeError:
+                checkpoint = torch.load(model_path, map_location="cpu")
+
+            # Check for new format indicators
+            has_metadata = "training_metadata" in checkpoint
+            has_version = "model_version" in checkpoint
+            has_registry_info = "registry_info" in checkpoint
+
+            return has_metadata or has_version or has_registry_info
+
+        except Exception:
+            return False
+
+    def migrate_legacy_model(self, legacy_path: str, output_path: str) -> None:
+        """Migrate a legacy model to the new registry format.
+
+        Args:
+            legacy_path: Path to legacy model checkpoint
+            output_path: Path for migrated model
+
+        Raises:
+            LoadCheckpointError: If migration fails
+        """
+        try:
+            logger.info("Migrating legacy model: %s -> %s", legacy_path, output_path)
+
+            # Load legacy checkpoint
+            try:
+                checkpoint = torch.load(legacy_path, map_location="cpu", weights_only=True)
+            except TypeError:
+                checkpoint = torch.load(legacy_path, map_location="cpu")
+
+            # Add new format metadata
+            checkpoint["model_version"] = "1.0.0"
+            checkpoint["training_metadata"] = {"migrated_from": legacy_path, "migration_date": torch.tensor(time.time()), "original_format": "legacy"}
+
+            # Ensure required fields exist
+            if "num_classes" not in checkpoint:
+                checkpoint["num_classes"] = 38  # Default PlantVillage classes
+
+            if "class_names" not in checkpoint:
+                checkpoint["class_names"] = [f"class_{i}" for i in range(checkpoint["num_classes"])]
+
+            # Save migrated model
+            torch.save(checkpoint, output_path)
+            logger.info("Model migration completed successfully")
+
+        except Exception as error:
+            logger.exception("Model migration failed")
             raise LoadCheckpointError() from error
 
     def preprocess_image(self, image: Image.Image) -> torch.Tensor:

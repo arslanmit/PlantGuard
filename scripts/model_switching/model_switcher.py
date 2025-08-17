@@ -11,11 +11,20 @@ from PIL import Image
 # Add project src to path (repo root / src)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-from src.core.model_manager import PlantGuardModelManager
+try:
+    from src.core.model_manager import PlantGuardModelManager
+
+    LEGACY_MODE = False
+except ImportError:
+    # Fallback to new registry system
+    LEGACY_MODE = True
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from src.core.vision import VisionAdapter
+    from src.training.model_registry import ModelRegistry
 
 
-def list_models(manager: "PlantGuardModelManager") -> None:
-    """List all available models."""
+def list_models_legacy(manager: "PlantGuardModelManager") -> None:
+    """List all available models (legacy mode)."""
     models = manager.list_available_models()
 
     print("🤖 Available PlantGuard Models:")
@@ -33,8 +42,40 @@ def list_models(manager: "PlantGuardModelManager") -> None:
         print(f"   Description: {model['description']}")
 
 
-def switch_model(manager: "PlantGuardModelManager", model_id: str) -> None:
-    """Switch to a specific model."""
+def list_models_registry() -> None:
+    """List all available models (registry mode)."""
+    registry = ModelRegistry()
+    models = registry.list_models()
+
+    print("🤖 Available PlantGuard Models (Registry):")
+    print("=" * 60)
+
+    if not models:
+        print("No models found in registry. Run 'make train-production' to create models.")
+        return
+
+    for model in models:
+        accuracy = f"{model.performance_metrics.get('accuracy', 0):.1%}" if model.performance_metrics else "Unknown"
+
+        print(f"\n📋 {model.model_id}")
+        print(f"   Version: {model.version}")
+        print(f"   Architecture: {model.architecture}")
+        print(f"   Training Date: {model.training_date.strftime('%Y-%m-%d %H:%M')}")
+        print(f"   Accuracy: {accuracy}")
+        print(f"   Dataset: {model.dataset_version}")
+        print(f"   File Size: {model.file_size / (1024 * 1024):.1f} MB")
+
+
+def list_models(manager=None) -> None:
+    """List all available models."""
+    if LEGACY_MODE:
+        list_models_registry()
+    else:
+        list_models_legacy(manager)
+
+
+def switch_model_legacy(manager: "PlantGuardModelManager", model_id: str) -> None:
+    """Switch to a specific model (legacy mode)."""
     print(f"🔄 Switching to model: {model_id}")
 
     if manager.switch_model(model_id):
@@ -52,8 +93,52 @@ def switch_model(manager: "PlantGuardModelManager", model_id: str) -> None:
         print(f"❌ Failed to switch to model: {model_id}")
 
 
-def test_model(manager: "PlantGuardModelManager", image_path: str) -> None:
-    """Test current model on an image."""
+def switch_model_registry(model_id: str) -> VisionAdapter:
+    """Switch to a specific model (registry mode)."""
+    print(f"🔄 Loading model from registry: {model_id}")
+
+    try:
+        registry = ModelRegistry()
+        model_info = registry.get_model(model_id)
+
+        if not model_info:
+            print(f"❌ Model not found in registry: {model_id}")
+            return None
+
+        # Create vision adapter and load model
+        adapter = VisionAdapter()
+        adapter.load_from_registry(model_id)
+
+        print(f"✅ Successfully loaded model: {model_id}")
+
+        # Show model info
+        print("\n📊 Model Info:")
+        print(f"   Version: {model_info.version}")
+        print(f"   Architecture: {model_info.architecture}")
+        print(f"   Classes: {len(adapter.get_class_names())}")
+        print(f"   Training Date: {model_info.training_date.strftime('%Y-%m-%d %H:%M')}")
+
+        if model_info.performance_metrics:
+            accuracy = model_info.performance_metrics.get("accuracy", 0)
+            print(f"   Accuracy: {accuracy:.1%}")
+
+        return adapter
+
+    except Exception as e:
+        print(f"❌ Failed to load model: {e}")
+        return None
+
+
+def switch_model(manager, model_id: str):
+    """Switch to a specific model."""
+    if LEGACY_MODE:
+        return switch_model_registry(model_id)
+    else:
+        return switch_model_legacy(manager, model_id)
+
+
+def test_model_legacy(manager: "PlantGuardModelManager", image_path: str) -> None:
+    """Test current model on an image (legacy mode)."""
     if not Path(image_path).exists():
         print(f"❌ Image not found: {image_path}")
         return
@@ -73,6 +158,39 @@ def test_model(manager: "PlantGuardModelManager", image_path: str) -> None:
 
     except Exception as e:
         print(f"❌ Failed to test image: {e}")
+
+
+def test_model_registry(adapter: VisionAdapter, image_path: str) -> None:
+    """Test model on an image (registry mode)."""
+    if not Path(image_path).exists():
+        print(f"❌ Image not found: {image_path}")
+        return
+
+    try:
+        image = Image.open(image_path)
+        raw_class, readable_name, confidence, plant_type = adapter.predict_with_readable_name(image)
+
+        print(f"🔍 Testing: {Path(image_path).name}")
+        print("=" * 50)
+        print(f"🌿 Plant Type: {plant_type}")
+        print(f"🦠 Disease: {readable_name}")
+        print(f"💚 Healthy: {'Yes' if adapter.is_healthy(raw_class) else 'No'}")
+        print(f"📊 Confidence: {confidence:.1%}")
+        print(f"🤖 Raw Class: {raw_class}")
+
+    except Exception as e:
+        print(f"❌ Failed to test image: {e}")
+
+
+def test_model(manager, image_path: str, adapter: VisionAdapter = None) -> None:
+    """Test current model on an image."""
+    if LEGACY_MODE:
+        if adapter is None:
+            print("❌ No model loaded. Use --switch to load a model first.")
+            return
+        test_model_registry(adapter, image_path)
+    else:
+        test_model_legacy(manager, image_path)
 
 
 def quick_test(manager: "PlantGuardModelManager") -> None:
@@ -200,63 +318,118 @@ def main() -> None:
     parser.add_argument("--quick-test", "-q", action="store_true", help="Quick test on sample images")
     parser.add_argument("--benchmark", "-b", action="store_true", help="Benchmark all models")
     parser.add_argument("--current", "-c", action="store_true", help="Show current model info")
+    parser.add_argument("--migrate", "-m", type=str, help="Migrate legacy model to registry format")
 
     args = parser.parse_args()
 
-    # Initialize model manager
-    try:
-        manager = PlantGuardModelManager()
-    except Exception as e:
-        print(f"❌ Failed to initialize model manager: {e}")
-        return
+    # Initialize based on mode
+    manager = None
+    current_adapter = None
+
+    if not LEGACY_MODE:
+        try:
+            manager = PlantGuardModelManager()
+        except Exception as e:
+            print(f"❌ Failed to initialize model manager: {e}")
+            return
 
     # Execute commands
     if args.list:
         list_models(manager)
 
     elif args.switch:
-        switch_model(manager, args.switch)
+        result = switch_model(manager, args.switch)
+        if LEGACY_MODE and result:
+            current_adapter = result
 
     elif args.test:
-        test_model(manager, args.test)
+        test_model(manager, args.test, current_adapter)
+
+    elif args.migrate and LEGACY_MODE:
+        # Migrate legacy model to registry format
+        legacy_path = args.migrate
+        if not Path(legacy_path).exists():
+            print(f"❌ Legacy model not found: {legacy_path}")
+            return
+
+        try:
+            adapter = VisionAdapter()
+            output_path = f"data/models/migrated_{Path(legacy_path).stem}.pt"
+            adapter.migrate_legacy_model(legacy_path, output_path)
+            print(f"✅ Model migrated successfully: {output_path}")
+
+            # Register in registry
+            registry = ModelRegistry()
+            metadata = {
+                "migrated_from": legacy_path,
+                "architecture": "resnet50",
+                "num_classes": 38,
+            }
+            model_id = registry.register_model(Path(output_path), metadata)
+            print(f"📝 Model registered with ID: {model_id}")
+
+        except Exception as e:
+            print(f"❌ Migration failed: {e}")
 
     elif args.quick_test:
-        quick_test(manager)
+        if LEGACY_MODE:
+            print("❌ Quick test not available in registry mode. Use --test with specific image.")
+        else:
+            quick_test(manager)
 
     elif args.benchmark:
-        benchmark_models(manager)
+        if LEGACY_MODE:
+            print("❌ Benchmark not available in registry mode yet.")
+        else:
+            benchmark_models(manager)
 
     elif args.current:
-        info = manager.get_current_model_info()
-        if "error" not in info:
-            print("🤖 Current Model:")
-            print("=" * 30)
-            print(f"Name: {info['name']}")
-            print(f"Type: {info['type']}")
-            print(f"Model ID: {info['model_id']}")
-            print(f"Accuracy: {info['accuracy']:.1%}")
-            print(f"Classes: {info['num_classes']}")
-            print(f"Device: {info['device']}")
+        if LEGACY_MODE:
+            if current_adapter and current_adapter.is_loaded:
+                info = current_adapter.get_model_info()
+                print("🤖 Current Model:")
+                print("=" * 30)
+                print(f"Classes: {info['num_classes']}")
+                print(f"Device: {info['device']}")
+                print(f"Model Path: {info['model_path']}")
+            else:
+                print("❌ No model currently loaded")
         else:
-            print("❌ No model currently loaded")
+            info = manager.get_current_model_info()
+            if "error" not in info:
+                print("🤖 Current Model:")
+                print("=" * 30)
+                print(f"Name: {info['name']}")
+                print(f"Type: {info['type']}")
+                print(f"Model ID: {info['model_id']}")
+                print(f"Accuracy: {info['accuracy']:.1%}")
+                print(f"Classes: {info['num_classes']}")
+                print(f"Device: {info['device']}")
+            else:
+                print("❌ No model currently loaded")
 
     else:
         # Default: show help and current status
         parser.print_help()
         print("\n" + "=" * 50)
 
-        # Show current model if any
-        info = manager.get_current_model_info()
-        if "error" not in info:
-            print(f"🤖 Current Model: {info['name']}")
-        else:
-            print("🤖 No model currently loaded")
+        mode_str = "Registry Mode" if LEGACY_MODE else "Legacy Mode"
+        print(f"🔧 Running in: {mode_str}")
+
+        if not LEGACY_MODE and manager:
+            # Show current model if any
+            info = manager.get_current_model_info()
+            if "error" not in info:
+                print(f"🤖 Current Model: {info['name']}")
+            else:
+                print("🤖 No model currently loaded")
 
         print("\n💡 Quick Commands:")
         print("  python scripts/model_switching/model_switcher.py --list              # List all models")
-        print("  python scripts/model_switching/model_switcher.py --switch vit_best   # Switch to best model")
-        print("  python scripts/model_switching/model_switcher.py --quick-test        # Test current model")
-        print("  python scripts/model_switching/model_switcher.py --benchmark         # Compare all models")
+        print("  python scripts/model_switching/model_switcher.py --switch MODEL_ID   # Switch to model")
+        print("  python scripts/model_switching/model_switcher.py --test IMAGE_PATH   # Test model")
+        if LEGACY_MODE:
+            print("  python scripts/model_switching/model_switcher.py --migrate PATH     # Migrate legacy model")
 
 
 if __name__ == "__main__":

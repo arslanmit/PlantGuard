@@ -74,6 +74,7 @@ help:
 	@echo "  $(BLUE)test$(NC)           - Run tests"
 	@echo ""
 	@echo "$(GREEN)🤖 Machine Learning$(NC)"
+	@echo "  $(BLUE)train-production$(NC) - Production training with validation and optimal settings"
 	@echo "  $(BLUE)train$(NC)          - Train plant disease models"
 	@echo "  $(BLUE)monitor-training$(NC) - Launch TensorBoard for training monitoring"
 	@echo "  $(BLUE)benchmark$(NC)      - Quick benchmark all available models (moved from UI)"
@@ -336,6 +337,15 @@ train-improved:
 		$(PY) scripts/train_vision_model_improved.py --data_dir data/plantvillage_dummy_improved --epochs 15 --batch_size 16 --learning_rate 0.0001; \
 	fi
 	@echo "$(GREEN)✅ Improved model training complete$(NC)"
+
+# Production training workflow with optimal settings and validation
+train-production:
+	@echo "$(BLUE)🚀 Starting PlantGuard Production Training Workflow...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🔍 This will validate prerequisites and run optimized training$(NC)"
+	@echo "$(CYAN)📋 Features: Resource detection, optimal config, error handling, model registry$(NC)"
+	@$(PY) scripts/production_training_workflow.py
+	@echo "$(GREEN)✅ Production training workflow complete$(NC)"
 
 # Monitor training with TensorBoard
 monitor-training:
