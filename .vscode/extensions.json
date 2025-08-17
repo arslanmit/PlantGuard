@@ -17,7 +17,6 @@
         "redhat.vscode-yaml",
         "ms-vscode.vscode-json",
         "tamasfe.even-better-toml",
-        "ms-python.flake8",
         "ms-python.black-formatter",
         "anysphere.cursorpyright"
     ],
