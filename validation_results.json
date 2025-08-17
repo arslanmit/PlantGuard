@@ -1,0 +1,57 @@
+{
+  "tests_passed": 9,
+  "tests_failed": 0,
+  "test_results": {
+    "DatasetManager": {
+      "passed": true,
+      "message": "Validated 21 files, analyzed 21 samples",
+      "error": null
+    },
+    "ModelRegistry": {
+      "passed": true,
+      "message": "Successfully registered and retrieved model: test_model_v1.0.0",
+      "error": null
+    },
+    "VisionAdapter.registry_integration": {
+      "passed": true,
+      "message": "Registry integration works (expected model loading failure)",
+      "error": null
+    },
+    "ModelManager.integration": {
+      "passed": true,
+      "message": "Model manager integration successful",
+      "error": null
+    },
+    "BackwardCompatibility": {
+      "passed": true,
+      "message": "Legacy model migration successful",
+      "error": null
+    },
+    "TrainingConfig": {
+      "passed": true,
+      "message": "Training configuration system working correctly",
+      "error": null
+    },
+    "ProductionTrainer.setup": {
+      "passed": true,
+      "message": "ProductionTrainer initialization successful",
+      "error": null
+    },
+    "Makefile.commands": {
+      "passed": true,
+      "message": "All required Makefile commands available",
+      "error": null
+    },
+    "IntegrationScripts": {
+      "passed": true,
+      "message": "All integration scripts available and valid",
+      "error": null
+    }
+  },
+  "errors": [],
+  "warnings": [],
+  "total_time": 2.584583044052124,
+  "total_tests": 9,
+  "success_rate": 100.0,
+  "overall_success": true
+}

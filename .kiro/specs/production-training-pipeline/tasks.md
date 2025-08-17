@@ -256,9 +256,26 @@
   - Create migration guide for existing PlantGuard installations
   - _Requirements: 7.6_
 
-- [x] 11. Fix production training workflow script
-  - Fix syntax error in `scripts/production_training_workflow.py` (missing docstring quotes)
-  - Test the production training workflow end-to-end
-  - Ensure all imports and dependencies are correctly resolved
-  - Validate that the script integrates properly with all training components
-  - _Requirements: 6.1, 6.2_
+- [x] 11. Validate and test end-to-end production training pipeline
+  - Test complete production training workflow from dataset to deployed model
+  - Validate integration between all components (DatasetManager, ProductionTrainer, ModelRegistry, etc.)
+  - Ensure VisionAdapter correctly loads and uses models from the new registry format
+  - Test model switching functionality with registry-managed models
+  - Verify backward compatibility with existing model files
+  - _Requirements: 6.1, 6.2, 8.1, 8.2, 8.3_
+
+- [-] 12. Enhance integration testing coverage
+  - Write comprehensive integration tests for production training pipeline
+  - Add tests for VisionAdapter integration with ModelRegistry
+  - Create tests for model switching with registry models
+  - Implement end-to-end tests from training to UI deployment
+  - Add performance regression tests for training pipeline
+  - _Requirements: 8.4, 8.5_
+
+- [ ] 13. Optimize production training performance
+  - Profile and optimize training pipeline bottlenecks
+  - Implement advanced data loading optimizations for large datasets
+  - Add support for distributed training on multiple GPUs
+  - Optimize memory usage during training and evaluation
+  - Implement training pipeline caching for faster iterations
+  - _Requirements: 7.1, 7.2, 7.4, 7.6_
