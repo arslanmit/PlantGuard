@@ -22,8 +22,10 @@ from .checkpoint_manager import CheckpointData, CheckpointManager
 from .config import TrainingConfig
 from .dataset_manager import DatasetManager
 from .error_handler import TrainingErrorHandler
+from .memory_optimizer import MemoryOptimizationConfig, MemoryOptimizer, create_memory_optimizer
 from .optimizers import TrainingComponents, create_training_components
 from .resource_manager import get_resource_manager
+from .transfer_learning import TransferLearningConfig, TransferLearningOptimizer, create_resnet_transfer_config
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +111,12 @@ class ProductionTrainer:
             enable_notifications=False,  # Can be enabled for production environments
         )
 
+        # Memory optimizer
+        self.memory_optimizer: MemoryOptimizer | None = None
+
+        # Transfer learning optimizer
+        self.transfer_learning_optimizer: TransferLearningOptimizer | None = None
+
         # Setup logging
         self._setup_logging()
 
@@ -163,6 +171,12 @@ class ProductionTrainer:
 
             # Setup tensorboard
             self._setup_tensorboard()
+
+            # Setup memory optimizer
+            self._setup_memory_optimizer()
+
+            # Setup transfer learning optimizer
+            self._setup_transfer_learning()
 
             # Save configuration
             self._save_config()
@@ -291,37 +305,23 @@ class ProductionTrainer:
         logger.info(f"Frozen {frozen_params:,} parameters, {trainable_params:,} remain trainable")
 
     def _setup_data_loaders(self) -> bool:
-        """Setup training and validation data loaders.
+        """Setup training and validation data loaders with optimization.
 
         Returns:
             True if data loaders setup successful
         """
         try:
-            logger.info("Setting up data loaders...")
+            logger.info("Setting up optimized data loaders...")
 
-            # Import here to avoid circular imports
-            from torchvision.datasets import ImageFolder
-
-            # Define transforms
-            train_transforms = self._get_train_transforms()
-            val_transforms = self._get_val_transforms()
+            # Import optimized data loader
+            from .data_loader import DataLoadingConfig, create_optimized_data_loaders
 
             # Assume dataset is already prepared with train/val split
             dataset_dir = Path("data/processed/plantvillage")  # Default path
-            train_dir = dataset_dir / "train"
-            val_dir = dataset_dir / "val"
 
-            if not train_dir.exists() or not val_dir.exists():
+            if not dataset_dir.exists():
                 logger.error(f"Dataset not found at {dataset_dir}. Please prepare dataset first.")
                 return False
-
-            # Create datasets
-            train_dataset = ImageFolder(train_dir, transform=train_transforms)
-            val_dataset = ImageFolder(val_dir, transform=val_transforms)
-
-            logger.info(f"Train dataset: {len(train_dataset)} samples")
-            logger.info(f"Validation dataset: {len(val_dataset)} samples")
-            logger.info(f"Number of classes: {len(train_dataset.classes)}")
 
             # Optimize batch size if needed
             if hasattr(self.config, "_auto_batch_size") or self.config.batch_size == 32:
@@ -329,36 +329,54 @@ class ProductionTrainer:
                 self.config.batch_size = optimal_batch_size
                 logger.info(f"Auto-optimized batch size: {optimal_batch_size}")
 
-            # Create data loaders
-            self.train_loader = DataLoader(
-                train_dataset,
-                batch_size=self.config.batch_size,
-                shuffle=True,
+            # Create data loading configuration
+            data_loading_config = DataLoadingConfig(
                 num_workers=self.config.num_workers,
                 pin_memory=self.config.pin_memory,
-                persistent_workers=self.config.persistent_workers and self.config.num_workers > 0,
+                persistent_workers=self.config.persistent_workers,
+                prefetch_factor=getattr(self.config, "prefetch_factor", 2),
+                use_memory_mapping=getattr(self.config, "use_memory_mapping", False),
+                enable_profiling=getattr(self.config, "profile_data_loading", False),
+                profile_batches=getattr(self.config, "profile_batches", 10),
             )
 
-            self.val_loader = DataLoader(
-                val_dataset,
+            # Create augmentation configuration
+            augmentation_config = {
+                "enabled": self.config.data_augmentation.enabled,
+                "horizontal_flip": self.config.data_augmentation.horizontal_flip,
+                "vertical_flip": self.config.data_augmentation.vertical_flip,
+                "rotation": self.config.data_augmentation.rotation,
+                "brightness": self.config.data_augmentation.brightness,
+                "contrast": self.config.data_augmentation.contrast,
+                "saturation": getattr(self.config.data_augmentation, "saturation", 0),
+                "hue": getattr(self.config.data_augmentation, "hue", 0),
+                "normalize": self.config.data_augmentation.normalize,
+            }
+
+            # Create optimized data loaders
+            self.train_loader, self.val_loader, self.class_names = create_optimized_data_loaders(
+                dataset_dir=dataset_dir,
                 batch_size=self.config.batch_size,
-                shuffle=False,
-                num_workers=self.config.num_workers,
-                pin_memory=self.config.pin_memory,
-                persistent_workers=self.config.persistent_workers and self.config.num_workers > 0,
+                augmentation_config=augmentation_config,
+                data_loading_config=data_loading_config,
+                validation_split=0.2,  # Fallback if no val dir exists
             )
+
+            logger.info(f"Train dataset: {len(self.train_loader.dataset)} samples")
+            logger.info(f"Validation dataset: {len(self.val_loader.dataset)} samples")
+            logger.info(f"Number of classes: {len(self.class_names)}")
 
             # Save class names for later use
-            self.class_names = train_dataset.classes
+            class_to_idx = {cls_name: idx for idx, cls_name in enumerate(self.class_names)}
             class_to_idx_file = self.output_dir / "class_to_idx.json"
             with class_to_idx_file.open("w") as f:
-                json.dump(train_dataset.class_to_idx, f, indent=2)
+                json.dump(class_to_idx, f, indent=2)
 
-            logger.info("Data loaders setup completed")
+            logger.info("Optimized data loaders setup completed")
             return True
 
         except Exception:
-            logger.exception("Failed to setup data loaders")
+            logger.exception("Failed to setup optimized data loaders")
             return False
 
     def _get_train_transforms(self) -> Any:
@@ -429,13 +447,40 @@ class ProductionTrainer:
         return transforms.Compose(transform_list)
 
     def _setup_training_components(self) -> None:
-        """Setup optimizer, scheduler, and early stopping."""
+        """Setup optimizer, scheduler, and early stopping with transfer learning support."""
         logger.info("Setting up training components...")
 
         if self.model is None:
             raise RuntimeError("Model must be setup before training components")
 
-        self.training_components = create_training_components(self.model, self.config)
+        # Use transfer learning optimizer if available
+        if self.transfer_learning_optimizer is not None:
+            # Create optimizer with layer-wise learning rates
+            from torch.optim import SGD, Adam, AdamW
+
+            optimizer_class = {
+                "adam": Adam,
+                "sgd": SGD,
+                "adamw": AdamW,
+            }.get(self.config.optimizer.lower(), Adam)
+
+            optimizer_kwargs = {"weight_decay": self.config.weight_decay}
+            if self.config.optimizer.lower() == "sgd":
+                optimizer_kwargs["momentum"] = self.config.momentum
+
+            optimizer = self.transfer_learning_optimizer.create_optimizer_param_groups(optimizer_class, **optimizer_kwargs)
+
+            # Create training components with custom optimizer
+            from .optimizers import TrainingComponents
+
+            self.training_components = TrainingComponents(
+                optimizer=optimizer,
+                config=self.config,
+            )
+        else:
+            # Use standard training components
+            self.training_components = create_training_components(self.model, self.config)
+
         logger.info("Training components setup completed")
 
     def _setup_mixed_precision(self) -> None:
@@ -453,6 +498,66 @@ class ProductionTrainer:
         log_dir = self.output_dir / "tensorboard"
         self.writer = SummaryWriter(log_dir)
         logger.info(f"TensorBoard logging setup: {log_dir}")
+
+    def _setup_memory_optimizer(self) -> None:
+        """Setup memory optimizer for efficient training."""
+        if self.model is None:
+            raise RuntimeError("Model must be setup before memory optimizer")
+
+        # Create memory optimization configuration
+        memory_config = MemoryOptimizationConfig(
+            enable_gradient_accumulation=self.config.gradient_accumulation_steps > 1,
+            max_gradient_accumulation_steps=getattr(self.config, "max_gradient_accumulation_steps", 8),
+            enable_automatic_gc=getattr(self.config, "enable_automatic_gc", True),
+            gc_frequency=getattr(self.config, "gc_frequency", 10),
+            clear_cache_frequency=getattr(self.config, "clear_cache_frequency", 50),
+            enable_dynamic_batch_size=getattr(self.config, "enable_dynamic_batch_size", True),
+            min_batch_size=max(1, self.config.batch_size // 4),
+            max_batch_size=self.config.batch_size * 2,
+            memory_threshold=getattr(self.config, "memory_threshold", 0.9),
+            enable_memory_profiling=getattr(self.config, "enable_memory_profiling", False),
+        )
+
+        self.memory_optimizer = create_memory_optimizer(
+            model=self.model,
+            initial_batch_size=self.config.batch_size,
+            gradient_accumulation_steps=self.config.gradient_accumulation_steps,
+            config=memory_config,
+        )
+
+        logger.info("Memory optimizer setup completed")
+
+    def _setup_transfer_learning(self) -> None:
+        """Setup transfer learning optimizer."""
+        if self.model is None:
+            raise RuntimeError("Model must be setup before transfer learning optimizer")
+
+        # Check if transfer learning is enabled
+        enable_transfer_learning = getattr(self.config, "enable_transfer_learning", True)
+        if not enable_transfer_learning:
+            logger.info("Transfer learning disabled")
+            return
+
+        # Create transfer learning configuration
+        if hasattr(self.config, "transfer_learning_config"):
+            transfer_config = self.config.transfer_learning_config
+        # Create default configuration based on model architecture
+        elif self.config.model_architecture.startswith("resnet"):
+            from .transfer_learning import FreezingStrategy
+
+            strategy = FreezingStrategy.GRADUAL_UNFREEZE if self.config.epochs > 50 else FreezingStrategy.BACKBONE_ONLY
+            transfer_config = create_resnet_transfer_config(strategy=strategy)
+        else:
+            transfer_config = TransferLearningConfig()
+
+        # Create transfer learning optimizer
+        self.transfer_learning_optimizer = TransferLearningOptimizer(
+            model=self.model,
+            config=transfer_config,
+            base_learning_rate=self.config.learning_rate,
+        )
+
+        logger.info("Transfer learning optimizer setup completed")
 
     def _save_config(self) -> None:
         """Save training configuration."""
@@ -485,6 +590,17 @@ class ProductionTrainer:
             for epoch in range(self.state.epoch, self.config.epochs):
                 self.state.epoch = epoch
                 epoch_start_time = time.time()
+
+                # Update transfer learning for new epoch
+                if self.transfer_learning_optimizer is not None:
+                    layers_unfrozen = self.transfer_learning_optimizer.update_epoch(epoch)
+                    if layers_unfrozen:
+                        logger.info(f"Transfer learning: layers unfrozen at epoch {epoch}")
+                        # Log transfer learning statistics
+                        if self.writer:
+                            tl_stats = self.transfer_learning_optimizer.get_layer_statistics()
+                            self.writer.add_scalar("TransferLearning/Trainable_Ratio", tl_stats["trainable_ratio"], epoch)
+                            self.writer.add_scalar("TransferLearning/Trainable_Params", tl_stats["trainable_parameters"], epoch)
 
                 # Train one epoch
                 train_loss = self._train_epoch()
@@ -536,6 +652,10 @@ class ProductionTrainer:
             # Save final state
             self._save_training_state()
 
+            # Evaluate transfer learning effectiveness
+            if self.transfer_learning_optimizer is not None:
+                self._evaluate_transfer_learning()
+
             return TrainingResult(
                 success=True,
                 final_epoch=self.state.epoch,
@@ -570,7 +690,7 @@ class ProductionTrainer:
                 self.writer.close()
 
     def _train_epoch(self) -> float:
-        """Train for one epoch.
+        """Train for one epoch with memory optimization.
 
         Returns:
             Average training loss for the epoch
@@ -581,67 +701,117 @@ class ProductionTrainer:
         self.model.train()
         total_loss = 0.0
         num_batches = 0
+        accumulated_loss = 0.0
 
         # Progress bar
         pbar = tqdm(self.train_loader, desc=f"Epoch {self.state.epoch + 1}/{self.config.epochs}")
 
         for batch_idx, (batch_data, batch_target) in enumerate(pbar):
-            data, target = batch_data.to(self.device), batch_target.to(self.device)
+            try:
+                data, target = batch_data.to(self.device, non_blocking=True), batch_target.to(self.device, non_blocking=True)
 
-            # Zero gradients
-            self.training_components.zero_grad()
-
-            # Forward pass with mixed precision
-            if self.scaler is not None:
-                with autocast():
+                # Forward pass with mixed precision
+                if self.scaler is not None:
+                    with autocast():
+                        output = self.model(data)
+                        loss = nn.functional.cross_entropy(output, target)
+                else:
                     output = self.model(data)
                     loss = nn.functional.cross_entropy(output, target)
 
-                # Backward pass with gradient scaling
-                self.scaler.scale(loss).backward()
+                # Use memory optimizer for gradient handling
+                if self.memory_optimizer is not None:
+                    # Handle training step with memory optimization
+                    optimizer_stepped, step_loss = self.memory_optimizer.handle_training_step(loss, self.training_components.optimizer, self.scaler)
 
-                # Gradient accumulation
-                if (batch_idx + 1) % self.config.gradient_accumulation_steps == 0:
-                    # Gradient clipping
-                    if self.config.gradient_clip_norm is not None:
-                        self.scaler.unscale_(self.training_components.optimizer)
-                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip_norm)
+                    if optimizer_stepped:
+                        accumulated_loss = step_loss
 
-                    self.scaler.step(self.training_components.optimizer)
-                    self.scaler.update()
-                    self.training_components.zero_grad()
-            else:
-                # Standard forward pass
-                output = self.model(data)
-                loss = nn.functional.cross_entropy(output, target)
-
-                # Backward pass
-                loss.backward()
-
-                # Gradient accumulation
-                if (batch_idx + 1) % self.config.gradient_accumulation_steps == 0:
-                    # Gradient clipping
-                    if self.config.gradient_clip_norm is not None:
-                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip_norm)
-
-                    self.training_components.step_optimizer()
+                        # Gradient clipping (if enabled)
+                        if self.config.gradient_clip_norm is not None:
+                            if self.scaler is not None:
+                                # Clipping is handled in memory optimizer for mixed precision
+                                pass
+                            else:
+                                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip_norm)
+                else:
+                    # Fallback to standard training without memory optimization
                     self.training_components.zero_grad()
 
-            total_loss += loss.item()
-            num_batches += 1
-            self.state.step += 1
+                    if self.scaler is not None:
+                        self.scaler.scale(loss).backward()
 
-            # Update progress bar
-            pbar.set_postfix({"loss": f"{loss.item():.4f}"})
+                        if (batch_idx + 1) % self.config.gradient_accumulation_steps == 0:
+                            if self.config.gradient_clip_norm is not None:
+                                self.scaler.unscale_(self.training_components.optimizer)
+                                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip_norm)
 
-            # Log batch metrics
-            if self.state.step % self.config.log_every_n_steps == 0 and self.writer:
-                self.writer.add_scalar("Loss/Train_Batch", loss.item(), self.state.step)
-                self.writer.add_scalar(
-                    "Learning_Rate",
-                    self.training_components.get_current_lr(),
-                    self.state.step,
-                )
+                            self.scaler.step(self.training_components.optimizer)
+                            self.scaler.update()
+                            self.training_components.zero_grad()
+                            accumulated_loss = loss.item()
+                    else:
+                        loss.backward()
+
+                        if (batch_idx + 1) % self.config.gradient_accumulation_steps == 0:
+                            if self.config.gradient_clip_norm is not None:
+                                torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.config.gradient_clip_norm)
+
+                            self.training_components.step_optimizer()
+                            self.training_components.zero_grad()
+                            accumulated_loss = loss.item()
+
+                total_loss += accumulated_loss if accumulated_loss > 0 else loss.item()
+                num_batches += 1
+                self.state.step += 1
+
+                # Update progress bar
+                current_loss = accumulated_loss if accumulated_loss > 0 else loss.item()
+                pbar.set_postfix({"loss": f"{current_loss:.4f}"})
+
+                # Log batch metrics
+                if self.state.step % self.config.log_every_n_steps == 0 and self.writer:
+                    self.writer.add_scalar("Loss/Train_Batch", current_loss, self.state.step)
+                    self.writer.add_scalar(
+                        "Learning_Rate",
+                        self.training_components.get_current_lr(),
+                        self.state.step,
+                    )
+
+                    # Log memory usage if memory optimizer is available
+                    if self.memory_optimizer is not None:
+                        memory_stats = self.memory_optimizer.get_optimization_stats()
+                        if memory_stats.get("memory_profile"):
+                            current_memory = memory_stats["memory_profile"].get("avg_memory_mb", 0)
+                            self.writer.add_scalar("Memory/Usage_MB", current_memory, self.state.step)
+
+            except RuntimeError as e:
+                if "out of memory" in str(e).lower():
+                    logger.warning(f"OOM error at batch {batch_idx}, attempting recovery...")
+
+                    if self.memory_optimizer is not None:
+                        # Handle OOM with memory optimizer
+                        recovery_info = self.memory_optimizer.handle_oom_error()
+                        logger.info(f"OOM recovery: {recovery_info}")
+
+                        # Skip this batch and continue
+                        continue
+                    else:
+                        # Fallback OOM handling
+                        if torch.cuda.is_available():
+                            torch.cuda.empty_cache()
+                        import gc
+
+                        gc.collect()
+                        logger.warning("OOM handled with basic cleanup, skipping batch")
+                        continue
+                else:
+                    # Re-raise non-OOM errors
+                    raise
+
+        # Log memory optimization summary at end of epoch
+        if self.memory_optimizer is not None:
+            self.memory_optimizer.log_optimization_summary()
 
         return total_loss / num_batches if num_batches > 0 else 0.0
 
@@ -801,6 +971,45 @@ class ProductionTrainer:
             json.dump(asdict(self.state), f, indent=2, default=str)
 
         logger.info(f"Training state saved: {state_file}")
+
+    def _evaluate_transfer_learning(self) -> None:
+        """Evaluate transfer learning effectiveness."""
+        if self.transfer_learning_optimizer is None:
+            return
+
+        # Evaluate transfer learning
+        evaluation = self.transfer_learning_optimizer.evaluate_transfer_learning_effectiveness(
+            train_losses=self.state.train_losses,
+            val_losses=self.state.val_losses,
+            val_accuracies=self.state.val_accuracies,
+        )
+
+        # Get recommendations
+        recommendations = self.transfer_learning_optimizer.get_recommendations(evaluation)
+
+        # Log evaluation results
+        logger.info("Transfer Learning Evaluation:")
+        logger.info(f"  Strategy: {evaluation['strategy']}")
+        logger.info(f"  Final accuracy: {evaluation.get('final_accuracy', 0):.4f}")
+        logger.info(f"  Best accuracy: {evaluation.get('best_accuracy', 0):.4f}")
+        logger.info(f"  Convergence epoch: {evaluation.get('convergence_epoch', 'N/A')}")
+
+        if "unfreeze_impacts" in evaluation:
+            logger.info("  Unfreezing impacts:")
+            for impact in evaluation["unfreeze_impacts"]:
+                logger.info(f"    Epoch {impact['epoch']}: {impact['improvement']:+.4f} accuracy change")
+
+        if recommendations:
+            logger.info("  Recommendations:")
+            for rec in recommendations:
+                logger.info(f"    - {rec}")
+
+        # Save evaluation to file
+        evaluation_file = self.output_dir / "transfer_learning_evaluation.json"
+        with evaluation_file.open("w") as f:
+            json.dump(evaluation, f, indent=2, default=str)
+
+        logger.info(f"Transfer learning evaluation saved to {evaluation_file}")
 
     def resume_from_checkpoint(self, checkpoint_path: Path | str) -> TrainingResult:
         """Resume training from a checkpoint.

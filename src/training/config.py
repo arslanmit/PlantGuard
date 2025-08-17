@@ -148,6 +148,29 @@ class TrainingConfig:
     pin_memory: bool = True
     persistent_workers: bool = True
 
+    # Data loading optimization
+    prefetch_factor: int = 2
+    use_memory_mapping: bool = False
+    profile_data_loading: bool = False
+    profile_batches: int = 10
+
+    # Memory optimization
+    max_gradient_accumulation_steps: int = 8
+    enable_automatic_gc: bool = True
+    gc_frequency: int = 10
+    clear_cache_frequency: int = 50
+    enable_dynamic_batch_size: bool = True
+    memory_threshold: float = 0.9
+    enable_memory_profiling: bool = False
+
+    # Transfer learning
+    enable_transfer_learning: bool = True
+    transfer_learning_strategy: str = "gradual_unfreeze"  # none, backbone_only, gradual_unfreeze, layer_wise
+    backbone_lr_multiplier: float = 0.1
+    classifier_lr_multiplier: float = 1.0
+    unfreeze_schedule: list[int] = field(default_factory=lambda: [10, 20, 30])
+    warmup_epochs: int = 5
+
     # Dataset configuration
     train_ratio: float = 0.8
     val_ratio: float = 0.2
