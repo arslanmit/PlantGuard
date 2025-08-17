@@ -55,7 +55,7 @@ safety==3.6.0
 pre-commit==4.3.0
 
 # --- Documentation ---
-sphinx==8.2.3
+sphinx==7.2.6
 sphinx-rtd-theme==3.0.2
 
 # --- Jupyter/Notebooks ---

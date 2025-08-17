@@ -35,7 +35,7 @@ description = "🌿 AI-powered plant disease detection with Vision Transformer, 
 authors = [{ name = "PlantGuard Team", email = "umit.arslan@outlook.com" }]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 
 # 🏷️ Keywords for package discovery
 keywords = [
@@ -50,6 +50,7 @@ classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: Education",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
@@ -180,7 +181,7 @@ plantguard-train = "src.training.production_trainer:main"  # Training CLI
 #   make dev     - Do both format + lint
 
 [tool.mypy]
-python_version = "3.11"           # 🐍 Python version we're using
+python_version = "3.10"           # 🐍 Python version we're using
 strict = false                    # 🎯 Gradual typing (not too strict while learning)
 
 # 🚫 Aggressive external package handling
@@ -526,7 +527,7 @@ skips = [
 
 [tool.ruff]
 line-length = 200              # 📏 Max characters per line (ADHD-friendly: not too long)
-target-version = "py311"       # 🐍 Python version we support
+target-version = "py310"       # 🐍 Python version we support
 fix = true                     # 🔧 Auto-fix issues when possible
 show-fixes = true              # 📝 Show what was fixed
 output-format = "grouped"      # 📊 Group similar issues together
