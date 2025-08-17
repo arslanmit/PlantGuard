@@ -80,6 +80,7 @@ endif
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
 .PHONY: reset fresh stop restart debug profile validate
+.PHONY: templates-list train-production-template train-production-config
 .PHONY: qa health-check tunnel
 
 # ========== Help & Information ==========
@@ -126,6 +127,9 @@ help:
 	@echo "  $(BLUE)train$(NC)              - Train models with optimal settings"
 	@echo "  $(BLUE)train-production$(NC)   - Full production training pipeline"
 	@echo "  $(BLUE)train-fast$(NC)         - Quick training for development/testing"
+	@echo "  $(BLUE)train-production-template$(NC) - Production training with a template (TEMPLATE=name|path)"
+	@echo "  $(BLUE)train-production-config$(NC)   - Production training with explicit config (CONFIG=path)"
+	@echo "  $(BLUE)templates-list$(NC)     - List available training templates"
 	@echo "  $(BLUE)monitor$(NC)            - Launch TensorBoard monitoring"
 	@echo "  $(BLUE)evaluate$(NC)           - Evaluate trained models"
 	@echo "  $(BLUE)benchmark$(NC)          - Benchmark all models"
@@ -577,9 +581,66 @@ train-production:
 	@echo "$(BLUE)🚀 Starting production training pipeline...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup-environment; fi
 	@echo "$(CYAN)🔍 Full production pipeline with validation and optimal settings$(NC)"
-	@$(PY) $(SCRIPTS_DIR)/production_training_workflow.py --production
+	@$(PY) $(SCRIPTS_DIR)/production_training_workflow.py --log-level INFO
 	@echo "$(GREEN)✅ Production training complete$(NC)"
 	@echo "$(CYAN)💡 Use 'make monitor' to view training metrics$(NC)"
+
+# List available training configuration templates
+templates-list:
+	@echo "$(BLUE)📚 Listing available training templates...$(NC)"
+	@GEN_DIR="$(CONFIG_DIR)/training_templates/generated"; \
+	BASE_DIR="$(CONFIG_DIR)/training_templates"; \
+	shopt -s nullglob; \
+	echo "$(YELLOW)Base templates ($(BASE_DIR)):$(NC)"; \
+	count=0; \
+	for f in "$$BASE_DIR"/*.{json,yaml,yml}; do \
+		[ -f "$$f" ] || continue; \
+		count=$$((count+1)); \
+		name=$$(basename "$$f"); \
+		echo "  • $$name"; \
+	done; \
+	[ $$count -gt 0 ] || echo "  (none)"; \
+	echo "$(YELLOW)Generated templates ($(GEN_DIR)):$(NC)"; \
+	count=0; \
+	for f in "$$GEN_DIR"/*.{json,yaml,yml}; do \
+		[ -f "$$f" ] || continue; \
+		count=$$((count+1)); \
+		name=$$(basename "$$f"); \
+		echo "  • $$name"; \
+	done; \
+	[ $$count -gt 0 ] || echo "  (none)"; \
+	echo "$(CYAN)💡 Use 'make train-production-template TEMPLATE=<name|path>' to run with a template$(NC)"
+
+# Production training with template selection
+train-production-template:
+	@echo "$(BLUE)🧩 Starting production training with template...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@if [ -z "$(TEMPLATE)" ]; then \
+		echo "$(RED)❌ Please specify TEMPLATE=<name|path to .json|.yaml>$(NC)"; \
+		echo "$(YELLOW)Examples:$(NC)"; \
+		echo "  make templates-list"; \
+		echo "  make train-production-template TEMPLATE=quick_test"; \
+		echo "  make train-production-template TEMPLATE=config/training_templates/auto_optimized.json"; \
+		exit 1; \
+	fi
+	@$(PY) $(SCRIPTS_DIR)/production_training_workflow.py --template "$(TEMPLATE)" --log-level INFO
+	@echo "$(GREEN)✅ Production training (template) complete$(NC)"
+
+# Production training with explicit config file
+train-production-config:
+	@echo "$(BLUE)📄 Starting production training with explicit config...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@if [ -z "$(CONFIG)" ]; then \
+		echo "$(RED)❌ Please specify CONFIG=<path to config .json|.yaml>$(NC)"; \
+		echo "$(YELLOW)Example:$(NC) make train-production-config CONFIG=config/training_templates/generated/production_training.yaml"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(CONFIG)" ]; then \
+		echo "$(RED)❌ Config file not found: $(CONFIG)$(NC)"; \
+		exit 1; \
+	fi
+	@$(PY) $(SCRIPTS_DIR)/production_training_workflow.py --config "$(CONFIG)" --log-level INFO
+	@echo "$(GREEN)✅ Production training (config) complete$(NC)"
 
 # Fast training for development
 train-fast:

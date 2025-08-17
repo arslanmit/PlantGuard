@@ -1,0 +1,76 @@
+backbone_lr_multiplier: 0.1
+batch_size: 16
+classifier_lr_multiplier: 1.0
+clear_cache_frequency: 50
+data_augmentation:
+  brightness: 0.2
+  contrast: 0.2
+  enabled: true
+  horizontal_flip: true
+  normalize: true
+  rotation: 15.0
+  vertical_flip: false
+device: auto
+dropout_rate: 0.5
+early_stopping:
+  enabled: false
+  min_delta: 0.001
+  mode: min
+  monitor: val_loss
+  patience: 15
+enable_automatic_gc: true
+enable_distributed_training: false
+enable_dynamic_batch_size: true
+enable_memory_profiling: false
+enable_performance_optimization: false
+enable_profiling: false
+enable_transfer_learning: true
+epochs: 5
+experiment_description: Quick test configuration for debugging
+experiment_name: plantguard_quick_test
+freeze_backbone: false
+gc_frequency: 10
+gradient_accumulation_steps: 1
+gradient_clip_norm: 1.0
+learning_rate: 0.01
+log_every_n_steps: 10
+max_checkpoints_to_keep: 5
+max_gradient_accumulation_steps: 8
+max_memory_usage_gb: 12.0
+memory_threshold: 0.9
+mixed_precision: true
+model_architecture: resnet50
+momentum: 0.9
+num_classes: 38
+num_workers: 2
+optimizer: adam
+persistent_workers: true
+pin_memory: true
+prefetch_factor: 2
+pretrained: true
+profile_batches: 10
+profile_data_loading: false
+random_seed: 42
+save_every_n_epochs: 1
+scheduler:
+  T_max: 100
+  eta_min: 0.0
+  factor: 0.5
+  gamma: 0.1
+  patience: 10
+  step_size: 30
+  type: step
+tags:
+- test
+- debug
+target_throughput_samples_per_sec: 100.0
+train_ratio: 0.8
+transfer_learning_strategy: gradual_unfreeze
+unfreeze_schedule:
+- 10
+- 20
+- 30
+use_memory_mapping: false
+val_ratio: 0.2
+warmup_epochs: 5
+weight_decay: 0.0001

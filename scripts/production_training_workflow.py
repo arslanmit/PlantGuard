@@ -23,7 +23,7 @@ from torch.utils.tensorboard import SummaryWriter
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from training.config import TrainingConfig
+from training.config import TrainingConfig, load_config
 from training.dataset_manager import DatasetManager
 from training.model_registry import ModelRegistry
 from training.monitor import TrainingMonitor
@@ -34,12 +34,13 @@ from utils.logging_config import setup_logging
 class ProductionWorkflow:
     """Production training workflow orchestrator."""
 
-    def __init__(self, config_path: Path | None = None):
+    def __init__(self, config_path: Path | None = None, template: str | None = None):
         """Initialize production workflow."""
         self.logger = logging.getLogger(__name__)
         self.dataset_manager = DatasetManager()
         self.model_registry = ModelRegistry()
         self.config_path = config_path
+        self.template = template
 
         # Minimum requirements
         self.min_disk_space_gb = 10.0  # GB
@@ -162,53 +163,78 @@ class ProductionWorkflow:
         # Determine dataset path
         dataset_path = self._get_best_dataset_path()
 
-        # Base configuration
-        config = TrainingConfig(
-            experiment_name=f"production_training_{int(time.time())}",
-            model_architecture="resnet50",
-            num_classes=38,  # PlantVillage has 38 classes
-            pretrained=True,
-        )
+        # Prefer pre-generated templates when available
+        templates_dir = Path("config/training_templates/generated")
+        selected_template: Path | None = None
+
+        if templates_dir.exists():
+            if has_gpu and memory_gb >= 16:
+                selected_template = templates_dir / "production_training.json"
+            elif has_gpu and memory_gb >= 8:
+                selected_template = templates_dir / "production_training.json"
+            elif has_gpu:
+                selected_template = templates_dir / "memory_efficient.json"
+            else:
+                selected_template = templates_dir / "memory_efficient.json"
+
+        config: TrainingConfig
+        if selected_template and selected_template.exists():
+            self.logger.info(f"📄 Loading configuration template: {selected_template}")
+            try:
+                config = load_config(selected_template)
+                # Ensure a unique experiment name per run
+                config.experiment_name = f"production_training_{int(time.time())}"
+            except Exception as e:
+                self.logger.warning(f"Failed to load template {selected_template}, falling back to dynamic config: {e}")
+                selected_template = None
+        if not templates_dir.exists() or not (selected_template and selected_template.exists()):
+            # Fallback: construct config dynamically
+            config = TrainingConfig(
+                experiment_name=f"production_training_{int(time.time())}",
+                model_architecture="resnet50",
+                num_classes=38,  # PlantVillage has 38 classes
+                pretrained=True,
+            )
+
+            # Adjust based on resources
+            if has_gpu and memory_gb >= 16:
+                # High-end configuration
+                config.batch_size = 64
+                config.num_workers = 8
+                config.mixed_precision = True
+                config.epochs = 100
+                self.logger.info("🚀 Using high-performance configuration")
+
+            elif has_gpu and memory_gb >= 8:
+                # Medium configuration
+                config.batch_size = 32
+                config.num_workers = 4
+                config.mixed_precision = True
+                config.epochs = 50
+                self.logger.info("⚡ Using medium-performance configuration")
+
+            elif has_gpu:
+                # Low-end GPU configuration
+                config.batch_size = 16
+                config.num_workers = 2
+                config.mixed_precision = False
+                config.epochs = 30
+                self.logger.info("🔋 Using low-resource GPU configuration")
+
+            else:
+                # CPU-only configuration
+                config.batch_size = 8
+                config.num_workers = 2
+                config.mixed_precision = False
+                config.epochs = 20
+                config.device = "cpu"
+                self.logger.info("💻 Using CPU-only configuration")
 
         # Store dataset path separately (will be passed to trainer)
         self.selected_dataset_path = dataset_path
 
-        # Adjust based on resources
-        if has_gpu and memory_gb >= 16:
-            # High-end configuration
-            config.batch_size = 64
-            config.num_workers = 8
-            config.mixed_precision = True
-            config.epochs = 100
-            self.logger.info("🚀 Using high-performance configuration")
-
-        elif has_gpu and memory_gb >= 8:
-            # Medium configuration
-            config.batch_size = 32
-            config.num_workers = 4
-            config.mixed_precision = True
-            config.epochs = 50
-            self.logger.info("⚡ Using medium-performance configuration")
-
-        elif has_gpu:
-            # Low-end GPU configuration
-            config.batch_size = 16
-            config.num_workers = 2
-            config.mixed_precision = False
-            config.epochs = 30
-            self.logger.info("🔋 Using low-resource GPU configuration")
-
-        else:
-            # CPU-only configuration
-            config.batch_size = 8
-            config.num_workers = 2
-            config.mixed_precision = False
-            config.epochs = 20
-            config.device = "cpu"
-            self.logger.info("💻 Using CPU-only configuration")
-
         # Enable early stopping for production
-        config.early_stopping_patience = max(10, config.epochs // 5)
+        config.early_stopping.patience = max(10, config.epochs // 5)
 
         return config
 
@@ -227,6 +253,51 @@ class ProductionWorkflow:
                 return path
 
         raise RuntimeError("No suitable dataset found")
+
+    def _load_template_config(self, template: str) -> TrainingConfig:
+        """Load a configuration from a template name or file path.
+
+        Args:
+            template: Template name (e.g., 'production_training', 'memory_efficient')
+                      or a direct file path to a JSON/YAML config.
+
+        Returns:
+            TrainingConfig loaded from the specified template
+        """
+        # If a path is provided, use it directly
+        tpath = Path(template)
+        if tpath.exists() and tpath.is_file():
+            self.logger.info(f"📄 Loading configuration template file: {tpath}")
+            return load_config(tpath)
+
+        # Otherwise, interpret as a template name and resolve under generated dir
+        templates_dir = Path("config/training_templates/generated")
+        # Try JSON then YAML
+        candidates = [
+            templates_dir / f"{template}.json",
+            templates_dir / f"{template}.yaml",
+            templates_dir / f"{template}.yml",
+        ]
+        for candidate in candidates:
+            if candidate.exists():
+                self.logger.info(f"📄 Loading configuration template: {candidate}")
+                return load_config(candidate)
+
+        # As a final fallback, try base templates directory (non-generated)
+        base_dir = Path("config/training_templates")
+        candidates = [
+            base_dir / f"{template}.json",
+            base_dir / f"{template}.yaml",
+            base_dir / f"{template}.yml",
+        ]
+        for candidate in candidates:
+            if candidate.exists():
+                self.logger.info(f"📄 Loading configuration template: {candidate}")
+                return load_config(candidate)
+
+        raise FileNotFoundError(
+            f"Template '{template}' not found as a file or in config/training_templates(/**)/"
+        )
 
     def _prepare_dataset_for_training(self) -> None:
         """Ensure dataset is available at the expected location for training."""
@@ -292,7 +363,7 @@ class ProductionWorkflow:
                 # Register model
                 model_metadata = {
                     "experiment_name": config.experiment_name,
-                    "dataset_path": str(config.dataset_path),
+                    "dataset_path": str(self.selected_dataset_path),
                     "final_accuracy": training_result.best_accuracy,
                     "training_time": training_result.training_time,
                     "config": config.to_dict(),
@@ -350,9 +421,24 @@ class ProductionWorkflow:
 
             self.logger.info("✅ All prerequisites validated")
 
-            # Step 2: Select optimal configuration
-            self.logger.info("2️⃣  Selecting optimal configuration...")
-            config = self.select_optimal_config()
+            # Step 2: Load/select configuration
+            self.logger.info("2️⃣  Selecting configuration...")
+            config: TrainingConfig
+            # Highest precedence: explicit config file
+            if self.config_path is not None:
+                self.logger.info(f"📄 Loading configuration from file: {self.config_path}")
+                config = load_config(self.config_path)
+                # Ensure unique experiment name
+                config.experiment_name = f"production_training_{int(time.time())}"
+            # Next: template flag (name or path)
+            elif self.template is not None:
+                config = self._load_template_config(self.template)
+                # Ensure unique experiment name
+                config.experiment_name = f"production_training_{int(time.time())}"
+            # Fallback: auto-select based on resources
+            else:
+                self.logger.info("🧠 Auto-selecting optimal configuration based on resources...")
+                config = self.select_optimal_config()
             self.logger.info(f"📋 Configuration: {config.batch_size} batch size, {config.epochs} epochs")
 
             # Step 3: Run production training
@@ -378,6 +464,14 @@ def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="PlantGuard Production Training Workflow")
     parser.add_argument("--config", type=Path, help="Path to custom training configuration file")
+    parser.add_argument(
+        "--template",
+        type=str,
+        help=(
+            "Template to use (name: quick_test, production_training, fine_tuning, memory_efficient, "
+            "auto_optimized) or a direct path to a JSON/YAML file"
+        ),
+    )
     parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], default="INFO", help="Logging level")
 
     args = parser.parse_args()
@@ -386,7 +480,7 @@ def main():
     setup_logging(level=args.log_level)
 
     # Run workflow
-    workflow = ProductionWorkflow(config_path=args.config)
+    workflow = ProductionWorkflow(config_path=args.config, template=args.template)
     exit_code = workflow.run_workflow()
 
     sys.exit(exit_code)

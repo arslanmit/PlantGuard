@@ -2,6 +2,7 @@
 # Complete dependencies for development and production
 # Updated: January 2025
 
+PyYAML==6.0.2
 # --- Core Deep Learning ---
 torch==2.8.0
 torchvision==0.23.0
