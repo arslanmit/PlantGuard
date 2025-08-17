@@ -544,11 +544,26 @@ train:
 		export PYTORCH_ENABLE_MPS_FALLBACK=1; \
 		echo "$(GREEN)🚀 Apple Silicon MPS acceleration enabled$(NC)"; \
 	fi
-	@$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
-		--device $(TORCH_DEVICE) \
-		--batch_size $(BATCH_SIZE) \
-		--workers $(WORKERS) \
-		--epochs 50
+	@if [ -d "$(DATA_DIR)/processed/plantvillage/train" ]; then \
+		echo "$(GREEN)✅ Using processed PlantVillage dataset$(NC)"; \
+		$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
+			--data_dir $(DATA_DIR)/processed/plantvillage \
+			--device $(TORCH_DEVICE) \
+			--batch_size $(BATCH_SIZE) \
+			--num_workers 4 \
+			--epochs 50; \
+	elif [ -d "$(DATA_DIR)/plantvillage_dummy/train" ]; then \
+		echo "$(YELLOW)⚠️  Using dummy dataset for training$(NC)"; \
+		$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
+			--data_dir $(DATA_DIR)/plantvillage_dummy \
+			--device $(TORCH_DEVICE) \
+			--batch_size $(BATCH_SIZE) \
+			--num_workers 4 \
+			--epochs 50; \
+	else \
+		echo "$(RED)❌ No dataset found. Run 'make dataset-status' or 'make dataset-dummy'$(NC)"; \
+		exit 1; \
+	fi
 	@echo "$(GREEN)✅ Training complete$(NC)"
 
 # Production training pipeline
@@ -564,12 +579,53 @@ train-production:
 train-fast:
 	@echo "$(BLUE)⚡ Fast training for development...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup-environment; fi
-	@$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
-		--device $(TORCH_DEVICE) \
-		--batch_size 16 \
-		--epochs 5 \
-		--fast
+	@if [ -d "$(DATA_DIR)/processed/plantvillage/train" ]; then \
+		echo "$(GREEN)✅ Using processed PlantVillage dataset$(NC)"; \
+		$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
+			--data_dir $(DATA_DIR)/processed/plantvillage \
+			--device $(TORCH_DEVICE) \
+			--batch_size 16 \
+			--epochs 5 \
+			--num_workers 4; \
+	elif [ -d "$(DATA_DIR)/plantvillage_dummy/train" ]; then \
+		echo "$(YELLOW)⚠️  Using dummy dataset for fast training$(NC)"; \
+		$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
+			--data_dir $(DATA_DIR)/plantvillage_dummy \
+			--device $(TORCH_DEVICE) \
+			--batch_size 16 \
+			--epochs 5 \
+			--num_workers 4; \
+	else \
+		echo "$(RED)❌ No dataset found. Run 'make dataset-dummy' for quick setup$(NC)"; \
+		exit 1; \
+	fi
 	@echo "$(GREEN)✅ Fast training complete$(NC)"
+
+# Single-threaded training (no multiprocessing issues)
+train-single:
+	@echo "$(BLUE)🔧 Single-threaded training (stable)...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@if [ -d "$(DATA_DIR)/processed/plantvillage/train" ]; then \
+		echo "$(GREEN)✅ Using processed PlantVillage dataset$(NC)"; \
+		$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
+			--data_dir $(DATA_DIR)/processed/plantvillage \
+			--device $(TORCH_DEVICE) \
+			--batch_size 16 \
+			--num_workers 0 \
+			--epochs 10; \
+	elif [ -d "$(DATA_DIR)/plantvillage_dummy/train" ]; then \
+		echo "$(YELLOW)⚠️  Using dummy dataset for single-threaded training$(NC)"; \
+		$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
+			--data_dir $(DATA_DIR)/plantvillage_dummy \
+			--device $(TORCH_DEVICE) \
+			--batch_size 16 \
+			--num_workers 0 \
+			--epochs 10; \
+	else \
+		echo "$(RED)❌ No dataset found. Run 'make dataset-dummy' for quick setup$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(GREEN)✅ Single-threaded training complete$(NC)"
 
 # Launch TensorBoard monitoring
 monitor:

@@ -72,7 +72,7 @@ class AudioAdapter:
         """
         try:
             # Check file size
-            if os.path.getsize(audio_path) == 0:
+            if Path(audio_path).stat().st_size == 0:
                 logger.warning("Audio file is empty: %s", audio_path)
                 return True
 
@@ -273,8 +273,9 @@ class AudioAdapter:
         """Remove temporary audio files with error handling."""
         for temp_file in self.temp_files:
             try:
-                if os.path.exists(temp_file):
-                    os.unlink(temp_file)
+                temp_path = Path(temp_file)
+                if temp_path.exists():
+                    temp_path.unlink()
                     logger.debug("Cleaned up temporary file: %s", temp_file)
             except Exception as e:
                 logger.warning("Failed to cleanup temporary file %s: %s", temp_file, e)

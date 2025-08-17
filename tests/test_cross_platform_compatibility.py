@@ -286,7 +286,7 @@ class TestCrossPlatformCompatibility:
                 # Windows might be more restrictive
                 pass
             else:
-                raise e
+                raise
 
     def test_environment_variable_handling(self, test_dataset, temp_dir):
         """Test environment variable handling across platforms."""

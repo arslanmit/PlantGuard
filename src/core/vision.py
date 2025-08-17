@@ -363,7 +363,8 @@ class VisionAdapter:
             try:
                 checkpoint = torch.load(model_path, map_location="cpu", weights_only=True)
             except TypeError:
-                checkpoint = torch.load(model_path, map_location="cpu")
+                # Fallback for older PyTorch versions or legacy models
+                checkpoint = torch.load(model_path, map_location="cpu", weights_only=False)
 
             # Check for new format indicators
             has_metadata = "training_metadata" in checkpoint
@@ -392,7 +393,8 @@ class VisionAdapter:
             try:
                 checkpoint = torch.load(legacy_path, map_location="cpu", weights_only=True)
             except TypeError:
-                checkpoint = torch.load(legacy_path, map_location="cpu")
+                # Fallback for older PyTorch versions or legacy models
+                checkpoint = torch.load(legacy_path, map_location="cpu", weights_only=False)
 
             # Add new format metadata
             checkpoint["model_version"] = "1.0.0"
@@ -427,7 +429,8 @@ class VisionAdapter:
             try:
                 checkpoint = torch.load(path, map_location="cpu", weights_only=True)
             except TypeError:
-                checkpoint = torch.load(path, map_location="cpu")
+                # Fallback for older PyTorch versions or legacy models
+                checkpoint = torch.load(path, map_location="cpu", weights_only=False)
 
             return checkpoint
 

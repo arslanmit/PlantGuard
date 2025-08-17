@@ -604,9 +604,13 @@ class ProductionTrainer:
             logger.info("Running comprehensive performance optimization...")
 
             # Extract dataset from data loader
+            if self.train_loader is None:
+                raise ValueError("Train loader not initialized")
             dataset = self.train_loader.dataset
 
             # Run optimization
+            if self.training_components is None:
+                raise ValueError("Training components not initialized")
             optimization_result = self.performance_optimizer.optimize_training_pipeline(
                 model=self.model,
                 dataset=dataset,

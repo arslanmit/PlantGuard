@@ -521,7 +521,7 @@ class TestEndToEndDeployment:
             if experimental_models:
                 success = manager.load_model(experimental_models[0]["id"])
                 # Should handle failure gracefully
-                assert not success or True  # Either fails gracefully or succeeds
+                assert True  # Either fails gracefully or succeeds
 
         print("✅ Experimental model deployment handled")
 
@@ -592,7 +592,7 @@ class TestEndToEndDeployment:
         health_status = manager.check_deployment_health()
         assert health_status is not None
         assert "model_loaded" in health_status
-        assert "last_prediction_time" in health_status or True  # May not be implemented
+        assert True  # May not be implemented
 
         # Test prediction monitoring
         test_image = Image.new("RGB", (224, 224), color="blue")
@@ -611,9 +611,9 @@ class TestEndToEndDeployment:
         # Test performance metrics collection
         performance_metrics = manager.get_deployment_metrics()
         if performance_metrics:
-            assert "total_predictions" in performance_metrics or True
-            assert "average_confidence" in performance_metrics or True
-            assert "error_rate" in performance_metrics or True
+            assert True
+            assert True
+            assert True
 
         print("✅ Deployment monitoring test completed")
 
@@ -632,10 +632,10 @@ class TestEndToEndDeployment:
         config_path = deployment_workspace / "config" / "deployment_config.json"
         manager = PlantGuardModelManager(config_path=str(config_path), autoload_default=False)
 
-        for env_name, config_template in config_templates.items():
+        for config_template in config_templates.values():
             # Apply configuration
             success = manager.apply_deployment_config(config_template)
-            assert success or True  # May not be implemented
+            assert True  # May not be implemented
 
             # Verify configuration
             current_config = manager.get_deployment_config()

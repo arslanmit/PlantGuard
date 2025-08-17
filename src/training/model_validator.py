@@ -283,7 +283,11 @@ class AutomatedModelValidator:
                 return None
 
             # Load checkpoint
-            checkpoint = torch.load(model_path, map_location=self.device)
+            try:
+                checkpoint = torch.load(model_path, map_location=self.device, weights_only=True)
+            except TypeError:
+                # Fallback for older PyTorch versions or legacy models
+                checkpoint = torch.load(model_path, map_location=self.device, weights_only=False)
 
             # Extract model architecture info
             if isinstance(checkpoint, dict) and "config" in checkpoint:

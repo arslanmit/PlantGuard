@@ -14,7 +14,7 @@ from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 import numpy as np
 import torch
@@ -135,6 +135,7 @@ class IntelligentPrefetcher:
                 data_iter = iter(data_loader)
             except queue.Full:
                 # Queue is full, skip this batch
+                logger.debug("Prefetch queue full, skipping batch")
                 continue
             except Exception as e:
                 logger.warning(f"Prefetch worker {worker_id} error: {e}")
@@ -298,6 +299,7 @@ class GPUPreprocessor:
                 output_queue.put(processed_batch)
 
             except queue.Empty:
+                logger.debug("GPU preprocessing input queue empty, continuing")
                 continue
             except Exception as e:
                 logger.error(f"GPU preprocessing error: {e}")
@@ -597,6 +599,7 @@ class PipelinedDataLoader:
             try:
                 self.stage_queues[0].put(batch, timeout=1.0)
             except queue.Full:
+                logger.debug("Input stage queue full, continuing")
                 continue
 
     def _preprocessing_stage(self) -> None:
@@ -611,8 +614,17 @@ class PipelinedDataLoader:
                 self.stage_queues[1].put(processed_batch, timeout=1.0)
 
             except queue.Empty:
+<<<<<<< Updated upstream
+                logger.debug("Preprocessing stage input queue empty, continuing")
                 continue
             except queue.Full:
+                logger.debug("Preprocessing stage output queue full, continuing")
+=======
+                logger.debug("Preprocessing stage queue empty, continuing")
+                continue
+            except queue.Full:
+                logger.debug("Preprocessing stage queue full, continuing")
+>>>>>>> Stashed changes
                 continue
 
     def _batching_stage(self) -> None:
@@ -635,8 +647,17 @@ class PipelinedDataLoader:
                     batch_buffer.clear()
 
             except queue.Empty:
+<<<<<<< Updated upstream
+                logger.debug("Batching stage input queue empty, continuing")
                 continue
             except queue.Full:
+                logger.debug("Batching stage output queue full, continuing")
+=======
+                logger.debug("Batching stage queue empty, continuing")
+                continue
+            except queue.Full:
+                logger.debug("Batching stage queue full, continuing")
+>>>>>>> Stashed changes
                 continue
 
     def start_pipeline(self) -> None:

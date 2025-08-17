@@ -9,7 +9,7 @@ import json
 import logging
 import tempfile
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import torch
 from PIL import Image

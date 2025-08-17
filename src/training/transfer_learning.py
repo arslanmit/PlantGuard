@@ -7,7 +7,7 @@ transfer learning evaluation, and fine-tuning optimization with different learni
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -137,10 +137,7 @@ class TransferLearningOptimizer:
             return True
 
         # Check if it's a final linear layer
-        if isinstance(module, nn.Linear) and "fc" in name_lower:
-            return True
-
-        return False
+        return bool(isinstance(module, nn.Linear) and "fc" in name_lower)
 
     def _create_layer_groups(self) -> list[LayerGroup]:
         """Create layer groups based on configuration.
@@ -425,7 +422,7 @@ class TransferLearningOptimizer:
         logger.info("Layer Groups:")
         for group_stat in stats["group_statistics"]:
             status = "FROZEN" if group_stat["frozen"] else "TRAINABLE"
-            logger.info(f"  {group_stat['name']}: {group_stat['trainable_params']:,}/{group_stat['total_params']:,} params, LR×{group_stat['lr_multiplier']:.2f}, {status}")
+            logger.info(f"  {group_stat['name']}: {group_stat['trainable_params']:,}/{group_stat['total_params']:,} params, LRx{group_stat['lr_multiplier']:.2f}, {status}")
 
     def evaluate_transfer_learning_effectiveness(
         self,

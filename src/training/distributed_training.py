@@ -9,7 +9,7 @@ import os
 import socket
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import torch
 import torch.distributed as dist
@@ -269,7 +269,11 @@ class DistributedTrainingManager:
         """
         # Load checkpoint on main process
         if self.is_main_process:
-            checkpoint = torch.load(checkpoint_path, map_location=device)
+            try:
+                checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
+            except TypeError:
+                # Fallback for older PyTorch versions or legacy models
+                checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
         else:
             checkpoint = None
 
@@ -300,7 +304,11 @@ class DistributedTrainingManager:
 
         # For now, just ensure all processes load the checkpoint
         if checkpoint is None:
-            checkpoint = torch.load(checkpoint_path, map_location=device)
+            try:
+                checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=True)
+            except TypeError:
+                # Fallback for older PyTorch versions or legacy models
+                checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
 
         return checkpoint
 
@@ -548,8 +556,8 @@ def create_distributed_config(
         world_size = torch.cuda.device_count() if torch.cuda.is_available() else 1
 
     # Get rank from environment if available
-    rank = int(os.environ.get("RANK", 0))
-    local_rank = int(os.environ.get("LOCAL_RANK", rank % world_size))
+    rank = int(os.environ.get("RANK", "0"))
+    local_rank = int(os.environ.get("LOCAL_RANK", str(rank % world_size)))
 
     return DistributedConfig(
         world_size=world_size,

@@ -12,7 +12,7 @@ import shutil
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -209,11 +209,11 @@ class CacheManager:
 
     def _calculate_checksum(self, file_path: Path) -> str:
         """Calculate file checksum."""
-        hash_md5 = hashlib.md5()
+        hash_sha256 = hashlib.sha256()
         with open(file_path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
-                hash_md5.update(chunk)
-        return hash_md5.hexdigest()
+                hash_sha256.update(chunk)
+        return hash_sha256.hexdigest()
 
     def _remove_cache_entry(self, key: str) -> None:
         """Remove cache entry and associated file."""
@@ -305,14 +305,22 @@ class CacheManager:
         try:
             # Load cached data
             if entry.path.suffix == ".pt":
-                data = torch.load(entry.path, map_location="cpu")
+                try:
+                    data = torch.load(entry.path, map_location="cpu", weights_only=True)
+                except TypeError:
+                    # Fallback for older PyTorch versions or legacy models
+                    data = torch.load(entry.path, map_location="cpu", weights_only=False)
             elif entry.path.suffix == ".pkl":
+                # WARNING: pickle.load can be unsafe with untrusted data
+                # Only load from trusted cache files
                 with open(entry.path, "rb") as f:
-                    data = pickle.load(f)
+                    data = pickle.load(f)  # nosec B301
             else:
                 # Try pickle as fallback
+                # WARNING: pickle.load can be unsafe with untrusted data
+                # Only load from trusted cache files
                 with open(entry.path, "rb") as f:
-                    data = pickle.load(f)
+                    data = pickle.load(f)  # nosec B301
 
             # Update access statistics
             entry.last_accessed = time.time()

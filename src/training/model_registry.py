@@ -6,7 +6,7 @@ import shutil
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -114,6 +114,7 @@ class ModelRegistry:
                 try:
                     existing_versions.append(version.parse(version_str))
                 except version.InvalidVersion:
+                    logger.debug(f"Invalid version string '{version_str}' in model ID '{model_id}', skipping")
                     continue
 
         if not existing_versions:
@@ -638,7 +639,11 @@ class ModelRegistry:
 
         try:
             # Load the model
-            model_state = torch.load(model_info.model_path, map_location="cpu")
+            try:
+                model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=True)
+            except TypeError:
+                # Fallback for older PyTorch versions or legacy models
+                model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=False)
 
             # Load configuration
             with open(model_info.config_path) as f:
@@ -880,7 +885,11 @@ except FileNotFoundError:
 
         try:
             # Load model state
-            model_state = torch.load(model_info.model_path, map_location="cpu")
+            try:
+                model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=True)
+            except TypeError:
+                # Fallback for older PyTorch versions or legacy models
+                model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=False)
 
             # Apply optimizations based on level
             optimized_state = self._apply_optimizations(model_state, optimization_level)
@@ -907,6 +916,7 @@ except FileNotFoundError:
 
         except Exception as e:
             print(f"Error optimizing model {model_id}: {e}")
+            return None
             return None
 
     def _apply_optimizations(self, model_state: dict[str, Any], level: str) -> dict[str, Any]:

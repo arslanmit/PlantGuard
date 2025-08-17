@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Generate comprehensive disease knowledge base for PlantGuard system.
+
 Creates detailed disease information for all 38 PlantVillage classes.
 """
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 
 def create_disease_info() -> dict[str, Any]:

@@ -459,7 +459,7 @@ class TestVisionAdapterRegistryIntegration:
             description="Corrupted model for testing",
         )
 
-        with pytest.raises(Exception):  # Should raise some kind of loading error
+        with pytest.raises(RuntimeError):  # Should raise model creation error
             with patch.object(adapter, "_create_model") as mock_create_model:
                 mock_create_model.side_effect = RuntimeError("Model creation failed")
                 adapter.load_from_registry(corrupted_id)
