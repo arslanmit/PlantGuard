@@ -219,6 +219,19 @@ disable_error_code = [
     "import-not-found",  # Allow missing imports - common in ML development
 ]
 
+# 🚫 Folders to skip (don't type-check these)
+exclude = [
+  "build/",           # Build artifacts
+  "dist/",            # Distribution files
+  ".venv/",           # Virtual environment
+  ".git/",            # Git files
+  "notebooks/",       # Jupyter notebooks (different rules)
+  "logs/",            # Log files
+  "runs/",            # TensorBoard runs
+  ".kiro/",           # Kiro IDE files
+  "data/raw/",        # Raw data files
+]
+
 # Disable all error checking for problematic files
 [[tool.mypy.overrides]]
 module = "final_cleanup"
@@ -259,19 +272,6 @@ check_untyped_defs = false
 
 # 📦 External libraries
 ignore_missing_imports = true    # Don't complain about missing library types
-
-# 🚫 Folders to skip (don't type-check these)
-exclude = [
-  "build/",           # Build artifacts
-  "dist/",            # Distribution files
-  ".venv/",           # Virtual environment
-  ".git/",            # Git files
-  "notebooks/",       # Jupyter notebooks (different rules)
-  "logs/",            # Log files
-  "runs/",            # TensorBoard runs
-  ".kiro/",           # Kiro IDE files
-  "data/raw/",        # Raw data files
-]
 
 # 🎯 Special rules for specific files/modules
 [[tool.mypy.overrides]]
