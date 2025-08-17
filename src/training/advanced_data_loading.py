@@ -614,17 +614,10 @@ class PipelinedDataLoader:
                 self.stage_queues[1].put(processed_batch, timeout=1.0)
 
             except queue.Empty:
-<<<<<<< Updated upstream
-                logger.debug("Preprocessing stage input queue empty, continuing")
-                continue
-            except queue.Full:
-                logger.debug("Preprocessing stage output queue full, continuing")
-=======
                 logger.debug("Preprocessing stage queue empty, continuing")
                 continue
             except queue.Full:
                 logger.debug("Preprocessing stage queue full, continuing")
->>>>>>> Stashed changes
                 continue
 
     def _batching_stage(self) -> None:
@@ -647,17 +640,10 @@ class PipelinedDataLoader:
                     batch_buffer.clear()
 
             except queue.Empty:
-<<<<<<< Updated upstream
-                logger.debug("Batching stage input queue empty, continuing")
-                continue
-            except queue.Full:
-                logger.debug("Batching stage output queue full, continuing")
-=======
                 logger.debug("Batching stage queue empty, continuing")
                 continue
             except queue.Full:
                 logger.debug("Batching stage queue full, continuing")
->>>>>>> Stashed changes
                 continue
 
     def start_pipeline(self) -> None:

@@ -1,0 +1,19 @@
+{
+  "experiment_name": "test_training",
+  "model_architecture": "resnet18",
+  "num_classes": 38,
+  "pretrained": true,
+  "freeze_backbone": true,
+  "epochs": 1,
+  "batch_size": 4,
+  "learning_rate": 0.0001,
+  "device": "cpu",
+  "num_workers": 0,
+  "train_ratio": 0.01,
+  "val_ratio": 0.01,
+  "data_augmentation": {
+    "enabled": false
+  },
+  "save_every_n_epochs": 1,
+  "log_every_n_steps": 1
+}
