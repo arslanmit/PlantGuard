@@ -46,7 +46,7 @@ endif
 
 .DEFAULT_GOAL := help
 
-.PHONY: help start setup install run switcher run-all model-switcher dev test clean
+.PHONY: help start setup install run dev test clean
 .PHONY: format lint check fix train monitor-training notebook benchmark
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
@@ -58,9 +58,7 @@ help:
 	@echo ""
 	@echo "$(GREEN)🚀 Getting Started$(NC)"
 	@echo "  $(BLUE)start$(NC)          - First-time setup + launch app"
-	@echo "  $(BLUE)run$(NC)            - Launch PlantGuard main app (port 8501)"
-	@echo "  $(BLUE)switcher$(NC)       - Launch Model Switcher UI (port 8502)"
-	@echo "  $(BLUE)run-all$(NC)        - Launch both main app and switcher"
+	@echo "  $(BLUE)run$(NC)            - Launch PlantGuard main app with integrated Model Management (port 8501)"
 	@echo "  $(BLUE)setup$(NC)          - Install dependencies & configure"
 	@echo "  $(BLUE)notebook$(NC)       - Open Jupyter for development"
 	@echo ""
@@ -103,9 +101,7 @@ help:
 	@echo ""
 	@echo "$(YELLOW)💡 Examples:$(NC)"
 	@echo "  $(CYAN)make start$(NC)     - New user? Start here!"
-	@echo "  $(CYAN)make run$(NC)       - Launch main app for plant detection"
-	@echo "  $(CYAN)make switcher$(NC)  - Launch model management interface"
-	@echo "  $(CYAN)make run-all$(NC)   - Run both apps simultaneously"
+	@echo "  $(CYAN)make run$(NC)       - Launch main app with integrated Model Management"
 	@echo "  $(CYAN)make benchmark$(NC) - Compare all model performance"
 	@echo "  $(CYAN)make dev$(NC)       - Quick code check before commit"
 	@echo "  $(CYAN)make train$(NC)     - Train your models"
@@ -160,13 +156,13 @@ install: deps
 
 # Launch PlantGuard app with enhanced UI
 run:
-	@echo "$(BLUE)🚀 Starting PlantGuard with Enhanced UI...$(NC)"
+	@echo "$(BLUE)🚀 Starting PlantGuard with Enhanced UI & Integrated Model Management...$(NC)"
 	@if [ ! -x $(PY) ]; then \
 		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
 		make setup; \
 	fi
 	@echo "$(GREEN)🌿 PlantGuard is starting at http://localhost:8501$(NC)"
-	@echo "$(CYAN)✨ Features: Multimodal Detection, Advanced Model Selection, Professional Layout$(NC)"
+	@echo "$(CYAN)✨ Features: Multimodal Detection, Advanced Model Selection, Professional Layout, Model Management$(NC)"
 	@echo "$(CYAN)📱 For microphone support, use HTTPS (ngrok/cloudflare tunnel)$(NC)"
 	@$(PY) -m streamlit run src/ui/app_streamlit.py --server.port 8501 --server.headless true --server.enableCORS false --server.enableXsrfProtection false
 
@@ -180,35 +176,6 @@ benchmark:
 	@echo "$(CYAN)📊 Benchmarking all enabled models on test dataset...$(NC)"
 	@echo "$(YELLOW)💡 This tests all enabled models on sample images and compares performance$(NC)"
 	@PYTHONPATH=. $(PY) scripts/model_switching/model_switcher.py --benchmark
-
-# Launch Model Switcher UI (Streamlit)
-switcher:
-	@echo "$(BLUE)🚀 Starting PlantGuard Model Switcher...$(NC)"
-	@if [ ! -x $(PY) ]; then \
-		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
-		make setup; \
-	fi
-	@echo "$(GREEN)🔧 Model Switcher is starting at http://localhost:8502$(NC)"
-	@echo "$(CYAN)✨ Features: Model Management, Performance Testing, Configuration$(NC)"
-	@$(PY) -m streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502 --server.headless true --server.enableCORS false --server.enableXsrfProtection false
-
-# Launch both main app and model switcher simultaneously
-run-all:
-	@echo "$(BLUE)🚀 Starting PlantGuard with both Main App and Model Switcher...$(NC)"
-	@if [ ! -x $(PY) ]; then \
-		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
-		make setup; \
-	fi
-	@echo "$(GREEN)🌿 PlantGuard Main App: http://localhost:8501$(NC)"
-	@echo "$(GREEN)🔧 Model Switcher: http://localhost:8502$(NC)"
-	@echo "$(CYAN)✨ Running both applications in parallel...$(NC)"
-	@echo "$(YELLOW)💡 Press Ctrl+C to stop both applications$(NC)"
-	@$(PY) -m streamlit run src/ui/app_streamlit.py --server.port 8501 --server.headless true --server.enableCORS false --server.enableXsrfProtection false & \
-	$(PY) -m streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502 --server.headless true --server.enableCORS false --server.enableXsrfProtection false & \
-	wait
-
-# Alias
-model-switcher: switcher
 
 # Open Jupyter notebook for development
 notebook:

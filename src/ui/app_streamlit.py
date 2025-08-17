@@ -1,7 +1,10 @@
 """PlantGuard Streamlit application for multimodal plant disease detection."""
 
 import json
-import subprocess  # nosec B404: subprocess is required for TensorBoard integration
+import platform
+import subprocess  # nosec B404: subprocess is required for
+
+# TensorBoard integration
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -29,7 +32,7 @@ from core.nlp import TextAdapter
 from core.vision import VisionAdapter
 from ui.components import ModelSwitcher, render_status_indicator
 
-st.set_page_config(page_title="PlantGuard", page_icon="🌿", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="PlantGuard", page_icon="🌿", layout="wide", initial_sidebar_state="collapsed")
 
 # Custom CSS for improved UI
 st.markdown(
@@ -394,61 +397,68 @@ for i, (model_type, config) in enumerate(model_configs.items()):
         st.session_state["selected_models"] = selected_models
 
 # Sidebar for model management (rotated from main area)
-with st.sidebar:
-    st.header("🤖 Model Management")
-
-    # Model status indicators
-    st.subheader("📊 Current Models")
-    model_status = get_model_status()
-
-    # Get selected models from session state
-    current_models = st.session_state.get("selected_models", {"vision": "vit_base_plants", "audio": "whisper_tiny_local", "text": "distilbert_plant_qa_v1"})
-
-    for model_type, status in model_status.items():
-        status_class = f"status-{status}"
-        model_name = current_models.get(model_type, "Unknown")
-        st.markdown(
-            f"""
-        <div class="model-card">
-            <span class="status-indicator {status_class}"></span>
-            <strong>{model_type.title()}:</strong> {model_name}
-        </div>
-        """,
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("---")
-
-    # Quick actions
-    st.subheader("⚡ Quick Actions")
-    if st.button("🔄 Reload All Models", use_container_width=True):
-        st.cache_resource.clear()
-        st.rerun()
-
-    if st.button("📊 Model Benchmark", use_container_width=True):
-        st.info("Benchmark feature coming soon!")
-
-    if st.button("🔧 Advanced Settings", use_container_width=True):
-        st.info("Advanced model settings coming soon!")
-
-    st.markdown("---")
-
-    # Model performance summary
-    st.subheader("📈 Performance Summary")
-    st.metric("Vision Accuracy", "95%", "2%")
-    st.metric("Audio Processing", "Local", "Offline")
-    st.metric("Text Response", "Fast", "< 1s")
+# REMOVED: Sidebar functionality moved to Model Management tab
 
 # Load adapters after model selection
 vision_adapter, audio_adapter, text_adapter = load_adapters()
 
 # Main content separator
 st.markdown("---")
+
+# Current Model Status & Quick Actions (moved from sidebar)
+st.markdown("## 🚀 Current Model Status & Quick Actions")
+st.markdown("*Monitor your active models and perform quick actions*")
+
+# Get selected models from session state
+current_models = st.session_state.get("selected_models", {"vision": "vit_base_plants", "audio": "whisper_tiny_local", "text": "distilbert_plant_qa_v1"})
+
+# Model status display
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.markdown("### 🌱 Vision Model")
+    st.info(f"**Active:** {current_models.get('vision', 'Unknown')}")
+    st.metric("Status", "🟢 Loaded", "Ready")
+
+with col2:
+    st.markdown("### 🎤 Audio Model")
+    st.info(f"**Active:** {current_models.get('audio', 'Unknown')}")
+    st.metric("Status", "🟢 Loaded", "Ready")
+
+with col3:
+    st.markdown("### 💬 Text Model")
+    st.info(f"**Active:** {current_models.get('text', 'Unknown')}")
+    st.metric("Status", "🟢 Loaded", "Ready")
+
+# Quick actions row
+st.markdown("---")
+st.markdown("### ⚡ Quick Actions")
+
+action_col1, action_col2, action_col3, action_col4 = st.columns(4)
+
+with action_col1:
+    if st.button("🔄 Reload Models", use_container_width=True, help="Reload all model adapters"):
+        st.cache_resource.clear()
+        st.success("✅ Models reloaded successfully!")
+        st.rerun()
+
+with action_col2:
+    if st.button("📊 Quick Test", use_container_width=True, help="Test current models on sample data"):
+        st.info("💡 Use the Model Management tab for comprehensive testing and benchmarking!")
+
+with action_col3:
+    if st.button("🔧 Settings", use_container_width=True, help="Access advanced model settings"):
+        st.info("💡 Model configuration is available in the Model Management tab!")
+
+with action_col4:
+    if st.button("📈 Performance", use_container_width=True, help="View model performance metrics"):
+        st.info("💡 Detailed performance analysis available in the Model Management tab!")
+
+st.markdown("---")
 st.markdown("## 🌿 Plant Analysis Tools")
 st.markdown("*Use the tools below to analyze your plants with AI-powered detection*")
 
 # Main content tabs with improved design
-tab1, tab2, tab3, tab4 = st.tabs(["🖼️ Vision Analysis", "🎤 Audio Processing", "💬 Text Q&A", "📚 Training"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["🖼️ Vision Analysis", "🎤 Audio Processing", "💬 Text Q&A", "📚 Training", "🔧 Model Management"])
 
 # Vision Analysis Tab
 with tab1:
@@ -815,30 +825,304 @@ with tab4:
                     return False
 
 
-# Footer with improved styling
-st.markdown("---")
-st.markdown(
-    """
-<div style="text-align: center; padding: 2rem; background-color: #f8f9fa; border-radius: 10px; margin-top: 2rem;">
-    <h4>⚠️ Important Disclaimer</h4>
-    <p>This tool provides AI-powered agronomic advice for educational purposes.
-    It is <strong>not a substitute for professional agricultural consultation</strong>.
-    Confidence scores are provided as indicators only.</p>
+# Model Management Tab (Merged from Model Switcher)
+with tab5:
+    st.subheader("🔧 Model Management & Configuration")
+    st.info("Switch between different plant disease detection models, benchmark performance, and manage configurations.")
 
-    <p><strong>🌿 PlantGuard AI</strong> - Empowering farmers with intelligent plant health insights</p>
+    # Initialize model manager
+    try:
+        from src.features.model_switching.model_manager import PlantGuardModelManager
 
-    <div style="margin-top: 1rem;">
-        <span style="margin: 0 1rem;">🤖 Model: """
-    + selected_models.get("vision", "N/A")
-    + """</span>
-        <span style="margin: 0 1rem;">🎤 Audio: """
-    + selected_models.get("audio", "N/A")
-    + """</span>
-        <span style="margin: 0 1rem;">💬 Text: """
-    + selected_models.get("text", "N/A")
-    + """</span>
-    </div>
-</div>
-""",
-    unsafe_allow_html=True,
-)
+        model_manager = PlantGuardModelManager(autoload_default=False)
+    except ImportError:
+        st.error("❌ Model Manager not available. Please check your installation.")
+        st.stop()
+
+    # Two-column layout for model management
+    mgmt_col1, mgmt_col2 = st.columns([1, 1])
+
+    with mgmt_col1:
+        st.markdown("### 🤖 Model Selection & Switching")
+
+        # Get available models
+        try:
+            models = model_manager.list_available_models()
+            enabled_models = [m for m in models if m["enabled"]]
+
+            if not enabled_models:
+                st.warning("⚠️ No enabled models found")
+            else:
+                # Model selection dropdown
+                model_options = {f"{m['name']} ({m['accuracy']:.1%})": m["id"] for m in enabled_models}
+
+                current_model_info = model_manager.get_current_model_info()
+                current_model_name = current_model_info.get("name", "None")
+
+                # Find current selection
+                default_index = 0
+                for i, (display_name, model_id) in enumerate(model_options.items()):
+                    if model_id == current_model_info.get("model_id", "").split("/")[-1]:
+                        default_index = i
+                        break
+
+                selected_display = st.selectbox("Choose Model:", options=list(model_options.keys()), index=default_index, help="Select a model to switch to", key="model_switcher_select")
+
+                selected_model_id = model_options[selected_display]
+
+                # Switch model button
+                if st.button("🔄 Switch Model", type="primary", use_container_width=True, key="switch_model_btn"):
+                    with st.spinner(f"Loading model: {selected_model_id}"):
+                        if model_manager.switch_model(selected_model_id):
+                            st.success(f"✅ Switched to: {selected_model_id}")
+                            st.rerun()
+                        else:
+                            st.error(f"❌ Failed to switch to: {selected_model_id}")
+
+                # Current model info
+                st.markdown("---")
+                st.markdown("### 📊 Current Model")
+
+                if "error" not in current_model_info:
+                    st.info(f"""
+                    **Name:** {current_model_info["name"]}
+
+                    **Type:** {current_model_info["type"]}
+
+                    **Accuracy:** {current_model_info["accuracy"]:.1%}
+
+                    **Classes:** {current_model_info["num_classes"]}
+
+                    **Device:** {current_model_info["device"]}
+                    """)
+                else:
+                    st.warning("No model loaded")
+
+        except Exception as e:
+            st.error(f"❌ Error loading models: {e}")
+
+    with mgmt_col2:
+        st.markdown("### 📊 Model Comparison & Benchmarking")
+
+        # Show all models in a table
+        try:
+            if models:
+                model_data = []
+                for model in models:
+                    status = "🟢 Current" if model["is_current"] else "⚪ Available" if model["enabled"] else "🔴 Disabled"
+                    model_data.append(
+                        {
+                            "Model": model["name"],
+                            "Type": model["type"],
+                            "Accuracy": f"{model['accuracy']:.1%}" if model["accuracy"] > 0 else "Unknown",
+                            "Status": status,
+                        }
+                    )
+
+                st.dataframe(model_data, use_container_width=True)
+
+                # Quick benchmark button
+                if st.button("🏁 Quick Benchmark", help="Test all enabled models on sample images", key="benchmark_btn"):
+                    with st.spinner("Running benchmark..."):
+                        # Load test metadata
+                        metadata_path = "data/pictures/sample_images_metadata.json"
+                        if Path(metadata_path).exists():
+                            with Path(metadata_path).open(encoding="utf-8") as f:
+                                metadata = json.load(f)
+
+                            benchmark_results = []
+
+                            for model_info in enabled_models[:3]:  # Limit to 3 models for speed
+                                model_id = model_info["id"]
+
+                                if model_manager.switch_model(model_id):
+                                    correct = 0
+                                    total = 0
+
+                                    # Test on first 3 images for speed
+                                    for sample in metadata["sample_images"][:3]:
+                                        image_path = Path("data/pictures") / sample["filename"]
+
+                                        if image_path.exists():
+                                            try:
+                                                image = Image.open(image_path)
+                                                result = model_manager.get_readable_prediction(image)
+
+                                                # Simple accuracy check
+                                                gt_plant = sample["plant"].lower()
+                                                pred_plant = result["plant_type"].lower()
+
+                                                if gt_plant in pred_plant or pred_plant in gt_plant:
+                                                    correct += 1
+
+                                                total += 1
+
+                                            except Exception as e:
+                                                st.warning(f"Error processing image: {e}")
+                                                continue
+
+                                    if total > 0:
+                                        accuracy = correct / total
+                                        benchmark_results.append(
+                                            {
+                                                "Model": model_info["name"],
+                                                "Accuracy": f"{accuracy:.1%}",
+                                                "Tested": f"{correct}/{total}",
+                                            }
+                                        )
+
+                            if benchmark_results:
+                                st.markdown("### 🏆 Benchmark Results")
+                                st.dataframe(benchmark_results, use_container_width=True)
+                            else:
+                                st.warning("No benchmark results available")
+                        else:
+                            st.error("Test metadata not found")
+            else:
+                st.info("No models available for comparison")
+
+        except Exception as e:
+            st.error(f"❌ Error comparing models: {e}")
+
+    # Model testing section
+    st.markdown("---")
+    st.markdown("### 🔍 Test Current Model")
+
+    test_col1, test_col2 = st.columns([1, 1])
+
+    with test_col1:
+        # Image upload for testing
+        test_image = st.file_uploader("Upload plant image for testing", type=["jpg", "jpeg", "png"], help="Upload an image of a plant leaf to test the current model", key="test_image_uploader")
+
+        # Sample image selection for testing
+        st.markdown("**Or choose a sample image:**")
+
+        sample_images = list(Path("data/pictures").glob("*.jpg"))
+        if sample_images:
+            sample_names = [img.name for img in sample_images]
+            selected_test_sample = st.selectbox("Sample images:", options=["None", *sample_names], help="Select a sample image for testing", key="test_sample_select")
+
+            if selected_test_sample != "None":
+                sample_path = Path("data/pictures") / selected_test_sample
+                if sample_path.exists():
+                    test_image = sample_path
+
+    with test_col2:
+        if test_image:
+            # Display test image
+            if isinstance(test_image, Path):
+                img = Image.open(test_image).convert("RGB")
+                img_name = test_image.name
+            else:
+                img = Image.open(test_image).convert("RGB")
+                img_name = test_image.name
+
+            st.image(img, caption=f"Testing: {img_name}", use_container_width=True)
+
+            # Test button
+            if st.button("🧪 Test Model", type="primary", use_container_width=True, key="test_model_btn"):
+                if "error" not in current_model_info:
+                    with st.spinner("Analyzing image..."):
+                        try:
+                            result = model_manager.get_readable_prediction(img)
+
+                            # Display results
+                            st.markdown("### 📋 Test Results")
+
+                            col_a, col_b = st.columns(2)
+
+                            with col_a:
+                                st.metric("🌿 Plant Type", result["plant_type"])
+                                st.metric("🦠 Disease", result["disease"])
+
+                            with col_b:
+                                st.metric("📊 Confidence", result["confidence_percentage"])
+                                health_status = "Healthy ✅" if result["is_healthy"] else "Diseased ⚠️"
+                                st.metric("💚 Health Status", health_status)
+
+                            # Additional info
+                            st.info(f"💡 **Recommendation:** {result['recommendation']}")
+
+                            # Raw prediction details
+                            with st.expander("🔧 Technical Details"):
+                                st.json(
+                                    {
+                                        "raw_prediction": result["raw_prediction"],
+                                        "confidence_score": result["confidence"],
+                                        "model_info": result["model_info"],
+                                    }
+                                )
+
+                        except Exception as e:
+                            st.error(f"❌ Testing failed: {e}")
+                else:
+                    st.error("❌ No model loaded for testing")
+        else:
+            st.info("👆 Upload an image or select a sample to test the current model")
+
+    # Configuration management
+    st.markdown("---")
+    st.markdown("### ⚙️ Configuration Management")
+
+    config_col1, config_col2 = st.columns([1, 1])
+
+    with config_col1:
+        st.markdown("**Current Configuration File:** `config/models.json`")
+
+        if st.button("📝 View Config", help="Display current model configuration"):
+            try:
+                with open("config/models.json") as f:
+                    config_content = f.read()
+                st.json(json.loads(config_content))
+            except Exception as e:
+                st.error(f"❌ Error reading config: {e}")
+
+        if st.button("🔄 Reload Config", help="Reload model configuration from file"):
+            try:
+                model_manager.load_model_configs()
+                st.success("✅ Configuration reloaded successfully!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"❌ Error reloading config: {e}")
+
+    with config_col2:
+        st.markdown("**Configuration Options:**")
+        st.markdown("""
+        You can edit the configuration file to:
+        - Add new models
+        - Change model settings
+        - Enable/disable models
+        - Set confidence thresholds
+        - Configure device preferences
+        """)
+
+        if st.button("📁 Open Config Folder", help="View configuration folder information"):
+            config_dir = Path("config")
+            if config_dir.exists():
+                st.success("✅ Configuration folder found!")
+                st.info(f"**Configuration Directory:** `{config_dir.absolute()}`")
+
+                # Show folder contents
+                st.markdown("**📁 Folder Contents:**")
+                try:
+                    config_files = list(config_dir.glob("*.json"))
+                    if config_files:
+                        for config_file in config_files:
+                            st.markdown(f"- `{config_file.name}`")
+                    else:
+                        st.markdown("- No JSON configuration files found")
+                except Exception as e:
+                    st.warning(f"Could not list folder contents: {e}")
+
+                # Platform-specific instructions
+                st.markdown("**💡 To open the folder manually:**")
+                if platform.system() == "Windows":
+                    st.markdown("- Press `Win + R`, type `explorer` and the path above, then press Enter")
+                elif platform.system() == "Darwin":  # macOS
+                    st.markdown("- Press `Cmd + Shift + G` in Finder, paste the path above, then press Enter")
+                else:  # Linux
+                    st.markdown("- Use your file manager to navigate to the path above")
+
+            else:
+                st.error("❌ Configuration folder not found")
+                st.info("The `config/` directory should be created automatically when needed")
