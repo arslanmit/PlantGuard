@@ -633,7 +633,7 @@ ignore = [
   # ============================================================================
   "C400",   # Allow generators over list comprehensions - ML often needs memory-efficient lazy evaluation
   "C401",   # Allow generators over set comprehensions - ML data processing benefits from lazy evaluation
-  # "C402",   # unnecessary generator (rewrite as a dict comprehension)
+  "C402",   # unnecessary generator (rewrite as a dict comprehension)
   # "C403",   # unnecessary list comprehension (rewrite as a set comprehension)
   # "C404",   # unnecessary list comprehension (rewrite as a dict comprehension)
   # "C405",   # unnecessary literal (rewrite as a set literal)
@@ -686,7 +686,7 @@ ignore = [
   # "D301",   # use r""" if any backslashes in a docstring
   "D400",   # Allow docstrings without periods - ML utility functions often have brief descriptions
   "D401",   # Allow non-imperative mood - ML docstrings often describe what function does rather than commands
-  # "D402",   # first line should not be the function's signature
+  "D402",   # first line should not be the function's signature
   # "D403",   # first word of the first line should be properly capitalized
   # "D404",   # first word of the docstring should not be This
   # "D405",   # section name should be properly capitalized
@@ -743,7 +743,7 @@ ignore = [
   # "S323",   # unverified-context
   # "S324",   # insecure-hash-function
   # "S401",   # import-telnetlib
-  # "S402",   # import-ftplib
+  "S402",   # import-ftplib
   "S403",   # Allow pickle imports - standard for ML model serialization and caching
   "S404",   # Allow subprocess imports - needed for ML preprocessing tools and external model utilities
   "S603",   # Allow subprocess calls - needed for ML tools like ffmpeg, imagemagick, external model converters
