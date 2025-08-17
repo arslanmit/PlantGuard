@@ -109,7 +109,14 @@ help:
 	@echo "  $(BLUE)check$(NC)          - Run all quality checks (type checking disabled)"
 	@echo "  $(BLUE)check-no-type$(NC)  - Run quality checks without type checking"
 	@echo "  $(BLUE)fix$(NC)            - Auto-fix common issues"
-	@echo "  $(BLUE)test$(NC)           - Run tests"
+	@echo "  $(BLUE)test$(NC)           - Run tests
+  $(BLUE)test-integration$(NC) - Run comprehensive integration tests
+  $(BLUE)test-integration-fast$(NC) - Run integration tests (fast mode, no performance)
+  $(BLUE)test-performance$(NC) - Run performance regression tests
+  $(BLUE)test-vision-registry$(NC) - Test VisionAdapter-Registry integration
+  $(BLUE)test-model-switching$(NC) - Test model switching functionality
+  $(BLUE)test-deployment$(NC) - Test end-to-end deployment workflow
+  $(BLUE)test-check$(NC)      - Check integration test prerequisites"
 	@echo ""
 	@echo "$(GREEN)🤖 Machine Learning$(NC)"
 	@echo "  $(BLUE)train-production$(NC) - Production training with full pipeline and validation"
@@ -351,6 +358,91 @@ coverage:
 	@$(PIP) install pytest pytest-cov --quiet
 	@$(PYTEST) $(TESTS_DIR)/ --cov=$(SRC_DIR) --cov-report=html --cov-report=term
 	@echo "$(GREEN)📊 Coverage report generated in htmlcov/index.html$(NC)"
+
+# ========== Integration Testing ==========
+
+# Run comprehensive integration tests
+test-integration:
+	@echo "$(BLUE)🔗 Running comprehensive integration tests...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🧪 Testing complete production training pipeline integration$(NC)"
+	@echo "$(CYAN)📋 Includes: Training, Registry, VisionAdapter, Model Switching, UI Deployment$(NC)"
+	@$(PIP) install pytest pytest-timeout pytest-json-report psutil --quiet
+	@$(PY) scripts/run_integration_tests.py
+	@echo "$(GREEN)✅ Integration tests completed$(NC)"
+	@echo "$(YELLOW)💡 Check integration_test_report.json for detailed results$(NC)"
+
+# Run integration tests without performance tests (faster)
+test-integration-fast:
+	@echo "$(BLUE)🔗 Running integration tests (fast mode)...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🧪 Testing integration without performance regression tests$(NC)"
+	@$(PIP) install pytest pytest-timeout pytest-json-report psutil --quiet
+	@$(PY) scripts/run_integration_tests.py --no-performance
+	@echo "$(GREEN)✅ Fast integration tests completed$(NC)"
+
+# Run only performance regression tests
+test-performance:
+	@echo "$(BLUE)📊 Running performance regression tests...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)⚡ Testing training pipeline performance and regression detection$(NC)"
+	@$(PIP) install pytest pytest-timeout psutil --quiet
+	@$(PYTEST) tests/test_performance_regression_comprehensive.py -v --tb=short -m performance
+	@echo "$(GREEN)✅ Performance regression tests completed$(NC)"
+
+# Test VisionAdapter integration with ModelRegistry
+test-vision-registry:
+	@echo "$(BLUE)👁️ Testing VisionAdapter-Registry integration...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🔍 Testing deep integration between VisionAdapter and ModelRegistry$(NC)"
+	@$(PIP) install pytest pytest-timeout --quiet
+	@$(PYTEST) tests/test_vision_adapter_registry_integration.py -v --tb=short
+	@echo "$(GREEN)✅ VisionAdapter-Registry integration tests completed$(NC)"
+
+# Test model switching functionality
+test-model-switching:
+	@echo "$(BLUE)🔄 Testing model switching functionality...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🔀 Testing comprehensive model switching with registry models$(NC)"
+	@$(PIP) install pytest pytest-timeout --quiet
+	@$(PYTEST) tests/test_model_switching_comprehensive.py -v --tb=short
+	@echo "$(GREEN)✅ Model switching tests completed$(NC)"
+
+# Test end-to-end deployment workflow
+test-deployment:
+	@echo "$(BLUE)🚀 Testing end-to-end deployment workflow...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🎯 Testing complete workflow from training to UI deployment$(NC)"
+	@$(PIP) install pytest pytest-timeout --quiet
+	@$(PYTEST) tests/test_end_to_end_deployment.py -v --tb=short
+	@echo "$(GREEN)✅ End-to-end deployment tests completed$(NC)"
+
+# Check integration test prerequisites
+test-check:
+	@echo "$(BLUE)🔍 Checking integration test prerequisites...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@$(PIP) install pytest pytest-timeout pytest-json-report psutil --quiet
+	@$(PY) scripts/run_integration_tests.py --check-only
+	@echo "$(GREEN)✅ Integration test prerequisites check completed$(NC)"
+
+# Run legacy integration tests (existing scripts)
+test-legacy-integration:
+	@echo "$(BLUE)🔗 Running legacy integration tests...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🧪 Running existing integration test scripts$(NC)"
+	@if [ -f scripts/test_production_workflow.py ]; then \
+		echo "$(YELLOW)Running production workflow test...$(NC)"; \
+		$(PY) scripts/test_production_workflow.py; \
+	fi
+	@if [ -f scripts/test_end_to_end_integration.py ]; then \
+		echo "$(YELLOW)Running end-to-end integration test...$(NC)"; \
+		$(PY) scripts/test_end_to_end_integration.py; \
+	fi
+	@if [ -f scripts/test_model_switching_integration.py ]; then \
+		echo "$(YELLOW)Running model switching integration test...$(NC)"; \
+		$(PY) scripts/test_model_switching_integration.py; \
+	fi
+	@echo "$(GREEN)✅ Legacy integration tests completed$(NC)"
 
 # ========== Machine Learning ==========
 
