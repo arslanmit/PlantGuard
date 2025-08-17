@@ -44,6 +44,44 @@ else
     NC :=
 endif
 
+# ========== Training Workflow Documentation ==========
+# 
+# Production Training Workflow:
+# 1. make setup-dataset          - Check dataset status and download if needed
+# 2. make train-production       - Run full production training pipeline
+# 3. make monitor-training       - Launch TensorBoard to monitor progress
+# 4. make evaluate-model         - Test trained model with comprehensive metrics
+# 5. make list-models           - View all models with performance comparison
+#
+# Quick Training Commands:
+# - make train-production       - Complete production pipeline (recommended)
+# - make train                  - Basic training (for development/testing)
+# - make train-improved         - Enhanced training with better hyperparameters
+#
+# Dataset Management:
+# - make download-dataset       - Auto-download PlantVillage from Kaggle
+# - make prepare-dataset        - Process raw data into train/val splits
+# - make validate-dataset       - Check dataset integrity and quality
+# - make analyze-dataset        - Generate dataset statistics and reports
+# - make dummy-dataset          - Create test dataset for development
+#
+# Model Management:
+# - make list-models           - Show all registered models with metrics
+# - make evaluate-model        - Run comprehensive model evaluation
+# - make benchmark             - Quick performance comparison of all models
+# - make models                - Basic model information (file sizes, etc.)
+#
+# Monitoring and Debugging:
+# - make monitor-training      - Launch TensorBoard (http://localhost:6006)
+# - make debug                 - Debug model performance issues
+# - make logs                  - View recent training logs
+#
+# Training Aliases (shortcuts):
+# - tp  -> train-production    - Quick production training
+# - mt  -> monitor-training    - Quick TensorBoard launch
+# - em  -> evaluate-model      - Quick model evaluation
+# - lm  -> list-models         - Quick model listing
+
 .DEFAULT_GOAL := help
 
 .PHONY: help start setup install run dev test clean
@@ -74,19 +112,23 @@ help:
 	@echo "  $(BLUE)test$(NC)           - Run tests"
 	@echo ""
 	@echo "$(GREEN)🤖 Machine Learning$(NC)"
-	@echo "  $(BLUE)train-production$(NC) - Production training with validation and optimal settings"
-	@echo "  $(BLUE)train$(NC)          - Train plant disease models"
+	@echo "  $(BLUE)train-production$(NC) - Production training with full pipeline and validation"
+	@echo "  $(BLUE)train$(NC)          - Train plant disease models (basic)"
 	@echo "  $(BLUE)monitor-training$(NC) - Launch TensorBoard for training monitoring"
-	@echo "  $(BLUE)benchmark$(NC)      - Quick benchmark all available models (moved from UI)"
+	@echo "  $(BLUE)evaluate-model$(NC) - Evaluate trained model with comprehensive metrics"
+	@echo "  $(BLUE)list-models$(NC)    - List all registered models with performance details"
+	@echo "  $(BLUE)benchmark$(NC)      - Quick benchmark all available models"
+	@echo ""
+	@echo "$(GREEN)📊 Dataset Management$(NC)"
 	@echo "  $(BLUE)setup-dataset$(NC)  - Show dataset status and setup options"
 	@echo "  $(BLUE)download-dataset$(NC) - Download PlantVillage dataset from Kaggle"
 	@echo "  $(BLUE)prepare-dataset$(NC) - Prepare dataset with train/val splits"
 	@echo "  $(BLUE)validate-dataset$(NC) - Validate dataset integrity and quality"
 	@echo "  $(BLUE)analyze-dataset$(NC) - Analyze dataset statistics and distribution"
 	@echo "  $(BLUE)dummy-dataset$(NC)  - Create dummy dataset for testing"
-	@echo "  $(BLUE)evaluate-model$(NC) - Evaluate trained model with comprehensive metrics"
-	@echo "  $(BLUE)models$(NC)         - Show model information"
-	@echo "  $(BLUE)list-models$(NC)    - List all registered models with details"
+	@echo ""
+	@echo "$(GREEN)🔧 Model Management$(NC)"
+	@echo "  $(BLUE)models$(NC)         - Show basic model information"
 	@echo "  $(BLUE)debug$(NC)          - Debug model performance"
 	@echo ""
 	@echo "$(GREEN)🔧 Maintenance$(NC)"
@@ -104,14 +146,32 @@ help:
 	@echo "  $(BLUE)logs$(NC)           - View recent logs"
 	@echo "  $(BLUE)coverage$(NC)       - Test coverage report"
 	@echo ""
-	@echo "$(YELLOW)💡 Examples:$(NC)"
-	@echo "  $(CYAN)make start$(NC)     - New user? Start here!"
-	@echo "  $(CYAN)make run$(NC)       - Launch main app with integrated Model Management"
-	@echo "  $(CYAN)make benchmark$(NC) - Compare all model performance"
-	@echo "  $(CYAN)make dev$(NC)       - Quick code check before commit"
-	@echo "  $(CYAN)make qa-no-type$(NC) - Run QA without type checking (if mypy has issues)"
-	@echo "  $(CYAN)make train$(NC)     - Train your models"
-	@echo "  $(CYAN)make stop$(NC)      - Stop all running applications"
+	@echo "$(GREEN)⚡ Training Shortcuts$(NC)"
+	@echo "  $(BLUE)tp$(NC)             - train-production (full pipeline)"
+	@echo "  $(BLUE)mt$(NC)             - monitor-training (TensorBoard)"
+	@echo "  $(BLUE)em$(NC)             - evaluate-model (test performance)"
+	@echo "  $(BLUE)lm$(NC)             - list-models (compare models)"
+	@echo "  $(BLUE)dd$(NC)             - download-dataset (get PlantVillage)"
+	@echo "  $(BLUE)pd$(NC)             - prepare-dataset (process data)"
+	@echo "  $(BLUE)vd$(NC)             - validate-dataset (check integrity)"
+	@echo "  $(BLUE)ad$(NC)             - analyze-dataset (statistics)"
+	@echo ""
+	@echo "$(YELLOW)💡 Training Workflow:$(NC)"
+	@echo "  1. $(CYAN)make setup-dataset$(NC)    - Check dataset status"
+	@echo "  2. $(CYAN)make train-production$(NC) - Run production training"
+	@echo "  3. $(CYAN)make monitor-training$(NC) - Monitor with TensorBoard"
+	@echo "  4. $(CYAN)make evaluate-model$(NC)   - Test model performance"
+	@echo "  5. $(CYAN)make list-models$(NC)      - Compare all models"
+	@echo ""
+	@echo "$(YELLOW)💡 Quick Examples:$(NC)"
+	@echo "  $(CYAN)make start$(NC)              - New user? Start here!"
+	@echo "  $(CYAN)make run$(NC)                - Launch main app"
+	@echo "  $(CYAN)make tp$(NC)                 - Quick: train-production"
+	@echo "  $(CYAN)make mt$(NC)                 - Quick: monitor-training"
+	@echo "  $(CYAN)make em$(NC)                 - Quick: evaluate-model"
+	@echo "  $(CYAN)make lm$(NC)                 - Quick: list-models"
+	@echo "  $(CYAN)make dev$(NC)                - Quick code check"
+	@echo "  $(CYAN)make stop$(NC)               - Stop all applications"
 
 # ========== Getting Started ==========
 
@@ -338,27 +398,35 @@ train-improved:
 	fi
 	@echo "$(GREEN)✅ Improved model training complete$(NC)"
 
-# Production training workflow with optimal settings and validation
+# Production training workflow with full pipeline and validation
 train-production:
-	@echo "$(BLUE)🚀 Starting PlantGuard Production Training Workflow...$(NC)"
+	@echo "$(BLUE)🚀 Starting PlantGuard Production Training Pipeline...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🔍 This will validate prerequisites and run optimized training$(NC)"
-	@echo "$(CYAN)📋 Features: Resource detection, optimal config, error handling, model registry$(NC)"
-	@$(PY) scripts/production_training_workflow.py
-	@echo "$(GREEN)✅ Production training workflow complete$(NC)"
+	@echo "$(CYAN)🔍 Full production pipeline with validation and optimal settings$(NC)"
+	@echo "$(CYAN)📋 Features: Dataset validation, resource detection, advanced training, model registry$(NC)"
+	@echo "$(CYAN)📊 Includes: Monitoring, checkpointing, evaluation, and deployment preparation$(NC)"
+	@$(PY) scripts/production_training_workflow.py --production
+	@echo "$(GREEN)✅ Production training pipeline complete$(NC)"
+	@echo "$(YELLOW)💡 Use 'make monitor-training' to view training metrics$(NC)"
+	@echo "$(YELLOW)💡 Use 'make evaluate-model' to test the trained model$(NC)"
+	@echo "$(YELLOW)💡 Use 'make list-models' to see all registered models$(NC)"
 
 # Monitor training with TensorBoard
 monitor-training:
 	@echo "$(BLUE)📊 Launching TensorBoard for training monitoring...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup; fi
+	@$(PIP) install tensorboard --quiet
 	@if [ ! -d "$(RUNS_DIR)" ]; then \
-		echo "$(YELLOW)⚠️  No training runs found. Run 'make train' first.$(NC)"; \
+		echo "$(YELLOW)⚠️  No training runs found. Creating directory...$(NC)"; \
 		mkdir -p $(RUNS_DIR); \
+		echo "$(CYAN)💡 Run 'make train-production' to start training with monitoring$(NC)"; \
 	fi
-	@echo "$(CYAN)Starting TensorBoard server...$(NC)"
-	@echo "$(YELLOW)📈 TensorBoard will open in your browser at http://localhost:6006$(NC)"
-	@echo "$(YELLOW)Press Ctrl+C to stop TensorBoard$(NC)"
-	@$(PY) -m tensorboard.main --logdir=$(RUNS_DIR) --port=6006 --reload_interval=1
+	@echo "$(CYAN)🚀 Starting TensorBoard server...$(NC)"
+	@echo "$(GREEN)📈 TensorBoard available at: http://localhost:6006$(NC)"
+	@echo "$(YELLOW)📊 Features: Training curves, model graphs, sample predictions$(NC)"
+	@echo "$(YELLOW)⌨️  Press Ctrl+C to stop TensorBoard$(NC)"
+	@echo ""
+	@$(PY) -m tensorboard.main --logdir=$(RUNS_DIR) --port=6006 --reload_interval=1 --host=0.0.0.0
 
 # Setup dataset (real PlantVillage or dummy for testing)
 setup-dataset:
@@ -423,11 +491,15 @@ dummy-dataset:
 
 # Evaluate trained model with comprehensive metrics
 evaluate-model:
-	@echo "$(BLUE)📊 Evaluating trained model...$(NC)"
+	@echo "$(BLUE)📊 Evaluating trained model with comprehensive metrics...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)Running comprehensive model evaluation...$(NC)"
-	@$(PY) scripts/evaluate_model.py
+	@echo "$(CYAN)🔍 Running detailed model evaluation...$(NC)"
+	@echo "$(CYAN)📋 Metrics: Accuracy, Precision, Recall, F1-Score, Confusion Matrix$(NC)"
+	@echo "$(CYAN)🖼️  Testing: Sample predictions with confidence scores$(NC)"
+	@$(PY) scripts/evaluate_model.py --comprehensive
 	@echo "$(GREEN)✅ Model evaluation complete$(NC)"
+	@echo "$(YELLOW)💡 Check evaluation results in logs/ directory$(NC)"
+	@echo "$(YELLOW)💡 Use 'make list-models' to compare with other models$(NC)"
 
 # Prepare real PlantVillage dataset (assumes raw data is available)
 prepare-dataset:
@@ -448,11 +520,15 @@ models:
 		echo "$(YELLOW)No models directory found. Run 'make train' to create models.$(NC)"; \
 	fi
 
-# List all registered models with details
+# List all registered models with performance details
 list-models:
-	@echo "$(BLUE)📋 Listing all registered models...$(NC)"
+	@echo "$(BLUE)📋 Listing all registered models with performance details...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup; fi
-	@PYTHONPATH=. $(PY) scripts/list_models.py
+	@echo "$(CYAN)🔍 Showing model registry with versions, metrics, and metadata$(NC)"
+	@PYTHONPATH=. $(PY) scripts/list_models.py --detailed
+	@echo ""
+	@echo "$(YELLOW)💡 Use 'make evaluate-model' to test a specific model$(NC)"
+	@echo "$(YELLOW)💡 Use 'make train-production' to train a new model$(NC)"
 
 # Debug model performance
 debug:
@@ -603,6 +679,33 @@ restart:
 	@sleep 2
 	@make run
 
+# ========== Training Command Aliases ==========
+# Shortcuts for common training tasks
+tp: train-production
+	@echo "$(GREEN)✅ Training alias 'tp' -> 'train-production' executed$(NC)"
+
+mt: monitor-training
+	@echo "$(GREEN)✅ Monitoring alias 'mt' -> 'monitor-training' executed$(NC)"
+
+em: evaluate-model
+	@echo "$(GREEN)✅ Evaluation alias 'em' -> 'evaluate-model' executed$(NC)"
+
+lm: list-models
+	@echo "$(GREEN)✅ Listing alias 'lm' -> 'list-models' executed$(NC)"
+
+# Dataset management aliases
+dd: download-dataset
+	@echo "$(GREEN)✅ Download alias 'dd' -> 'download-dataset' executed$(NC)"
+
+pd: prepare-dataset
+	@echo "$(GREEN)✅ Prepare alias 'pd' -> 'prepare-dataset' executed$(NC)"
+
+vd: validate-dataset
+	@echo "$(GREEN)✅ Validate alias 'vd' -> 'validate-dataset' executed$(NC)"
+
+ad: analyze-dataset
+	@echo "$(GREEN)✅ Analyze alias 'ad' -> 'analyze-dataset' executed$(NC)"
+
 # ========== Aliases for Common Typos ==========
 instal: install
 insall: install
@@ -612,3 +715,6 @@ tets: test
 testt: test
 clen: clean
 cean: clean
+trian: train
+tarining: train
+traning: train
