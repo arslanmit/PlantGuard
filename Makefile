@@ -47,7 +47,7 @@ endif
 .DEFAULT_GOAL := help
 
 .PHONY: help start setup install run dev test clean
-.PHONY: format lint check fix train monitor-training notebook benchmark
+.PHONY: format lint check fix train monitor-training notebook benchmark evaluate-model
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
 .PHONY: reset fresh stop restart debug profile validate
@@ -83,7 +83,9 @@ help:
 	@echo "  $(BLUE)validate-dataset$(NC) - Validate dataset integrity and quality"
 	@echo "  $(BLUE)analyze-dataset$(NC) - Analyze dataset statistics and distribution"
 	@echo "  $(BLUE)dummy-dataset$(NC)  - Create dummy dataset for testing"
+	@echo "  $(BLUE)evaluate-model$(NC) - Evaluate trained model with comprehensive metrics"
 	@echo "  $(BLUE)models$(NC)         - Show model information"
+	@echo "  $(BLUE)list-models$(NC)    - List all registered models with details"
 	@echo "  $(BLUE)debug$(NC)          - Debug model performance"
 	@echo ""
 	@echo "$(GREEN)🔧 Maintenance$(NC)"
@@ -409,6 +411,14 @@ dummy-dataset:
 	@echo "$(GREEN)✅ Dummy dataset created at data/plantvillage_dummy/$(NC)"
 	@echo "$(YELLOW)⚠️  This is for testing only. Use real PlantVillage dataset for production.$(NC)"
 
+# Evaluate trained model with comprehensive metrics
+evaluate-model:
+	@echo "$(BLUE)📊 Evaluating trained model...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)Running comprehensive model evaluation...$(NC)"
+	@$(PY) scripts/evaluate_model.py
+	@echo "$(GREEN)✅ Model evaluation complete$(NC)"
+
 # Prepare real PlantVillage dataset (assumes raw data is available)
 prepare-dataset:
 	@echo "$(BLUE)📊 Preparing PlantVillage dataset...$(NC)"
@@ -427,6 +437,12 @@ models:
 	else \
 		echo "$(YELLOW)No models directory found. Run 'make train' to create models.$(NC)"; \
 	fi
+
+# List all registered models with details
+list-models:
+	@echo "$(BLUE)📋 Listing all registered models...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@PYTHONPATH=. $(PY) scripts/list_models.py
 
 # Debug model performance
 debug:
