@@ -29,6 +29,7 @@ safetensors==0.6.2
 librosa==0.11.0
 soundfile==0.13.1
 SpeechRecognition==3.14.3
+openai-whisper==20230314
 
 # --- User Interface ---
 streamlit==1.48.0
