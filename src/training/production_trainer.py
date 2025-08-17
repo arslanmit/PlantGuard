@@ -481,10 +481,13 @@ class ProductionTrainer:
             # Create training components with custom optimizer
             from .optimizers import TrainingComponents
 
+            # Create training components with the model and config
             self.training_components = TrainingComponents(
-                optimizer=optimizer,
-                config=self.config,
+                model=self.model,
+                config=self.config
             )
+            # Override the optimizer with our custom one
+            self.training_components.optimizer = optimizer
         else:
             # Use standard training components
             self.training_components = create_training_components(self.model, self.config)
