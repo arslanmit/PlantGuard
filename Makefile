@@ -11,7 +11,7 @@ IS_MACOS := $(shell [ "$(UNAME_S)" = "Darwin" ] && echo 1 || echo 0)
 IS_APPLE_SILICON := $(shell [ "$(UNAME_M)" = "arm64" ] && echo 1 || echo 0)
 
 # ========== Python Environment ==========
-PYTHON := python3
+PYTHON := python3.10
 PY := .venv/bin/python
 PIP := $(PY) -m pip
 RUFF := $(PY) -m ruff
@@ -207,10 +207,16 @@ setup-environment:
 	@echo "$(BLUE)🛠️  Setting up PlantGuard environment...$(NC)"
 	@echo "$(YELLOW)📍 Platform: $(UNAME_S) $(UNAME_M)$(NC)"
 	@if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
-		echo "$(GREEN)🍎 Apple Silicon detected - enabling MPS acceleration$(NC)"; \
+		echo "$(GREEN)🍎 Apple Silicon detected - enabling MPS acceleration"; \
 	fi
-	@echo "$(YELLOW)Step 1/4: Creating virtual environment$(NC)"
-	@[ -x $(PY) ] || $(PYTHON) -m venv .venv
+
+	@echo "$(BLUE)Step 1/4: Creating virtual environment...$(NC)"
+	@if [ ! -d ".venv" ]; then \
+		$(PYTHON) -m venv .venv --clear --upgrade-deps; \
+		echo "$(GREEN)✅ Virtual environment created with $(shell .venv/bin/python3 --version)$(NC)"; \
+	else \
+		echo "$(YELLOW)✅ Virtual environment already exists (using $(shell .venv/bin/python3 --version))$(NC)"; \
+	fi
 	@echo "$(YELLOW)Step 2/4: Upgrading pip and build tools$(NC)"
 	@$(PIP) install --upgrade pip setuptools wheel --quiet
 	@echo "$(YELLOW)Step 3/4: Installing dependencies$(NC)"
