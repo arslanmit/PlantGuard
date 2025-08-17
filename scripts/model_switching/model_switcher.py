@@ -55,15 +55,15 @@ def list_models_registry() -> None:
         return
 
     for model in models:
-        accuracy = f"{model.performance_metrics.get('accuracy', 0):.1%}" if model.performance_metrics else "Unknown"
+        accuracy = f"{model.metadata.performance_metrics.get('accuracy', 0):.1%}" if model.metadata.performance_metrics else "Unknown"
 
-        print(f"\n📋 {model.model_id}")
-        print(f"   Version: {model.version}")
-        print(f"   Architecture: {model.architecture}")
-        print(f"   Training Date: {model.training_date.strftime('%Y-%m-%d %H:%M')}")
+        print(f"\n📋 {model.metadata.model_id}")
+        print(f"   Version: {model.metadata.version}")
+        print(f"   Architecture: {model.metadata.architecture}")
+        print(f"   Training Date: {model.metadata.training_date.strftime('%Y-%m-%d %H:%M')}")
         print(f"   Accuracy: {accuracy}")
-        print(f"   Dataset: {model.dataset_version}")
-        print(f"   File Size: {model.file_size / (1024 * 1024):.1f} MB")
+        print(f"   Dataset: {model.metadata.dataset_version}")
+        print(f"   File Size: {model.metadata.file_size / (1024 * 1024):.1f} MB")
 
 
 def list_models(manager=None) -> None:
@@ -113,13 +113,13 @@ def switch_model_registry(model_id: str) -> VisionAdapter:
 
         # Show model info
         print("\n📊 Model Info:")
-        print(f"   Version: {model_info.version}")
-        print(f"   Architecture: {model_info.architecture}")
+        print(f"   Version: {model_info.metadata.version}")
+        print(f"   Architecture: {model_info.metadata.architecture}")
         print(f"   Classes: {len(adapter.get_class_names())}")
-        print(f"   Training Date: {model_info.training_date.strftime('%Y-%m-%d %H:%M')}")
+        print(f"   Training Date: {model_info.metadata.training_date.strftime('%Y-%m-%d %H:%M')}")
 
-        if model_info.performance_metrics:
-            accuracy = model_info.performance_metrics.get("accuracy", 0)
+        if model_info.metadata.performance_metrics:
+            accuracy = model_info.metadata.performance_metrics.get("accuracy", 0)
             print(f"   Accuracy: {accuracy:.1%}")
 
         return adapter
@@ -319,6 +319,8 @@ def main() -> None:
     parser.add_argument("--benchmark", "-b", action="store_true", help="Benchmark all models")
     parser.add_argument("--current", "-c", action="store_true", help="Show current model info")
     parser.add_argument("--migrate", "-m", type=str, help="Migrate legacy model to registry format")
+    parser.add_argument("--sync", action="store_true", help="Sync model configuration with registry")
+    parser.add_argument("--migrate-all", action="store_true", help="Migrate all legacy models to registry")
 
     args = parser.parse_args()
 
@@ -370,6 +372,29 @@ def main() -> None:
 
         except Exception as e:
             print(f"❌ Migration failed: {e}")
+
+    elif args.sync:
+        # Sync configuration with registry
+        if not LEGACY_MODE:
+            if manager.sync_with_registry():
+                print("✅ Successfully synced configuration with registry")
+            else:
+                print("❌ Failed to sync with registry")
+        else:
+            print("❌ Sync only available with model manager")
+
+    elif args.migrate_all:
+        # Migrate all legacy models
+        if not LEGACY_MODE:
+            migrated = manager.migrate_legacy_models()
+            if migrated:
+                print(f"✅ Successfully migrated {len(migrated)} models:")
+                for model_id in migrated:
+                    print(f"  - {model_id}")
+            else:
+                print("No legacy models found to migrate")
+        else:
+            print("❌ Bulk migration only available with model manager")
 
     elif args.quick_test:
         if LEGACY_MODE:

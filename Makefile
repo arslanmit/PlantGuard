@@ -85,7 +85,7 @@ endif
 .DEFAULT_GOAL := help
 
 .PHONY: help start setup install run dev test clean
-.PHONY: format lint check fix train monitor-training notebook benchmark evaluate-model
+.PHONY: format lint check fix train monitor-training notebook benchmark evaluate-model migrate-models sync-models switch-model
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
 .PHONY: reset fresh stop restart debug profile validate
@@ -129,6 +129,9 @@ help:
 	@echo ""
 	@echo "$(GREEN)🔧 Model Management$(NC)"
 	@echo "  $(BLUE)models$(NC)         - Show basic model information"
+	@echo "  $(BLUE)migrate-models$(NC) - Migrate legacy models to registry format"
+	@echo "  $(BLUE)sync-models$(NC)    - Sync model configuration with registry"
+	@echo "  $(BLUE)switch-model$(NC)   - Switch to a specific model (use MODEL_ID=id)"
 	@echo "  $(BLUE)debug$(NC)          - Debug model performance"
 	@echo ""
 	@echo "$(GREEN)🔧 Maintenance$(NC)"
@@ -530,6 +533,37 @@ list-models:
 	@echo "$(YELLOW)💡 Use 'make evaluate-model' to test a specific model$(NC)"
 	@echo "$(YELLOW)💡 Use 'make train-production' to train a new model$(NC)"
 
+# Migrate legacy models to registry format
+migrate-models:
+	@echo "$(BLUE)🔄 Migrating legacy models to registry format...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)📋 Scanning for legacy models...$(NC)"
+	@PYTHONPATH=. $(PY) scripts/migrate_models.py --migrate-all
+	@echo "$(GREEN)✅ Model migration complete$(NC)"
+	@echo "$(YELLOW)💡 Use 'make list-models' to see migrated models$(NC)"
+
+# Sync model configuration with registry
+sync-models:
+	@echo "$(BLUE)🔄 Syncing model configuration with registry...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@PYTHONPATH=. $(PY) scripts/model_switching/model_switcher.py --sync
+	@echo "$(GREEN)✅ Model configuration synced$(NC)"
+
+# Switch to a specific model
+switch-model:
+	@echo "$(BLUE)🔄 Model switcher interface...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)Available commands:$(NC)"
+	@echo "  make switch-model MODEL_ID=your_model_id"
+	@echo "  make list-models  # to see available models"
+	@if [ -n "$(MODEL_ID)" ]; then \
+		echo "$(CYAN)Switching to model: $(MODEL_ID)$(NC)"; \
+		PYTHONPATH=. $(PY) scripts/model_switching/model_switcher.py --switch $(MODEL_ID); \
+	else \
+		echo "$(YELLOW)💡 Usage: make switch-model MODEL_ID=your_model_id$(NC)"; \
+		PYTHONPATH=. $(PY) scripts/model_switching/model_switcher.py --list; \
+	fi
+
 # Debug model performance
 debug:
 	@echo "$(BLUE)🔍 Debugging model performance...$(NC)"
@@ -692,6 +726,12 @@ em: evaluate-model
 
 lm: list-models
 	@echo "$(GREEN)✅ Listing alias 'lm' -> 'list-models' executed$(NC)"
+
+mm: migrate-models
+	@echo "$(GREEN)✅ Migration alias 'mm' -> 'migrate-models' executed$(NC)"
+
+sm: sync-models
+	@echo "$(GREEN)✅ Sync alias 'sm' -> 'sync-models' executed$(NC)"
 
 # Dataset management aliases
 dd: download-dataset

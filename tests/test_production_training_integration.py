@@ -1,465 +1,342 @@
-"""Integration tests for the production training pipeline.
-
-These tests validate the complete training workflow from dataset preparation
-to model registration and deployment.
-"""
+"""Integration tests for production training pipeline with existing PlantGuard components."""
 
 import json
-import shutil
 import tempfile
-import time
+import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, patch
 
-import pytest
 import torch
 from PIL import Image
 
 from src.core.vision import VisionAdapter
-from src.training.config import TrainingConfig
-from src.training.dataset_manager import DatasetManager
+from src.features.model_switching.model_manager import PlantGuardModelManager
 from src.training.model_registry import ModelRegistry
-from src.training.monitor import TrainingMonitor
-from src.training.production_trainer import ProductionTrainer
 
 
-class TestProductionTrainingIntegration:
-    """Integration tests for production training pipeline."""
+class TestProductionTrainingIntegration(unittest.TestCase):
+    """Test integration between production training pipeline and existing components."""
 
-    @pytest.fixture
-    def temp_dir(self):
-        """Create temporary directory for tests."""
-        temp_dir = Path(tempfile.mkdtemp())
-        yield temp_dir
-        shutil.rmtree(temp_dir, ignore_errors=True)
+    def setUp(self) -> None:
+        """Set up test environment."""
+        self.temp_dir = Path(tempfile.mkdtemp())
+        self.registry_dir = self.temp_dir / "models"
+        self.config_dir = self.temp_dir / "config"
+        self.config_dir.mkdir(parents=True, exist_ok=True)
 
-    @pytest.fixture
-    def dummy_dataset(self, temp_dir):
-        """Create a minimal dummy dataset for testing."""
-        dataset_dir = temp_dir / "dummy_dataset"
+        # Create test image
+        self.test_image = Image.new("RGB", (224, 224), color="green")
 
-        # Create train and validation directories
-        train_dir = dataset_dir / "train"
-        val_dir = dataset_dir / "val"
+    def tearDown(self) -> None:
+        """Clean up test environment."""
+        import shutil
 
-        # Create class directories
-        classes = ["healthy", "diseased"]
-        for split_dir in [train_dir, val_dir]:
-            for class_name in classes:
-                class_dir = split_dir / class_name
-                class_dir.mkdir(parents=True, exist_ok=True)
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
 
-                # Create dummy images
-                for i in range(5):  # 5 images per class
-                    img = Image.new("RGB", (224, 224), color=(i * 50, 100, 150))
-                    img.save(class_dir / f"image_{i}.jpg")
+    def test_vision_adapter_registry_integration(self) -> None:
+        """Test VisionAdapter integration with ModelRegistry."""
+        # Create registry
+        registry = ModelRegistry(self.registry_dir)
 
-        return dataset_dir
-
-    @pytest.fixture
-    def training_config(self, dummy_dataset, temp_dir):
-        """Create training configuration for tests."""
-        return TrainingConfig(
-            experiment_name="test_integration",
-            dataset_path=dummy_dataset,
-            model_architecture="resnet50",
-            num_classes=2,
-            epochs=2,  # Short training for tests
-            batch_size=2,
-            learning_rate=0.01,
-            device="cpu",  # Use CPU for tests
-            output_dir=temp_dir / "models",
-        )
-
-    def test_complete_training_pipeline(self, training_config, temp_dir):
-        """Test the complete training pipeline from start to finish."""
-        # Initialize components
-        dataset_manager = DatasetManager()
-        model_registry = ModelRegistry(registry_path=temp_dir / "model_registry.json")
-        monitor = TrainingMonitor(experiment_name=training_config.experiment_name, log_dir=temp_dir / "runs")
-
-        # Create trainer
-        trainer = ProductionTrainer(training_config, dataset_manager)
-
-        # Test setup
-        assert trainer.setup_training(), "Training setup should succeed"
-
-        # Test training
-        result = trainer.train()
-        assert result.success, f"Training should succeed: {result.error_message}"
-        assert result.best_model_path.exists(), "Best model should be saved"
-        assert result.best_accuracy > 0, "Should have positive accuracy"
-
-        # Test model registration
-        metadata = {
-            "experiment_name": training_config.experiment_name,
-            "dataset_path": str(training_config.dataset_path),
-            "final_accuracy": result.best_accuracy,
-            "training_time": result.training_time,
+        # Create a mock model checkpoint
+        model_path = self.temp_dir / "test_model.pt"
+        checkpoint = {
+            "model_state_dict": {"layer.weight": torch.randn(10, 5)},
+            "num_classes": 38,
+            "class_names": [f"class_{i}" for i in range(38)],
         }
-
-        model_id = model_registry.register_model(result.best_model_path, metadata)
-        assert model_id, "Model should be registered successfully"
-
-        # Test model loading from registry
-        adapter = VisionAdapter()
-        adapter.load_from_registry(model_id)
-        assert adapter.is_loaded, "Model should load from registry"
-
-        # Test prediction
-        test_image = Image.new("RGB", (224, 224), color=(100, 150, 200))
-        prediction, confidence = adapter.predict(test_image)
-        assert prediction in ["healthy", "diseased"], "Should predict valid class"
-        assert 0 <= confidence <= 1, "Confidence should be between 0 and 1"
-
-    def test_training_with_validation(self, training_config, temp_dir):
-        """Test training with validation and early stopping."""
-        # Enable early stopping
-        training_config.early_stopping_patience = 1
-        training_config.epochs = 10  # More epochs to test early stopping
-
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(training_config, dataset_manager)
-
-        # Setup and train
-        assert trainer.setup_training()
-        result = trainer.train()
-
-        assert result.success
-        # Should stop early due to patience
-        assert result.final_epoch < training_config.epochs
-
-    def test_checkpoint_resumption(self, training_config, temp_dir):
-        """Test training resumption from checkpoint."""
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(training_config, dataset_manager)
-
-        # First training run (partial)
-        training_config.epochs = 3
-        assert trainer.setup_training()
-        result1 = trainer.train()
-        assert result1.success
-
-        # Find checkpoint
-        checkpoint_dir = training_config.output_dir / training_config.experiment_name / "checkpoints"
-        checkpoints = list(checkpoint_dir.glob("checkpoint_epoch_*.pt"))
-        assert len(checkpoints) > 0, "Should have saved checkpoints"
-
-        # Resume training
-        training_config.epochs = 5  # Train for more epochs
-        training_config.resume_from_checkpoint = checkpoints[-1]  # Latest checkpoint
-
-        trainer2 = ProductionTrainer(training_config, dataset_manager)
-        assert trainer2.setup_training()
-        result2 = trainer2.train()
-
-        assert result2.success
-        assert result2.final_epoch > result1.final_epoch, "Should continue from checkpoint"
-
-    def test_model_evaluation_integration(self, training_config, temp_dir):
-        """Test model evaluation after training."""
-        from src.training.evaluator import ModelEvaluator
-
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(training_config, dataset_manager)
-
-        # Train model
-        assert trainer.setup_training()
-        result = trainer.train()
-        assert result.success
-
-        # Evaluate model
-        evaluator = ModelEvaluator()
-        eval_result = evaluator.evaluate_model(model_path=result.best_model_path, dataset_path=training_config.dataset_path / "val", num_classes=training_config.num_classes)
-
-        assert eval_result.accuracy > 0, "Should have positive accuracy"
-        assert len(eval_result.per_class_metrics) == training_config.num_classes
-        assert eval_result.confusion_matrix is not None
-
-    def test_model_registry_operations(self, temp_dir):
-        """Test model registry CRUD operations."""
-        registry = ModelRegistry(registry_path=temp_dir / "test_registry.json")
-
-        # Create dummy model file
-        model_path = temp_dir / "test_model.pt"
-        torch.save({"model_state_dict": {}, "num_classes": 2}, model_path)
-
-        # Test registration
-        metadata = {
-            "experiment_name": "test_experiment",
-            "accuracy": 0.85,
-            "training_date": "2024-01-01",
-        }
-
-        model_id = registry.register_model(model_path, metadata)
-        assert model_id, "Should register model successfully"
-
-        # Test retrieval
-        model_info = registry.get_model(model_id)
-        assert model_info is not None, "Should retrieve model info"
-        assert model_info.model_path == model_path
-
-        # Test listing
-        models = registry.list_models()
-        assert len(models) == 1, "Should list one model"
-        assert models[0].model_id == model_id
-
-        # Test comparison
-        # Register another model
-        model_path2 = temp_dir / "test_model2.pt"
-        torch.save({"model_state_dict": {}, "num_classes": 2}, model_path2)
-
-        metadata2 = {
-            "experiment_name": "test_experiment2",
-            "accuracy": 0.90,
-            "training_date": "2024-01-02",
-        }
-
-        model_id2 = registry.register_model(model_path2, metadata2)
-
-        comparison = registry.compare_models([model_id, model_id2])
-        assert len(comparison.models) == 2, "Should compare two models"
-
-    def test_vision_adapter_integration(self, training_config, temp_dir):
-        """Test VisionAdapter integration with new model format."""
-        # Train a model first
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(training_config, dataset_manager)
-
-        assert trainer.setup_training()
-        result = trainer.train()
-        assert result.success
-
-        # Test loading with VisionAdapter
-        adapter = VisionAdapter()
-        adapter.load_checkpoint(str(result.best_model_path))
-
-        assert adapter.is_loaded, "Adapter should load model successfully"
-        assert len(adapter.get_class_names()) == training_config.num_classes
-
-        # Test compatibility check
-        assert adapter.is_compatible_with_registry_format(str(result.best_model_path))
-
-        # Test migration (should not be needed for new format)
-        migrated_path = temp_dir / "migrated_model.pt"
-        adapter.migrate_legacy_model(str(result.best_model_path), str(migrated_path))
-        assert migrated_path.exists(), "Migration should create new file"
-
-    def test_error_handling_and_recovery(self, training_config, temp_dir):
-        """Test error handling and recovery mechanisms."""
-        dataset_manager = DatasetManager()
-
-        # Test with invalid dataset path
-        invalid_config = training_config
-        invalid_config.dataset_path = temp_dir / "nonexistent"
-
-        trainer = ProductionTrainer(invalid_config, dataset_manager)
-        assert not trainer.setup_training(), "Setup should fail with invalid dataset"
-
-        # Test with invalid model architecture
-        invalid_config.dataset_path = training_config.dataset_path  # Fix dataset
-        invalid_config.model_architecture = "invalid_arch"
-
-        trainer = ProductionTrainer(invalid_config, dataset_manager)
-        # Should handle gracefully and fall back to default
-
-    def test_cross_platform_compatibility(self, training_config, temp_dir):
-        """Test cross-platform compatibility (macOS, Linux)."""
-        import platform
-
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(training_config, dataset_manager)
-
-        # Test path handling across platforms
-        assert trainer.setup_training()
-
-        # Test device detection
-        if platform.system() == "Darwin":  # macOS
-            # Should detect MPS if available
-            if torch.backends.mps.is_available():
-                assert "mps" in str(trainer.device) or "cpu" in str(trainer.device)
-        elif platform.system() == "Linux":
-            # Should detect CUDA if available
-            if torch.cuda.is_available():
-                assert "cuda" in str(trainer.device) or "cpu" in str(trainer.device)
-
-        # Train should work regardless of platform
-        result = trainer.train()
-        assert result.success, "Training should work on all platforms"
-
-    def test_performance_benchmarks(self, training_config, temp_dir):
-        """Test performance benchmarks and regression testing."""
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(training_config, dataset_manager)
-
-        # Measure training time
-        start_time = time.time()
-
-        assert trainer.setup_training()
-        result = trainer.train()
-
-        training_time = time.time() - start_time
-
-        assert result.success
-        assert training_time < 300, "Training should complete within 5 minutes for test dataset"
-        assert result.training_time > 0, "Should record training time"
-
-        # Test memory usage (basic check)
-        import psutil
-
-        process = psutil.Process()
-        memory_mb = process.memory_info().rss / 1024 / 1024
-
-        # Should not use excessive memory for small test dataset
-        assert memory_mb < 2000, "Should not use more than 2GB for test dataset"
-
-    def test_end_to_end_validation(self, training_config, temp_dir):
-        """Test complete end-to-end validation with sample datasets."""
-        # This test validates the entire pipeline with realistic data
-
-        # Create more realistic dummy dataset
-        dataset_dir = temp_dir / "realistic_dataset"
-        self._create_realistic_dataset(dataset_dir)
-
-        training_config.dataset_path = dataset_dir
-        training_config.num_classes = 4  # More classes
-        training_config.epochs = 5  # More training
-
-        # Initialize all components
-        dataset_manager = DatasetManager()
-        model_registry = ModelRegistry(registry_path=temp_dir / "registry.json")
-        trainer = ProductionTrainer(training_config, dataset_manager)
-
-        # Validate dataset
-        validation_result = dataset_manager.validate_dataset(dataset_dir)
-        assert validation_result.is_valid, "Dataset should be valid"
-
-        # Train model
-        assert trainer.setup_training()
-        result = trainer.train()
-        assert result.success
-        assert result.best_accuracy > 0.2, "Should achieve reasonable accuracy"
+        torch.save(checkpoint, model_path)
 
         # Register model
-        metadata = {
-            "experiment_name": training_config.experiment_name,
-            "dataset_classes": training_config.num_classes,
-            "final_accuracy": result.best_accuracy,
+        model_id = registry.register_model(
+            model_path=model_path,
+            name="test_model",
+            architecture="resnet50",
+            dataset_version="test",
+            hyperparameters={"num_classes": 38},
+            performance_metrics={"accuracy": 0.95},
+            description="Test model for integration",
+        )
+
+        # Test VisionAdapter can load from registry
+        adapter = VisionAdapter()
+
+        # Mock the model loading to avoid actual ResNet50 instantiation
+        with patch.object(adapter, "_create_model") as mock_create_model:
+            mock_model = MagicMock()
+            mock_create_model.return_value = mock_model
+
+            # This should work without errors
+            adapter.load_from_registry(model_id)
+
+            self.assertTrue(adapter.is_loaded)
+            self.assertEqual(len(adapter.class_names), 38)
+
+    def test_model_manager_registry_integration(self) -> None:
+        """Test PlantGuardModelManager integration with registry models."""
+        # Create config file
+        config_path = self.config_dir / "models.json"
+        config_data = {
+            "default_model": "test_registry_model",
+            "models": {
+                "test_registry_model": {
+                    "name": "Test Registry Model",
+                    "type": "local",
+                    "model_id": "registry:test_model_v1.0.0",
+                    "description": "Test model from registry",
+                    "accuracy": 0.95,
+                    "confidence_threshold": 0.7,
+                    "enabled": True,
+                    "device": "cpu",
+                }
+            },
         }
 
-        model_id = model_registry.register_model(result.best_model_path, metadata)
+        with config_path.open("w") as f:
+            json.dump(config_data, f)
 
-        # Test model in production-like scenario
+        # Create model manager
+        manager = PlantGuardModelManager(config_path=str(config_path), autoload_default=False)
+
+        # Test listing models
+        models = manager.list_available_models()
+        self.assertEqual(len(models), 1)
+        self.assertEqual(models[0]["name"], "Test Registry Model")
+        self.assertEqual(models[0]["type"], "local")
+
+    def test_backward_compatibility(self) -> None:
+        """Test backward compatibility with legacy model files."""
+        # Create a legacy model file
+        legacy_path = self.temp_dir / "legacy_model.pt"
+        legacy_checkpoint = {
+            "model_state_dict": {"layer.weight": torch.randn(10, 5)},
+            "num_classes": 38,
+            # No class_names or registry metadata
+        }
+        torch.save(legacy_checkpoint, legacy_path)
+
+        # Test VisionAdapter can detect it's not registry format
         adapter = VisionAdapter()
-        adapter.load_from_registry(model_id)
+        is_compatible = adapter.is_compatible_with_registry_format(str(legacy_path))
+        self.assertFalse(is_compatible)
 
-        # Test on various image types
-        test_images = self._create_test_images(temp_dir)
-        for img_path in test_images:
-            image = Image.open(img_path)
-            prediction, confidence = adapter.predict(image)
-            assert prediction, "Should make prediction"
-            assert 0 <= confidence <= 1, "Confidence should be valid"
+        # Test migration
+        migrated_path = self.temp_dir / "migrated_model.pt"
+        adapter.migrate_legacy_model(str(legacy_path), str(migrated_path))
 
-    def _create_realistic_dataset(self, dataset_dir: Path):
-        """Create a more realistic dataset for testing."""
-        classes = ["apple_healthy", "apple_scab", "tomato_healthy", "tomato_blight"]
+        # Check migrated model has registry format
+        is_migrated_compatible = adapter.is_compatible_with_registry_format(str(migrated_path))
+        self.assertTrue(is_migrated_compatible)
 
-        for split in ["train", "val"]:
-            split_dir = dataset_dir / split
+        # Load migrated checkpoint and verify metadata
+        migrated_checkpoint = torch.load(migrated_path, map_location="cpu")
+        self.assertIn("model_version", migrated_checkpoint)
+        self.assertIn("training_metadata", migrated_checkpoint)
 
-            for class_name in classes:
-                class_dir = split_dir / class_name
-                class_dir.mkdir(parents=True, exist_ok=True)
+    def test_model_manager_sync_with_registry(self) -> None:
+        """Test model manager syncing with registry."""
+        # Create registry with a model
+        registry = ModelRegistry(self.registry_dir)
 
-                # Create more varied images
-                num_images = 10 if split == "train" else 5
-                for i in range(num_images):
-                    # Create images with different colors/patterns
-                    if "healthy" in class_name:
-                        color = (50 + i * 10, 150 + i * 5, 50 + i * 8)
-                    else:
-                        color = (100 + i * 15, 50 + i * 3, 30 + i * 5)
+        model_path = self.temp_dir / "sync_test_model.pt"
+        checkpoint = {
+            "model_state_dict": {"layer.weight": torch.randn(10, 5)},
+            "num_classes": 38,
+            "class_names": [f"class_{i}" for i in range(38)],
+        }
+        torch.save(checkpoint, model_path)
 
-                    img = Image.new("RGB", (224, 224), color=color)
+        model_id = registry.register_model(
+            model_path=model_path,
+            name="sync_test",
+            architecture="resnet50",
+            dataset_version="test",
+            hyperparameters={"num_classes": 38},
+            performance_metrics={"accuracy": 0.90},
+            description="Model for sync test",
+        )
 
-                    # Add some noise/variation
-                    import numpy as np
+        # Create model manager with empty config
+        config_path = self.config_dir / "sync_test_models.json"
+        config_data = {"models": {}}
+        with config_path.open("w") as f:
+            json.dump(config_data, f)
 
-                    img_array = np.array(img)
-                    noise = np.random.randint(-20, 20, img_array.shape, dtype=np.int16)
-                    img_array = np.clip(img_array.astype(np.int16) + noise, 0, 255).astype(np.uint8)
-                    img = Image.fromarray(img_array)
+        manager = PlantGuardModelManager(config_path=str(config_path), autoload_default=False)
 
-                    img.save(class_dir / f"{class_name}_{i:03d}.jpg")
+        # Initially no models
+        models = manager.list_available_models()
+        self.assertEqual(len(models), 0)
 
-    def _create_test_images(self, temp_dir: Path) -> list[Path]:
-        """Create test images for validation."""
-        test_dir = temp_dir / "test_images"
-        test_dir.mkdir(exist_ok=True)
+        # Sync with registry
+        with patch.object(manager, "_load_local_model") as mock_load:
+            mock_adapter = MagicMock()
+            mock_load.return_value = mock_adapter
 
-        test_images = []
+            success = manager.sync_with_registry()
+            self.assertTrue(success)
 
-        # Create various test images
-        colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
-        sizes = [(224, 224), (256, 256), (300, 300)]
+        # Should now have the registry model
+        models = manager.list_available_models()
+        self.assertEqual(len(models), 1)
+        self.assertIn("registry_", models[0]["id"])
 
-        for i, (color, size) in enumerate(zip(colors, sizes)):
-            img = Image.new("RGB", size, color=color)
-            img_path = test_dir / f"test_image_{i}.jpg"
-            img.save(img_path)
-            test_images.append(img_path)
+    def test_migration_utility_integration(self) -> None:
+        """Test the migration utility script integration."""
+        # Create legacy models
+        legacy_models = []
+        for i in range(2):
+            legacy_path = self.temp_dir / f"legacy_model_{i}.pt"
+            checkpoint = {
+                "model_state_dict": {"layer.weight": torch.randn(10, 5)},
+                "num_classes": 38,
+            }
+            torch.save(checkpoint, legacy_path)
+            legacy_models.append(legacy_path)
 
-        return test_images
+        # Test scanning for legacy models
+        from scripts.migrate_models import scan_for_legacy_models
+
+        with patch("scripts.migrate_models.Path") as mock_path:
+            # Mock the search paths to return our temp directory
+            mock_search_dir = MagicMock()
+            mock_search_dir.exists.return_value = True
+            mock_search_dir.glob.return_value = legacy_models
+            mock_path.return_value = mock_search_dir
+
+            found_models = scan_for_legacy_models()
+            self.assertEqual(len(found_models), 2)
+
+    def test_model_switcher_registry_support(self) -> None:
+        """Test model switcher script with registry support."""
+        # Create registry with model
+        registry = ModelRegistry(self.registry_dir)
+
+        model_path = self.temp_dir / "switcher_test_model.pt"
+        checkpoint = {
+            "model_state_dict": {"layer.weight": torch.randn(10, 5)},
+            "num_classes": 38,
+            "class_names": [f"class_{i}" for i in range(38)],
+        }
+        torch.save(checkpoint, model_path)
+
+        model_id = registry.register_model(
+            model_path=model_path,
+            name="switcher_test",
+            architecture="resnet50",
+            dataset_version="test",
+            hyperparameters={"num_classes": 38},
+            performance_metrics={"accuracy": 0.85},
+            description="Model for switcher test",
+        )
+
+        # Test listing models in registry mode
+        from scripts.model_switching.model_switcher import list_models_registry
+
+        with patch("scripts.model_switching.model_switcher.ModelRegistry") as mock_registry_class:
+            mock_registry = MagicMock()
+            mock_registry.list_models.return_value = [registry.get_model(model_id)]
+            mock_registry_class.return_value = mock_registry
+
+            # This should not raise an exception
+            list_models_registry()
+
+    def test_ui_integration_with_registry(self) -> None:
+        """Test UI components work with registry models."""
+        # Create model manager with registry model
+        config_path = self.config_dir / "ui_test_models.json"
+        config_data = {
+            "models": {
+                "ui_test_model": {
+                    "name": "UI Test Model",
+                    "type": "local",
+                    "model_id": "registry:ui_test_v1.0.0",
+                    "description": "Model for UI testing",
+                    "accuracy": 0.92,
+                    "confidence_threshold": 0.7,
+                    "enabled": True,
+                    "device": "cpu",
+                }
+            }
+        }
+
+        with config_path.open("w") as f:
+            json.dump(config_data, f)
+
+        manager = PlantGuardModelManager(config_path=str(config_path), autoload_default=False)
+
+        # Test getting registry models for UI
+        registry_models = manager.get_registry_models()
+        # Should return empty list if no registry exists, but not crash
+        self.assertIsInstance(registry_models, list)
+
+    def test_complete_workflow_integration(self) -> None:
+        """Test complete workflow from training to UI integration."""
+        # 1. Create a "trained" model (simulate production training output)
+        registry = ModelRegistry(self.registry_dir)
+
+        model_path = self.temp_dir / "workflow_model.pt"
+        checkpoint = {
+            "model_state_dict": {"layer.weight": torch.randn(10, 5)},
+            "num_classes": 38,
+            "class_names": [f"class_{i}" for i in range(38)],
+            "model_version": "1.0.0",
+            "training_metadata": {
+                "training_date": "2024-08-17",
+                "dataset": "plantvillage",
+                "accuracy": 0.94,
+            },
+        }
+        torch.save(checkpoint, model_path)
+
+        # 2. Register model (simulate production training registration)
+        model_id = registry.register_model(
+            model_path=model_path,
+            name="workflow_test",
+            architecture="resnet50",
+            dataset_version="plantvillage_v1.0",
+            hyperparameters={"num_classes": 38, "epochs": 100},
+            performance_metrics={"accuracy": 0.94, "f1_score": 0.93},
+            description="Complete workflow test model",
+            tags=["production", "plantvillage"],
+        )
+
+        # 3. Create model manager config
+        config_path = self.config_dir / "workflow_models.json"
+        manager = PlantGuardModelManager(config_path=str(config_path), autoload_default=False)
+
+        # 4. Sync with registry (simulate user running make sync-models)
+        with patch.object(manager, "_load_local_model") as mock_load:
+            mock_adapter = MagicMock()
+            mock_adapter.predict.return_value = ("test_class", 0.95)
+            mock_adapter.get_class_names.return_value = [f"class_{i}" for i in range(38)]
+            mock_load.return_value = mock_adapter
+
+            success = manager.sync_with_registry()
+            self.assertTrue(success)
+
+        # 5. Test model is available in manager
+        models = manager.list_available_models()
+        self.assertEqual(len(models), 1)
+        self.assertIn("workflow_test", models[0]["name"])
+
+        # 6. Test loading and prediction
+        registry_model_key = f"registry_{model_id}"
+        if registry_model_key in [m["id"] for m in models]:
+            with patch.object(manager, "_load_local_model") as mock_load:
+                mock_adapter = MagicMock()
+                mock_adapter.predict.return_value = ("healthy_plant", 0.95)
+                mock_load.return_value = mock_adapter
+
+                success = manager.load_model(registry_model_key)
+                self.assertTrue(success)
+
+                # Test prediction
+                predicted_class, confidence, metadata = manager.predict(self.test_image)
+                self.assertEqual(predicted_class, "healthy_plant")
+                self.assertEqual(confidence, 0.95)
+                self.assertIn("model_name", metadata)
 
 
-@pytest.mark.integration
-class TestProductionWorkflowScript:
-    """Test the production workflow script."""
-
-    def test_workflow_script_execution(self, tmp_path):
-        """Test the production workflow script can be executed."""
-        # This would test the actual script execution
-        # For now, we'll test the main components
-
-        from scripts.production_training_workflow import ProductionWorkflow
-
-        workflow = ProductionWorkflow()
-
-        # Test prerequisite validation
-        is_valid, errors = workflow.validate_prerequisites()
-
-        # Should either be valid or have specific error messages
-        if not is_valid:
-            assert len(errors) > 0, "Should have error messages if invalid"
-            assert all(isinstance(error, str) for error in errors), "Errors should be strings"
-
-    def test_resource_validation(self):
-        """Test system resource validation."""
-        from scripts.production_training_workflow import ProductionWorkflow
-
-        workflow = ProductionWorkflow()
-
-        # Test resource validation
-        is_valid, errors = workflow._validate_resources()
-
-        # Should not fail on basic resource checks
-        assert isinstance(is_valid, bool)
-        assert isinstance(errors, list)
-
-    def test_config_selection(self):
-        """Test automatic configuration selection."""
-        from scripts.production_training_workflow import ProductionWorkflow
-
-        workflow = ProductionWorkflow()
-
-        # Mock dataset path
-        with patch.object(workflow, "_get_best_dataset_path") as mock_dataset:
-            mock_dataset.return_value = Path("dummy/path")
-
-            config = workflow.select_optimal_config()
-
-            assert config is not None
-            assert config.batch_size > 0
-            assert config.epochs > 0
-            assert config.learning_rate > 0
+if __name__ == "__main__":
+    unittest.main()

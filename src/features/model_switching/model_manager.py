@@ -138,6 +138,35 @@ class PlantGuardModelManager:
             },
         }
 
+        # Check for registry models and add them
+        try:
+            from src.training.model_registry import ModelRegistry
+
+            registry = ModelRegistry()
+            registry_models = registry.list_models()
+
+            for model_info in registry_models:
+                model_key = f"registry_{model_info.metadata.model_id}"
+                accuracy = model_info.metadata.performance_metrics.get("accuracy", 0.0)
+
+                default_config["models"][model_key] = {
+                    "name": f"{model_info.metadata.model_id} (Registry)",
+                    "type": "local",
+                    "model_id": f"registry:{model_info.metadata.model_id}",
+                    "description": f"Production model from registry: {model_info.metadata.description or 'No description'}",
+                    "accuracy": accuracy,
+                    "confidence_threshold": 0.7,
+                    "enabled": True,
+                    "device": "auto",
+                }
+
+                # Set as default if it's a high-performing model
+                if accuracy > 0.9 and not default_config.get("default_model"):
+                    default_config["default_model"] = model_key
+
+        except Exception as e:
+            logger.warning("Could not load registry models for config: %s", e)
+
         # Create config directory
         self.config_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -260,7 +289,16 @@ class PlantGuardModelManager:
 
         device_str = config.device_preference if config.device_preference != "auto" else str(self.device)
         adapter = VisionAdapter(device=device_str)
-        adapter.load_checkpoint(config.model_id)
+
+        # Check if this is a registry model ID or a file path
+        if config.model_id.startswith("registry:"):
+            # Load from registry
+            registry_model_id = config.model_id[9:]  # Remove "registry:" prefix
+            adapter.load_from_registry(registry_model_id)
+        else:
+            # Load from file path (legacy)
+            adapter.load_checkpoint(config.model_id)
+
         return adapter
 
     def predict(self, image: Image.Image) -> tuple[str, float, dict[str, Any]]:
@@ -400,3 +438,177 @@ class PlantGuardModelManager:
         except Exception as e:
             logger.error("Failed to update model config: %s", e)
             return False
+
+    def sync_with_registry(self) -> bool:
+        """Sync model configuration with the model registry.
+
+        This adds any new registry models to the configuration and updates
+        existing ones with latest metadata.
+
+        Returns:
+            True if sync successful, False otherwise
+        """
+        try:
+            from src.training.model_registry import ModelRegistry
+
+            registry = ModelRegistry()
+            registry_models = registry.list_models()
+
+            # Load current config
+            with self.config_path.open(encoding="utf-8") as f:
+                config_data = json.load(f)
+
+            updated = False
+
+            for model_info in registry_models:
+                model_key = f"registry_{model_info.metadata.model_id}"
+                registry_model_id = f"registry:{model_info.metadata.model_id}"
+                accuracy = model_info.metadata.performance_metrics.get("accuracy", 0.0)
+
+                # Check if model already exists in config
+                existing_model = None
+                for key, model_config in config_data["models"].items():
+                    if model_config.get("model_id") == registry_model_id:
+                        existing_model = key
+                        break
+
+                model_config = {
+                    "name": f"{model_info.metadata.model_id} (Registry)",
+                    "type": "local",
+                    "model_id": registry_model_id,
+                    "description": f"Production model: {model_info.metadata.description or 'Trained model from registry'}",
+                    "accuracy": accuracy,
+                    "confidence_threshold": 0.7,
+                    "enabled": True,
+                    "device": "auto",
+                }
+
+                if existing_model:
+                    # Update existing model
+                    config_data["models"][existing_model].update(model_config)
+                    logger.info("Updated registry model in config: %s", existing_model)
+                else:
+                    # Add new model
+                    config_data["models"][model_key] = model_config
+                    logger.info("Added new registry model to config: %s", model_key)
+
+                updated = True
+
+            if updated:
+                # Save updated config
+                with self.config_path.open("w", encoding="utf-8") as f:
+                    json.dump(config_data, f, indent=2)
+
+                # Reload configs
+                self.load_model_configs()
+                logger.info("Successfully synced with model registry")
+
+            return True
+
+        except Exception as e:
+            logger.error("Failed to sync with registry: %s", e)
+            return False
+
+    def migrate_legacy_models(self) -> list[str]:
+        """Migrate legacy model files to the new registry format.
+
+        Returns:
+            List of migrated model IDs
+        """
+        migrated_models = []
+
+        try:
+            from src.core.vision import VisionAdapter
+            from src.training.model_registry import ModelRegistry
+
+            registry = ModelRegistry()
+            adapter = VisionAdapter()
+
+            # Look for legacy model files
+            legacy_paths = [
+                "data/models/vision_resnet50.pt",
+                "data/models/best_model.pt",
+                "data/models/plantguard_model.pt",
+            ]
+
+            for legacy_path in legacy_paths:
+                legacy_file = Path(legacy_path)
+                if not legacy_file.exists():
+                    continue
+
+                # Check if it's already in registry format
+                if adapter.is_compatible_with_registry_format(str(legacy_file)):
+                    logger.info("Model already in registry format: %s", legacy_path)
+                    continue
+
+                try:
+                    # Create migrated model path
+                    migrated_name = f"migrated_{legacy_file.stem}"
+                    migrated_path = legacy_file.parent / f"{migrated_name}.pt"
+
+                    # Migrate the model
+                    adapter.migrate_legacy_model(str(legacy_file), str(migrated_path))
+
+                    # Register in registry
+                    model_id = registry.register_model(
+                        model_path=migrated_path,
+                        name=migrated_name,
+                        architecture="resnet50",
+                        dataset_version="legacy",
+                        hyperparameters={"migrated": True, "original_path": str(legacy_file)},
+                        performance_metrics={"accuracy": 0.0},  # Unknown accuracy
+                        description=f"Migrated from legacy model: {legacy_file.name}",
+                        tags=["migrated", "legacy"],
+                    )
+
+                    migrated_models.append(model_id)
+                    logger.info("Successfully migrated model: %s -> %s", legacy_path, model_id)
+
+                except Exception as e:
+                    logger.error("Failed to migrate model %s: %s", legacy_path, e)
+                    continue
+
+            # Sync configuration after migration
+            if migrated_models:
+                self.sync_with_registry()
+
+            return migrated_models
+
+        except Exception as e:
+            logger.error("Migration process failed: %s", e)
+            return []
+
+    def get_registry_models(self) -> list[dict[str, Any]]:
+        """Get all models from the registry with their details.
+
+        Returns:
+            List of registry model information
+        """
+        try:
+            from src.training.model_registry import ModelRegistry
+
+            registry = ModelRegistry()
+            registry_models = registry.list_models()
+
+            models = []
+            for model_info in registry_models:
+                models.append(
+                    {
+                        "id": model_info.metadata.model_id,
+                        "version": model_info.metadata.version,
+                        "name": model_info.metadata.model_id,
+                        "architecture": model_info.metadata.architecture,
+                        "training_date": model_info.metadata.training_date.isoformat(),
+                        "accuracy": model_info.metadata.performance_metrics.get("accuracy", 0.0),
+                        "dataset_version": model_info.metadata.dataset_version,
+                        "description": model_info.metadata.description,
+                        "file_size": model_info.metadata.file_size,
+                        "tags": model_info.metadata.tags,
+                    }
+                )
+
+            return models
+
+        except Exception as e:
+            logger.error("Failed to get registry models: %s", e)
+            return []

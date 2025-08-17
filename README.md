@@ -55,6 +55,10 @@ PlantGuard is a production-ready multimodal AI system for plant disease detectio
 - [x] **Complete production training system** with robust error handling and recovery
 - [x] **Advanced dataset management** with DatasetManager for download, validation, and preparation
 - [x] **Kaggle integration** for automatic PlantVillage dataset acquisition
+- [x] **Model registry integration** with existing VisionAdapter and model switcher
+- [x] **Backward compatibility** with legacy model files and configurations
+- [x] **Automatic model migration** from legacy to registry format
+- [x] **Seamless UI integration** with enhanced model management capabilities
 - [x] **Dataset validation** with integrity checking and corruption detection
 - [x] **Dataset analysis** with comprehensive statistics and class distribution reporting
 - [x] **Production trainer** with checkpoint management and training resumption
@@ -242,6 +246,9 @@ make train-production # Complete production training pipeline with optimal setti
 make monitor-training # Launch TensorBoard for training monitoring
 make evaluate-model  # Comprehensive model evaluation and testing
 make list-models     # Show all available models with performance metrics
+make migrate-models  # Migrate legacy models to registry format
+make sync-models     # Sync model configuration with registry
+make switch-model MODEL_ID=name  # Switch to specific model
 make setup-dataset   # Show dataset status and setup options
 make download-dataset # Download PlantVillage dataset from Kaggle
 make prepare-dataset # Prepare dataset with train/val splits

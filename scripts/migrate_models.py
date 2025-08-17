@@ -1,296 +1,306 @@
 #!/usr/bin/env python3
-"""Model Migration Script
+"""Migration utility for upgrading PlantGuard models to the new registry format.
 
-This script migrates existing PlantGuard models to the new registry format.
-It scans for legacy models and converts them to the new format with proper metadata.
+This script helps migrate existing PlantGuard models to the new production
+training pipeline format with proper versioning and metadata.
 """
 
 import argparse
-import logging
+import json
 import sys
-import time
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import torch
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-# Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-
-from core.vision import VisionAdapter
-from training.model_registry import ModelRegistry
-from utils.logging_config import setup_logging
+from src.core.vision import VisionAdapter
+from src.training.model_registry import ModelRegistry
 
 
-class ModelMigrator:
-    """Handles migration of legacy models to new registry format."""
+def scan_for_legacy_models() -> list[Path]:
+    """Scan for legacy model files that need migration.
 
-    def __init__(self):
-        """Initialize model migrator."""
-        self.logger = logging.getLogger(__name__)
-        self.registry = ModelRegistry()
-        self.legacy_paths = [
-            "data/models",
-            "data/vision_resnet50.pt",
-            "data/models/vision_resnet50.pt",
-            "data/models/plantguard_model.pt",
-        ]
+    Returns:
+        List of paths to legacy model files
+    """
+    legacy_paths = []
 
-    def find_legacy_models(self) -> list[Path]:
-        """Find all legacy model files that need migration.
+    # Common locations for legacy models
+    search_paths = [
+        "data/models",
+        "models",
+        "checkpoints",
+    ]
 
-        Returns:
-            List of paths to legacy model files
-        """
-        legacy_models = []
+    for search_path in search_paths:
+        search_dir = Path(search_path)
+        if not search_dir.exists():
+            continue
 
-        for path_str in self.legacy_paths:
-            path = Path(path_str)
-
-            if path.is_file() and path.suffix == ".pt":
-                # Check if it's a legacy format
-                adapter = VisionAdapter()
-                if not adapter.is_compatible_with_registry_format(str(path)):
-                    legacy_models.append(path)
-                    self.logger.info(f"Found legacy model: {path}")
-
-            elif path.is_dir():
-                # Scan directory for .pt files
-                for model_file in path.glob("*.pt"):
-                    adapter = VisionAdapter()
-                    if not adapter.is_compatible_with_registry_format(str(model_file)):
-                        legacy_models.append(model_file)
-                        self.logger.info(f"Found legacy model: {model_file}")
-
-        return legacy_models
-
-    def analyze_legacy_model(self, model_path: Path) -> dict[str, Any]:
-        """Analyze a legacy model to extract metadata.
-
-        Args:
-            model_path: Path to legacy model
-
-        Returns:
-            Dictionary with model metadata
-        """
-        try:
-            # Load checkpoint to analyze
-            checkpoint = torch.load(model_path, map_location="cpu")
-
-            metadata = {
-                "original_path": str(model_path),
-                "file_size": model_path.stat().st_size,
-                "modification_time": model_path.stat().st_mtime,
-                "architecture": "resnet50",  # Default for PlantGuard
-                "num_classes": checkpoint.get("num_classes", 38),
-                "class_names": checkpoint.get("class_names", []),
-                "training_metadata": {},
-            }
-
-            # Try to extract additional info from filename
-            filename = model_path.stem
-            if "resnet" in filename.lower():
-                metadata["architecture"] = "resnet50"
-            elif "vit" in filename.lower():
-                metadata["architecture"] = "vit"
-
-            # Check for training info in checkpoint
-            if "epoch" in checkpoint:
-                metadata["training_metadata"]["final_epoch"] = checkpoint["epoch"]
-            if "best_accuracy" in checkpoint:
-                metadata["training_metadata"]["best_accuracy"] = checkpoint["best_accuracy"]
-            if "optimizer_state_dict" in checkpoint:
-                metadata["training_metadata"]["has_optimizer_state"] = True
-
-            return metadata
-
-        except Exception as e:
-            self.logger.error(f"Failed to analyze model {model_path}: {e}")
-            return {}
-
-    def migrate_model(self, model_path: Path, metadata: dict[str, Any]) -> str:
-        """Migrate a single legacy model to the new format.
-
-        Args:
-            model_path: Path to legacy model
-            metadata: Model metadata
-
-        Returns:
-            Model ID in registry, or empty string if failed
-        """
-        try:
-            self.logger.info(f"Migrating model: {model_path}")
-
-            # Create migrated model path
-            migrated_dir = Path("data/models/migrated")
-            migrated_dir.mkdir(parents=True, exist_ok=True)
-
-            timestamp = int(time.time())
-            migrated_path = migrated_dir / f"migrated_{model_path.stem}_{timestamp}.pt"
-
-            # Use VisionAdapter to perform migration
+        # Look for .pt files
+        for model_file in search_dir.glob("*.pt"):
+            # Skip if already migrated or in registry format
             adapter = VisionAdapter()
-            adapter.migrate_legacy_model(str(model_path), str(migrated_path))
+            if not adapter.is_compatible_with_registry_format(str(model_file)):
+                legacy_paths.append(model_file)
 
-            # Prepare registry metadata
-            registry_metadata = {
-                "model_id": f"migrated_{model_path.stem}_{timestamp}",
-                "version": "1.0.0",
-                "architecture": metadata.get("architecture", "resnet50"),
-                "training_date": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(metadata.get("modification_time", time.time()))),
-                "dataset_version": "legacy",
-                "hyperparameters": metadata.get("training_metadata", {}),
-                "performance_metrics": {},
-                "migration_info": {
-                    "migrated_from": str(model_path),
-                    "migration_date": time.strftime("%Y-%m-%d %H:%M:%S"),
-                    "original_size": metadata.get("file_size", 0),
-                },
-            }
-
-            # Add performance metrics if available
-            if "best_accuracy" in metadata.get("training_metadata", {}):
-                registry_metadata["performance_metrics"]["accuracy"] = metadata["training_metadata"]["best_accuracy"]
-
-            # Register in model registry
-            model_id = self.registry.register_model(migrated_path, registry_metadata)
-
-            self.logger.info(f"✅ Model migrated successfully: {model_id}")
-            return model_id
-
-        except Exception as e:
-            self.logger.error(f"❌ Failed to migrate model {model_path}: {e}")
-            return ""
-
-    def migrate_all_models(self, dry_run: bool = False) -> dict[str, str]:
-        """Migrate all found legacy models.
-
-        Args:
-            dry_run: If True, only analyze models without migrating
-
-        Returns:
-            Dictionary mapping original paths to new model IDs
-        """
-        legacy_models = self.find_legacy_models()
-
-        if not legacy_models:
-            self.logger.info("No legacy models found to migrate")
-            return {}
-
-        self.logger.info(f"Found {len(legacy_models)} legacy models to migrate")
-
-        migration_results = {}
-
-        for model_path in legacy_models:
-            self.logger.info(f"Processing: {model_path}")
-
-            # Analyze model
-            metadata = self.analyze_legacy_model(model_path)
-            if not metadata:
-                self.logger.warning(f"Skipping {model_path} - analysis failed")
-                continue
-
-            # Show analysis results
-            self.logger.info(f"  Architecture: {metadata.get('architecture', 'unknown')}")
-            self.logger.info(f"  Classes: {metadata.get('num_classes', 'unknown')}")
-            self.logger.info(f"  Size: {metadata.get('file_size', 0) / (1024 * 1024):.1f} MB")
-
-            if dry_run:
-                self.logger.info("  [DRY RUN] Would migrate to registry")
-                migration_results[str(model_path)] = "dry_run"
-            else:
-                # Perform migration
-                model_id = self.migrate_model(model_path, metadata)
-                if model_id:
-                    migration_results[str(model_path)] = model_id
-
-        return migration_results
-
-    def create_backup(self, model_paths: list[Path]) -> Path:
-        """Create backup of legacy models before migration.
-
-        Args:
-            model_paths: List of model paths to backup
-
-        Returns:
-            Path to backup directory
-        """
-        backup_dir = Path("data/models/backup") / f"backup_{int(time.time())}"
-        backup_dir.mkdir(parents=True, exist_ok=True)
-
-        for model_path in model_paths:
-            if model_path.exists():
-                backup_path = backup_dir / model_path.name
-                backup_path.write_bytes(model_path.read_bytes())
-                self.logger.info(f"Backed up: {model_path} -> {backup_path}")
-
-        return backup_dir
+    return legacy_paths
 
 
-def main():
-    """Main entry point."""
-    parser = argparse.ArgumentParser(description="PlantGuard Model Migration Tool")
-    parser.add_argument("--dry-run", action="store_true", help="Analyze models without migrating them")
-    parser.add_argument("--backup", action="store_true", help="Create backup of legacy models before migration")
-    parser.add_argument("--model", type=Path, help="Migrate specific model file")
-    parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], default="INFO", help="Logging level")
+def migrate_model(
+    model_path: Path,
+    registry: ModelRegistry,
+    name: str | None = None,
+    description: str | None = None,
+    architecture: str = "resnet50",
+    dataset_version: str = "unknown",
+) -> str | None:
+    """Migrate a single model to registry format.
+
+    Args:
+        model_path: Path to legacy model file
+        registry: ModelRegistry instance
+        name: Optional model name (defaults to filename)
+        description: Optional model description
+        architecture: Model architecture
+        dataset_version: Dataset version used for training
+
+    Returns:
+        Model ID if successful, None if failed
+    """
+    try:
+        print(f"🔄 Migrating: {model_path}")
+
+        # Create VisionAdapter for migration
+        adapter = VisionAdapter()
+
+        # Generate migrated model path
+        migrated_name = name or f"migrated_{model_path.stem}"
+        migrated_path = model_path.parent / f"{migrated_name}_registry.pt"
+
+        # Migrate the model file
+        adapter.migrate_legacy_model(str(model_path), str(migrated_path))
+
+        # Extract metadata from migrated model
+        try:
+            checkpoint = adapter._load_checkpoint_metadata(str(migrated_path))
+            num_classes = checkpoint.get("num_classes", 38)
+            class_names = checkpoint.get("class_names", [])
+        except Exception:
+            num_classes = 38
+            class_names = []
+
+        # Register in registry
+        model_id = registry.register_model(
+            model_path=migrated_path,
+            name=migrated_name,
+            architecture=architecture,
+            dataset_version=dataset_version,
+            hyperparameters={
+                "num_classes": num_classes,
+                "class_names": class_names,
+                "migrated_from": str(model_path),
+                "migration_tool": "migrate_models.py",
+            },
+            performance_metrics={"accuracy": 0.0},  # Unknown accuracy
+            description=description or f"Migrated from legacy model: {model_path.name}",
+            tags=["migrated", "legacy"],
+        )
+
+        print(f"✅ Successfully migrated: {model_path} -> {model_id}")
+        return model_id
+
+    except Exception as e:
+        print(f"❌ Failed to migrate {model_path}: {e}")
+        return None
+
+
+def update_model_manager_config(migrated_models: list[str]) -> None:
+    """Update model manager configuration with migrated models.
+
+    Args:
+        migrated_models: List of migrated model IDs
+    """
+    try:
+        from src.features.model_switching.model_manager import PlantGuardModelManager
+
+        manager = PlantGuardModelManager(autoload_default=False)
+
+        # Sync with registry to pick up new models
+        if manager.sync_with_registry():
+            print("✅ Updated model manager configuration")
+        else:
+            print("⚠️  Could not update model manager configuration")
+
+    except Exception as e:
+        print(f"⚠️  Could not update model manager: {e}")
+
+
+def create_migration_report(
+    legacy_models: list[Path],
+    migrated_models: list[str],
+    failed_models: list[Path],
+) -> None:
+    """Create a migration report.
+
+    Args:
+        legacy_models: List of legacy model paths found
+        migrated_models: List of successfully migrated model IDs
+        failed_models: List of models that failed to migrate
+    """
+    report = {
+        "migration_summary": {
+            "total_found": len(legacy_models),
+            "successfully_migrated": len(migrated_models),
+            "failed": len(failed_models),
+        },
+        "migrated_models": migrated_models,
+        "failed_models": [str(p) for p in failed_models],
+        "recommendations": [],
+    }
+
+    # Add recommendations
+    if migrated_models:
+        report["recommendations"].append("Run 'python scripts/model_switching/model_switcher.py --list' to see migrated models")
+        report["recommendations"].append("Test migrated models with 'python scripts/model_switching/model_switcher.py --switch MODEL_ID --test IMAGE_PATH'")
+
+    if failed_models:
+        report["recommendations"].append("Check failed models manually - they may be corrupted or in an unsupported format")
+
+    # Save report
+    report_path = Path("migration_report.json")
+    with report_path.open("w") as f:
+        json.dump(report, f, indent=2)
+
+    print("\n📋 Migration Report:")
+    print(f"   Total models found: {len(legacy_models)}")
+    print(f"   Successfully migrated: {len(migrated_models)}")
+    print(f"   Failed migrations: {len(failed_models)}")
+    print(f"   Report saved to: {report_path}")
+
+
+def main() -> None:
+    """Main migration utility."""
+    parser = argparse.ArgumentParser(description="Migrate PlantGuard models to registry format")
+    parser.add_argument("--scan", "-s", action="store_true", help="Scan for legacy models")
+    parser.add_argument("--migrate", "-m", type=str, help="Migrate specific model file")
+    parser.add_argument("--migrate-all", "-a", action="store_true", help="Migrate all found legacy models")
+    parser.add_argument("--name", "-n", type=str, help="Name for migrated model")
+    parser.add_argument("--description", "-d", type=str, help="Description for migrated model")
+    parser.add_argument("--architecture", type=str, default="resnet50", help="Model architecture")
+    parser.add_argument("--dataset", type=str, default="unknown", help="Dataset version")
+    parser.add_argument("--dry-run", action="store_true", help="Show what would be migrated without doing it")
 
     args = parser.parse_args()
 
-    # Setup logging
-    setup_logging(level=args.log_level)
-    logger = logging.getLogger(__name__)
-
-    # Initialize migrator
-    migrator = ModelMigrator()
-
+    # Initialize registry
     try:
-        if args.model:
-            # Migrate specific model
-            if not args.model.exists():
-                logger.error(f"Model file not found: {args.model}")
-                sys.exit(1)
-
-            metadata = migrator.analyze_legacy_model(args.model)
-            if not metadata:
-                logger.error(f"Failed to analyze model: {args.model}")
-                sys.exit(1)
-
-            if args.dry_run:
-                logger.info(f"[DRY RUN] Would migrate: {args.model}")
-                logger.info(f"  Architecture: {metadata.get('architecture')}")
-                logger.info(f"  Classes: {metadata.get('num_classes')}")
-            else:
-                if args.backup:
-                    migrator.create_backup([args.model])
-
-                model_id = migrator.migrate_model(args.model, metadata)
-                if model_id:
-                    logger.info(f"✅ Migration successful: {model_id}")
-                else:
-                    logger.error("❌ Migration failed")
-                    sys.exit(1)
-
-        else:
-            # Migrate all legacy models
-            legacy_models = migrator.find_legacy_models()
-
-            if args.backup and legacy_models and not args.dry_run:
-                backup_dir = migrator.create_backup(legacy_models)
-                logger.info(f"📦 Backup created: {backup_dir}")
-
-            results = migrator.migrate_all_models(dry_run=args.dry_run)
-
-            if results:
-                logger.info(f"🎉 Migration completed: {len(results)} models processed")
-                for original, model_id in results.items():
-                    logger.info(f"  {Path(original).name} -> {model_id}")
-            else:
-                logger.info("No models were migrated")
-
+        registry = ModelRegistry()
     except Exception as e:
-        logger.error(f"Migration failed: {e}")
-        sys.exit(1)
+        print(f"❌ Failed to initialize model registry: {e}")
+        return
+
+    if args.scan or args.migrate_all:
+        # Scan for legacy models
+        print("🔍 Scanning for legacy models...")
+        legacy_models = scan_for_legacy_models()
+
+        if not legacy_models:
+            print("✅ No legacy models found - all models are already in registry format")
+            return
+
+        print(f"📋 Found {len(legacy_models)} legacy models:")
+        for model_path in legacy_models:
+            print(f"   - {model_path}")
+
+        if args.scan:
+            return
+
+        if args.dry_run:
+            print("\n🔍 Dry run - would migrate:")
+            for model_path in legacy_models:
+                print(f"   - {model_path} -> migrated_{model_path.stem}")
+            return
+
+        # Migrate all found models
+        print(f"\n🚀 Starting migration of {len(legacy_models)} models...")
+        migrated_models = []
+        failed_models = []
+
+        for model_path in legacy_models:
+            model_id = migrate_model(
+                model_path,
+                registry,
+                architecture=args.architecture,
+                dataset_version=args.dataset,
+            )
+
+            if model_id:
+                migrated_models.append(model_id)
+            else:
+                failed_models.append(model_path)
+
+        # Update model manager configuration
+        if migrated_models:
+            update_model_manager_config(migrated_models)
+
+        # Create migration report
+        create_migration_report(legacy_models, migrated_models, failed_models)
+
+    elif args.migrate:
+        # Migrate specific model
+        model_path = Path(args.migrate)
+
+        if not model_path.exists():
+            print(f"❌ Model file not found: {model_path}")
+            return
+
+        if args.dry_run:
+            print(f"🔍 Dry run - would migrate: {model_path}")
+            return
+
+        model_id = migrate_model(
+            model_path,
+            registry,
+            name=args.name,
+            description=args.description,
+            architecture=args.architecture,
+            dataset_version=args.dataset,
+        )
+
+        if model_id:
+            update_model_manager_config([model_id])
+            print("\n✅ Migration completed successfully!")
+            print(f"   Model ID: {model_id}")
+            print(f"   Test with: python scripts/model_switching/model_switcher.py --switch {model_id}")
+        else:
+            print("❌ Migration failed")
+
+    else:
+        # Show help and current status
+        parser.print_help()
+
+        print("\n" + "=" * 60)
+        print("🔧 PlantGuard Model Migration Utility")
+        print("=" * 60)
+
+        # Show registry status
+        models = registry.list_models()
+        print(f"📊 Current registry status: {len(models)} models")
+
+        # Quick scan
+        legacy_models = scan_for_legacy_models()
+        if legacy_models:
+            print(f"⚠️  Found {len(legacy_models)} legacy models that need migration")
+            print("   Run with --migrate-all to migrate them")
+        else:
+            print("✅ No legacy models found")
+
+        print("\n💡 Quick Commands:")
+        print("  python scripts/migrate_models.py --scan                    # Scan for legacy models")
+        print("  python scripts/migrate_models.py --migrate-all             # Migrate all legacy models")
+        print("  python scripts/migrate_models.py --migrate MODEL.pt       # Migrate specific model")
 
 
 if __name__ == "__main__":

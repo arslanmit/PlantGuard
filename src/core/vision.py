@@ -316,7 +316,7 @@ class VisionAdapter:
         """
         try:
             # Import here to avoid circular imports
-            from training.model_registry import ModelRegistry
+            from src.training.model_registry import ModelRegistry
 
             registry = ModelRegistry()
             model_info = registry.get_model(model_id)
@@ -332,14 +332,12 @@ class VisionAdapter:
                 metadata = model_info.metadata
 
                 # Update class mapping if available in metadata
-                if "class_names" in metadata:
-                    self.class_names = metadata["class_names"]
+                if hasattr(metadata, "hyperparameters") and "class_names" in metadata.hyperparameters:
+                    self.class_names = metadata.hyperparameters["class_names"]
 
-                # Load class mapping file if specified
-                if "class_mapping_path" in metadata:
-                    mapping_path = metadata["class_mapping_path"]
-                    if Path(mapping_path).exists():
-                        self.load_class_mapping(mapping_path)
+                # Load class mapping file if available
+                if model_info.classes_path and model_info.classes_path.exists():
+                    self.load_class_mapping(str(model_info.classes_path))
 
             logger.info("Model loaded from registry: %s", model_id)
 
@@ -413,6 +411,28 @@ class VisionAdapter:
 
         except Exception as error:
             logger.exception("Model migration failed")
+            raise LoadCheckpointError() from error
+
+    def _load_checkpoint_metadata(self, path: str) -> dict[str, Any]:
+        """Load checkpoint metadata without loading the full model.
+
+        Args:
+            path: Path to checkpoint file
+
+        Returns:
+            Dictionary with checkpoint metadata
+        """
+        try:
+            # Load checkpoint metadata only
+            try:
+                checkpoint = torch.load(path, map_location="cpu", weights_only=True)
+            except TypeError:
+                checkpoint = torch.load(path, map_location="cpu")
+
+            return checkpoint
+
+        except Exception as error:
+            logger.exception("Failed to load checkpoint metadata")
             raise LoadCheckpointError() from error
 
     def preprocess_image(self, image: Image.Image) -> torch.Tensor:
