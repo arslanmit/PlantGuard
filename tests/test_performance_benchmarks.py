@@ -2,6 +2,11 @@
 
 These tests measure and validate performance characteristics of the training system.
 """
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 import shutil
 import tempfile
@@ -58,30 +63,40 @@ class TestPerformanceBenchmarks:
     @pytest.fixture
     def benchmark_config(self, benchmark_dataset, temp_dir):
         """Create configuration for benchmarking."""
-        return TrainingConfig(
-            experiment_name="benchmark_test",
-            dataset_path=benchmark_dataset,
-            model_architecture="resnet50",
-            num_classes=4,
-            epochs=5,  # Reasonable for benchmarking
-            batch_size=16,
-            learning_rate=0.001,
-            device="cpu",  # Use CPU for consistent benchmarking
-            output_dir=temp_dir / "models",
-            num_workers=2,
-        )
+        config = TrainingConfig()
+        config.experiment_name = "benchmark_test"
+        config.model_architecture = "resnet50"
+        config.num_classes = 4
+        config.epochs = 5  # Reasonable for benchmarking
+        config.batch_size = 16
+        config.learning_rate = 0.001
+        config.device = "cpu"  # Use CPU for consistent benchmarking
+        config.num_workers = 2
+        
+        # Set dataset path in the dataset manager
+        self.dataset_manager = DatasetManager()
+        self.dataset_manager.base_data_dir = benchmark_dataset
+        
+        return config
 
-    def test_training_speed_benchmark(self, benchmark_config, temp_dir):
+    def test_training_speed_benchmark(self, benchmark_config, benchmark_dataset):
         """Benchmark training speed and set performance expectations."""
+        # Update config to use the benchmark dataset
+        benchmark_config.data_dir = str(benchmark_dataset)
+        
+        # Ensure num_classes matches the benchmark dataset (4 classes)
+        benchmark_config.num_classes = 4
+        
         dataset_manager = DatasetManager()
         trainer = ProductionTrainer(benchmark_config, dataset_manager)
 
         # Measure setup time
         setup_start = time.time()
-        assert trainer.setup_training()
+        setup_success = trainer.setup_training()
         setup_time = time.time() - setup_start
 
-        # Setup should be fast
+        # Setup should be fast and successful
+        assert setup_success, f"Setup failed: {getattr(trainer.error_handler, 'last_error', 'Unknown error')}"
         assert setup_time < 30, f"Setup took too long: {setup_time:.2f}s"
 
         # Measure training time
@@ -89,7 +104,10 @@ class TestPerformanceBenchmarks:
         result = trainer.train()
         train_time = time.time() - train_start
 
-        assert result.success, "Training should succeed"
+        if not result.success:
+            logger.error(f"Training failed: {result.error_message}")
+            
+        assert result.success, f"Training failed: {result.error_message}"
 
         # Performance expectations (adjust based on hardware)
         # These are reasonable expectations for CPU training
@@ -103,7 +121,12 @@ class TestPerformanceBenchmarks:
         print(f"   Setup Time: {setup_time:.2f}s")
         print(f"   Training Time: {train_time:.2f}s")
         print(f"   Time per Epoch: {train_time / benchmark_config.epochs:.2f}s")
-        print(f"   Final Accuracy: {result.best_accuracy:.3f}")
+        print(f"   Final Validation Accuracy: {result.best_val_accuracy:.3f}")
+
+        # Check if we achieved reasonable accuracy (adjust based on dataset complexity)
+        min_expected_accuracy = 0.25  # Random chance for 4 classes is 0.25
+        assert result.best_val_accuracy >= min_expected_accuracy, \
+            f"Model accuracy too low: {result.best_val_accuracy:.3f} < {min_expected_accuracy}"
 
     def test_memory_usage_benchmark(self, benchmark_config, temp_dir):
         """Benchmark memory usage during training."""
@@ -261,16 +284,17 @@ class TestPerformanceBenchmarks:
             dataset_dir = temp_dir / f"dataset_{size}"
             self._create_sized_dataset(dataset_dir, size)
 
-            config = TrainingConfig(
-                experiment_name=f"scale_test_{size}",
-                dataset_path=dataset_dir,
-                model_architecture="resnet50",
-                num_classes=2,
-                epochs=2,  # Short for scaling test
-                batch_size=8,
-                device="cpu",
-                output_dir=temp_dir / "models",
-            )
+            config = TrainingConfig()
+            config.experiment_name = f"scale_test_{size}"
+            config.model_architecture = "resnet50"
+            config.num_classes = 2
+            config.epochs = 2  # Short for scaling test
+            config.batch_size = 8
+            config.device = "cpu"
+            
+            # Set dataset path in the dataset manager
+            self.dataset_manager = DatasetManager()
+            self.dataset_manager.base_data_dir = dataset_dir
 
             # Measure training time
             dataset_manager = DatasetManager()
@@ -288,7 +312,7 @@ class TestPerformanceBenchmarks:
                 {
                     "dataset_size": size,
                     "train_time": train_time,
-                    "accuracy": result.best_accuracy,
+                    "accuracy": result.best_val_accuracy,
                     "time_per_sample": train_time / (size * 2 * 2),  # 2 classes, 2 epochs
                 }
             )
@@ -428,14 +452,15 @@ class TestRegressionBenchmarks:
         dataset_dir = tmp_path / "regression_dataset"
         self._create_minimal_dataset(dataset_dir)
 
-        config = TrainingConfig(
-            experiment_name="regression_test",
-            dataset_path=dataset_dir,
-            epochs=1,
-            batch_size=4,
-            device="cpu",
-            output_dir=tmp_path / "models",
-        )
+        config = TrainingConfig()
+        config.experiment_name = "regression_test"
+        config.epochs = 1
+        config.batch_size = 4
+        config.device = "cpu"
+        
+        # Set dataset path in the dataset manager
+        self.dataset_manager = DatasetManager()
+        self.dataset_manager.base_data_dir = dataset_dir
 
         dataset_manager = DatasetManager()
         trainer = ProductionTrainer(config, dataset_manager)
@@ -468,14 +493,15 @@ class TestRegressionBenchmarks:
         dataset_dir = tmp_path / "memory_regression_dataset"
         self._create_minimal_dataset(dataset_dir)
 
-        config = TrainingConfig(
-            experiment_name="memory_regression_test",
-            dataset_path=dataset_dir,
-            epochs=1,
-            batch_size=4,
-            device="cpu",
-            output_dir=tmp_path / "models",
-        )
+        config = TrainingConfig()
+        config.experiment_name = "memory_regression_test"
+        config.epochs = 1
+        config.batch_size = 4
+        config.device = "cpu"
+        
+        # Set dataset path in the dataset manager
+        self.dataset_manager = DatasetManager()
+        self.dataset_manager.base_data_dir = dataset_dir
 
         dataset_manager = DatasetManager()
         trainer = ProductionTrainer(config, dataset_manager)

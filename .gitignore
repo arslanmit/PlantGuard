@@ -188,18 +188,18 @@ __marimo__/
 # PlantGuard specific
 data/temp/
 
-logs/
-runs/
-*.pkl
+# logs/
+# runs/
+# *.pkl
 *.joblib
-*.wav
+# *.wav
 *.mp3
 *.m4a
 *.onnx
 *.csv
 .qodo/
 
-data/models/*
-/data/plantvillage_dummy
-/data/raw/plantvillage
+# data/models/*
+# /data/plantvillage_dummy
+# /data/raw/plantvillage
 ~/.kaggle/kaggle.json

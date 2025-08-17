@@ -448,13 +448,14 @@ class TrainingMonitor:
                 val_accuracy=val_accuracy,
                 learning_rate=learning_rate,
             )
+            # Safely get attributes with defaults
             metrics: dict[str, float | None] = {
-                "epoch": float(progress_metrics.epoch),
-                "train_loss": progress_metrics.train_loss,
-                "val_loss": progress_metrics.val_loss,
-                "val_accuracy": progress_metrics.val_accuracy,
-                "learning_rate": progress_metrics.learning_rate,
-                "eta": progress_metrics.eta,
+                "epoch": getattr(progress_metrics, 'epoch', 0.0),
+                "train_loss": getattr(progress_metrics, 'train_loss', 0.0),
+                "val_loss": val_loss,
+                "val_accuracy": val_accuracy,
+                "learning_rate": learning_rate,
+                "eta": getattr(progress_metrics, 'eta', 0.0),
             }
         return {}
 

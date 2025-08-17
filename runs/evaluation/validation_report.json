@@ -1,0 +1,46 @@
+{
+  "model_path": "data/models/converted_model.pt",
+  "validation_passed": false,
+  "overall_score": 0.0,
+  "metrics_validation": {
+    "model_path": "data/models/converted_model.pt",
+    "validation_passed": false,
+    "metrics": {
+      "accuracy": 0.0,
+      "macro_precision": 0.0,
+      "macro_recall": 0.0,
+      "macro_f1": 0.0,
+      "weighted_precision": 0.0,
+      "weighted_recall": 0.0,
+      "weighted_f1": 0.0,
+      "class_metrics": [],
+      "total_samples": 0,
+      "num_classes": 0,
+      "evaluation_time": 0.0,
+      "confusion_matrix": [],
+      "class_names": [],
+      "roc_auc_macro": null,
+      "roc_auc_weighted": null,
+      "roc_curves": null
+    },
+    "quality_score": 0.0,
+    "issues": [
+      "Failed to load model"
+    ],
+    "recommendations": [
+      "Fix model loading issues before validation"
+    ]
+  },
+  "sample_test_results": [],
+  "regression_analysis": null,
+  "sample_accuracy": 0.0,
+  "avg_confidence": 0.0,
+  "high_confidence_ratio": 0.0,
+  "critical_issues": [
+    "Failed to load model"
+  ],
+  "warnings": [],
+  "recommendations": [],
+  "validation_time": 0.5616660118103027,
+  "timestamp": "2025-08-17 14:44:33"
+}

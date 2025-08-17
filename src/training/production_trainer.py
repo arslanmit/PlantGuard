@@ -324,12 +324,18 @@ class ProductionTrainer:
             # Import optimized data loader
             from .data_loader import DataLoadingConfig, create_optimized_data_loaders
 
-            # Assume dataset is already prepared with train/val split
-            dataset_dir = Path("data/processed/plantvillage")  # Default path
+            # Get dataset directory from config if available, otherwise use default
+            dataset_dir = Path(getattr(self.config, "data_dir", "data/processed/plantvillage"))
 
+            # Check if dataset exists
             if not dataset_dir.exists():
-                logger.error(f"Dataset not found at {dataset_dir}. Please prepare dataset first.")
-                return False
+                # Try parent directory (in case we're given a train/val directory directly)
+                parent_dir = dataset_dir.parent
+                if (parent_dir / "train").exists() and (parent_dir / "val").exists():
+                    dataset_dir = parent_dir
+                elif not (dataset_dir / "train").exists() or not (dataset_dir / "val").exists():
+                    logger.error(f"Dataset not found at {dataset_dir}. Please prepare dataset first.")
+                    return False
 
             # Optimize batch size if needed
             if hasattr(self.config, "_auto_batch_size") or self.config.batch_size == 32:
