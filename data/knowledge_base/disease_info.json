@@ -1,0 +1,190 @@
+{
+    "schema_version": "1.0",
+    "last_updated": "2025-01-17",
+    "medical_discla",
+    "usage_guidelines": {
+        "confidence_thresholds": {
+            "high": 0.8,
+            "medium": 0.6,
+            "low": 0.4
+        },
+        "response_templates": {
+            "disease_detected": "Based on the image analysis, your e.",
+            "healthy_plant": "Great news! Your {plant_type} app",
+            "low_confidence": "I'm not entirce."
+        }
+    },
+    "diseases": {
+        "Apple___Apple_scab": {
+            "disease_name": "Apple Scab",
+            "scientific_name": "Venturia inaequalis",
+            "plant_type": "Apple",
+            "severity": "medium",
+            "description": "Apple scab is a fd.",
+      "symptom"Dark, olive-green,"Scabby, corky lesions","Premature leaf drop",
+            "Cracked or distorted fruit",
+            "Reduced fruit quality and marketability"
+        ],
+        "causes": [
+            "Fungal pathogen Ventur"Cool, wet weather conditions","Poor air circulation",
+            "Overhead irrigation",
+            "Infected plant debris"
+        ],
+        "treatment": {
+            "immediate": [
+                "Remove and destroy infected leaves and fruit",
+                "Improve air circulation by pruni",
+                "Apply fungicide spray (coppe",
+                "Avoid overhead watering"
+            ],
+            "preve["Choose scab-resities","Rake and dispose of fallen leaves in autumn",
+            "Prune trees for better air circulation",
+            "Apply dormant season fungicide spray",
+            "Maintain proper tree spacing"
+        ],
+        "organ": [
+            "Baking soda spray (1 water)",
+            "Neem oil appli,"Copper fungicide","Sulfur-baseddes"
+        ]
+    },
+    "prevention": [
+        "Plant resistant"Ensurees","Clean up fallen leaves and frbris",
+        "Apply preventive fungicing",
+        "Avoid wetting foliage when 
+    ],
+    "affectegs"
+],
+"season": [
+    "spring",
+    "summer"
+],
+"env"
+],
+"economic_impact": "Can es"
+},
+"Apple___Black_rot": {
+"disease_name": "Apple BlackRot",
+"scientific_name": "Botrysa",
+"plant_type": "Apple",
+"severity": "high",
+"description": "Black rot is a serious fungal disease affecting apple tree",
+"symptoms": [
+"Brown to black circular spots on leaves with c"Black, mummified fruit that reee","Sunken cankers on branches and trunk",
+"Prema,"Yellowing and s"
+],
+"causes": [
+"Fungal pathogen Botryosphaeria obtus"Warm, humid weather","Wounds or injuries to tree",
+"Stres,"Poor sanitation pactices"
+],
+"treatment": {
+"immediate": [
+    "Remove and destroy all infected fruit and leaves",
+    "Prune out infected branches and cankers",
+    "Apply fhyl",
+    "Disinfect pruning to"
+],
+"preventive": [
+    "Maintain tree vigor through proper fertilization",
+    "Prune for good air circulation",
+    "Remove mummified fruit from tree and ground",
+    "Apply dngicide",
+          "Avoid mechanical 
+],
+"organic": [
+    "Copper-based fungicides",
+    "Bordeaux mixture",
+    "Lime spray",
+    "Pro"
+]
+},
+"prevention": [
+"Choose resistant apple varieties",
+"Maintain proper tree nutrition and",
+"Remove all mummified fruit and infected de,"Prune","Apply preventive fungi"
+],
+"affected_parts": [unk"],"season": ["summer",
+,
+"environmental_fans"
+],
+      "economi
+},
+"Apple___Cedar_apple_"disease_name": st",
+"scientinae",
+"plant_type": "Apple",
+"severity": "medium",
+"description": "Cedar appl.",
+"symptoms": [
+"Brighe",
+"Small, tube-like projections on leaf undersides",
+"O",
+"Premature leaf drop",
+"Reduced fruit quality"
+],
+"causes": [
+"Fungal pathogen Gymnospo",
+"Presence of cedar or juniper trees nearby",
+"Wet spring weather",
+"Wind-dispersed spores",
+"Two-host life cycle requirement"
+],
+"treatment": {
+"immediate": [
+"Appge",
+"Remove nearbssible",
+"Rake and destroy infected leaves",
+"Continue fungicide applications through summer"
+],
+"preventive": [
+"Plant rust-resistant apple varieties",
+"Remiles",
+"Apply preventiv"Improve air circula"
+],
+"organic": [
+"Sulfur-based fungicides",
+"Copper fungicides",
+"Neem oi"Proper sanitation prs"
+]
+},
+"prevention": [
+"Choose rust-resistant varieties like Liberty or Ese",
+"Remove al"Apply fungicide spr","Maintain good tree health and vigor"
+],
+"affected_parts": [
+"leaves",
+"fruit"
+],
+"season": [
+"spring",
+"early summer"
+],
+"environmen,"economi"
+},
+"Apple___healthy": {
+"disease_name": "Healthy Apple",
+"scientific_name": null,
+"plant_type": "Apple",
+"severite",
+"description": "Healthy aormal.",
+"symptoms": [],
+"causes": [],
+"treatme": {
+"immediate": [],
+"preventive": [
+"Continue regular mon",
+"Mai"Ensure good air circulation","Practice good sanitation"
+],
+"organ": [
+"Regular inspection and monitoring",
+         e",
+     n"
+]
+},
+"prevention": [
+        "Regular monitoring "Maintain optimal ,"Practice integ","Ensure proper nutrition and water management"
+],
+"affected_p,"season": [""environmental_facs"
+],
+"economic_impact"
+}
+}
+}

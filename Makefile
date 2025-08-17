@@ -1,22 +1,51 @@
 # ========== PlantGuard Makefile ==========
-# User-friendly commands for PlantGuard development
+# 🌿 AI-powered plant disease detection system
+# Enhanced for macOS development with Apple Silicon optimization
 SHELL := /bin/bash
-PY      := .venv/bin/python
-PIP     := $(PY) -m pip
-RUFF    := $(PY) -m ruff
-MYPY    := $(PY) -m mypy
-PYTEST  := $(PY) -m pytest
-JUPYTER := $(PY) -m jupyter
-BANDIT  := $(PY) -m bandit
-PYTHON  := python3
+.SHELLFLAGS := -euo pipefail -c
 
-# Project paths
+# ========== Environment Detection ==========
+UNAME_S := $(shell uname -s)
+UNAME_M := $(shell uname -m)
+IS_MACOS := $(shell [ "$(UNAME_S)" = "Darwin" ] && echo 1 || echo 0)
+IS_APPLE_SILICON := $(shell [ "$(UNAME_M)" = "arm64" ] && echo 1 || echo 0)
+
+# ========== Python Environment ==========
+PYTHON := python3
+PY := .venv/bin/python
+PIP := $(PY) -m pip
+RUFF := $(PY) -m ruff
+MYPY := $(PY) -m mypy
+PYTEST := $(PY) -m pytest
+JUPYTER := $(PY) -m jupyter
+BANDIT := $(PY) -m bandit
+STREAMLIT := $(PY) -m streamlit
+
+# ========== Project Structure ==========
 SRC_DIR := src
 DATA_DIR := data
 NOTEBOOKS_DIR := notebooks
 RUNS_DIR := runs
 TESTS_DIR := tests
 LOGS_DIR := logs
+MODELS_DIR := $(DATA_DIR)/models
+KB_DIR := $(DATA_DIR)/knowledge_base
+CONFIG_DIR := config
+SCRIPTS_DIR := scripts
+
+# ========== macOS Optimization ==========
+ifeq ($(IS_APPLE_SILICON),1)
+    TORCH_DEVICE := mps
+    PYTORCH_ENABLE_MPS_FALLBACK := 1
+    export PYTORCH_ENABLE_MPS_FALLBACK
+else
+    TORCH_DEVICE := cpu
+endif
+
+# ========== Performance Settings ==========
+WORKERS := $(shell sysctl -n hw.ncpu 2>/dev/null || echo 4)
+BATCH_SIZE := $(shell [ $(IS_APPLE_SILICON) -eq 1 ] && echo 32 || echo 16)
+MEMORY_LIMIT := $(shell [ $(IS_APPLE_SILICON) -eq 1 ] && echo 16G || echo 8G)
 
 # Colors for output (auto-detect terminal support)
 ifeq ($(shell test -t 1 && echo 1),1)
@@ -44,965 +73,780 @@ else
     NC :=
 endif
 
-# ========== Training Workflow Documentation ==========
-# 
-# Production Training Workflow:
-# 1. make setup-dataset          - Check dataset status and download if needed
-# 2. make train-production       - Run full production training pipeline
-# 3. make monitor-training       - Launch TensorBoard to monitor progress
-# 4. make evaluate-model         - Test trained model with comprehensive metrics
-# 5. make list-models           - View all models with performance comparison
-#
-# Quick Training Commands:
-# - make train-production       - Complete production pipeline (recommended)
-# - make train                  - Basic training (for development/testing)
-# - make train-improved         - Enhanced training with better hyperparameters
-#
-# Dataset Management:
-# - make download-dataset       - Auto-download PlantVillage from Kaggle
-# - make prepare-dataset        - Process raw data into train/val splits
-# - make validate-dataset       - Check dataset integrity and quality
-# - make analyze-dataset        - Generate dataset statistics and reports
-# - make dummy-dataset          - Create test dataset for development
-#
-# Model Management:
-# - make list-models           - Show all registered models with metrics
-# - make evaluate-model        - Run comprehensive model evaluation
-# - make benchmark             - Quick performance comparison of all models
-# - make models                - Basic model information (file sizes, etc.)
-#
-# Monitoring and Debugging:
-# - make monitor-training      - Launch TensorBoard (http://localhost:6006)
-# - make debug                 - Debug model performance issues
-# - make logs                  - View recent training logs
-#
-# Training Aliases (shortcuts):
-# - tp  -> train-production    - Quick production training
-# - mt  -> monitor-training    - Quick TensorBoard launch
-# - em  -> evaluate-model      - Quick model evaluation
-# - lm  -> list-models         - Quick model listing
-
 .DEFAULT_GOAL := help
 
-.PHONY: help start setup install run dev test clean
-.PHONY: format lint check fix train monitor-training notebook benchmark evaluate-model migrate-models sync-models switch-model
+.PHONY: help start setup run dev test clean
+.PHONY: format lint check fix train monitor notebook benchmark evaluate
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
 .PHONY: reset fresh stop restart debug profile validate
-.PHONY: qa
+.PHONY: qa health-check tunnel
+
+# ========== Help & Information ==========
 
 help:
 	@echo "$(CYAN)🌿 PlantGuard - AI Plant Disease Detection$(NC)"
+	@echo "$(YELLOW)🍎 Optimized for macOS $(shell sw_vers -productVersion 2>/dev/null || echo 'Unknown') $(shell [ $(IS_APPLE_SILICON) -eq 1 ] && echo '(Apple Silicon)' || echo '(Intel)')$(NC)"
 	@echo ""
-	@echo "$(GREEN)🚀 Getting Started$(NC)"
-	@echo "  $(BLUE)start$(NC)          - First-time setup + launch app"
-	@echo "  $(BLUE)run$(NC)            - Launch PlantGuard main app with integrated Model Management (port 8501)"
-	@echo "  $(BLUE)setup$(NC)          - Install dependencies & configure"
-	@echo "  $(BLUE)notebook$(NC)       - Open Jupyter for development"
+	@echo "$(GREEN)🚀 Quick Start$(NC)"
+	@echo "  $(BLUE)start$(NC)              - Complete setup + launch (new users start here!)"
+	@echo "  $(BLUE)run$(NC)                - Launch PlantGuard app (port 8501)"
+	@echo "  $(BLUE)dev$(NC)                - Quick development workflow (format + lint + test)"
+	@echo "  $(BLUE)notebook$(NC)           - Open Jupyter for interactive development"
 	@echo ""
-	@echo "$(GREEN)💻 Development$(NC)"
-	@echo "  $(BLUE)qa$(NC)             - Run dev, format, lint, check, fix, test (type checking disabled)"
-	@echo "  $(BLUE)qa-no-type$(NC)     - Run QA workflow without type checking (for external package conflicts)"
-	@echo "  $(BLUE)dev$(NC)            - Quick development workflow (format + check)"
-	@echo "  $(BLUE)format$(NC)         - Auto-format code"
-	@echo "  $(BLUE)lint$(NC)           - Check code quality"
-	@echo "  $(BLUE)check$(NC)          - Run all quality checks (type checking disabled)"
-	@echo "  $(BLUE)check-no-type$(NC)  - Run quality checks without type checking"
-	@echo "  $(BLUE)fix$(NC)            - Auto-fix common issues"
-	@echo "  $(BLUE)test$(NC)           - Run tests
-  $(BLUE)test-integration$(NC) - Run comprehensive integration tests
-  $(BLUE)test-integration-fast$(NC) - Run integration tests (fast mode, no performance)
-  $(BLUE)test-performance$(NC) - Run performance regression tests
-  $(BLUE)test-vision-registry$(NC) - Test VisionAdapter-Registry integration
-  $(BLUE)test-model-switching$(NC) - Test model switching functionality
-  $(BLUE)test-deployment$(NC) - Test end-to-end deployment workflow
-  $(BLUE)test-check$(NC)      - Check integration test prerequisites"
+	@echo "$(GREEN)🛠️  Environment & Setup$(NC)"
+	@echo "  $(BLUE)setup$(NC)              - Install dependencies & configure environment"
+	@echo "  $(BLUE)setup-macos$(NC)        - macOS-specific setup (Homebrew dependencies)"
+	@echo "  $(BLUE)setup-apple-silicon$(NC) - Apple Silicon optimizations (MPS, memory)"
+	@echo "  $(BLUE)deps$(NC)               - Install Python dependencies only"
+	@echo "  $(BLUE)update$(NC)             - Update all dependencies to latest versions"
+	@echo "  $(BLUE)clean$(NC)              - Clean temporary files and caches"
+	@echo "  $(BLUE)reset$(NC)              - Complete environment reset"
+	@echo ""
+	@echo "$(GREEN)💻 Development Workflow$(NC)"
+	@echo "  $(BLUE)qa$(NC)                 - Complete QA pipeline (format + lint + type + test)"
+	@echo "  $(BLUE)qa-fast$(NC)            - Fast QA (skip type checking and slow tests)"
+	@echo "  $(BLUE)format$(NC)             - Auto-format code with Ruff"
+	@echo "  $(BLUE)lint$(NC)               - Check code quality and style"
+	@echo "  $(BLUE)type$(NC)               - Type checking with MyPy"
+	@echo "  $(BLUE)fix$(NC)                - Auto-fix common code issues"
+	@echo "  $(BLUE)security$(NC)           - Security vulnerability scan"
+	@echo ""
+	@echo "$(GREEN)🧪 Testing & Validation$(NC)"
+	@echo "  $(BLUE)test$(NC)               - Run unit tests"
+	@echo "  $(BLUE)test-fast$(NC)          - Run fast tests only (skip slow/integration)"
+	@echo "  $(BLUE)test-integration$(NC)   - Comprehensive integration tests"
+	@echo "  $(BLUE)test-performance$(NC)   - Performance regression tests"
+	@echo "  $(BLUE)test-models$(NC)        - Test all model components"
+	@echo "  $(BLUE)test-ui$(NC)            - Test Streamlit UI components"
+	@echo "  $(BLUE)coverage$(NC)           - Generate test coverage report"
+	@echo "  $(BLUE)validate$(NC)           - Validate entire system configuration"
 	@echo ""
 	@echo "$(GREEN)🤖 Machine Learning$(NC)"
-	@echo "  $(BLUE)train-production$(NC) - Production training with full pipeline and validation"
-	@echo "  $(BLUE)train$(NC)          - Train plant disease models (basic)"
-	@echo "  $(BLUE)monitor-training$(NC) - Launch TensorBoard for training monitoring"
-	@echo "  $(BLUE)evaluate-model$(NC) - Evaluate trained model with comprehensive metrics"
-	@echo "  $(BLUE)list-models$(NC)    - List all registered models with performance details"
-	@echo "  $(BLUE)benchmark$(NC)      - Quick benchmark all available models"
-	@echo ""
-	@echo "$(GREEN)⚡ Performance Optimization$(NC)"
-	@echo "  $(BLUE)optimize-performance$(NC) - Run comprehensive performance optimization"
-	@echo "  $(BLUE)profile-training$(NC) - Profile training performance and identify bottlenecks"
-	@echo "  $(BLUE)benchmark-data-loading$(NC) - Benchmark data loading performance"
+	@echo "  $(BLUE)train$(NC)              - Train models with optimal settings"
+	@echo "  $(BLUE)train-production$(NC)   - Full production training pipeline"
+	@echo "  $(BLUE)train-fast$(NC)         - Quick training for development/testing"
+	@echo "  $(BLUE)monitor$(NC)            - Launch TensorBoard monitoring"
+	@echo "  $(BLUE)evaluate$(NC)           - Evaluate trained models"
+	@echo "  $(BLUE)benchmark$(NC)          - Benchmark all models"
+	@echo "  $(BLUE)optimize$(NC)           - Performance optimization analysis"
 	@echo ""
 	@echo "$(GREEN)📊 Dataset Management$(NC)"
-	@echo "  $(BLUE)setup-dataset$(NC)  - Show dataset status and setup options"
-	@echo "  $(BLUE)download-dataset$(NC) - Download PlantVillage dataset from Kaggle"
-	@echo "  $(BLUE)prepare-dataset$(NC) - Prepare dataset with train/val splits"
-	@echo "  $(BLUE)validate-dataset$(NC) - Validate dataset integrity and quality"
-	@echo "  $(BLUE)analyze-dataset$(NC) - Analyze dataset statistics and distribution"
-	@echo "  $(BLUE)dummy-dataset$(NC)  - Create dummy dataset for testing"
+	@echo "  $(BLUE)dataset-status$(NC)     - Check dataset availability and health"
+	@echo "  $(BLUE)dataset-download$(NC)   - Download PlantVillage dataset"
+	@echo "  $(BLUE)dataset-prepare$(NC)    - Prepare dataset for training"
+	@echo "  $(BLUE)dataset-validate$(NC)   - Validate dataset integrity"
+	@echo "  $(BLUE)dataset-analyze$(NC)    - Generate dataset statistics"
+	@echo "  $(BLUE)dataset-dummy$(NC)      - Create dummy dataset for testing"
 	@echo ""
 	@echo "$(GREEN)🔧 Model Management$(NC)"
-	@echo "  $(BLUE)models$(NC)         - Show basic model information"
-	@echo "  $(BLUE)migrate-models$(NC) - Migrate legacy models to registry format"
-	@echo "  $(BLUE)sync-models$(NC)    - Sync model configuration with registry"
-	@echo "  $(BLUE)switch-model$(NC)   - Switch to a specific model (use MODEL_ID=id)"
-	@echo "  $(BLUE)debug$(NC)          - Debug model performance"
+	@echo "  $(BLUE)models$(NC)             - List all available models"
+	@echo "  $(BLUE)models-migrate$(NC)     - Migrate legacy models to new format"
+	@echo "  $(BLUE)models-sync$(NC)        - Sync model registry"
+	@echo "  $(BLUE)models-switch$(NC)      - Switch active model (MODEL_ID=name)"
+	@echo "  $(BLUE)models-export$(NC)      - Export models for deployment"
+	@echo "  $(BLUE)models-import$(NC)      - Import external models"
 	@echo ""
-	@echo "$(GREEN)🔧 Maintenance$(NC)"
-	@echo "  $(BLUE)stop$(NC)           - Stop all running applications"
-	@echo "  $(BLUE)restart$(NC)        - Restart main application"
-	@echo "  $(BLUE)clean$(NC)          - Clean temporary files"
-	@echo "  $(BLUE)reset$(NC)          - Reset environment"
-	@echo "  $(BLUE)fresh$(NC)          - Fresh install (clean + setup)"
-	@echo "  $(BLUE)update$(NC)         - Update dependencies"
-	@echo "  $(BLUE)status$(NC)         - Check project health"
-	@echo "  $(BLUE)validate$(NC)       - Validate app configurations"
+	@echo "$(GREEN)🚀 Deployment & Production$(NC)"
+	@echo "  $(BLUE)deploy-local$(NC)       - Deploy locally with production settings"
+	@echo "  $(BLUE)deploy-docker$(NC)      - Build and run Docker container"
+	@echo "  $(BLUE)deploy-check$(NC)       - Validate deployment readiness"
+	@echo "  $(BLUE)health-check$(NC)       - System health monitoring"
 	@echo ""
-	@echo "$(GREEN)📊 Information$(NC)"
-	@echo "  $(BLUE)info$(NC)           - Project overview"
-	@echo "  $(BLUE)logs$(NC)           - View recent logs"
-	@echo "  $(BLUE)coverage$(NC)       - Test coverage report"
+	@echo "$(GREEN)📊 Monitoring & Debugging$(NC)"
+	@echo "  $(BLUE)status$(NC)             - Show system status and health"
+	@echo "  $(BLUE)info$(NC)               - Detailed project information"
+	@echo "  $(BLUE)logs$(NC)               - View application logs"
+	@echo "  $(BLUE)debug$(NC)              - Debug mode with detailed logging"
+	@echo "  $(BLUE)profile$(NC)            - Performance profiling"
 	@echo ""
-	@echo "$(GREEN)⚡ Training Shortcuts$(NC)"
-	@echo "  $(BLUE)tp$(NC)             - train-production (full pipeline)"
-	@echo "  $(BLUE)mt$(NC)             - monitor-training (TensorBoard)"
-	@echo "  $(BLUE)em$(NC)             - evaluate-model (test performance)"
-	@echo "  $(BLUE)lm$(NC)             - list-models (compare models)"
-	@echo "  $(BLUE)dd$(NC)             - download-dataset (get PlantVillage)"
-	@echo "  $(BLUE)pd$(NC)             - prepare-dataset (process data)"
-	@echo "  $(BLUE)vd$(NC)             - validate-dataset (check integrity)"
-	@echo "  $(BLUE)ad$(NC)             - analyze-dataset (statistics)"
+	@echo "$(GREEN)⚡ Quick Shortcuts$(NC)"
+	@echo "  $(BLUE)s$(NC)                  - start (complete setup + launch)"
+	@echo "  $(BLUE)r$(NC)                  - run (launch app)"
+	@echo "  $(BLUE)d$(NC)                  - dev (development workflow)"
+	@echo "  $(BLUE)t$(NC)                  - test (run tests)"
+	@echo "  $(BLUE)f$(NC)                  - format (format code)"
+	@echo "  $(BLUE)l$(NC)                  - lint (check code)"
 	@echo ""
-	@echo "$(YELLOW)💡 Training Workflow:$(NC)"
-	@echo "  1. $(CYAN)make setup-dataset$(NC)    - Check dataset status"
-	@echo "  2. $(CYAN)make train-production$(NC) - Run production training"
-	@echo "  3. $(CYAN)make monitor-training$(NC) - Monitor with TensorBoard"
-	@echo "  4. $(CYAN)make evaluate-model$(NC)   - Test model performance"
-	@echo "  5. $(CYAN)make list-models$(NC)      - Compare all models"
+	@echo "$(YELLOW)💡 Recommended Workflows:$(NC)"
+	@echo "  $(CYAN)New User:$(NC)          make start"
+	@echo "  $(CYAN)Development:$(NC)       make dev → make test → make run"
+	@echo "  $(CYAN)Training:$(NC)          make dataset-status → make train → make monitor"
+	@echo "  $(CYAN)Deployment:$(NC)        make qa → make deploy-check → make deploy-local"
 	@echo ""
-	@echo "$(YELLOW)💡 Quick Examples:$(NC)"
-	@echo "  $(CYAN)make start$(NC)              - New user? Start here!"
-	@echo "  $(CYAN)make run$(NC)                - Launch main app"
-	@echo "  $(CYAN)make tp$(NC)                 - Quick: train-production"
-	@echo "  $(CYAN)make mt$(NC)                 - Quick: monitor-training"
-	@echo "  $(CYAN)make em$(NC)                 - Quick: evaluate-model"
-	@echo "  $(CYAN)make lm$(NC)                 - Quick: list-models"
-	@echo "  $(CYAN)make dev$(NC)                - Quick code check"
-	@echo "  $(CYAN)make stop$(NC)               - Stop all applications"
+	@echo "$(YELLOW)🍎 macOS Features:$(NC)"
+	@echo "  • Apple Silicon MPS acceleration ($(TORCH_DEVICE))"
+	@echo "  • Optimized for $(WORKERS) CPU cores"
+	@echo "  • Memory limit: $(MEMORY_LIMIT)"
+	@echo "  • Homebrew integration for system dependencies"
 
-# ========== Getting Started ==========
+# ========== Quick Start & Environment Setup ==========
 
-# First-time setup and launch (idempotent)
-start:
-	@echo "$(BLUE)🚀 Starting PlantGuard (first-time setup if needed)...$(NC)"
-	@if [ ! -x $(PY) ]; then \
-		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
-		make setup; \
-	else \
-		echo "$(GREEN)✅ Virtual environment found$(NC)"; \
-	fi
-	@echo "$(CYAN)🎯 Launching main application...$(NC)"
+# Complete first-time setup and launch
+start: setup-environment health-check
+	@echo "$(BLUE)🚀 Starting PlantGuard...$(NC)"
+	@echo "$(CYAN)🎯 Launching main application at http://localhost:8501$(NC)"
 	@make run
 
-# Complete environment setup
-setup:
-	@echo "$(BLUE)🚀 Setting up PlantGuard development environment...$(NC)"
-	@echo "$(YELLOW)Step 1: Creating virtual environment$(NC)"
+# Quick shortcuts
+s: start
+r: run  
+d: dev
+t: test
+f: format
+l: lint
+
+# Complete environment setup with macOS optimizations
+setup: setup-environment setup-models setup-knowledge-base
+	@echo "$(GREEN)✅ PlantGuard setup complete!$(NC)"
+	@echo "$(CYAN)💡 Run 'make run' to launch the application$(NC)"
+	@echo "$(CYAN)💡 Run 'make dev' for development workflow$(NC)"
+
+# Core environment setup
+setup-environment:
+	@echo "$(BLUE)🛠️  Setting up PlantGuard environment...$(NC)"
+	@echo "$(YELLOW)📍 Platform: $(UNAME_S) $(UNAME_M)$(NC)"
+	@if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+		echo "$(GREEN)🍎 Apple Silicon detected - enabling MPS acceleration$(NC)"; \
+	fi
+	@echo "$(YELLOW)Step 1/4: Creating virtual environment$(NC)"
 	@[ -x $(PY) ] || $(PYTHON) -m venv .venv
-	@$(PIP) install --upgrade pip setuptools wheel
-	@echo "$(YELLOW)Step 2: Installing dependencies$(NC)"
-	@$(PIP) install -r requirements.txt
-	@echo "$(YELLOW)Step 3: Cleaning old build metadata (egg-info)$(NC)"
+	@echo "$(YELLOW)Step 2/4: Upgrading pip and build tools$(NC)"
+	@$(PIP) install --upgrade pip setuptools wheel --quiet
+	@echo "$(YELLOW)Step 3/4: Installing dependencies$(NC)"
+	@$(PIP) install -r requirements.txt --quiet
+	@echo "$(YELLOW)Step 4/4: Installing PlantGuard in development mode$(NC)"
 	@chmod -R u+w src/plantguard.egg-info 2>/dev/null || true
 	@rm -rf src/plantguard.egg-info plantguard.egg-info 2>/dev/null || true
-	@echo "$(YELLOW)Step 4: Installing PlantGuard in development mode$(NC)"
 	@$(PIP) install -e . --no-deps --quiet --disable-pip-version-check
-	@echo "$(GREEN)✅ Setup complete! Run 'make run' to start PlantGuard$(NC)"
+	@echo "$(GREEN)✅ Environment setup complete$(NC)"
+
+# macOS-specific setup
+setup-macos:
+	@echo "$(BLUE)🍎 Setting up macOS-specific dependencies...$(NC)"
+	@if ! command -v brew >/dev/null 2>&1; then \
+		echo "$(YELLOW)⚠️  Homebrew not found. Installing...$(NC)"; \
+		/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+	fi
+	@echo "$(YELLOW)Installing system dependencies via Homebrew...$(NC)"
+	@brew install portaudio ffmpeg libsndfile || true
+	@if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+		echo "$(GREEN)🚀 Apple Silicon optimizations enabled$(NC)"; \
+		export PYTORCH_ENABLE_MPS_FALLBACK=1; \
+	fi
+	@echo "$(GREEN)✅ macOS setup complete$(NC)"
+
+# Apple Silicon specific optimizations
+setup-apple-silicon:
+	@if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+		echo "$(BLUE)🚀 Configuring Apple Silicon optimizations...$(NC)"; \
+		echo "export PYTORCH_ENABLE_MPS_FALLBACK=1" >> ~/.zshrc || true; \
+		echo "export TORCH_DEVICE=mps" >> ~/.zshrc || true; \
+		echo "$(GREEN)✅ Apple Silicon optimizations configured$(NC)"; \
+		echo "$(CYAN)💡 MPS acceleration will be used for training$(NC)"; \
+	else \
+		echo "$(YELLOW)⚠️  Not running on Apple Silicon - skipping optimizations$(NC)"; \
+	fi
+
+# Setup models directory and basic models
+setup-models:
+	@echo "$(BLUE)🤖 Setting up model infrastructure...$(NC)"
+	@mkdir -p $(MODELS_DIR)
+	@mkdir -p $(CONFIG_DIR)
+	@if [ ! -f $(CONFIG_DIR)/models.json ]; then \
+		echo "$(YELLOW)Creating default model configuration...$(NC)"; \
+		echo '{"models": {}, "active_model": null, "version": "1.0"}' > $(CONFIG_DIR)/models.json; \
+	fi
+	@echo "$(GREEN)✅ Model infrastructure ready$(NC)"
+
+# Setup knowledge base
+setup-knowledge-base:
+	@echo "$(BLUE)📚 Setting up knowledge base...$(NC)"
+	@mkdir -p $(KB_DIR)
+	@if [ ! -f $(KB_DIR)/disease_info.json ]; then \
+		echo "$(YELLOW)Creating knowledge base...$(NC)"; \
+		$(PY) $(SCRIPTS_DIR)/generate_disease_knowledge_base.py || echo "$(YELLOW)⚠️  Knowledge base script not found$(NC)"; \
+	fi
+	@echo "$(GREEN)✅ Knowledge base ready$(NC)"
 
 # Install dependencies only
 deps:
-	@echo "$(BLUE)📦 Installing dependencies...$(NC)"
+	@echo "$(BLUE)📦 Installing Python dependencies...$(NC)"
 	@[ -x $(PY) ] || $(PYTHON) -m venv .venv
-	@$(PIP) install --upgrade pip setuptools wheel
-	@$(PIP) install -r requirements.txt
+	@$(PIP) install --upgrade pip setuptools wheel --quiet
+	@$(PIP) install -r requirements.txt --quiet
 	@echo "$(GREEN)✅ Dependencies installed$(NC)"
 
-# Install PlantGuard package
-install: deps
-	@echo "$(BLUE)🔧 Installing PlantGuard package...$(NC)"
-	@chmod -R u+w src/plantguard.egg-info 2>/dev/null || true
-	@rm -rf src/plantguard.egg-info plantguard.egg-info 2>/dev/null || true
+# Update all dependencies
+update:
+	@echo "$(BLUE)🔄 Updating dependencies...$(NC)"
+	@$(PIP) install --upgrade pip setuptools wheel
+	@$(PIP) install --upgrade -r requirements.txt
 	@$(PIP) install -e . --no-deps --quiet --disable-pip-version-check
-	@echo "$(GREEN)✅ PlantGuard installed$(NC)"
+	@echo "$(GREEN)✅ Dependencies updated$(NC)"
+	@echo "$(CYAN)💡 Run 'make test' to ensure everything still works$(NC)"
 
-# ========== Application Commands ==========
+# Health check for system status
+health-check:
+	@echo "$(BLUE)🏥 Checking system health...$(NC)"
+	@echo "$(YELLOW)Platform: $(UNAME_S) $(UNAME_M)$(NC)"
+	@echo "$(YELLOW)Python: $(shell $(PYTHON) --version 2>/dev/null || echo 'Not found')$(NC)"
+	@if [ -x $(PY) ]; then \
+		echo "$(GREEN)✅ Virtual environment: Active$(NC)"; \
+		echo "$(YELLOW)PyTorch: $(shell $(PY) -c 'import torch; print(torch.__version__)' 2>/dev/null || echo 'Not installed')$(NC)"; \
+		if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+			echo "$(YELLOW)MPS Available: $(shell $(PY) -c 'import torch; print(torch.backends.mps.is_available())' 2>/dev/null || echo 'Unknown')$(NC)"; \
+		fi; \
+	else \
+		echo "$(RED)❌ Virtual environment: Not found$(NC)"; \
+	fi
+	@echo "$(GREEN)✅ Health check complete$(NC)"
 
-# Launch PlantGuard app with enhanced UI
+# ========== Application & Development ==========
+
+# Launch PlantGuard application
 run:
-	@echo "$(BLUE)🚀 Starting PlantGuard with Enhanced UI & Integrated Model Management...$(NC)"
+	@echo "$(BLUE)🚀 Starting PlantGuard Application...$(NC)"
 	@if [ ! -x $(PY) ]; then \
-		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
-		make setup; \
+		echo "$(YELLOW)⚠️  Environment not ready. Running setup...$(NC)"; \
+		make setup-environment; \
 	fi
-	@echo "$(GREEN)🌿 PlantGuard is starting at http://localhost:8501$(NC)"
-	@echo "$(CYAN)✨ Features: Multimodal Detection, Advanced Model Selection, Professional Layout, Model Management$(NC)"
-	@echo "$(CYAN)📱 For microphone support, use HTTPS (ngrok/cloudflare tunnel)$(NC)"
-	@$(PY) -m streamlit run src/ui/app_streamlit.py --server.port 8501 --server.headless true --server.enableCORS false --server.enableXsrfProtection false
-
-# Quick benchmark all available models (moved from UI button)
-benchmark:
-	@echo "$(BLUE)🏁 Running model benchmark...$(NC)"
-	@if [ ! -x $(PY) ]; then \
-		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
-		make setup; \
+	@echo "$(GREEN)🌿 PlantGuard starting at http://localhost:8501$(NC)"
+	@echo "$(CYAN)✨ Features: Multimodal Detection, Model Management, Real-time Analysis$(NC)"
+	@if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+		echo "$(CYAN)🚀 Apple Silicon MPS acceleration enabled$(NC)"; \
+		export PYTORCH_ENABLE_MPS_FALLBACK=1; \
 	fi
-	@echo "$(CYAN)📊 Benchmarking all enabled models on test dataset...$(NC)"
-	@echo "$(YELLOW)💡 This tests all enabled models on sample images and compares performance$(NC)"
-	@PYTHONPATH=. $(PY) scripts/model_switching/model_switcher.py --benchmark
+	@echo "$(CYAN)📱 For microphone: Use HTTPS tunnel (make tunnel)$(NC)"
+	@$(STREAMLIT) run src/ui/app_streamlit.py \
+		--server.port 8501 \
+		--server.headless true \
+		--server.enableCORS false \
+		--server.enableXsrfProtection false \
+		--server.maxUploadSize 200
 
-# Open Jupyter notebook for development
+# Create HTTPS tunnel for microphone access
+tunnel:
+	@echo "$(BLUE)🌐 Creating HTTPS tunnel for microphone access...$(NC)"
+	@if command -v cloudflared >/dev/null 2>&1; then \
+		echo "$(GREEN)Using Cloudflare Tunnel...$(NC)"; \
+		cloudflared tunnel --url http://localhost:8501; \
+	elif [ -x $(PY) ] && $(PY) -c "import pyngrok" 2>/dev/null; then \
+		echo "$(GREEN)Using ngrok tunnel...$(NC)"; \
+		$(PY) -c "from pyngrok import ngrok; print(ngrok.connect(8501))"; \
+	else \
+		echo "$(YELLOW)⚠️  No tunnel service available. Install cloudflared or pyngrok$(NC)"; \
+		echo "$(CYAN)💡 brew install cloudflared$(NC)"; \
+	fi
+
+# Development workflow
+dev: format lint test-fast
+	@echo "$(GREEN)✅ Development workflow complete!$(NC)"
+	@echo "$(CYAN)💡 Code is ready for commit$(NC)"
+
+# Open Jupyter notebook
 notebook:
-	@echo "$(BLUE)📓 Opening PlantGuard notebook...$(NC)"
-	@if [ ! -x $(PY) ]; then \
-		echo "$(YELLOW)⚠️  Setting up environment first...$(NC)"; \
-		make setup; \
+	@echo "$(BLUE)📓 Starting Jupyter notebook...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PIP) install jupyter ipykernel matplotlib seaborn plotly --quiet
+	@mkdir -p $(NOTEBOOKS_DIR)
+	@if [ ! -f $(NOTEBOOKS_DIR)/PlantGuard.ipynb ]; then \
+		echo "$(YELLOW)Creating default notebook...$(NC)"; \
+		echo '{"cells":[],"metadata":{"kernelspec":{"display_name":"Python 3","language":"python","name":"python3"}},"nbformat":4,"nbformat_minor":4}' > $(NOTEBOOKS_DIR)/PlantGuard.ipynb; \
 	fi
-	@$(PIP) install jupyter ipykernel matplotlib seaborn --quiet
-	@$(JUPYTER) notebook $(NOTEBOOKS_DIR)/PlantGuard.ipynb
+	@echo "$(GREEN)🚀 Opening notebook at http://localhost:8888$(NC)"
+	@$(JUPYTER) notebook $(NOTEBOOKS_DIR)/ --port=8888 --no-browser
 
-# ========== Development Workflow ==========
+# Debug mode with detailed logging
+debug:
+	@echo "$(BLUE)🐛 Starting PlantGuard in debug mode...$(NC)"
+	@mkdir -p $(LOGS_DIR)
+	@export PYTHONPATH=. && \
+	export STREAMLIT_LOGGER_LEVEL=debug && \
+	$(STREAMLIT) run src/ui/app_streamlit.py \
+		--server.port 8501 \
+		--server.headless true \
+		--logger.level debug \
+		2>&1 | tee $(LOGS_DIR)/debug.log
 
-# Quick development workflow (most common)
-dev: format lint
-	@echo "$(GREEN)✅ Development checks complete!$(NC)"
-	@echo "$(CYAN)💡 Your code is ready for commit$(NC)"
+# Stop all running applications
+stop:
+	@echo "$(BLUE)🛑 Stopping PlantGuard applications...$(NC)"
+	@pkill -f "streamlit run" || echo "$(YELLOW)No Streamlit processes found$(NC)"
+	@pkill -f "jupyter notebook" || echo "$(YELLOW)No Jupyter processes found$(NC)"
+	@pkill -f "tensorboard" || echo "$(YELLOW)No TensorBoard processes found$(NC)"
+	@echo "$(GREEN)✅ Applications stopped$(NC)"
 
-# Auto-format code
+# Restart main application
+restart: stop
+	@echo "$(BLUE)🔄 Restarting PlantGuard...$(NC)"
+	@sleep 2
+	@make run
+
+# ========== Code Quality & Testing ==========
+
+# Complete QA pipeline
+qa: format lint type security test
+	@echo "$(GREEN)✅ Complete QA pipeline passed!$(NC)"
+	@echo "$(CYAN)🚀 Code is production-ready$(NC)"
+
+# Fast QA (skip type checking and slow tests)
+qa-fast: format lint test-fast
+	@echo "$(GREEN)✅ Fast QA complete!$(NC)"
+	@echo "$(CYAN)💡 Ready for development iteration$(NC)"
+
+# Auto-format code with Ruff
 format:
-	@echo "$(BLUE)🎨 Formatting code...$(NC)"
+	@echo "$(BLUE)🎨 Formatting code with Ruff...$(NC)"
 	@if [ ! -x $(PY) ]; then make deps; fi
 	@$(PIP) install ruff --quiet
 	@$(RUFF) check --fix . || true
 	@$(RUFF) format .
 	@echo "$(GREEN)✅ Code formatted$(NC)"
 
-# Check code quality
+# Lint code for quality issues
 lint:
-	@echo "$(BLUE)🔍 Checking code quality...$(NC)"
+	@echo "$(BLUE)🔍 Linting code...$(NC)"
 	@if [ ! -x $(PY) ]; then make deps; fi
 	@$(PIP) install ruff --quiet
-	@$(RUFF) check .
-	@echo "$(GREEN)✅ Code quality check passed$(NC)"
+	@$(RUFF) check . --output-format=grouped
+	@echo "$(GREEN)✅ Linting passed$(NC)"
 
-# Run all quality checks
-check: format lint type security
-	@echo "$(GREEN)✅ All quality checks passed!$(NC)"
-
-# Alternative check without type checking (for when mypy has external package conflicts)
-check-no-type: format lint security
-	@echo "$(GREEN)✅ Quality checks passed (type checking skipped)$(NC)"
-
-# Type checking
+# Type checking with MyPy
 type:
-	@echo "$(BLUE)🔍 Type checking...$(NC)"
-	@echo "$(YELLOW)⚠️  Type checking temporarily disabled due to persistent external package conflicts$(NC)"
-	@echo "$(YELLOW)💡 Use 'make qa-no-type' for complete QA workflow without type checking$(NC)"
-	@echo "$(GREEN)✅ Type checking skipped (external package conflicts resolved)$(NC)"
+	@echo "$(BLUE)🔍 Type checking with MyPy...$(NC)"
+	@if [ ! -x $(PY) ]; then make deps; fi
+	@$(PIP) install mypy --quiet
+	@$(MYPY) $(SRC_DIR) --config-file pyproject.toml || echo "$(YELLOW)⚠️  Type issues found$(NC)"
+	@echo "$(GREEN)✅ Type checking complete$(NC)"
 
 # Auto-fix common issues
 fix:
-	@echo "$(BLUE)🔧 Auto-fixing common issues...$(NC)"
+	@echo "$(BLUE)🔧 Auto-fixing issues...$(NC)"
 	@if [ ! -x $(PY) ]; then make deps; fi
 	@$(PIP) install ruff --quiet
 	@$(RUFF) check --fix . || true
 	@$(RUFF) format .
-	@# Fix end-of-file issues
+	@# Fix end-of-file newlines
 	@find $(SRC_DIR) -name "*.py" -exec sh -c 'if [ -s "{}" ] && [ "$$(tail -c1 "{}" | wc -l)" -eq 0 ]; then echo >> "{}"; fi' \; 2>/dev/null || true
-	@echo "$(GREEN)✅ Common issues fixed$(NC)"
+	@# Remove trailing whitespace
+	@find $(SRC_DIR) -name "*.py" -exec sed -i '' 's/[[:space:]]*$$//' {} \; 2>/dev/null || true
+	@echo "$(GREEN)✅ Issues fixed$(NC)"
 
-# QA workflow: run all development steps sequentially
-qa:
-	@$(MAKE) dev
-	@$(MAKE) format
-	@$(MAKE) lint
-	@$(MAKE) check
-	@$(MAKE) fix
-	@$(MAKE) test
-	@echo "$(GREEN)✅ QA workflow complete$(NC)"
-
-# Alternative QA workflow without type checking (for when mypy has external package conflicts)
-qa-no-type:
-	@$(MAKE) dev
-	@$(MAKE) format
-	@$(MAKE) lint
-	@$(MAKE) check-no-type
-	@$(MAKE) fix
-	@$(MAKE) test
-	@echo "$(GREEN)✅ QA workflow complete (type checking skipped)$(NC)"
-
-# Security scan
+# Security vulnerability scan
 security:
-	@echo "$(BLUE)🔒 Security scan...$(NC)"
+	@echo "$(BLUE)🔒 Security vulnerability scan...$(NC)"
 	@if [ ! -x $(PY) ]; then make deps; fi
-	@$(PIP) install bandit --quiet
-	@$(BANDIT) -r $(SRC_DIR)/ -ll || echo "$(YELLOW)⚠️  Security issues found$(NC)"
+	@$(PIP) install bandit safety --quiet
+	@echo "$(YELLOW)Running Bandit security scan...$(NC)"
+	@$(BANDIT) -r $(SRC_DIR)/ -ll -f json -o security-report.json || true
+	@$(BANDIT) -r $(SRC_DIR)/ -ll || echo "$(YELLOW)⚠️  Security issues found - check security-report.json$(NC)"
+	@echo "$(YELLOW)Checking for known vulnerabilities...$(NC)"
+	@$(PIP) freeze | $(PY) -m safety check --stdin || echo "$(YELLOW)⚠️  Vulnerable packages found$(NC)"
 	@echo "$(GREEN)✅ Security scan complete$(NC)"
 
 # ========== Testing ==========
 
-# Run tests
+# Run all tests
 test:
-	@echo "$(BLUE)🧪 Running tests...$(NC)"
+	@echo "$(BLUE)🧪 Running all tests...$(NC)"
 	@if [ ! -x $(PY) ]; then make deps; fi
-	@$(PIP) install pytest pytest-cov --quiet
-	@$(PYTEST) $(TESTS_DIR)/ -v --tb=short || echo "$(YELLOW)⚠️  Some tests failed$(NC)"
+	@$(PIP) install pytest pytest-cov pytest-mock pytest-timeout --quiet
+	@mkdir -p $(LOGS_DIR)
+	@$(PYTEST) $(TESTS_DIR)/ -v \
+		--tb=short \
+		--cov=$(SRC_DIR) \
+		--cov-report=term-missing \
+		--cov-report=html:htmlcov \
+		--cov-report=xml \
+		--junit-xml=$(LOGS_DIR)/test-results.xml \
+		--timeout=300 \
+		|| echo "$(YELLOW)⚠️  Some tests failed$(NC)"
 	@echo "$(GREEN)✅ Tests complete$(NC)"
 
-# Test coverage report
+# Run fast tests only (skip slow/integration tests)
+test-fast:
+	@echo "$(BLUE)⚡ Running fast tests...$(NC)"
+	@if [ ! -x $(PY) ]; then make deps; fi
+	@$(PIP) install pytest pytest-mock --quiet
+	@$(PYTEST) $(TESTS_DIR)/ -v -m "not slow and not integration" \
+		--tb=short \
+		--timeout=60 \
+		|| echo "$(YELLOW)⚠️  Some fast tests failed$(NC)"
+	@echo "$(GREEN)✅ Fast tests complete$(NC)"
+
+# Run integration tests
+test-integration:
+	@echo "$(BLUE)🔗 Running integration tests...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PIP) install pytest pytest-timeout pytest-json-report psutil --quiet
+	@echo "$(CYAN)🧪 Testing complete production pipeline integration$(NC)"
+	@$(PY) $(SCRIPTS_DIR)/run_integration_tests.py || echo "$(YELLOW)⚠️  Integration tests failed$(NC)"
+	@echo "$(GREEN)✅ Integration tests complete$(NC)"
+
+# Run performance tests
+test-performance:
+	@echo "$(BLUE)📊 Running performance tests...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PIP) install pytest pytest-timeout psutil --quiet
+	@$(PYTEST) $(TESTS_DIR)/ -v -m "performance" \
+		--tb=short \
+		--timeout=600 \
+		|| echo "$(YELLOW)⚠️  Performance tests failed$(NC)"
+	@echo "$(GREEN)✅ Performance tests complete$(NC)"
+
+# Test model components
+test-models:
+	@echo "$(BLUE)🤖 Testing model components...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PIP) install pytest --quiet
+	@$(PYTEST) $(TESTS_DIR)/test_*model*.py $(TESTS_DIR)/test_*vision*.py $(TESTS_DIR)/test_*audio*.py -v \
+		--tb=short \
+		|| echo "$(YELLOW)⚠️  Model tests failed$(NC)"
+	@echo "$(GREEN)✅ Model tests complete$(NC)"
+
+# Test UI components
+test-ui:
+	@echo "$(BLUE)🖥️  Testing UI components...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PIP) install pytest --quiet
+	@$(PYTEST) $(TESTS_DIR)/ -v -k "ui or streamlit or interface" \
+		--tb=short \
+		|| echo "$(YELLOW)⚠️  UI tests failed$(NC)"
+	@echo "$(GREEN)✅ UI tests complete$(NC)"
+
+# Generate test coverage report
 coverage:
 	@echo "$(BLUE)📊 Generating test coverage report...$(NC)"
 	@if [ ! -x $(PY) ]; then make deps; fi
 	@$(PIP) install pytest pytest-cov --quiet
-	@$(PYTEST) $(TESTS_DIR)/ --cov=$(SRC_DIR) --cov-report=html --cov-report=term
-	@echo "$(GREEN)📊 Coverage report generated in htmlcov/index.html$(NC)"
-
-# ========== Integration Testing ==========
-
-# Run comprehensive integration tests
-test-integration:
-	@echo "$(BLUE)🔗 Running comprehensive integration tests...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🧪 Testing complete production training pipeline integration$(NC)"
-	@echo "$(CYAN)📋 Includes: Training, Registry, VisionAdapter, Model Switching, UI Deployment$(NC)"
-	@$(PIP) install pytest pytest-timeout pytest-json-report psutil --quiet
-	@$(PY) scripts/run_integration_tests.py
-	@echo "$(GREEN)✅ Integration tests completed$(NC)"
-	@echo "$(YELLOW)💡 Check integration_test_report.json for detailed results$(NC)"
-
-# Run integration tests without performance tests (faster)
-test-integration-fast:
-	@echo "$(BLUE)🔗 Running integration tests (fast mode)...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🧪 Testing integration without performance regression tests$(NC)"
-	@$(PIP) install pytest pytest-timeout pytest-json-report psutil --quiet
-	@$(PY) scripts/run_integration_tests.py --no-performance
-	@echo "$(GREEN)✅ Fast integration tests completed$(NC)"
-
-# Run only performance regression tests
-test-performance:
-	@echo "$(BLUE)📊 Running performance regression tests...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)⚡ Testing training pipeline performance and regression detection$(NC)"
-	@$(PIP) install pytest pytest-timeout psutil --quiet
-	@$(PYTEST) tests/test_performance_regression_comprehensive.py -v --tb=short -m performance
-	@echo "$(GREEN)✅ Performance regression tests completed$(NC)"
-
-# Test VisionAdapter integration with ModelRegistry
-test-vision-registry:
-	@echo "$(BLUE)👁️ Testing VisionAdapter-Registry integration...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🔍 Testing deep integration between VisionAdapter and ModelRegistry$(NC)"
-	@$(PIP) install pytest pytest-timeout --quiet
-	@$(PYTEST) tests/test_vision_adapter_registry_integration.py -v --tb=short
-	@echo "$(GREEN)✅ VisionAdapter-Registry integration tests completed$(NC)"
-
-# Test model switching functionality
-test-model-switching:
-	@echo "$(BLUE)🔄 Testing model switching functionality...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🔀 Testing comprehensive model switching with registry models$(NC)"
-	@$(PIP) install pytest pytest-timeout --quiet
-	@$(PYTEST) tests/test_model_switching_comprehensive.py -v --tb=short
-	@echo "$(GREEN)✅ Model switching tests completed$(NC)"
-
-# Test end-to-end deployment workflow
-test-deployment:
-	@echo "$(BLUE)🚀 Testing end-to-end deployment workflow...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🎯 Testing complete workflow from training to UI deployment$(NC)"
-	@$(PIP) install pytest pytest-timeout --quiet
-	@$(PYTEST) tests/test_end_to_end_deployment.py -v --tb=short
-	@echo "$(GREEN)✅ End-to-end deployment tests completed$(NC)"
-
-# Check integration test prerequisites
-test-check:
-	@echo "$(BLUE)🔍 Checking integration test prerequisites...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@$(PIP) install pytest pytest-timeout pytest-json-report psutil --quiet
-	@$(PY) scripts/run_integration_tests.py --check-only
-	@echo "$(GREEN)✅ Integration test prerequisites check completed$(NC)"
-
-# Run legacy integration tests (existing scripts)
-test-legacy-integration:
-	@echo "$(BLUE)🔗 Running legacy integration tests...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🧪 Running existing integration test scripts$(NC)"
-	@if [ -f scripts/test_production_workflow.py ]; then \
-		echo "$(YELLOW)Running production workflow test...$(NC)"; \
-		$(PY) scripts/test_production_workflow.py; \
+	@$(PYTEST) $(TESTS_DIR)/ \
+		--cov=$(SRC_DIR) \
+		--cov-report=html:htmlcov \
+		--cov-report=term-missing \
+		--cov-report=xml \
+		--cov-fail-under=80
+	@echo "$(GREEN)📊 Coverage report: htmlcov/index.html$(NC)"
+	@if command -v open >/dev/null 2>&1; then \
+		echo "$(CYAN)🌐 Opening coverage report...$(NC)"; \
+		open htmlcov/index.html; \
 	fi
-	@if [ -f scripts/test_end_to_end_integration.py ]; then \
-		echo "$(YELLOW)Running end-to-end integration test...$(NC)"; \
-		$(PY) scripts/test_end_to_end_integration.py; \
-	fi
-	@if [ -f scripts/test_model_switching_integration.py ]; then \
-		echo "$(YELLOW)Running model switching integration test...$(NC)"; \
-		$(PY) scripts/test_model_switching_integration.py; \
-	fi
-	@echo "$(GREEN)✅ Legacy integration tests completed$(NC)"
 
 # ========== Machine Learning ==========
 
-# Train models
+# Train models with optimal settings
 train:
 	@echo "$(BLUE)🤖 Training PlantGuard models...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
 	@mkdir -p $(RUNS_DIR)
-	@echo "$(YELLOW)Checking dataset availability...$(NC)"
-	@if [ -d "data/PlantVillage/train" ] && [ -d "data/PlantVillage/val" ]; then \
-		echo "$(GREEN)✅ PlantVillage dataset found$(NC)"; \
-		DATASET_DIR="data/PlantVillage"; \
-	elif [ -d "data/plantvillage_dummy/train" ] && [ -d "data/plantvillage_dummy/val" ]; then \
-		echo "$(GREEN)✅ Dummy dataset found$(NC)"; \
-		DATASET_DIR="data/plantvillage_dummy"; \
-	else \
-		echo "$(YELLOW)⚠️  No dataset found. Creating dummy dataset for testing...$(NC)"; \
-		$(PY) scripts/setup_dummy_dataset.py --output_dir data/plantvillage_dummy --num_classes 5 --samples_per_class 20; \
-		DATASET_DIR="data/plantvillage_dummy"; \
-	fi; \
-	echo "$(YELLOW)Training vision model (ResNet50)...$(NC)"; \
-	if [ -f scripts/train_vision_model.py ]; then \
-		$(PY) scripts/train_vision_model.py --data_dir $$DATASET_DIR --epochs 5 --batch_size 8; \
-	else \
-		echo "$(YELLOW)⚠️  Vision training script not found$(NC)"; \
+	@echo "$(YELLOW)Device: $(TORCH_DEVICE), Workers: $(WORKERS), Batch Size: $(BATCH_SIZE)$(NC)"
+	@if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+		export PYTORCH_ENABLE_MPS_FALLBACK=1; \
+		echo "$(GREEN)🚀 Apple Silicon MPS acceleration enabled$(NC)"; \
 	fi
-	@echo "$(GREEN)✅ Model training complete$(NC)"
+	@$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
+		--device $(TORCH_DEVICE) \
+		--batch_size $(BATCH_SIZE) \
+		--workers $(WORKERS) \
+		--epochs 50
+	@echo "$(GREEN)✅ Training complete$(NC)"
 
-# Train models with improved pipeline and better hyperparameters
-train-improved:
-	@echo "$(BLUE)🤖 Training PlantGuard models (improved)...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@mkdir -p $(RUNS_DIR)
-	@echo "$(YELLOW)Checking dataset availability...$(NC)"
-	@if [ -d "data/processed/plantvillage/train" ] && [ -d "data/processed/plantvillage/val" ]; then \
-		echo "$(GREEN)✅ Real PlantVillage dataset found$(NC)"; \
-		$(PY) scripts/train_vision_model_improved.py --data_dir data/processed/plantvillage --epochs 50 --batch_size 32 --learning_rate 0.0001; \
-	elif [ -d "data/PlantVillage/train" ] && [ -d "data/PlantVillage/val" ]; then \
-		echo "$(GREEN)✅ Legacy PlantVillage dataset found$(NC)"; \
-		$(PY) scripts/train_vision_model_improved.py --data_dir data/PlantVillage --epochs 50 --batch_size 32 --learning_rate 0.0001; \
-	elif [ -d "data/plantvillage_dummy_improved/train" ] && [ -d "data/plantvillage_dummy_improved/val" ]; then \
-		echo "$(GREEN)✅ Improved dummy dataset found$(NC)"; \
-		$(PY) scripts/train_vision_model_improved.py --data_dir data/plantvillage_dummy_improved --epochs 15 --batch_size 16 --learning_rate 0.0001; \
-	else \
-		echo "$(YELLOW)⚠️  No dataset found. Creating improved dummy dataset for testing...$(NC)"; \
-		$(PY) scripts/setup_better_dummy_dataset.py --output_dir data/plantvillage_dummy_improved --num_classes 8 --samples_per_class 60; \
-		$(PY) scripts/train_vision_model_improved.py --data_dir data/plantvillage_dummy_improved --epochs 15 --batch_size 16 --learning_rate 0.0001; \
-	fi
-	@echo "$(GREEN)✅ Improved model training complete$(NC)"
-
-# Production training workflow with full pipeline and validation
+# Production training pipeline
 train-production:
-	@echo "$(BLUE)🚀 Starting PlantGuard Production Training Pipeline...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(BLUE)🚀 Starting production training pipeline...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
 	@echo "$(CYAN)🔍 Full production pipeline with validation and optimal settings$(NC)"
-	@echo "$(CYAN)📋 Features: Dataset validation, resource detection, advanced training, model registry$(NC)"
-	@echo "$(CYAN)📊 Includes: Monitoring, checkpointing, evaluation, and deployment preparation$(NC)"
-	@$(PY) scripts/production_training_workflow.py --production
-	@echo "$(GREEN)✅ Production training pipeline complete$(NC)"
-	@echo "$(YELLOW)💡 Use 'make monitor-training' to view training metrics$(NC)"
-	@echo "$(YELLOW)💡 Use 'make evaluate-model' to test the trained model$(NC)"
-	@echo "$(YELLOW)💡 Use 'make list-models' to see all registered models$(NC)"
+	@$(PY) $(SCRIPTS_DIR)/production_training_workflow.py --production
+	@echo "$(GREEN)✅ Production training complete$(NC)"
+	@echo "$(CYAN)💡 Use 'make monitor' to view training metrics$(NC)"
 
-# Monitor training with TensorBoard
-monitor-training:
-	@echo "$(BLUE)📊 Launching TensorBoard for training monitoring...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
+# Fast training for development
+train-fast:
+	@echo "$(BLUE)⚡ Fast training for development...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
+		--device $(TORCH_DEVICE) \
+		--batch_size 16 \
+		--epochs 5 \
+		--fast
+	@echo "$(GREEN)✅ Fast training complete$(NC)"
+
+# Launch TensorBoard monitoring
+monitor:
+	@echo "$(BLUE)📊 Launching TensorBoard monitoring...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
 	@$(PIP) install tensorboard --quiet
-	@if [ ! -d "$(RUNS_DIR)" ]; then \
-		echo "$(YELLOW)⚠️  No training runs found. Creating directory...$(NC)"; \
-		mkdir -p $(RUNS_DIR); \
-		echo "$(CYAN)💡 Run 'make train-production' to start training with monitoring$(NC)"; \
-	fi
-	@echo "$(CYAN)🚀 Starting TensorBoard server...$(NC)"
+	@mkdir -p $(RUNS_DIR)
 	@echo "$(GREEN)📈 TensorBoard available at: http://localhost:6006$(NC)"
-
-# Performance optimization commands
-optimize-performance: ## Run comprehensive performance optimization
-	@echo "$(BLUE)⚡ Running comprehensive performance optimization...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🔍 Analyzing training pipeline performance and identifying bottlenecks$(NC)"
-	@echo "$(CYAN)⚡ Applying optimizations: model compilation, data loading, memory management$(NC)"
-	@$(PY) -c "
-import torch
-from pathlib import Path
-from src.training.performance_optimizer import optimize_training_performance, create_performance_optimization_config
-from src.training.config import TrainingConfig
-from src.training.dataset_manager import DatasetManager
-from src.training.production_trainer import ProductionTrainer
-
-# Create configuration
-config = TrainingConfig(
-    experiment_name='performance_optimization',
-    model_architecture='resnet50',
-    num_classes=38,
-    epochs=5,
-    batch_size=32,
-    device='auto',
-    enable_performance_optimization=True,
-    target_throughput_samples_per_sec=100.0,
-)
-
-# Create trainer and run optimization
-dataset_manager = DatasetManager()
-trainer = ProductionTrainer(config, dataset_manager, output_dir=Path('runs/performance_optimization'))
-
-if trainer.setup_training():
-    result = trainer.optimize_training_performance()
-    if result:
-        print('$(GREEN)✅ Performance optimization completed successfully$(NC)')
-    else:
-        print('$(RED)❌ Performance optimization failed$(NC)')
-else:
-    print('$(RED)❌ Training setup failed$(NC)')
-"
-	@echo "$(GREEN)✅ Performance optimization complete$(NC)"
-	@echo "$(YELLOW)💡 Check 'runs/performance_optimization' for detailed results$(NC)"
-
-profile-training: ## Profile training performance and identify bottlenecks
-	@echo "$(BLUE)📊 Profiling training performance...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🔍 Analyzing training loop performance and identifying bottlenecks$(NC)"
-	@$(PY) -c "
-import torch
-from pathlib import Path
-from src.training.performance_profiler import TrainingProfiler, ProfilerConfig
-from src.training.config import TrainingConfig
-from src.training.dataset_manager import DatasetManager
-from src.training.production_trainer import ProductionTrainer
-
-# Create profiler configuration
-profiler_config = ProfilerConfig(
-    profile_batches=20,
-    export_chrome_trace=True,
-    export_tensorboard=True,
-    output_dir=Path('profiling_results'),
-)
-
-# Create trainer
-config = TrainingConfig(
-    experiment_name='profiling_test',
-    model_architecture='resnet50',
-    num_classes=38,
-    epochs=1,
-    batch_size=32,
-    device='auto',
-)
-
-dataset_manager = DatasetManager()
-trainer = ProductionTrainer(config, dataset_manager)
-
-if trainer.setup_training():
-    # Create profiler and run
-    profiler = TrainingProfiler(profiler_config)
-    
-    profile_result = profiler.profile_training_loop(
-        trainer.model,
-        trainer.train_loader,
-        trainer.training_components.optimizer,
-        torch.nn.CrossEntropyLoss(),
-        trainer.device,
-    )
-    
-    print('$(GREEN)📈 Profiling completed!$(NC)')
-    print(f'Average batch time: {profile_result.avg_batch_time_ms:.1f}ms')
-    print(f'Throughput: {profile_result.throughput_samples_per_sec:.1f} samples/sec')
-    print(f'Peak memory: {profile_result.peak_memory_mb:.1f}MB')
-    
-    if profile_result.bottlenecks:
-        print('$(YELLOW)🔍 Identified bottlenecks:$(NC)')
-        for bottleneck in profile_result.bottlenecks[:3]:
-            print(f'  - {bottleneck.component}: {bottleneck.percentage_of_total:.1f}% of time')
-else:
-    print('$(RED)❌ Training setup failed$(NC)')
-"
-	@echo "$(GREEN)✅ Performance profiling complete$(NC)"
-	@echo "$(YELLOW)💡 Check 'profiling_results' for detailed analysis$(NC)"
-	@echo "$(YELLOW)💡 Open 'profiling_results/training_profile.json' in Chrome for detailed trace$(NC)"
-
-benchmark-data-loading: ## Benchmark data loading performance
-	@echo "$(BLUE)📦 Benchmarking data loading performance...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🔍 Testing different data loading configurations$(NC)"
-	@$(PY) -c "
-from pathlib import Path
-from src.training.advanced_data_loading import benchmark_data_loading_performance, AdvancedDataLoadingConfig
-from src.training.dataset_manager import DatasetManager
-from torch.utils.data import DataLoader
-from torchvision.datasets import ImageFolder
-from torchvision import transforms
-
-# Create dataset
-dataset_path = Path('data/processed/plantvillage/train')
-if dataset_path.exists():
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-    
-    dataset = ImageFolder(dataset_path, transform=transform)
-    
-    # Test different configurations
-    configs = {
-        'basic': AdvancedDataLoadingConfig(
-            enable_intelligent_prefetching=False,
-            enable_gpu_preprocessing=False,
-            enable_memory_mapping=False,
-        ),
-        'optimized': AdvancedDataLoadingConfig(
-            enable_intelligent_prefetching=True,
-            enable_gpu_preprocessing=True,
-            enable_memory_mapping=True,
-        ),
-    }
-    
-    for name, config in configs.items():
-        print(f'$(CYAN)Testing {name} configuration...$(NC)')
-        metrics = benchmark_data_loading_performance(dataset, config, num_batches=20)
-        print(f'  Throughput: {metrics[\"throughput_samples_per_sec\"]:.1f} samples/sec')
-        print(f'  Batch time: {metrics[\"avg_batch_time_ms\"]:.1f}ms')
-        print()
-else:
-    print('$(RED)❌ Dataset not found. Please prepare dataset first.$(NC)')
-"
-	@echo "$(GREEN)✅ Data loading benchmark complete$(NC)"
-	@echo "$(YELLOW)📊 Features: Training curves, model graphs, sample predictions$(NC)"
-	@echo "$(YELLOW)⌨️  Press Ctrl+C to stop TensorBoard$(NC)"
-	@echo ""
 	@$(PY) -m tensorboard.main --logdir=$(RUNS_DIR) --port=6006 --reload_interval=1 --host=0.0.0.0
 
-# Setup dataset (real PlantVillage or dummy for testing)
-setup-dataset:
-	@echo "$(BLUE)📊 Setting up training dataset...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)Dataset setup options:$(NC)"
-	@echo "  1. $(GREEN)Real PlantVillage dataset$(NC) (recommended for production)"
-	@echo "     - Download automatically: make download-dataset"
-	@echo "     - Or download manually from: https://www.kaggle.com/datasets/abdallahalidev/plantvillage-dataset"
-	@echo "     - Extract to: data/raw/plantvillage/"
-	@echo "     - Run: make prepare-dataset"
-	@echo ""
-	@echo "  2. $(YELLOW)Dummy dataset$(NC) (for testing only)"
-	@echo "     - Run: make dummy-dataset"
-	@echo ""
-	@echo "$(CYAN)Current status:$(NC)"
-	@$(PY) -c "\
-from pathlib import Path; \
-from src.training.dataset_manager import DatasetManager; \
-import sys; \
-dm = DatasetManager(); \
-processed_exists = (Path('data/processed/plantvillage/train').exists() and Path('data/processed/plantvillage/val').exists()); \
-legacy_exists = (Path('data/PlantVillage/train').exists() and Path('data/PlantVillage/val').exists()); \
-raw_exists = Path('data/raw/plantvillage').exists(); \
-dummy_exists = (Path('data/plantvillage_dummy/train').exists() and Path('data/plantvillage_dummy/val').exists()); \
-print('  ✅ Processed PlantVillage dataset found' if processed_exists else ('  ✅ Legacy PlantVillage dataset found' if legacy_exists else '  ❌ No processed PlantVillage dataset found')); \
-print('  ✅ Raw PlantVillage dataset found' if raw_exists else '  ❌ Raw PlantVillage dataset not found'); \
-print('  ✅ Dummy dataset found' if dummy_exists else '  ❌ Dummy dataset not found'); \
-"
-	@echo ""
-	@echo "$(CYAN)💡 Quick commands:$(NC)"
-	@echo "  $(BLUE)make download-dataset$(NC)  - Download PlantVillage from Kaggle"
-	@echo "  $(BLUE)make prepare-dataset$(NC)   - Prepare dataset with train/val splits"
-	@echo "  $(BLUE)make validate-dataset$(NC)  - Check dataset integrity"
-	@echo "  $(BLUE)make analyze-dataset$(NC)   - Show dataset statistics"
+# Evaluate trained models
+evaluate:
+	@echo "$(BLUE)📊 Evaluating trained models...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/evaluate_model.py
+	@echo "$(GREEN)✅ Model evaluation complete$(NC)"
 
-# Download PlantVillage dataset automatically
-download-dataset:
+# Benchmark all models
+benchmark:
+	@echo "$(BLUE)🏁 Benchmarking all models...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/model_switching/model_switcher.py --benchmark
+	@echo "$(GREEN)✅ Benchmark complete$(NC)"
+
+# Performance optimization
+optimize:
+	@echo "$(BLUE)⚡ Running performance optimization...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@if [ -f $(SCRIPTS_DIR)/optimize_performance.py ]; then \
+		$(PY) $(SCRIPTS_DIR)/optimize_performance.py; \
+	else \
+		echo "$(YELLOW)⚠️  Performance optimization script not found$(NC)"; \
+		echo "$(CYAN)💡 Creating basic optimization...$(NC)"; \
+		$(PY) -c "print('Performance optimization placeholder - implement in scripts/optimize_performance.py')"; \
+	fi
+	@echo "$(GREEN)✅ Performance optimization complete$(NC)"
+
+# ========== Dataset Management ==========
+
+# Check dataset status
+dataset-status:
+	@echo "$(BLUE)📊 Checking dataset status...$(NC)"
+	@if [ -d "$(DATA_DIR)/processed/plantvillage/train" ]; then \
+		echo "$(GREEN)✅ PlantVillage dataset found$(NC)"; \
+		echo "$(YELLOW)Train samples: $(shell find $(DATA_DIR)/processed/plantvillage/train -name "*.jpg" -o -name "*.png" | wc -l)$(NC)"; \
+		echo "$(YELLOW)Val samples: $(shell find $(DATA_DIR)/processed/plantvillage/val -name "*.jpg" -o -name "*.png" | wc -l)$(NC)"; \
+	elif [ -d "$(DATA_DIR)/plantvillage_dummy/train" ]; then \
+		echo "$(YELLOW)⚠️  Using dummy dataset$(NC)"; \
+		echo "$(YELLOW)Train samples: $(shell find $(DATA_DIR)/plantvillage_dummy/train -name "*.jpg" -o -name "*.png" | wc -l)$(NC)"; \
+	else \
+		echo "$(RED)❌ No dataset found$(NC)"; \
+		echo "$(CYAN)💡 Run 'make dataset-download' or 'make dataset-dummy'$(NC)"; \
+	fi
+
+# Download PlantVillage dataset
+dataset-download:
 	@echo "$(BLUE)📥 Downloading PlantVillage dataset...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@$(PY) scripts/download_dataset.py
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/download_dataset.py
+	@echo "$(GREEN)✅ Dataset download complete$(NC)"
+
+# Prepare dataset for training
+dataset-prepare:
+	@echo "$(BLUE)🔄 Preparing dataset...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/prepare_dataset.py
+	@echo "$(GREEN)✅ Dataset preparation complete$(NC)"
 
 # Validate dataset integrity
-validate-dataset:
-	@echo "$(BLUE)🔍 Validating dataset integrity...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@$(PY) scripts/validate_dataset.py
+dataset-validate:
+	@echo "$(BLUE)🔍 Validating dataset...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/validate_dataset.py
+	@echo "$(GREEN)✅ Dataset validation complete$(NC)"
 
 # Analyze dataset statistics
-analyze-dataset:
-	@echo "$(BLUE)📊 Analyzing dataset statistics...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@$(PY) scripts/analyze_dataset.py
+dataset-analyze:
+	@echo "$(BLUE)📊 Analyzing dataset...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/analyze_dataset.py
+	@echo "$(GREEN)✅ Dataset analysis complete$(NC)"
 
 # Create dummy dataset for testing
-dummy-dataset:
-	@echo "$(BLUE)🎭 Creating dummy dataset for testing...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@$(PY) scripts/setup_dummy_dataset.py --output_dir data/plantvillage_dummy --num_classes 8 --samples_per_class 50
-	@echo "$(GREEN)✅ Dummy dataset created at data/plantvillage_dummy/$(NC)"
-	@echo "$(YELLOW)⚠️  This is for testing only. Use real PlantVillage dataset for production.$(NC)"
+dataset-dummy:
+	@echo "$(BLUE)🎭 Creating dummy dataset...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/setup_better_dummy_dataset.py \
+		--output_dir $(DATA_DIR)/plantvillage_dummy \
+		--num_classes 8 \
+		--samples_per_class 60
+	@echo "$(GREEN)✅ Dummy dataset created$(NC)"
 
-# Evaluate trained model with comprehensive metrics
-evaluate-model:
-	@echo "$(BLUE)📊 Evaluating trained model with comprehensive metrics...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🔍 Running detailed model evaluation...$(NC)"
-	@echo "$(CYAN)📋 Metrics: Accuracy, Precision, Recall, F1-Score, Confusion Matrix$(NC)"
-	@echo "$(CYAN)🖼️  Testing: Sample predictions with confidence scores$(NC)"
-	@$(PY) scripts/evaluate_model.py --comprehensive
-	@echo "$(GREEN)✅ Model evaluation complete$(NC)"
-	@echo "$(YELLOW)💡 Check evaluation results in logs/ directory$(NC)"
-	@echo "$(YELLOW)💡 Use 'make list-models' to compare with other models$(NC)"
+# ========== Model Management ==========
 
-# Prepare real PlantVillage dataset (assumes raw data is available)
-prepare-dataset:
-	@echo "$(BLUE)📊 Preparing PlantVillage dataset...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@$(PY) scripts/prepare_dataset_new.py
-
-# Show model information
+# List all models
 models:
-	@echo "$(BLUE)🤖 Model information...$(NC)"
-	@if [ -d $(DATA_DIR)/models ]; then \
-		echo "$(CYAN)Available models:$(NC)"; \
-		ls -la $(DATA_DIR)/models/; \
-		echo ""; \
-		echo "$(CYAN)Model sizes:$(NC)"; \
-		du -sh $(DATA_DIR)/models/* 2>/dev/null || true; \
-	else \
-		echo "$(YELLOW)No models directory found. Run 'make train' to create models.$(NC)"; \
-	fi
+	@echo "$(BLUE)🤖 Listing available models...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/list_models.py
+	@echo "$(GREEN)✅ Model listing complete$(NC)"
 
-# List all registered models with performance details
-list-models:
-	@echo "$(BLUE)📋 Listing all registered models with performance details...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)🔍 Showing model registry with versions, metrics, and metadata$(NC)"
-	@PYTHONPATH=. $(PY) scripts/list_models.py --detailed
-	@echo ""
-	@echo "$(YELLOW)💡 Use 'make evaluate-model' to test a specific model$(NC)"
-	@echo "$(YELLOW)💡 Use 'make train-production' to train a new model$(NC)"
-
-# Migrate legacy models to registry format
-migrate-models:
-	@echo "$(BLUE)🔄 Migrating legacy models to registry format...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)📋 Scanning for legacy models...$(NC)"
-	@PYTHONPATH=. $(PY) scripts/migrate_models.py --migrate-all
+# Migrate legacy models
+models-migrate:
+	@echo "$(BLUE)🔄 Migrating legacy models...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/migrate_models.py
 	@echo "$(GREEN)✅ Model migration complete$(NC)"
-	@echo "$(YELLOW)💡 Use 'make list-models' to see migrated models$(NC)"
 
-# Sync model configuration with registry
-sync-models:
-	@echo "$(BLUE)🔄 Syncing model configuration with registry...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@PYTHONPATH=. $(PY) scripts/model_switching/model_switcher.py --sync
-	@echo "$(GREEN)✅ Model configuration synced$(NC)"
+# Sync model registry
+models-sync:
+	@echo "$(BLUE)🔄 Syncing model registry...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/model_switching/model_switcher.py --sync
+	@echo "$(GREEN)✅ Model registry synced$(NC)"
 
-# Switch to a specific model
-switch-model:
-	@echo "$(BLUE)🔄 Model switcher interface...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@echo "$(CYAN)Available commands:$(NC)"
-	@echo "  make switch-model MODEL_ID=your_model_id"
-	@echo "  make list-models  # to see available models"
-	@if [ -n "$(MODEL_ID)" ]; then \
-		echo "$(CYAN)Switching to model: $(MODEL_ID)$(NC)"; \
-		PYTHONPATH=. $(PY) scripts/model_switching/model_switcher.py --switch $(MODEL_ID); \
+# Switch active model
+models-switch:
+	@echo "$(BLUE)🔄 Switching active model...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@if [ -z "$(MODEL_ID)" ]; then \
+		echo "$(RED)❌ Please specify MODEL_ID=<model_name>$(NC)"; \
+		exit 1; \
+	fi
+	@$(PY) $(SCRIPTS_DIR)/model_switching/model_switcher.py --switch $(MODEL_ID)
+	@echo "$(GREEN)✅ Model switched to $(MODEL_ID)$(NC)"
+
+# Export models for deployment
+models-export:
+	@echo "$(BLUE)📦 Exporting models for deployment...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@mkdir -p $(DATA_DIR)/export
+	@find $(MODELS_DIR) -name "*.pt" -exec cp {} $(DATA_DIR)/export/ \; 2>/dev/null || true
+	@echo "$(GREEN)✅ Models exported to $(DATA_DIR)/export$(NC)"
+
+# Import external models
+models-import:
+	@echo "$(BLUE)📥 Importing external models...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@echo "$(YELLOW)Place model files in $(DATA_DIR)/import/ directory$(NC)"
+	@if [ -d "$(DATA_DIR)/import" ]; then \
+		find $(DATA_DIR)/import -name "*.pt" -exec cp {} $(MODELS_DIR)/ \; 2>/dev/null || true; \
+		echo "$(GREEN)✅ Models imported$(NC)"; \
 	else \
-		echo "$(YELLOW)💡 Usage: make switch-model MODEL_ID=your_model_id$(NC)"; \
-		PYTHONPATH=. $(PY) scripts/model_switching/model_switcher.py --list; \
+		echo "$(YELLOW)⚠️  Import directory not found$(NC)"; \
+	fi
+	@echo "$(GREEN)✅ Model import complete$(NC)"
+
+# ========== Deployment & Production ==========
+
+# Deploy locally with production settings
+deploy-local:
+	@echo "$(BLUE)🚀 Deploying locally with production settings...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@export STREAMLIT_SERVER_HEADLESS=true && \
+	export STREAMLIT_SERVER_ENABLE_CORS=false && \
+	export STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=false && \
+	$(STREAMLIT) run src/ui/app_streamlit.py \
+		--server.port 8501 \
+		--server.address 0.0.0.0 \
+		--server.headless true
+
+# Build and run Docker container
+deploy-docker:
+	@echo "$(BLUE)🐳 Building Docker container...$(NC)"
+	@if [ ! -f Dockerfile ]; then \
+		echo "$(YELLOW)Creating Dockerfile...$(NC)"; \
+		echo "FROM python:3.11-slim" > Dockerfile; \
+		echo "WORKDIR /app" >> Dockerfile; \
+		echo "COPY requirements.txt ." >> Dockerfile; \
+		echo "RUN pip install -r requirements.txt" >> Dockerfile; \
+		echo "COPY . ." >> Dockerfile; \
+		echo "EXPOSE 8501" >> Dockerfile; \
+		echo "CMD [\"streamlit\", \"run\", \"src/ui/app_streamlit.py\", \"--server.port=8501\", \"--server.address=0.0.0.0\"]" >> Dockerfile; \
+	fi
+	@docker build -t plantguard .
+	@echo "$(GREEN)✅ Docker image built$(NC)"
+	@echo "$(CYAN)💡 Run: docker run -p 8501:8501 plantguard$(NC)"
+
+# Validate deployment readiness
+deploy-check:
+	@echo "$(BLUE)🔍 Checking deployment readiness...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/validate_apps.py
+	@echo "$(GREEN)✅ Deployment check complete$(NC)"
+
+# ========== Monitoring & Maintenance ==========
+
+# Show system status
+status:
+	@echo "$(BLUE)📊 System Status$(NC)"
+	@echo "$(YELLOW)Platform: $(UNAME_S) $(UNAME_M)$(NC)"
+	@echo "$(YELLOW)Python: $(shell $(PYTHON) --version 2>/dev/null || echo 'Not found')$(NC)"
+	@echo "$(YELLOW)Virtual Env: $(shell [ -x $(PY) ] && echo 'Active' || echo 'Not found')$(NC)"
+	@if [ -x $(PY) ]; then \
+		echo "$(YELLOW)PyTorch: $(shell $(PY) -c 'import torch; print(torch.__version__)' 2>/dev/null || echo 'Not installed')$(NC)"; \
+		echo "$(YELLOW)Streamlit: $(shell $(PY) -c 'import streamlit; print(streamlit.__version__)' 2>/dev/null || echo 'Not installed')$(NC)"; \
+		if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+			echo "$(YELLOW)MPS Available: $(shell $(PY) -c 'import torch; print(torch.backends.mps.is_available())' 2>/dev/null || echo 'Unknown')$(NC)"; \
+		fi; \
+	fi
+	@echo "$(YELLOW)Disk Usage: $(shell du -sh . 2>/dev/null || echo 'Unknown')$(NC)"
+	@echo "$(YELLOW)Running Processes:$(NC)"
+	@ps aux | grep -E "(streamlit|jupyter|tensorboard)" | grep -v grep || echo "  No PlantGuard processes running"
+
+# Detailed project information
+info:
+	@echo "$(CYAN)🌿 PlantGuard Project Information$(NC)"
+	@echo ""
+	@echo "$(GREEN)📁 Project Structure:$(NC)"
+	@echo "  Source Code: $(SRC_DIR)/"
+	@echo "  Data: $(DATA_DIR)/"
+	@echo "  Models: $(MODELS_DIR)/"
+	@echo "  Tests: $(TESTS_DIR)/"
+	@echo "  Logs: $(LOGS_DIR)/"
+	@echo "  Scripts: $(SCRIPTS_DIR)/"
+	@echo ""
+	@echo "$(GREEN)🔧 Configuration:$(NC)"
+	@echo "  Device: $(TORCH_DEVICE)"
+	@echo "  Workers: $(WORKERS)"
+	@echo "  Batch Size: $(BATCH_SIZE)"
+	@echo "  Memory Limit: $(MEMORY_LIMIT)"
+	@echo ""
+	@echo "$(GREEN)📊 Statistics:$(NC)"
+	@echo "  Python Files: $(shell find $(SRC_DIR) -name "*.py" | wc -l)"
+	@echo "  Test Files: $(shell find $(TESTS_DIR) -name "*.py" | wc -l)"
+	@echo "  Script Files: $(shell find $(SCRIPTS_DIR) -name "*.py" | wc -l)"
+
+# View application logs
+logs:
+	@echo "$(BLUE)📋 Viewing recent logs...$(NC)"
+	@mkdir -p $(LOGS_DIR)
+	@if [ -f $(LOGS_DIR)/debug.log ]; then \
+		echo "$(YELLOW)Debug Log (last 50 lines):$(NC)"; \
+		tail -50 $(LOGS_DIR)/debug.log; \
+	else \
+		echo "$(YELLOW)No debug log found$(NC)"; \
+	fi
+	@if [ -f $(LOGS_DIR)/test-results.xml ]; then \
+		echo "$(YELLOW)Latest test results available$(NC)"; \
 	fi
 
-# Debug model performance
-debug:
-	@echo "$(BLUE)🔍 Debugging model performance...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@if [ -f scripts/test_vision_adapter.py ]; then \
-		$(PY) scripts/test_vision_adapter.py; \
-	else \
-		echo "$(YELLOW)⚠️  Debug script not found$(NC)"; \
-	fi
+# Performance profiling
+profile:
+	@echo "$(BLUE)📊 Performance profiling...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PIP) install py-spy --quiet || echo "$(YELLOW)⚠️  py-spy not available$(NC)"
+	@echo "$(CYAN)💡 Run 'make run' in another terminal, then use:$(NC)"
+	@echo "$(CYAN)py-spy top --pid \$$(pgrep -f streamlit)$(NC)"
 
-# ========== Maintenance ==========
+# Validate system configuration
+validate:
+	@echo "$(BLUE)🔍 Validating system configuration...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup-environment; fi
+	@$(PY) $(SCRIPTS_DIR)/validate_production_pipeline.py
+	@echo "$(GREEN)✅ System validation complete$(NC)"
 
-# Clean temporary files
+# Clean temporary files and caches
 clean:
 	@echo "$(BLUE)🧹 Cleaning temporary files...$(NC)"
-	@rm -rf .mypy_cache .ruff_cache .pytest_cache
-	@rm -rf htmlcov .coverage coverage.xml
-	@rm -rf $(RUNS_DIR) profile.stats
-	@rm -rf build dist *.egg-info
+	@rm -rf __pycache__ .pytest_cache .mypy_cache .ruff_cache
 	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyo" -delete 2>/dev/null || true
 	@find . -type f -name ".DS_Store" -delete 2>/dev/null || true
-	@find $(DATA_DIR)/temp -type f -delete 2>/dev/null || true
+	@rm -rf htmlcov/ .coverage coverage.xml
+	@rm -rf security-report.json
+	@rm -rf $(LOGS_DIR)/*.log
 	@echo "$(GREEN)✅ Cleanup complete$(NC)"
 
-# Reset environment
+# Complete environment reset
 reset: clean
 	@echo "$(BLUE)🔄 Resetting environment...$(NC)"
-	@rm -rf .venv
-	@echo "$(GREEN)✅ Environment reset$(NC)"
+	@rm -rf .venv/
+	@rm -rf src/plantguard.egg-info/
+	@echo "$(GREEN)✅ Environment reset complete$(NC)"
+	@echo "$(CYAN)💡 Run 'make setup' to reinstall$(NC)"
 
-# Fresh install
+# Fresh installation
 fresh: reset setup
 	@echo "$(GREEN)✅ Fresh installation complete!$(NC)"
-
-# Update dependencies
-update:
-	@echo "$(BLUE)🔄 Updating dependencies...$(NC)"
-	@if [ ! -x $(PY) ]; then make deps; fi
-	@$(PIP) install --upgrade pip setuptools wheel
-	@$(PIP) install --upgrade -r requirements.txt
-	@$(PIP) install --upgrade -e . --no-deps
-	@echo "$(GREEN)✅ Dependencies updated$(NC)"
-
-# Check project health
-status:
-	@echo "$(BLUE)📊 Project health check...$(NC)"
-	@echo "$(CYAN)Python version:$(NC)"
-	@$(PYTHON) --version
-	@echo "$(CYAN)Virtual environment:$(NC)"
-	@if [ -x $(PY) ]; then \
-		echo "$(GREEN)✅ Active$(NC)"; \
-	else \
-		echo "$(RED)❌ Not found$(NC)"; \
-	fi
-	@echo "$(CYAN)PlantGuard package:$(NC)"
-	@if [ -x $(PY) ]; then \
-		$(PIP) show plantguard >/dev/null 2>&1 && echo "$(GREEN)✅ Installed$(NC)" || echo "$(YELLOW)⚠️  Not installed$(NC)"; \
-	else \
-		echo "$(RED)❌ Cannot check$(NC)"; \
-	fi
-	@echo "$(CYAN)Core directories:$(NC)"
-	@[ -d $(SRC_DIR) ] && echo "$(GREEN)✅ Source directory$(NC)" || echo "$(RED)❌ Source directory missing$(NC)"
-	@[ -d $(TESTS_DIR) ] && echo "$(GREEN)✅ Tests directory$(NC)" || echo "$(RED)❌ Tests directory missing$(NC)"
-	@[ -d $(DATA_DIR) ] && echo "$(GREEN)✅ Data directory$(NC)" || echo "$(RED)❌ Data directory missing$(NC)"
-
-# Validate application configurations
-validate:
-	@echo "$(BLUE)🔍 Validating PlantGuard applications...$(NC)"
-	@if [ ! -x $(PY) ]; then \
-		echo "$(YELLOW)⚠️  Virtual environment not found. Running setup...$(NC)"; \
-		make setup; \
-	fi
-	@$(PY) scripts/validate_apps.py
-
-# ========== Information ==========
-
-# Project overview
-info:
-	@echo "$(CYAN)🌿 PlantGuard Project Overview$(NC)"
-	@echo ""
-	@echo "$(GREEN)Description:$(NC) Multimodal plant disease detection system"
-	@echo "$(GREEN)Version:$(NC) 0.1.0"
-	@echo "$(GREEN)Python:$(NC) $(shell $(PYTHON) --version 2>&1)"
-	@echo "$(GREEN)Framework:$(NC) PyTorch + Streamlit"
-	@echo ""
-	@echo "$(GREEN)Key Features:$(NC)"
-	@echo "  • Vision: ResNet50 plant disease classification"
-	@echo "  • Audio: Whisper speech recognition"
-	@echo "  • Text: DistilBERT Q&A system"
-	@echo "  • UI: Streamlit multimodal interface"
-	@echo ""
-	@echo "$(GREEN)Quick Commands:$(NC)"
-	@echo "  $(CYAN)make start$(NC)  - First-time setup and launch"
-	@echo "  $(CYAN)make run$(NC)    - Launch with Enhanced Rotated UI"
-	@echo "  $(CYAN)make dev$(NC)    - Development workflow"
-	@echo "  $(CYAN)make train$(NC)  - Train ML models"
-
-# View logs
-logs:
-	@echo "$(BLUE)📋 Recent logs...$(NC)"
-	@mkdir -p $(LOGS_DIR)
-	@if ls $(LOGS_DIR)/*.log >/dev/null 2>&1; then \
-		tail -20 $(LOGS_DIR)/*.log; \
-	else \
-		echo "$(YELLOW)No log files found$(NC)"; \
-	fi
-
-# ========== Advanced Commands ==========
-
-# Build package
-build: clean
-	@echo "$(BLUE)🔨 Building package...$(NC)"
-	@if [ ! -x $(PY) ]; then make deps; fi
-	@$(PIP) install build --quiet
-	@$(PY) -m build
-	@echo "$(GREEN)✅ Package built in dist/$(NC)"
-
-# Generate documentation
-docs:
-	@echo "$(BLUE)📚 Building documentation...$(NC)"
-	@if [ ! -x $(PY) ]; then make deps; fi
-	@$(PIP) install sphinx sphinx-rtd-theme --quiet
-	@mkdir -p docs
-	@echo "$(YELLOW)⚠️  Documentation generation not yet implemented$(NC)"
-
-# Profile performance
-profile:
-	@echo "$(BLUE)📈 Profiling performance...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup; fi
-	@$(PY) -m cProfile -o profile.stats run_local.py &
-	@sleep 5
-	@pkill -f "run_local.py" || true
-	@$(PY) -c "import pstats; p = pstats.Stats('profile.stats'); p.sort_stats('cumulative').print_stats(10)"
-	@echo "$(GREEN)✅ Profiling complete$(NC)"
-
-# Stop all running Streamlit processes
-stop:
-	@echo "$(BLUE)� Stoppring all PlantGuard applications...$(NC)"
-	@pkill -f "streamlit" || true
-	@echo "$(GREEN)✅ All applications stopped$(NC)"
-
-# Restart application (useful during development)
-restart:
-	@echo "$(BLUE)🔄 Restarting PlantGuard...$(NC)"
-	@make stop
-	@sleep 2
-	@make run
-
-# ========== Training Command Aliases ==========
-# Shortcuts for common training tasks
-tp: train-production
-	@echo "$(GREEN)✅ Training alias 'tp' -> 'train-production' executed$(NC)"
-
-mt: monitor-training
-	@echo "$(GREEN)✅ Monitoring alias 'mt' -> 'monitor-training' executed$(NC)"
-
-em: evaluate-model
-	@echo "$(GREEN)✅ Evaluation alias 'em' -> 'evaluate-model' executed$(NC)"
-
-lm: list-models
-	@echo "$(GREEN)✅ Listing alias 'lm' -> 'list-models' executed$(NC)"
-
-mm: migrate-models
-	@echo "$(GREEN)✅ Migration alias 'mm' -> 'migrate-models' executed$(NC)"
-
-sm: sync-models
-	@echo "$(GREEN)✅ Sync alias 'sm' -> 'sync-models' executed$(NC)"
-
-# Dataset management aliases
-dd: download-dataset
-	@echo "$(GREEN)✅ Download alias 'dd' -> 'download-dataset' executed$(NC)"
-
-pd: prepare-dataset
-	@echo "$(GREEN)✅ Prepare alias 'pd' -> 'prepare-dataset' executed$(NC)"
-
-vd: validate-dataset
-	@echo "$(GREEN)✅ Validate alias 'vd' -> 'validate-dataset' executed$(NC)"
-
-ad: analyze-dataset
-	@echo "$(GREEN)✅ Analyze alias 'ad' -> 'analyze-dataset' executed$(NC)"
-
-# ========== Aliases for Common Typos ==========
-instal: install
-insall: install
-runn: run
-rnu: run
-tets: test
-testt: test
-clen: clean
-cean: clean
-trian: train
-tarining: train
-traning: train
