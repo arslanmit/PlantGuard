@@ -24,6 +24,7 @@ from .dataset_manager import DatasetManager
 from .error_handler import TrainingErrorHandler
 from .memory_optimizer import MemoryOptimizationConfig, MemoryOptimizer, create_memory_optimizer
 from .optimizers import TrainingComponents, create_training_components
+from .performance_optimizer import PerformanceOptimizationConfig, PerformanceOptimizer, create_performance_optimization_config
 from .resource_manager import get_resource_manager
 from .transfer_learning import TransferLearningConfig, TransferLearningOptimizer, create_resnet_transfer_config
 
@@ -117,6 +118,9 @@ class ProductionTrainer:
         # Transfer learning optimizer
         self.transfer_learning_optimizer: TransferLearningOptimizer | None = None
 
+        # Performance optimizer
+        self.performance_optimizer: PerformanceOptimizer | None = None
+
         # Setup logging
         self._setup_logging()
 
@@ -177,6 +181,9 @@ class ProductionTrainer:
 
             # Setup transfer learning optimizer
             self._setup_transfer_learning()
+
+            # Setup performance optimization
+            self._setup_performance_optimization()
 
             # Save configuration
             self._save_config()
@@ -558,6 +565,78 @@ class ProductionTrainer:
         )
 
         logger.info("Transfer learning optimizer setup completed")
+
+    def _setup_performance_optimization(self) -> None:
+        """Setup performance optimization if enabled."""
+        # Check if performance optimization is enabled in config
+        enable_optimization = getattr(self.config, "enable_performance_optimization", False)
+
+        if not enable_optimization:
+            return
+
+        # Create performance optimization configuration
+        perf_config = create_performance_optimization_config(
+            enable_all_optimizations=True,
+            target_throughput=getattr(self.config, "target_throughput_samples_per_sec", 100.0),
+            max_memory_gb=getattr(self.config, "max_memory_usage_gb", 12.0),
+            output_dir=self.output_dir / "performance_optimization",
+        )
+
+        # Initialize performance optimizer
+        self.performance_optimizer = PerformanceOptimizer(perf_config)
+        logger.info("Performance optimizer setup completed")
+
+    def optimize_training_performance(self) -> bool:
+        """Run comprehensive performance optimization.
+
+        Returns:
+            True if optimization successful, False otherwise
+        """
+        if self.performance_optimizer is None:
+            logger.warning("Performance optimizer not initialized")
+            return False
+
+        if not all([self.model, self.train_loader, self.training_components]):
+            logger.error("Training components not setup - cannot optimize performance")
+            return False
+
+        try:
+            logger.info("Running comprehensive performance optimization...")
+
+            # Extract dataset from data loader
+            dataset = self.train_loader.dataset
+
+            # Run optimization
+            optimization_result = self.performance_optimizer.optimize_training_pipeline(
+                model=self.model,
+                dataset=dataset,
+                optimizer=self.training_components.optimizer,
+                criterion=torch.nn.CrossEntropyLoss(),
+                device=self.device,
+                batch_size=self.config.batch_size,
+            )
+
+            if optimization_result.success:
+                logger.info("Performance optimization completed successfully")
+
+                # Log performance improvements
+                for metric, improvement in optimization_result.performance_improvement.items():
+                    logger.info(f"  {metric}: {improvement:+.1f}% improvement")
+
+                # Log recommendations
+                if optimization_result.recommendations:
+                    logger.info("Optimization recommendations:")
+                    for rec in optimization_result.recommendations:
+                        logger.info(f"  - {rec}")
+
+                return True
+            else:
+                logger.error("Performance optimization failed")
+                return False
+
+        except Exception as e:
+            logger.exception(f"Performance optimization error: {e}")
+            return False
 
     def _save_config(self) -> None:
         """Save training configuration."""

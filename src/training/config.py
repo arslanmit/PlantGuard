@@ -181,6 +181,13 @@ class TrainingConfig:
     log_every_n_steps: int = 100
     max_checkpoints_to_keep: int = 5
 
+    # Performance optimization
+    enable_performance_optimization: bool = False
+    target_throughput_samples_per_sec: float = 100.0
+    max_memory_usage_gb: float = 12.0
+    enable_profiling: bool = False
+    enable_distributed_training: bool = False
+
     def __post_init__(self) -> None:
         """Validate all configuration parameters."""
         self._validate_model_params()

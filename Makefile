@@ -126,6 +126,11 @@ help:
 	@echo "  $(BLUE)list-models$(NC)    - List all registered models with performance details"
 	@echo "  $(BLUE)benchmark$(NC)      - Quick benchmark all available models"
 	@echo ""
+	@echo "$(GREEN)⚡ Performance Optimization$(NC)"
+	@echo "  $(BLUE)optimize-performance$(NC) - Run comprehensive performance optimization"
+	@echo "  $(BLUE)profile-training$(NC) - Profile training performance and identify bottlenecks"
+	@echo "  $(BLUE)benchmark-data-loading$(NC) - Benchmark data loading performance"
+	@echo ""
 	@echo "$(GREEN)📊 Dataset Management$(NC)"
 	@echo "  $(BLUE)setup-dataset$(NC)  - Show dataset status and setup options"
 	@echo "  $(BLUE)download-dataset$(NC) - Download PlantVillage dataset from Kaggle"
@@ -518,6 +523,157 @@ monitor-training:
 	fi
 	@echo "$(CYAN)🚀 Starting TensorBoard server...$(NC)"
 	@echo "$(GREEN)📈 TensorBoard available at: http://localhost:6006$(NC)"
+
+# Performance optimization commands
+optimize-performance: ## Run comprehensive performance optimization
+	@echo "$(BLUE)⚡ Running comprehensive performance optimization...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🔍 Analyzing training pipeline performance and identifying bottlenecks$(NC)"
+	@echo "$(CYAN)⚡ Applying optimizations: model compilation, data loading, memory management$(NC)"
+	@$(PY) -c "
+import torch
+from pathlib import Path
+from src.training.performance_optimizer import optimize_training_performance, create_performance_optimization_config
+from src.training.config import TrainingConfig
+from src.training.dataset_manager import DatasetManager
+from src.training.production_trainer import ProductionTrainer
+
+# Create configuration
+config = TrainingConfig(
+    experiment_name='performance_optimization',
+    model_architecture='resnet50',
+    num_classes=38,
+    epochs=5,
+    batch_size=32,
+    device='auto',
+    enable_performance_optimization=True,
+    target_throughput_samples_per_sec=100.0,
+)
+
+# Create trainer and run optimization
+dataset_manager = DatasetManager()
+trainer = ProductionTrainer(config, dataset_manager, output_dir=Path('runs/performance_optimization'))
+
+if trainer.setup_training():
+    result = trainer.optimize_training_performance()
+    if result:
+        print('$(GREEN)✅ Performance optimization completed successfully$(NC)')
+    else:
+        print('$(RED)❌ Performance optimization failed$(NC)')
+else:
+    print('$(RED)❌ Training setup failed$(NC)')
+"
+	@echo "$(GREEN)✅ Performance optimization complete$(NC)"
+	@echo "$(YELLOW)💡 Check 'runs/performance_optimization' for detailed results$(NC)"
+
+profile-training: ## Profile training performance and identify bottlenecks
+	@echo "$(BLUE)📊 Profiling training performance...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🔍 Analyzing training loop performance and identifying bottlenecks$(NC)"
+	@$(PY) -c "
+import torch
+from pathlib import Path
+from src.training.performance_profiler import TrainingProfiler, ProfilerConfig
+from src.training.config import TrainingConfig
+from src.training.dataset_manager import DatasetManager
+from src.training.production_trainer import ProductionTrainer
+
+# Create profiler configuration
+profiler_config = ProfilerConfig(
+    profile_batches=20,
+    export_chrome_trace=True,
+    export_tensorboard=True,
+    output_dir=Path('profiling_results'),
+)
+
+# Create trainer
+config = TrainingConfig(
+    experiment_name='profiling_test',
+    model_architecture='resnet50',
+    num_classes=38,
+    epochs=1,
+    batch_size=32,
+    device='auto',
+)
+
+dataset_manager = DatasetManager()
+trainer = ProductionTrainer(config, dataset_manager)
+
+if trainer.setup_training():
+    # Create profiler and run
+    profiler = TrainingProfiler(profiler_config)
+    
+    profile_result = profiler.profile_training_loop(
+        trainer.model,
+        trainer.train_loader,
+        trainer.training_components.optimizer,
+        torch.nn.CrossEntropyLoss(),
+        trainer.device,
+    )
+    
+    print('$(GREEN)📈 Profiling completed!$(NC)')
+    print(f'Average batch time: {profile_result.avg_batch_time_ms:.1f}ms')
+    print(f'Throughput: {profile_result.throughput_samples_per_sec:.1f} samples/sec')
+    print(f'Peak memory: {profile_result.peak_memory_mb:.1f}MB')
+    
+    if profile_result.bottlenecks:
+        print('$(YELLOW)🔍 Identified bottlenecks:$(NC)')
+        for bottleneck in profile_result.bottlenecks[:3]:
+            print(f'  - {bottleneck.component}: {bottleneck.percentage_of_total:.1f}% of time')
+else:
+    print('$(RED)❌ Training setup failed$(NC)')
+"
+	@echo "$(GREEN)✅ Performance profiling complete$(NC)"
+	@echo "$(YELLOW)💡 Check 'profiling_results' for detailed analysis$(NC)"
+	@echo "$(YELLOW)💡 Open 'profiling_results/training_profile.json' in Chrome for detailed trace$(NC)"
+
+benchmark-data-loading: ## Benchmark data loading performance
+	@echo "$(BLUE)📦 Benchmarking data loading performance...$(NC)"
+	@if [ ! -x $(PY) ]; then make setup; fi
+	@echo "$(CYAN)🔍 Testing different data loading configurations$(NC)"
+	@$(PY) -c "
+from pathlib import Path
+from src.training.advanced_data_loading import benchmark_data_loading_performance, AdvancedDataLoadingConfig
+from src.training.dataset_manager import DatasetManager
+from torch.utils.data import DataLoader
+from torchvision.datasets import ImageFolder
+from torchvision import transforms
+
+# Create dataset
+dataset_path = Path('data/processed/plantvillage/train')
+if dataset_path.exists():
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+    
+    dataset = ImageFolder(dataset_path, transform=transform)
+    
+    # Test different configurations
+    configs = {
+        'basic': AdvancedDataLoadingConfig(
+            enable_intelligent_prefetching=False,
+            enable_gpu_preprocessing=False,
+            enable_memory_mapping=False,
+        ),
+        'optimized': AdvancedDataLoadingConfig(
+            enable_intelligent_prefetching=True,
+            enable_gpu_preprocessing=True,
+            enable_memory_mapping=True,
+        ),
+    }
+    
+    for name, config in configs.items():
+        print(f'$(CYAN)Testing {name} configuration...$(NC)')
+        metrics = benchmark_data_loading_performance(dataset, config, num_batches=20)
+        print(f'  Throughput: {metrics[\"throughput_samples_per_sec\"]:.1f} samples/sec')
+        print(f'  Batch time: {metrics[\"avg_batch_time_ms\"]:.1f}ms')
+        print()
+else:
+    print('$(RED)❌ Dataset not found. Please prepare dataset first.$(NC)')
+"
+	@echo "$(GREEN)✅ Data loading benchmark complete$(NC)"
 	@echo "$(YELLOW)📊 Features: Training curves, model graphs, sample predictions$(NC)"
 	@echo "$(YELLOW)⌨️  Press Ctrl+C to stop TensorBoard$(NC)"
 	@echo ""
