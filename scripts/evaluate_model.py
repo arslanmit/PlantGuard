@@ -6,6 +6,7 @@ allowing users to evaluate trained models with detailed metrics and reporting.
 """
 
 import argparse
+import contextlib
 import logging
 import sys
 from pathlib import Path
@@ -58,10 +59,8 @@ def find_model_path(model_path: str | None = None) -> Path:
             found_models.append(search_path)
         else:
             # Handle glob patterns
-            try:
+            with contextlib.suppress(AttributeError, TypeError):
                 found_models.extend(list(search_path))
-            except (AttributeError, TypeError):
-                pass
 
     if not found_models:
         raise FileNotFoundError("No trained models found. Please train a model first with 'make train' or specify --model-path")
@@ -94,15 +93,13 @@ def find_dataset_path(dataset_path: str | None = None) -> Path:
     search_paths = [
         Path("data/processed/plantvillage"),
         Path("data/PlantVillage"),
-        Path("data/plantvillage_dummy_improved"),
-        Path("data/plantvillage_dummy"),
     ]
 
     for search_path in search_paths:
         if search_path.exists() and (search_path / "val").exists():
             return search_path
 
-    raise FileNotFoundError("No validation dataset found. Please prepare a dataset first with 'make setup-dataset'")
+    raise FileNotFoundError("No validation dataset found. Please run 'make dataset-download' then 'make dataset-prepare'")
 
 
 def create_data_loader(dataset_path: Path, batch_size: int = 32) -> tuple[DataLoader, list[str]]:
@@ -143,7 +140,12 @@ def main() -> None:
     parser.add_argument("--model-path", type=str, help="Path to the model file to evaluate")
     parser.add_argument("--dataset-path", type=str, help="Path to the dataset directory (should contain 'val' subdirectory)")
     parser.add_argument("--batch-size", type=int, default=32, help="Batch size for evaluation (default: 32)")
-    parser.add_argument("--output-dir", type=str, default="runs/evaluation", help="Output directory for evaluation reports (default: runs/evaluation)")
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="runs/evaluation",
+        help="Output directory for evaluation reports (default: runs/evaluation)",
+    )
     parser.add_argument("--min-accuracy", type=float, default=0.7, help="Minimum accuracy threshold for validation (default: 0.7)")
     parser.add_argument("--num-samples", type=int, default=100, help="Number of samples for detailed testing (default: 100)")
     parser.add_argument("--strict", action="store_true", help="Use strict validation mode with higher thresholds")

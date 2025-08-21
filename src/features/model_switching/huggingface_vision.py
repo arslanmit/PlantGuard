@@ -54,7 +54,23 @@ class HuggingFaceVisionAdapter:
             # Load processor and model with revision pinning for security
             self.processor = AutoImageProcessor.from_pretrained(self.model_name, revision="main")  # type: ignore # nosec B615
             self.model = AutoModelForImageClassification.from_pretrained(self.model_name, revision="main")  # type: ignore # nosec B615
-            self.model.to(self.device)  # type: ignore
+            # Attempt to move model to target device. Some HF/torch loading paths create
+            # "meta" tensors (no data) which cannot be copied using `to()`; in that
+            # case use `to_empty()` as a fallback which properly allocates tensors on
+            # the destination device.
+            try:
+                self.model.to(self.device)  # type: ignore
+            except NotImplementedError as e:
+                logger.warning(
+                    "Model move using .to() failed (meta tensors); falling back to .to_empty(): %s",
+                    e,
+                )
+                if hasattr(self.model, "to_empty"):
+                    # to_empty exists on torch.nn.Module in recent PyTorch versions
+                    self.model.to_empty(self.device)  # type: ignore
+                else:
+                    # Re-raise if to_empty is not available
+                    raise
             self.model.eval()  # type: ignore
 
             # Extract class names

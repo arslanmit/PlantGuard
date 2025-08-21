@@ -1,6 +1,6 @@
 {
-  "tests_passed": 9,
-  "tests_failed": 0,
+  "tests_passed": 8,
+  "tests_failed": 1,
   "test_results": {
     "DatasetManager": {
       "passed": true,
@@ -12,9 +12,9 @@
       "message": "Successfully registered and retrieved model: test_model_v1.0.0",
       "error": null
     },
-    "VisionAdapter.registry_integration": {
-      "passed": true,
-      "message": "Registry integration works (expected model loading failure)",
+    "VisionAdapter.load_from_registry": {
+      "passed": false,
+      "message": "Model loaded successfully with mock data - unexpected",
       "error": null
     },
     "ModelManager.integration": {
@@ -50,8 +50,8 @@
   },
   "errors": [],
   "warnings": [],
-  "total_time": 2.584583044052124,
+  "total_time": 6.286725997924805,
   "total_tests": 9,
-  "success_rate": 100.0,
-  "overall_success": true
+  "success_rate": 88.88888888888889,
+  "overall_success": false
 }

@@ -32,6 +32,9 @@ MODELS_DIR := $(DATA_DIR)/models
 KB_DIR := $(DATA_DIR)/knowledge_base
 CONFIG_DIR := config
 SCRIPTS_DIR := scripts
+# Coverage storage: put coverage DB inside a directory to avoid root-file permission issues
+COVERAGE_DIR := .coverage
+COVERAGE_FILE := $(CURDIR)/$(COVERAGE_DIR)/.coverage
 
 # ========== macOS Optimization ==========
 ifeq ($(IS_APPLE_SILICON),1)
@@ -45,7 +48,7 @@ endif
 # ========== Performance Settings ==========
 WORKERS := $(shell sysctl -n hw.ncpu 2>/dev/null || echo 4)
 BATCH_SIZE := $(shell [ $(IS_APPLE_SILICON) -eq 1 ] && echo 32 || echo 16)
-MEMORY_LIMIT := $(shell [ $(IS_APPLE_SILICON) -eq 1 ] && echo 16G || echo 8G)
+MEMORY_LIMIT := $(shell [ $(IS_APPLE_SILICON) -eq 1 ] && echo 8G || echo 8G)
 
 # Colors for output (auto-detect terminal support)
 ifeq ($(shell test -t 1 && echo 1),1)
@@ -81,7 +84,7 @@ endif
 .PHONY: security coverage docs build deploy
 .PHONY: reset fresh stop restart debug profile validate
 .PHONY: templates-list train-production-template train-production-config
-.PHONY: qa health-check tunnel
+.PHONY: qa health-check tunnel list-models evaluate-model monitor-training setup-dataset
 
 # ========== Help & Information ==========
 
@@ -141,7 +144,6 @@ help:
 	@echo "  $(BLUE)dataset-prepare$(NC)    - Prepare dataset for training"
 	@echo "  $(BLUE)dataset-validate$(NC)   - Validate dataset integrity"
 	@echo "  $(BLUE)dataset-analyze$(NC)    - Generate dataset statistics"
-	@echo "  $(BLUE)dataset-dummy$(NC)      - Create dummy dataset for testing"
 	@echo ""
 	@echo "$(GREEN)🔧 Model Management$(NC)"
 	@echo "  $(BLUE)models$(NC)             - List all available models"
@@ -194,7 +196,7 @@ start: setup-environment health-check
 
 # Quick shortcuts
 s: start
-r: run  
+r: run
 d: dev
 t: test
 f: format
@@ -219,7 +221,18 @@ setup-environment:
 		$(PYTHON) -m venv .venv --clear --upgrade-deps; \
 		echo "$(GREEN)✅ Virtual environment created with $(shell .venv/bin/python3 --version)$(NC)"; \
 	else \
-		echo "$(YELLOW)✅ Virtual environment already exists (using $(shell .venv/bin/python3 --version))$(NC)"; \
+		CURRENT_VER="$$(.venv/bin/python3 --version 2>/dev/null | awk '{print $$2}')"; \
+		case "$$CURRENT_VER" in \
+			3.10.*) \
+				echo "$(YELLOW)✅ Virtual environment already exists (using Python $$CURRENT_VER)$(NC)"; \
+				;; \
+			*) \
+				echo "$(YELLOW)⚠️  Existing venv uses Python $$CURRENT_VER; recreating with $(PYTHON) for compatibility$(NC)"; \
+				rm -rf .venv; \
+				$(PYTHON) -m venv .venv --clear --upgrade-deps; \
+				echo "$(GREEN)✅ Recreated virtual environment with $(shell .venv/bin/python3 --version)$(NC)"; \
+				;; \
+		esac; \
 	fi
 	@echo "$(YELLOW)Step 2/4: Upgrading pip and build tools$(NC)"
 	@$(PIP) install --upgrade pip setuptools wheel --quiet
@@ -273,9 +286,19 @@ setup-models:
 setup-knowledge-base:
 	@echo "$(BLUE)📚 Setting up knowledge base...$(NC)"
 	@mkdir -p $(KB_DIR)
+	# If file missing, generate complete knowledge base
 	@if [ ! -f $(KB_DIR)/disease_info.json ]; then \
 		echo "$(YELLOW)Creating knowledge base...$(NC)"; \
-		$(PY) $(SCRIPTS_DIR)/generate_disease_knowledge_base.py || echo "$(YELLOW)⚠️  Knowledge base script not found$(NC)"; \
+		$(PY) $(SCRIPTS_DIR)/complete_knowledge_base.py || echo "$(YELLOW)⚠️  Knowledge base generation failed$(NC)"; \
+	fi
+	# Validate and auto-fix if invalid
+	@if [ -f $(KB_DIR)/disease_info.json ]; then \
+		if ! $(PY) $(SCRIPTS_DIR)/validate_knowledge_base.py >/dev/null 2>&1; then \
+			echo "$(YELLOW)⚠️  Knowledge base invalid. Regenerating...$(NC)"; \
+			$(PY) $(SCRIPTS_DIR)/complete_knowledge_base.py || true; \
+		else \
+			echo "$(GREEN)✅ Knowledge base validated$(NC)"; \
+		fi; \
 	fi
 	@echo "$(GREEN)✅ Knowledge base ready$(NC)"
 
@@ -426,8 +449,9 @@ lint:
 type:
 	@echo "$(BLUE)🔍 Type checking with MyPy...$(NC)"
 	@if [ ! -x $(PY) ]; then make deps; fi
-	@$(PIP) install mypy --quiet
-	@$(MYPY) $(SRC_DIR) --config-file pyproject.toml || echo "$(YELLOW)⚠️  Type issues found$(NC)"
+	@# Pin MyPy to a stable version to avoid assertion errors with namespace packages (e.g., google)
+	@$(PIP) install "mypy==1.11.1" --quiet
+	@$(MYPY) $(SRC_DIR) --namespace-packages --config-file pyproject.toml || echo "$(YELLOW)⚠️  Type issues found$(NC)"
 	@echo "$(GREEN)✅ Type checking complete$(NC)"
 
 # Auto-fix common issues
@@ -463,7 +487,9 @@ test:
 	@if [ ! -x $(PY) ]; then make deps; fi
 	@$(PIP) install pytest pytest-cov pytest-mock pytest-timeout --quiet
 	@mkdir -p $(LOGS_DIR)
-	@$(PYTEST) $(TESTS_DIR)/ -v \
+	@mkdir -p $(COVERAGE_DIR)
+	@export COVERAGE_FILE=$(COVERAGE_FILE) ; \
+	$(PYTEST) $(TESTS_DIR)/ -v \
 		--tb=short \
 		--cov=$(SRC_DIR) \
 		--cov-report=term-missing \
@@ -478,7 +504,7 @@ test:
 test-fast:
 	@echo "$(BLUE)⚡ Running fast tests...$(NC)"
 	@if [ ! -x $(PY) ]; then make deps; fi
-	@$(PIP) install pytest pytest-mock --quiet
+	@$(PIP) install pytest pytest-mock pytest-timeout --quiet
 	@$(PYTEST) $(TESTS_DIR)/ -v -m "not slow and not integration" \
 		--tb=short \
 		--timeout=60 \
@@ -530,7 +556,9 @@ coverage:
 	@echo "$(BLUE)📊 Generating test coverage report...$(NC)"
 	@if [ ! -x $(PY) ]; then make deps; fi
 	@$(PIP) install pytest pytest-cov --quiet
-	@$(PYTEST) $(TESTS_DIR)/ \
+	@mkdir -p $(COVERAGE_DIR)
+	@export COVERAGE_FILE=$(COVERAGE_FILE) ; \
+	$(PYTEST) $(TESTS_DIR)/ \
 		--cov=$(SRC_DIR) \
 		--cov-report=html:htmlcov \
 		--cov-report=term-missing \
@@ -562,16 +590,8 @@ train:
 			--batch_size $(BATCH_SIZE) \
 			--num_workers 4 \
 			--epochs 50; \
-	elif [ -d "$(DATA_DIR)/plantvillage_dummy/train" ]; then \
-		echo "$(YELLOW)⚠️  Using dummy dataset for training$(NC)"; \
-		$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
-			--data_dir $(DATA_DIR)/plantvillage_dummy \
-			--device $(TORCH_DEVICE) \
-			--batch_size $(BATCH_SIZE) \
-			--num_workers 4 \
-			--epochs 50; \
 	else \
-		echo "$(RED)❌ No dataset found. Run 'make dataset-status' or 'make dataset-dummy'$(NC)"; \
+		echo "$(RED)❌ No dataset found. Run 'make dataset-status' or 'make dataset-download'$(NC)"; \
 		exit 1; \
 	fi
 	@echo "$(GREEN)✅ Training complete$(NC)"
@@ -654,16 +674,8 @@ train-fast:
 			--batch_size 16 \
 			--epochs 5 \
 			--num_workers 4; \
-	elif [ -d "$(DATA_DIR)/plantvillage_dummy/train" ]; then \
-		echo "$(YELLOW)⚠️  Using dummy dataset for fast training$(NC)"; \
-		$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
-			--data_dir $(DATA_DIR)/plantvillage_dummy \
-			--device $(TORCH_DEVICE) \
-			--batch_size 16 \
-			--epochs 5 \
-			--num_workers 4; \
 	else \
-		echo "$(RED)❌ No dataset found. Run 'make dataset-dummy' for quick setup$(NC)"; \
+		echo "$(RED)❌ No dataset found. Run 'make dataset-download' to set it up$(NC)"; \
 		exit 1; \
 	fi
 	@echo "$(GREEN)✅ Fast training complete$(NC)"
@@ -680,16 +692,8 @@ train-single:
 			--batch_size 16 \
 			--num_workers 0 \
 			--epochs 10; \
-	elif [ -d "$(DATA_DIR)/plantvillage_dummy/train" ]; then \
-		echo "$(YELLOW)⚠️  Using dummy dataset for single-threaded training$(NC)"; \
-		$(PY) $(SCRIPTS_DIR)/train_vision_model_improved.py \
-			--data_dir $(DATA_DIR)/plantvillage_dummy \
-			--device $(TORCH_DEVICE) \
-			--batch_size 16 \
-			--num_workers 0 \
-			--epochs 10; \
 	else \
-		echo "$(RED)❌ No dataset found. Run 'make dataset-dummy' for quick setup$(NC)"; \
+		echo "$(RED)❌ No dataset found. Run 'make dataset-download' to set it up$(NC)"; \
 		exit 1; \
 	fi
 	@echo "$(GREEN)✅ Single-threaded training complete$(NC)"
@@ -714,7 +718,7 @@ evaluate:
 benchmark:
 	@echo "$(BLUE)🏁 Benchmarking all models...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup-environment; fi
-	@$(PY) $(SCRIPTS_DIR)/model_switching/model_switcher.py --benchmark
+	@export PYTHONPATH=. && $(PY) $(SCRIPTS_DIR)/model_switching/model_switcher.py --benchmark
 	@echo "$(GREEN)✅ Benchmark complete$(NC)"
 
 # Performance optimization
@@ -739,12 +743,9 @@ dataset-status:
 		echo "$(GREEN)✅ PlantVillage dataset found$(NC)"; \
 		echo "$(YELLOW)Train samples: $(shell find $(DATA_DIR)/processed/plantvillage/train -name "*.jpg" -o -name "*.png" | wc -l)$(NC)"; \
 		echo "$(YELLOW)Val samples: $(shell find $(DATA_DIR)/processed/plantvillage/val -name "*.jpg" -o -name "*.png" | wc -l)$(NC)"; \
-	elif [ -d "$(DATA_DIR)/plantvillage_dummy/train" ]; then \
-		echo "$(YELLOW)⚠️  Using dummy dataset$(NC)"; \
-		echo "$(YELLOW)Train samples: $(shell find $(DATA_DIR)/plantvillage_dummy/train -name "*.jpg" -o -name "*.png" | wc -l)$(NC)"; \
 	else \
 		echo "$(RED)❌ No dataset found$(NC)"; \
-		echo "$(CYAN)💡 Run 'make dataset-download' or 'make dataset-dummy'$(NC)"; \
+		echo "$(CYAN)💡 Run 'make dataset-download'$(NC)"; \
 	fi
 
 # Download PlantVillage dataset
@@ -775,15 +776,7 @@ dataset-analyze:
 	@$(PY) $(SCRIPTS_DIR)/analyze_dataset.py
 	@echo "$(GREEN)✅ Dataset analysis complete$(NC)"
 
-# Create dummy dataset for testing
-dataset-dummy:
-	@echo "$(BLUE)🎭 Creating dummy dataset...$(NC)"
-	@if [ ! -x $(PY) ]; then make setup-environment; fi
-	@$(PY) $(SCRIPTS_DIR)/setup_better_dummy_dataset.py \
-		--output_dir $(DATA_DIR)/plantvillage_dummy \
-		--num_classes 8 \
-		--samples_per_class 60
-	@echo "$(GREEN)✅ Dummy dataset created$(NC)"
+
 
 # ========== Model Management ==========
 
@@ -791,21 +784,21 @@ dataset-dummy:
 models:
 	@echo "$(BLUE)🤖 Listing available models...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup-environment; fi
-	@$(PY) $(SCRIPTS_DIR)/list_models.py
+	@export PYTHONPATH=. && $(PY) $(SCRIPTS_DIR)/list_models.py
 	@echo "$(GREEN)✅ Model listing complete$(NC)"
 
 # Migrate legacy models
 models-migrate:
 	@echo "$(BLUE)🔄 Migrating legacy models...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup-environment; fi
-	@$(PY) $(SCRIPTS_DIR)/migrate_models.py
+	@export PYTHONPATH=. && $(PY) $(SCRIPTS_DIR)/migrate_models.py
 	@echo "$(GREEN)✅ Model migration complete$(NC)"
 
 # Sync model registry
 models-sync:
 	@echo "$(BLUE)🔄 Syncing model registry...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup-environment; fi
-	@$(PY) $(SCRIPTS_DIR)/model_switching/model_switcher.py --sync
+	@export PYTHONPATH=. && $(PY) $(SCRIPTS_DIR)/model_switching/model_switcher.py --sync
 	@echo "$(GREEN)✅ Model registry synced$(NC)"
 
 # Switch active model
@@ -816,7 +809,7 @@ models-switch:
 		echo "$(RED)❌ Please specify MODEL_ID=<model_name>$(NC)"; \
 		exit 1; \
 	fi
-	@$(PY) $(SCRIPTS_DIR)/model_switching/model_switcher.py --switch $(MODEL_ID)
+	@export PYTHONPATH=. && $(PY) $(SCRIPTS_DIR)/model_switching/model_switcher.py --switch $(MODEL_ID)
 	@echo "$(GREEN)✅ Model switched to $(MODEL_ID)$(NC)"
 
 # Export models for deployment
@@ -946,7 +939,7 @@ profile:
 validate:
 	@echo "$(BLUE)🔍 Validating system configuration...$(NC)"
 	@if [ ! -x $(PY) ]; then make setup-environment; fi
-	@$(PY) $(SCRIPTS_DIR)/validate_production_pipeline.py
+	@export PYTHONPATH=. && $(PY) $(SCRIPTS_DIR)/validate_production_pipeline.py
 	@echo "$(GREEN)✅ System validation complete$(NC)"
 
 # Clean temporary files and caches
@@ -957,7 +950,7 @@ clean:
 	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
 	@find . -type f -name "*.pyo" -delete 2>/dev/null || true
 	@find . -type f -name ".DS_Store" -delete 2>/dev/null || true
-	@rm -rf htmlcov/ .coverage coverage.xml
+	@rm -rf htmlcov/ $(COVERAGE_DIR) coverage.xml
 	@rm -rf security-report.json
 	@rm -rf $(LOGS_DIR)/*.log
 	@echo "$(GREEN)✅ Cleanup complete$(NC)"
@@ -969,6 +962,19 @@ reset: clean
 	@rm -rf src/plantguard.egg-info/
 	@echo "$(GREEN)✅ Environment reset complete$(NC)"
 	@echo "$(CYAN)💡 Run 'make setup' to reinstall$(NC)"
+
+# Missing commands that validation script expects (aliases)
+list-models: models
+	@echo "$(YELLOW)📋 'list-models' is now 'models' - redirecting...$(NC)"
+
+evaluate-model: evaluate
+	@echo "$(YELLOW)📊 'evaluate-model' is now 'evaluate' - redirecting...$(NC)"
+
+monitor-training: monitor
+	@echo "$(YELLOW)📈 'monitor-training' is now 'monitor' - redirecting...$(NC)"
+
+setup-dataset: dataset-prepare
+	@echo "$(YELLOW)📦 'setup-dataset' is now 'dataset-prepare' - redirecting...$(NC)"
 
 # Fresh installation
 fresh: reset setup

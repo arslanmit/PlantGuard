@@ -9,7 +9,6 @@ import json
 import logging
 import tempfile
 from pathlib import Path
-from typing import Any
 
 import torch
 from PIL import Image
@@ -35,7 +34,12 @@ def create_test_model(model_path: Path, num_classes: int = 38, model_name: str =
         "num_classes": num_classes,
         "class_names": [f"class_{i}" for i in range(num_classes)],
         "model_version": "1.0.0",
-        "training_metadata": {"training_date": "2024-08-17", "dataset": "test_dataset", "accuracy": 0.95, "model_name": model_name},
+        "training_metadata": {
+            "training_date": "2024-08-17",
+            "dataset": "test_dataset",
+            "accuracy": 0.95,
+            "model_name": model_name,
+        },
     }
 
     torch.save(checkpoint, model_path)

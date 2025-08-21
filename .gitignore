@@ -9,11 +9,8 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
-develop-eggs/
 dist/
 downloads/
-eggs/
-.eggs/
 lib/
 lib64/
 parts/
@@ -21,9 +18,7 @@ sdist/
 var/
 wheels/
 share/python-wheels/
-*.egg-info/
 .installed.cfg
-*.egg
 MANIFEST
 
 # PyInstaller
@@ -188,18 +183,15 @@ __marimo__/
 # PlantGuard specific
 data/temp/
 
-# logs/
-# runs/
+logs/
+runs/
 # *.pkl
-*.joblib
+#*.joblib
 # *.wav
-*.mp3
-*.m4a
-*.onnx
-*.csv
+#*.mp3
+#*.m4a
+#*.onnx
+#*.csv
 .qodo/
 
-# data/models/*
-# /data/plantvillage_dummy
-# /data/raw/plantvillage
-~/.kaggle/kaggle.json
+

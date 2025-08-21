@@ -22,15 +22,15 @@
 # 1️⃣ BUILD SYSTEM - How Python packages this project
 # ============================================================================
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling>=1.18.0"]
+build-backend = "hatchling.build"
 
 # ============================================================================
 # 2️⃣ PROJECT INFORMATION - Basic project details
 # ============================================================================
 [project]
 name = "plantguard"
-version = "0.1.0"
+version = "0.2.0"
 description = "🌿 AI-powered plant disease detection with Vision Transformer, MobileNet, and ResNet50 models"
 authors = [{ name = "PlantGuard Team", email = "umit.arslan@outlook.com" }]
 license = "MIT"
@@ -68,86 +68,87 @@ classifiers = [
 
 dependencies = [
   # 🧠 AI/ML Core - The brain of PlantGuard
-  "torch>=2.1.0",           # PyTorch - main ML framework
-  "torchvision>=0.16.0",    # Computer vision models
-  "torchaudio>=2.1.0",      # Audio processing
-  "torchmetrics>=1.2.0",    # ML metrics and evaluation
+  "torch>=2.8.0",           # PyTorch - main ML framework
+  "torchvision>=0.23.0",    # Computer vision models
+  "torchaudio>=2.8.0",      # Audio processing
+  "torchmetrics>=1.8.1",    # ML metrics and evaluation
 
   # 📊 Data Processing - Handle numbers and data
-  "numpy>=1.24.0",          # Fast arrays and math
-  "pandas>=2.1.0",          # Data tables and analysis
-  "scikit-learn>=1.3.0",    # Traditional ML algorithms
+  "numpy>=2.2.6",           # Fast arrays and math
+  "pandas>=2.3.1",          # Data tables and analysis
+  "scikit-learn>=1.7.1",    # Traditional ML algorithms
+  "PyYAML>=6.0.2",          # YAML configuration files
 
   # 👁️ Computer Vision - See and understand images
-  "opencv-python-headless>=4.8.0",  # Image processing (no GUI)
-  "Pillow>=10.0.0",                  # Image loading and basic editing
+  "opencv-python-headless>=4.12.0.88",  # Image processing (no GUI)
+  "Pillow>=11.3.0",                      # Image loading and basic editing
 
   # 🤗 Hugging Face - Pre-trained AI models
-  "transformers>=4.34.0",   # Vision Transformer, BERT, etc.
-  "accelerate>=0.24.0",     # Fast model loading
-  "datasets>=2.14.0",       # Dataset handling
+  "transformers>=4.55.0",   # Vision Transformer, BERT, etc.
+  "accelerate>=1.10.0",     # Fast model loading
+  "datasets>=4.0.0",        # Dataset handling
+  "huggingface-hub>=0.34.4", # Model hub integration
+  "tokenizers>=0.21.4",     # Text tokenization
+  "safetensors>=0.6.2",     # Safe tensor serialization
 
   # 🎵 Audio Processing - Hear and understand speech
-  "librosa>=0.10.1",        # Audio analysis
-  "soundfile>=0.12.1",      # Audio file reading/writing
-  "SpeechRecognition>=3.10.0",  # Speech-to-text
+  "librosa>=0.11.0",        # Audio analysis
+  "soundfile>=0.13.1",      # Audio file reading/writing
+  "SpeechRecognition>=3.14.3",  # Speech-to-text
+  "openai-whisper>=20230314",    # Advanced speech recognition
 
   # 🌐 Web Interface - The app you see in your browser
-  "streamlit>=1.27.0",      # Main web framework
-  "streamlit-webrtc>=0.47.0",  # Real-time audio/video
+  "streamlit>=1.48.0",      # Main web framework
+  "streamlit-webrtc>=0.63.4",   # Real-time audio/video
+  "streamlit-option-menu>=0.4.0", # Enhanced UI components
   "pycloudflared>=0.2.0",   # HTTPS tunnels for microphone
-  "pyngrok>=7.0.0",         # Alternative tunneling
+  "pyngrok>=7.3.0",         # Alternative tunneling
+  "plotly>=5.24.1",         # Interactive plotting
 
   # 🛠️ Utilities - Helper tools
-  "python-dotenv>=1.0.0",   # Environment variables (.env files)
-  "tensorboard>=2.14.0",    # Training visualization
+  "python-dotenv>=1.1.1",   # Environment variables (.env files)
+  "tensorboard>=2.20.0",    # Training visualization
+  "psutil>=6.1.1",          # System monitoring
+  "reportlab>=4.2.5",       # PDF generation
+  "watchdog>=6.0.0",        # File system monitoring
 ]
 
-# ============================================================================
-# 📦 OPTIONAL DEPENDENCIES - Extra features you can install
-# ============================================================================
-# 💡 USAGE:
-#   pip install plantguard[dev]      - Development tools
-#   pip install plantguard[jupyter]  - Notebook support
-#   pip install plantguard[all]      - Everything
-#
 # 🚀 QUICK INSTALL: make setup (installs everything automatically)
 
 [project.optional-dependencies]
 
 # 🛠️ Development Tools - For coding and maintaining PlantGuard
 dev = [
-  "ruff>=0.1.0",           # ⚡ Super fast Python linter & formatter
-  "mypy>=1.6.0",           # 🔍 Type checking (catches bugs early)
-  "pytest>=7.4.0",        # 🧪 Testing framework
-  "pytest-cov>=4.1.0",    # 📊 Test coverage reports
-  "pytest-mock>=3.12.0",  # 🎭 Mock objects for testing
-  "bandit>=1.7.5",        # 🔒 Security vulnerability scanner
-  "safety>=3.0.0",        # 🛡️ Check for known security issues
-  "pre-commit>=3.0.0",    # 🪝 Git hooks for code quality
+  "ruff>=0.12.8",          # ⚡ Super fast Python linter & formatter
+  "mypy>=1.17.1",          # 🔍 Type checking (catches bugs early)
+  "pytest>=8.4.1",        # 🧪 Testing framework
+  "pytest-cov>=6.2.1",    # 📊 Test coverage reports
+  "pytest-mock>=3.14.1",  # 🎭 Mock objects for testing
+  "bandit>=1.8.6",        # 🔒 Security vulnerability scanner
+  "safety>=3.6.0",        # 🛡️ Check for known security issues
+  "pre-commit>=4.3.0",    # 🪝 Git hooks for code quality
 ]
 
 # 📚 Documentation Tools - Generate beautiful docs
 docs = [
-  "sphinx>=7.0.0",         # 📖 Documentation generator
-  "sphinx-rtd-theme>=2.0.0",  # 🎨 Read the Docs theme
+  "sphinx>=7.2.6",         # 📖 Documentation generator
+  "sphinx-rtd-theme>=3.0.2",  # 🎨 Read the Docs theme
   "myst-parser>=2.0.0",    # 📝 Markdown support in Sphinx
 ]
 
 # 📓 Jupyter & Analysis - Interactive development
 jupyter = [
-  "jupyter>=1.0.0",        # 📓 Jupyter notebooks
-  "ipykernel>=6.25.0",     # 🐍 Python kernel for notebooks
-  "matplotlib>=3.7.0",     # 📈 Plotting and visualization
-  "seaborn>=0.12.0",       # 🎨 Beautiful statistical plots
-  "plotly>=5.0.0",         # 📊 Interactive plots
+  "jupyter>=1.1.1",        # 📓 Jupyter notebooks
+  "ipykernel>=6.30.1",     # 🐍 Python kernel for notebooks
+  "matplotlib>=3.10.5",    # 📈 Plotting and visualization
+  "seaborn>=0.13.2",       # 🎨 Beautiful statistical plots
+  "plotly>=5.24.1",        # 📊 Interactive plots (also in main deps)
 ]
 
 # 🤖 ML Training & Experiments - Advanced ML features
 training = [
-  "wandb>=0.15.0",         # 📊 Experiment tracking (Weights & Biases)
-  "optuna>=3.3.0",        # 🎯 Hyperparameter optimization
-  "tensorboard>=2.14.0",   # 📈 Training visualization (already in main deps)
+  "wandb>=0.21.1",         # 📊 Experiment tracking (Weights & Biases)
+  "optuna>=4.4.0",        # 🎯 Hyperparameter optimization
 ]
 
 # 🎯 Quick Install Options
@@ -159,9 +160,6 @@ full-dev = ["plantguard[dev,docs,jupyter]"]      # Development without ML extras
 [project.urls]
 "🏠 Homepage" = "https://github.com/arslanmit/PlantGuard"
 "📂 Source Code" = "https://github.com/arslanmit/PlantGuard"
-"🐛 Bug Reports" = "https://github.com/arslanmit/PlantGuard/issues"
-"📖 Documentation" = "https://github.com/arslanmit/PlantGuard/wiki"
-"📋 Changelog" = "https://github.com/arslanmit/PlantGuard/releases"
 "🚀 Try in Colab" = "https://colab.research.google.com/github/arslanmit/PlantGuard/blob/main/notebooks/PlantGuard.ipynb"
 
 # 🖥️ Command Line Tools - Run PlantGuard from terminal
@@ -180,40 +178,30 @@ plantguard-train = "src.training.production_trainer:main"  # Training CLI
 #   make fix     - Auto-fix what we can
 #   make dev     - Do both format + lint
 
+# ============================================================================
+# 4️⃣ CODE QUALITY - Keep code clean and consistent
+# ============================================================================
+# 🎯 GOAL: Make code readable, consistent, and bug-free
+#
+# 🚀 QUICK COMMANDS:
+#   make format  - Auto-fix formatting
+#   make lint    - Check for issues
+#   make fix     - Auto-fix what we can
+#   make dev     - Do both format + lint
+
 [tool.mypy]
 python_version = "3.10"           # 🐍 Python version we're using
 strict = false                    # 🎯 Gradual typing (not too strict while learning)
 
-# 🚫 Aggressive external package handling
-ignore_missing_imports = true     # Ignore all missing imports
+# � External libraries - ignore missing type information
+ignore_missing_imports = true     # Ignore missing imports from external packages
 follow_imports = "silent"         # Don't follow imports to external packages
 namespace_packages = true         # Handle namespace packages better
-explicit_package_bases = false    # Don't require explicit package bases
-
-# 🚫 Disable problematic mypy features
-disable_error_code = [
-    "import", "import-untyped", "import-not-found",  # Import issues
-    "attr-defined", "name-defined", "has-type",      # Attribute/name issues
-    "no-untyped-def", "no-untyped-call",            # Untyped function issues
-    "assignment", "index", "operator",               # Assignment/indexing issues
-    "misc", "valid-type", "var-annotated",          # Miscellaneous issues
-    "return-value", "no-any-return",                 # Return type issues
-    "arg-type", "call-arg", "call-overload",         # Argument issues
-    "type-arg", "type-var",                          # Generic type issues
-    "unreachable", "unused-ignore",                  # Unreachable code
-    "redundant-cast", "redundant-expr",              # Redundant code
-    "no-redef", "valid-newtype",                     # Redefinition issues
-    "override", "assert-type",                        # Advanced type features
-]
-
-# 🚫 Ultra-aggressive external package handling
-# Note: Most settings are already configured above, these are additional overrides
 
 # ⚠️ Warnings we want to see
 warn_return_any = true           # Warn when function returns 'Any' type
 warn_unused_configs = true       # Warn about unused MyPy settings
 warn_redundant_casts = true      # Warn about unnecessary type casts
-warn_unused_ignores = false      # Don't warn about unused # type: ignore
 warn_no_return = true            # Warn when function should return something
 warn_unreachable = true          # Warn about code that can't be reached
 strict_equality = true           # Strict checking for == and !=
@@ -222,10 +210,6 @@ strict_equality = true           # Strict checking for == and !=
 disallow_untyped_defs = true     # Functions need type hints
 disallow_incomplete_defs = true  # All parameters need types
 check_untyped_defs = true        # Check functions even without types
-disallow_untyped_decorators = true  # Decorators need types
-no_implicit_optional = true      # Be explicit about Optional types
-
-# 🧠 ML-specific MyPy settings - Consolidated with aggressive error disabling
 
 # 🚫 Folders to skip (don't type-check these)
 exclude = [
@@ -236,155 +220,16 @@ exclude = [
   "notebooks/",       # Jupyter notebooks (different rules)
   "logs/",            # Log files
   "runs/",            # TensorBoard runs
-  ".kiro/",           # Kiro IDE files
-  "data/raw/",        # Raw data files
+  "data/",            # Data files
+  "scripts/",         # CLI helper scripts (not part of package)
+  "/tests/",
 ]
 
-# Disable all error checking for problematic files
-[[tool.mypy.overrides]]
-module = "final_cleanup"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "final_optimization"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "deploy_improvements"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "fix_model_issues"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "apply_model_workarounds"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "demo_switcher"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "verify_deployment"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "scripts.*"
-ignore_errors = true
-
+# 🧪 Test files - relaxed rules for tests
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
 check_untyped_defs = false
-
-# 📦 External libraries
-ignore_missing_imports = true    # Don't complain about missing library types
-
-# 🎯 Special rules for specific files/modules
-[[tool.mypy.overrides]]
-module = "src.ui.app_streamlit"
-disallow_untyped_decorators = false  # Streamlit decorators don't need types
-
-# 🚫 Ignore Jupyter notebooks completely
-[[tool.mypy.overrides]]
-module = "notebooks.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "PlantGuard"
-ignore_errors = true
-
-# 🚫 Ignore specific notebook files
-[[tool.mypy.overrides]]
-module = "PlantGuard.ipynb"
-ignore_errors = true
-
-# 🚫 Completely ignore all external package issues
-[[tool.mypy.overrides]]
-module = "google.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "google.protobuf.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "google_crc32c.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "tensorboard.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "wandb.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "streamlit.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "torch.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "torchvision.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "transformers.*"
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = "huggingface_hub.*"
-ignore_errors = true
-
-# 🚧 Work in progress - relax rules for new modules while we add types
-[[tool.mypy.overrides]]
-module = [
-  "src.core.model_manager",
-  "src.core.huggingface_vision",
-  "src.features.model_switching.model_manager",
-  "src.features.model_switching.huggingface_vision",
-]
-ignore_errors = true  # Skip type checking for now
-
-# 📦 External libraries - ignore missing type information
-[[tool.mypy.overrides]]
-module = [
-  # 🧠 AI/ML Libraries
-  "torch.*", "torchvision.*", "torchaudio.*", "torchmetrics.*",
-
-  # 👁️ Computer Vision
-  "cv2.*",
-
-  # 🎵 Audio Processing
-  "librosa.*", "soundfile.*", "speech_recognition.*",
-
-  # 🌐 Web Interface
-  "streamlit.*", "streamlit_webrtc.*",
-
-  # 🔗 Networking
-  "pycloudflared.*", "pyngrok.*",
-
-  # 🤖 ML Tools
-  "wandb.*", "optuna.*",
-
-  # 🚫 Google-related packages that cause issues
-  "google.*", "google.protobuf.*", "google_crc32c.*",
-
-  # 🚫 Additional problematic packages
-  "tensorboard.*", "huggingface_hub.*", "transformers.*",
-  "numpy.*", "pandas.*", "scipy.*", "sklearn.*",
-  "matplotlib.*", "seaborn.*", "plotly.*",
-  "PIL.*", "Pillow.*", "opencv.*",
-  "jupyter.*", "ipython.*", "notebook.*",
-
-]
-ignore_missing_imports = true
-ignore_errors = true  # Completely ignore all errors from these packages
 
 # ============================================================================
 # 6️⃣ TESTING - Make sure everything works correctly
@@ -428,10 +273,10 @@ markers = [
 
 # ⚠️ Warning filters (what warnings to show/hide)
 filterwarnings = [
-  "error",                            # Treat warnings as errors (strict)
+#  "error",                            # Treat warnings as errors (strict)
   "ignore::UserWarning",              # Ignore user warnings (common in ML)
-  "ignore::DeprecationWarning",       # Ignore deprecation warnings
-  "ignore::PendingDeprecationWarning", # Ignore pending deprecation warnings
+#  "ignore::DeprecationWarning",       # Ignore deprecation warnings
+#  "ignore::PendingDeprecationWarning", # Ignore pending deprecation warnings
 ]
 
 # 📊 Test Coverage - How much of our code is tested
@@ -480,7 +325,7 @@ directory = "htmlcov"                 # Where to put HTML coverage report
 # 🔒 Bandit - Security linter (finds potential security issues)
 [tool.bandit]
 # 🚫 Folders to skip during security scan
-exclude_dirs = ["tests", "build", "dist", ".venv"]
+exclude_dirs = ["tests", "build", "dist", ".venv", "run", "data"]
 
 # 🚫 Security checks to skip (because they're OK for PlantGuard)
 skips = [
@@ -526,726 +371,471 @@ skips = [
 #   pip install -e .  - Install PlantGuard in development mode
 
 [tool.ruff]
-line-length = 200              # 📏 Max characters per line (ADHD-friendly: not too long)
+line-length = 150              # 📏 Reasonable line length for readability
 target-version = "py310"       # 🐍 Python version we support
 fix = true                     # 🔧 Auto-fix issues when possible
 show-fixes = true              # 📝 Show what was fixed
 output-format = "grouped"      # 📊 Group similar issues together
 
-# 🔍 What Ruff checks for (the rules we follow)
+# 🔍 What Ruff checks for (focused on essential rules)
 [tool.ruff.lint]
 select = [
   # ============================================================================
-  # 🐍 CORE PYTHON RULES - The absolute basics everyone should follow
+  # 🐍 CORE PYTHON RULES - Essential code quality
   # ============================================================================
   "E",   # pycodestyle errors (spacing, indentation, line length)
   "F",   # pyflakes (unused imports, undefined variables, syntax errors)
   "I",   # isort (organize imports nicely by category)
+  "W",   # pycodestyle warnings
 
   # ============================================================================
-  # 🐛 BUG PREVENTION - Catch common Python mistakes and gotchas
+  # 🐛 BUG PREVENTION - Catch common mistakes
   # ============================================================================
   "B",   # flake8-bugbear (common Python gotchas and anti-patterns)
-  "A",   # flake8-builtins (don't shadow built-ins like 'list', 'dict')
   "C4",  # flake8-comprehensions (better list/dict comprehensions)
-  "PIE", # flake8-pie (miscellaneous improvements and simplifications)
-  "SIM", # flake8-simplify (simpler, more readable code patterns)
   "UP",  # pyupgrade (modern Python syntax, f-strings, type hints)
 
   # ============================================================================
-  # 📝 DOCUMENTATION & TYPE SAFETY - Make code self-documenting
-  # ============================================================================
-  "ANN", # flake8-annotations (type hints for functions and variables)
-  "D",   # pydocstyle (docstring style and completeness)
-
-  # ============================================================================
-  # 🔒 SECURITY & ERROR HANDLING - Keep code safe and robust
+  # 🔒 SECURITY & SAFETY - Keep code secure
   # ============================================================================
   "S",   # flake8-bandit (security vulnerabilities and unsafe patterns)
-  "BLE", # flake8-blind-except (catch specific exceptions, not bare except)
-  "TRY", # tryceratops (better exception handling patterns)
 
   # ============================================================================
-  # 🧠 CODE COMPLEXITY - Keep it simple and maintainable (ADHD-friendly!)
-  # ============================================================================
-  "C90", # mccabe (cyclomatic complexity - how many paths through functions)
-  "PLR", # pylint refactor (code structure, complexity, design issues)
-  "PLW", # pylint warnings (potential bugs, unused variables, etc.)
-  "PLE", # pylint errors (definite bugs and errors)
-
-  # ============================================================================
-  # 🚀 MODERN PYTHON - Use the latest best practices and features
+  # 📝 CODE STYLE - Clean, readable code
   # ============================================================================
   "PTH", # flake8-use-pathlib (use pathlib.Path instead of os.path)
+  "SIM", # flake8-simplify (simpler, more readable code patterns)
   "RUF", # ruff-specific rules (unique to Ruff linter)
 
   # ============================================================================
-  # ⚡ PERFORMANCE - Make code faster and more efficient
-  # ============================================================================
-  "PERF", # perflint (performance improvements and optimizations)
-
-  # ============================================================================
-  # 📦 IMPORT & CODE ORGANIZATION - Clean, organized, readable code
-  # ============================================================================
-  "TID", # flake8-tidy-imports (import organization and banned imports)
-
-  # ============================================================================
-  # 🖨️ LOGGING & OUTPUT - Proper logging instead of print statements
-  # ============================================================================
-  "G",   # flake8-logging-format (proper logging format and usage)
-  "T20", # flake8-print (discourage print(), encourage logging)
-
-  # ============================================================================
-  # 🔧 ADDITIONAL RULE CATEGORIES - Future-ready and optional
-  # ============================================================================
-  # 💡 Add # before any category to deactivate it, remove # to activate
-
   # 🧪 TESTING - Test code quality
-  # "PT",  # flake8-pytest-style (pytest best practices)
-
-  # 🎨 CODE STYLE - Additional style rules
-  # "COM", # flake8-commas (trailing commas)
-  # "Q",   # flake8-quotes (quote style consistency)
-
-  # 🔍 CODE ANALYSIS - Advanced analysis
-  # "ERA", # eradicate (commented-out code detection)
-  # "FBT", # flake8-boolean-trap (boolean trap anti-pattern)
-  # "ARG", # flake8-unused-arguments (unused function arguments)
-
-  # 🔄 COMPATIBILITY & MODERNIZATION
-  # "YTT", # flake8-2020 (Python 2/3 compatibility)
-  # "FURB", # refurb (code modernization and improvements)
-
-  # 🌐 FRAMEWORK-SPECIFIC
-  # "DJ",  # flake8-django (Django best practices)
-  # "PD",  # pandas-vet (Pandas best practices)
-
-  # � FUTURE CAATEGORIES - Add as they become available
-  # "ASYNC", # flake8-async (async/await best practices)
-  # "NPY",   # numpy-specific rules
-  # "CRYPT", # cryptography best practices
-  # "DOC",   # documentation generation rules
+  # ============================================================================
+  "PT",  # flake8-pytest-style (pytest best practices)
 ]
 
 ignore = [
   # ============================================================================
-  # � PYFRLAKES (F) - Core Python issues
+  # 🤖 ML/AI Specific Exceptions - Allow common ML patterns
   # ============================================================================
-  "F841",   # Allow unused variables - ML experiments often have intermediate variables for debugging
-  "F821",   # Allow undefined names - ML code often has conditional imports
-  "F401",   # Allow unused imports - ML code often imports for type checking or optional features
+  "S101",   # Allow assert statements - essential for ML tensor shape validation
+  "S301",   # Allow pickle usage - standard for ML model serialization
+  "S603",   # Allow subprocess calls - needed for ML preprocessing tools
+  "B008",   # Allow function calls in defaults - ML often has computed defaults
+  "B018",   # Allow useless expressions - ML tensor operations have side effects
+  "UP032",  # Allow .format() calls - ML logging often needs .format()
+  "PTH123", # Allow open() instead of Path.open() - ML compatibility
+  "S506",   # Allow yaml.load() - ML config files need full YAML loading
 
   # ============================================================================
-  # 🎨 PYCODESTYLE (E) - Code style and formatting
+  # 📊 Development Workflow Exceptions - Allow rapid prototyping
   # ============================================================================
-  "E501",   # Allow long lines - ML code often has long parameter lists and tensor operations
-  "E701",   # Allow multiple statements on one line - ML code sometimes needs compact expressions
-  "E702",   # Allow multiple statements on one line - ML code sometimes needs compact expressions
-  "E203",   # Allow whitespace before ':' - conflicts with black formatter in ML tensor slicing
-  "E402",   # Allow module level import not at top of file - ML scripts often have conditional imports
+  "B007",   # Allow unused loop variables - common in ML training epochs
+  "SIM102", # Allow if/else over ternary - ML logic often clearer explicit
+  "SIM108", # Allow if/else for boolean assignment - ML model conditions
+  "C408",   # Allow unnecessary dict calls - ML config clarity
+  "RUF012", # Allow mutable class attributes - ML model classes need mutable state
 
   # ============================================================================
-  # 📦 ISORT (I) - Import organization and sorting
+  # 🎨 Code Style Exceptions - Maintain readability over strictness  
   # ============================================================================
-  "I001",   # Allow unsorted imports - ML experiments often have dynamic import patterns during development
-  # "I002",   # missing required import (e.g. from __future__ import annotations)
+  "E501",   # Allow long lines beyond 120 chars for complex ML expressions
+  "COM812", # Allow missing trailing commas - dynamic ML parameter lists
 
   # ============================================================================
-  # 🔤 FLAKE8-BUILTINS (A) - Builtin shadowing
+  # 📚 ALL AVAILABLE RULES - Commented for reference
   # ============================================================================
-  "A001",   # Allow variable shadowing builtins - ML code commonly uses 'input', 'output', 'filter', 'format', 'type'
-  "A002",   # Allow argument shadowing builtins - ML function parameters often use 'input', 'output', 'format'
-  "A003",   # Allow class attribute shadowing builtins - ML model classes often have 'input', 'output' attributes
-  # "A004",   # import is shadowing a python builtin
-  # "A005",   # module is shadowing a python builtin
-  # "A006",   # variable is shadowing a python builtin in a nested scope
+  # Uncomment any rule below to add it to the ignore list
+  
+  # PYCODESTYLE ERRORS (E) - Code style and formatting
+  # "E101",   # Indentation contains mixed spaces and tabs
+  # "E111",   # Indentation is not a multiple of four
+  # "E112",   # Expected an indented block
+  # "E113",   # Unexpected indentation
+  # "E114",   # Indentation is not a multiple of four (comment)
+  # "E115",   # Expected an indented block (comment)
+  # "E116",   # Unexpected indentation (comment)
+  # "E117",   # Over-indented
+  # "E201",   # Whitespace after '('
+  # "E202",   # Whitespace before ')'
+  # "E203",   # Whitespace before ':'
+  # "E211",   # Whitespace before '('
+  # "E221",   # Multiple spaces before operator
+  # "E222",   # Multiple spaces after operator
+  # "E223",   # Tab before operator
+  # "E224",   # Tab after operator
+  # "E225",   # Missing whitespace around operator
+  # "E226",   # Missing whitespace around arithmetic operator
+  # "E227",   # Missing whitespace around bitwise or shift operator
+  # "E228",   # Missing whitespace around modulo operator
+  # "E231",   # Missing whitespace after ','
+  # "E241",   # Multiple spaces after ','
+  # "E242",   # Tab after ','
+  # "E251",   # Unexpected spaces around keyword / parameter equals
+  # "E261",   # At least two spaces before inline comment
+  # "E262",   # Inline comment should start with '# '
+  # "E265",   # Block comment should start with '# '
+  # "E266",   # Too many leading '#' for block comment
+  # "E271",   # Multiple spaces after keyword
+  # "E272",   # Multiple spaces before keyword
+  # "E273",   # Tab after keyword
+  # "E274",   # Tab before keyword
+  # "E275",   # Missing whitespace after keyword
+  # "E301",   # Expected 1 blank line, found 0
+  # "E302",   # Expected 2 blank lines, found 0
+  # "E303",   # Too many blank lines
+  # "E304",   # Blank lines found after function decorator
+  # "E305",   # Expected 2 blank lines after class or function definition
+  # "E306",   # Expected 1 blank line before a nested definition
+  # "E401",   # Multiple imports on one line
+  # "E402",   # Module level import not at top of file
+  # "E501",   # Line too long (82 > 79 characters)
+  # "E502",   # The backslash is redundant between brackets
+  # "E701",   # Multiple statements on one line (colon)
+  # "E702",   # Multiple statements on one line (semicolon)
+  # "E703",   # Statement ends with a semicolon
+  # "E711",   # Comparison to None should be 'if cond is None:'
+  # "E712",   # Comparison to True should be 'if cond is True:' or 'if cond:'
+  # "E713",   # Test for membership should be 'not in'
+  # "E714",   # Test for object identity should be 'is not'
+  # "E721",   # Do not compare types, use 'isinstance()'
+  # "E722",   # Do not use bare 'except'
+  # "E731",   # Do not assign a lambda expression, use a def
+  # "E741",   # Ambiguous variable name 'l'
+  # "E742",   # Ambiguous variable name 'O'
+  # "E743",   # Ambiguous variable name 'I'
+  # "E902",   # TokenError
+  # "E999",   # SyntaxError
 
-  # ============================================================================
-  # 🐛 FLAKE8-BUGBEAR (B) - Common Python gotchas and bugs
-  # ============================================================================
+  # PYCODESTYLE WARNINGS (W) - Less critical style issues
+  # "W191",   # Indentation contains tabs
+  # "W291",   # Trailing whitespace
+  # "W292",   # No newline at end of file
+  # "W293",   # Blank line contains whitespace
+  # "W391",   # Blank line at end of file
+  # "W503",   # Line break before binary operator
+  # "W504",   # Line break after binary operator
+  # "W601",   # .has_key() is deprecated, use 'in'
+  # "W602",   # Deprecated form of raising exception
+  # "W603",   # '<>' is deprecated, use '!='
+  # "W604",   # Backticks are deprecated, use 'repr()'
+  # "W605",   # Invalid escape sequence 'x'
+
+  # PYFLAKES (F) - Logic errors and undefined variables
+  # "F401",   # Module imported but unused
+  # "F402",   # Import module from line N shadowed by loop variable
+  # "F403",   # 'from module import *' used; unable to detect undefined names
+  # "F404",   # Future import(s) name after other statements
+  # "F405",   # Name may be undefined, or defined from star imports: module
+  # "F811",   # Redefinition of unused name from line N
+  # "F821",   # Undefined name name
+  # "F822",   # Undefined name name in __all__
+  # "F823",   # Local variable name ... referenced before assignment
+  # "F831",   # Duplicate argument name in function definition
+   "F841",   # Local variable name is assigned to but never used
+  # "F901",   # raise NotImplemented should be raise NotImplementedError
+
+  # ISORT (I) - Import sorting and organization
+  # "I001",   # Import block is un-sorted or un-formatted
+  # "I002",   # Missing required import (e.g. from __future__ import annotations)
+
+  # FLAKE8-BUGBEAR (B) - Common Python gotchas
   # "B002",   # Python does not support the unary prefix increment
-  # "B003",   # assigning to os.environ doesn't clear the environment
-  # "B004",   # using hasattr(x, '__call__') to test if x is callable is unreliable
-  # "B005",   # using .strip() with multi-character strings is misleading
-  "B006",   # Allow mutable defaults - ML model configs and data processing functions often use mutable defaults
-  "B007",   # Allow unused loop variables - common in ML training epochs and batch processing where index isn't used
-  "B008",   # Allow function calls in defaults - ML often has computed defaults like device detection, model paths
-  # "B009",   # do not call getattr with a constant attribute value
-  # "B010",   # do not call setattr with a constant attribute value
-  # "B011",   # do not call assert False since python -O removes these calls
-  # "B012",   # use of break, continue or return inside finally blocks
-  # "B013",   # a length-one tuple literal is redundant
-  # "B014",   # exception handler is an exception group
-  # "B015",   # pointless comparison
-  # "B016",   # cannot raise a literal
-  # "B017",   # assertRaises(Exception) should be considered evil
-  "B018",   # Allow useless expressions - ML code often has tensor operations with side effects (GPU memory, model state)
-  # "B019",   # use of assert detected
-  # "B020",   # loop control variable overrides iterable it iterates
-  # "B021",   # f-string used as docstring
-  # "B022",   # no arguments passed to contextmanager
-  "B023",   # Allow unbound loop variables in function definitions - common in ML training loop callbacks
-  # "B024",   # abstract base class with no abstract methods
-  # "B025",   # duplicate try block exception handler
-  # "B026",   # star-arg unpacking after a keyword argument is strongly discouraged
-  # "B027",   # empty method in an abstract base class
-  # "B028",   # no explicit stacklevel keyword argument found
-  # "B029",   # using except (...): with an empty tuple does not catch anything
-  # "B030",   # except handlers should only be exception classes or tuples of exception classes
-  # "B031",   # using itertools.groupby without explicitly sorting first
-  # "B032",   # possible unintentional type annotation (use =)
-  # "B033",   # duplicate value in set
-  # "B034",   # re.sub called with positional arguments
-  # "B035",   # found except clause that may not bind an exception
-  # "B901",   # using return x in a generator function used to be syntactically invalid
-  # "B902",   # blind except Exception: statement
-  # "B903",   # data class should use __slots__
-  "B904",   # Allow raise without 'from' - ML error handling often needs clean exception chains for model failures
-  "B905",   # Allow zip() without strict - ML data processing often uses zip with different length iterables intentionally
+  # "B003",   # Assigning to os.environ doesn't clear the environment
+  # "B004",   # Using `hasattr(x, '__call__')` to test if x is callable is unreliable
+  # "B005",   # Using .strip() with multi-character strings is misleading
+  # "B006",   # Do not use mutable data structures for argument defaults
+  # "B007",   # Loop control variable `i` not used within the loop body
+  # "B008",   # Do not perform function calls in argument defaults
+  # "B009",   # Do not call getattr with a constant attribute value
+  # "B010",   # Do not call setattr with a constant attribute value
+  # "B011",   # Do not call assert False since python -O removes these calls
+  # "B012",   # return/continue/break inside finally blocks cause exceptions to be silenced
+  # "B013",   # A length-one tuple literal is redundant
+  # "B014",   # Exception handler is an except clause that duplicates a previous clause
+  # "B015",   # Pointless comparison. This comparison does nothing but waste CPU cycles
+  # "B016",   # Cannot raise a literal. Did you intend to return it or raise an Exception?
+  # "B017",   # self.assertRaises(Exception) should be considered evil
+  # "B018",   # Found useless expression. Either assign it to a variable or remove it
+  # "B019",   # Use of `assert` detected outside of tests
+  # "B020",   # Loop control variable overrides iterable it iterates
+  # "B021",   # f-string is missing placeholders
+  # "B022",   # No arguments passed to `contextlib.suppress`
+  # "B023",   # Function definition does not bind loop variable
+  # "B024",   # Abstract base class with no abstract methods
+  # "B025",   # Exception handler is an except clause that duplicates a previous clause
+  # "B026",   # Star-arg unpacking after a keyword argument is strongly discouraged
+  # "B027",   # Empty method in an abstract base class
+  # "B028",   # No explicit stacklevel keyword argument found
+  # "B029",   # Using `except ():` with an empty tuple does not catch anything
+  # "B030",   # Except handlers should only be exception classes or tuples of exception classes
+  # "B031",   # Using the generator returned from itertools.groupby() more than once
+  # "B032",   # Possible unintentional type annotation (use `:`): `var = value`
+  # "B033",   # Sets should not contain duplicate item
+  # "B034",   # `re.sub()` should pass `count` and `flags` as keyword arguments
+  # "B035",   # Found `except BaseException:` (except-base-exception)
+  # "B901",   # Using `return x` in a generator function used to be syntactically invalid
+  # "B902",   # Invalid first argument used for method
+  # "B904",   # Within an except clause, raise exceptions with `raise ... from err`
+  # "B905",   # `zip()` without an explicit `strict=` parameter
 
-  # ============================================================================
-  # 🔄 FLAKE8-COMPREHENSIONS (C4) - List/dict comprehension improvements
-  # ============================================================================
-  "C400",   # Allow generators over list comprehensions - ML often needs memory-efficient lazy evaluation
-  "C401",   # Allow generators over set comprehensions - ML data processing benefits from lazy evaluation
-  "C402",   # unnecessary generator (rewrite as a dict comprehension)
-  # "C403",   # unnecessary list comprehension (rewrite as a set comprehension)
-  # "C404",   # unnecessary list comprehension (rewrite as a dict comprehension)
-  # "C405",   # unnecessary literal (rewrite as a set literal)
-  # "C406",   # unnecessary literal (rewrite as a dict literal)
-  # "C408",   # unnecessary dict call (rewrite as a literal)
-  # "C409",   # unnecessary list passed to tuple() (rewrite as a tuple literal)
-  # "C410",   # unnecessary list passed to list() (remove the outer call to list())
-  # "C411",   # unnecessary list call (remove the outer call to list())
-  # "C413",   # unnecessary reversed call around sorted()
-  # "C414",   # unnecessary double cast
-  # "C415",   # unnecessary subscript reversal of iterable
-  "C416",   # Allow list comprehensions over list() calls - ML code often clearer with explicit comprehensions
-  "C417",   # Allow map() usage - ML data processing often clearer with map() for transformations
-  # "C418",   # unnecessary dict literal passed to dict() (remove the outer call)
-  # "C419",   # unnecessary list comprehension
+  # FLAKE8-COMPREHENSIONS (C4) - List/dict comprehension improvements
+  # "C400",   # Unnecessary generator - rewrite as a list comprehension
+  # "C401",   # Unnecessary generator - rewrite as a set comprehension
+  # "C402",   # Unnecessary generator - rewrite as a dict comprehension
+  # "C403",   # Unnecessary list comprehension - rewrite as a set comprehension
+  # "C404",   # Unnecessary list comprehension - rewrite as a dict comprehension
+  # "C405",   # Unnecessary literal - rewrite as a set literal
+  # "C406",   # Unnecessary literal - rewrite as a dict literal
+  # "C408",   # Unnecessary dict call - rewrite as a literal
+  # "C409",   # Unnecessary list passed to tuple() - rewrite as a tuple literal
+  # "C410",   # Unnecessary list passed to list() - remove the outer call to list()
+  # "C411",   # Unnecessary list call - remove the outer call to list()
+  # "C413",   # Unnecessary list call around sorted()
+  # "C414",   # Unnecessary list call within sorted()
+  # "C415",   # Unnecessary subscript reversal of iterable
+  # "C416",   # Unnecessary list comprehension - rewrite using list()
+  # "C417",   # Unnecessary map usage - rewrite using a list comprehension
+  # "C418",   # Unnecessary dict literal passed to dict() - remove the outer call
+  # "C419",   # Unnecessary list comprehension
 
-  # ============================================================================
-  # 🧠 MCCABE (C90) - Cyclomatic complexity
-  # ============================================================================
-   "C901",   # Allow complex functions - ML pipelines, model architectures, and data preprocessing often require complex logic
+  # PYUPGRADE (UP) - Modern Python syntax
+  # "UP001",  # Use `{}` instead of `{}.format()`
+  # "UP003",  # Use `{}` instead of `{}.format()`
+  # "UP004",  # Class `Foo` inherits from `object`
+  # "UP005",  # `six.text_type` alias for `str`
+  # "UP006",  # Use `list` instead of `List` for type annotations
+  # "UP007",  # Use `X | Y` for type annotations
+  # "UP008",  # Use `super()` instead of `super(__class__, self)`
+  # "UP009",  # UTF-8 encoding declaration is unnecessary
+  # "UP010",  # Unnecessary `__future__` import `{name}` for target Python version
+  # "UP011",  # Unnecessary parameters to `functools.lru_cache`
+  # "UP012",  # Unnecessary call to `encode` as UTF-8
+  # "UP013",  # Convert `typing.Text` to `str`
+  # "UP014",  # Convert `typing.Callable[[...], ...]` to `collections.abc.Callable`
+  # "UP015",  # Unnecessary open mode parameters
+  # "UP017",  # Use `datetime.timezone.utc` alias
+  # "UP018",  # Unnecessary call to `str`
+  # "UP019",  # `typing.Text` is deprecated, use `str`
+  # "UP020",  # Use builtin `open`
+  # "UP021",  # `typing.List` is deprecated, use `list`
+  # "UP022",  # `typing.Dict` is deprecated, use `dict`
+  # "UP023",  # `typing.Set` is deprecated, use `set`
+  # "UP024",  # `typing.FrozenSet` is deprecated, use `frozenset`
+  # "UP025",  # `typing.Tuple` is deprecated, use `tuple`
+  # "UP026",  # `typing.Type` is deprecated, use `type`
+  # "UP027",  # `typing.Union` is deprecated, use `X | Y`
+  # "UP028",  # `typing.Optional` is deprecated, use `X | None`
+  # "UP029",  # Use `str` instead of `typing_extensions.LiteralString`
+  # "UP030",  # Use implicit references for positional format fields
+  # "UP031",  # Use format specifiers instead of `%` formatting
+  # "UP032",  # Use f-string instead of `format` call
+  # "UP033",  # Use `X | Y` in `isinstance` call instead of `(X, Y)`
+  # "UP034",  # Avoid extraneous parentheses
+  # "UP035",  # `typing.Dict` is deprecated, use `dict`
+  # "UP036",  # Version block is outdated for minimum Python version
+  # "UP037",  # Remove quotes from type annotation
+  # "UP038",  # Use `X | Y` in `isinstance` call instead of `(X, Y)`
+  # "UP039",  # Unnecessary parentheses after class base
+  # "UP040",  # Type alias without `TypeAlias` annotation
+  # "UP041",  # Use `types.MethodType` instead of `type(lambda: None)`
+  # "UP042",  # Replace `yield` over `async` comprehension with `async yield`
+  # "UP043",  # Avoid importing `typing_extensions` members deprecated in Python 3.10+
 
-  # ============================================================================
-  # 📝 PYDOCSTYLE (D) - Documentation style
-  # ============================================================================
-  "D100",   # Allow missing module docstrings - rapid ML prototyping and experimental scripts don't always need full docs
-  "D101",   # Allow missing class docstrings - ML model classes often self-explanatory from name and usage
-  "D102",   # Allow missing method docstrings - ML utility methods and model helpers often self-explanatory
-  "D103",   # Allow missing function docstrings - ML utility functions and model helpers often self-explanatory
-  # "D104",   # missing docstring in public package
-  "D105",   # Allow missing magic method docstrings - ML model __call__, __getitem__ often self-explanatory
-  "D106",   # Allow missing nested class docstrings - ML often has utility classes that don't need docs
-  "D107",   # Allow missing __init__ docstrings - ML model constructors often self-explanatory from parameters
-  # "D200",   # one-line docstring should fit on one line with quotes
-  # "D201",   # no blank lines allowed before function docstring
-  # "D202",   # no blank lines allowed after function docstring
-  # "D203",   # 1 blank line required before class docstring
-  # "D204",   # 1 blank line required after class docstring
-  # "D205",   # 1 blank line required between summary line and description
-  # "D206",   # docstring should be indented with spaces, not tabs
-  # "D207",   # docstring is under-indented
-  # "D208",   # docstring is over-indented
-  # "D209",   # multi-line docstring closing quotes should be on a separate line
-  # "D210",   # no whitespaces allowed surrounding docstring text
-  # "D211",   # no blank lines allowed before class docstring
-  # "D212",   # multi-line docstring summary should start at the first line
-  # "D213",   # multi-line docstring summary should start at the second line
-  # "D214",   # section is over-indented
-  # "D215",   # section underline is over-indented
-  # "D300",   # use """triple double quotes"""
-  # "D301",   # use r""" if any backslashes in a docstring
-  "D400",   # Allow docstrings without periods - ML utility functions often have brief descriptions
-  "D401",   # Allow non-imperative mood - ML docstrings often describe what function does rather than commands
-  "D402",   # first line should not be the function's signature
-  # "D403",   # first word of the first line should be properly capitalized
-  # "D404",   # first word of the docstring should not be This
-  # "D405",   # section name should be properly capitalized
-  # "D406",   # section name should end with a newline
-  # "D407",   # missing dashed underline after section
-  # "D408",   # section underline should be in the line following the section's name
-  # "D409",   # section underline should match the length of its name
-  # "D410",   # missing blank line after section
-  # "D411",   # missing blank line before section
-  # "D412",   # no blank lines allowed between a section header and its content
-  # "D413",   # missing blank line after last section
-  # "D414",   # section has no content
-  # "D415",   # first line should end with a period, question mark, or exclamation point
-  # "D416",   # section name should end with a colon
-  # "D417",   # missing argument descriptions in the docstring
+  # FLAKE8-BANDIT (S) - Security issues
+  # "S101",   # Use of assert detected. The enclosed code will be removed when compiling to optimised byte code
+  # "S102",   # Use of exec detected
+  # "S103",   # bad-file-permissions
+  # "S104",   # Possible binding to all interfaces
+  # "S105",   # Possible hardcoded password
+  # "S106",   # Possible hardcoded password
+  # "S107",   # Possible hardcoded password
+  # "S108",   # Probable insecure usage of temp file/directory
+  # "S110",   # try-except-pass detected, consider logging the exception
+  # "S112",   # try-except-continue detected, consider logging the exception
+  # "S113",   # Probable use of requests call without timeout
+  # "S201",   # Use of `{name}` with `shell=True` seems safe, but may be changed in the future
+  # "S202",   # Use of `tarfile.extractall` and `tarfile.extract` are unsafe
+  # "S301",   # `pickle` and modules that wrap it can be unsafe when used to deserialize untrusted data
+  # "S302",   # Deserialization with the marshal module is possibly dangerous
+  # "S303",   # Use of insecure MD2, MD4, MD5, or SHA1 hash function
+  # "S304",   # Use of insecure cipher {name}
+  # "S305",   # Use of insecure cipher mode {name}
+  # "S306",   # Use of insecure and deprecated function (mktemp)
+  # "S307",   # Use of possibly insecure function - consider using safer ast.literal_eval
+  # "S308",   # Use of mark_safe() may expose cross-site scripting vulnerabilities
+  # "S310",   # Audit url open for permitted schemes
+  # "S311",   # Standard pseudo-random generators are not suitable for security/cryptographic purposes
+  # "S312",   # Telnet-related functions are being called
+  # "S313",   # Using xml to parse untrusted data is known to be vulnerable to XML attacks
+  # "S314",   # Using xml to parse untrusted data is known to be vulnerable to XML attacks
+  # "S315",   # Using xml to parse untrusted data is known to be vulnerable to XML attacks
+  # "S316",   # Using xml to parse untrusted data is known to be vulnerable to XML attacks
+  # "S317",   # Using xml to parse untrusted data is known to be vulnerable to XML attacks
+  # "S318",   # Using xml to parse untrusted data is known to be vulnerable to XML attacks
+  # "S319",   # Using xml to parse untrusted data is known to be vulnerable to XML attacks
+  # "S320",   # Using lxml to parse untrusted data is known to be vulnerable to XML attacks
+  # "S321",   # FTP-related functions are being called
+  # "S323",   # Using unverified HTTPS requests is unsafe
+  # "S324",   # Probable use of insecure hash functions in `hashlib`
+  # "S401",   # Use of deprecated `tempfile.mktemp`
+  # "S402",   # Use of `ftplib.FTP` in an insecure manner
+  # "S403",   # Consider possible security implications associated with {module} module
+  # "S404",   # Consider possible security implications associated with subprocess module
+  # "S405",   # Consider possible security implications associated with xml module
+  # "S406",   # Consider possible security implications associated with {module} module
+  # "S407",   # Consider possible security implications associated with xml module
+  # "S408",   # Consider possible security implications associated with xml module
+  # "S409",   # Consider possible security implications associated with {module} module
+  # "S410",   # Consider possible security implications associated with lxml module
+  # "S411",   # Consider possible security implications associated with xmlrpc module
+  # "S412",   # Consider possible security implications associated with httpserver module
+  # "S413",   # Consider possible security implications associated with pycrypto module
+  # "S501",   # Probable use of `{name}` call with verify=False disabling SSL certificate checks
+  # "S502",   # ssl.wrap_socket call with insecure SSL/TLS protocol version
+  # "S503",   # ssl.wrap_socket call without cert checking
+  # "S504",   # ssl.wrap_socket call with missing hostname verification
+  # "S505",   # ssl.wrap_socket call with weak or no cipher suites
+  # "S506",   # Use of yaml.load(). Allows instantiation of arbitrary objects. Consider yaml.safe_load()
+  # "S507",   # Use of `{name}` with default permissions can lead to security vulnerabilities
+  # "S508",   # Use of `snmp-get` with SNMPv1 and SNMPv2 is insecure
+  # "S601",   # paramiko call with policy set to AutoAddPolicy or WarningPolicy
+  # "S602",   # `subprocess` call with `shell=True` identified, security issue
+  # "S603",   # `subprocess` call: check for execution of untrusted input
+  # "S604",   # Function call with `shell=True` parameter identified, security issue
+  # "S605",   # Starting a process with a shell, possible injection attack vector
+  # "S606",   # Starting a process without a shell
+  # "S607",   # Starting a process with a partial executable path
+  # "S608",   # Possible SQL injection vector through string-based query construction
+  # "S609",   # Possible wildcard injection in call due to `*` usage
+  # "S612",   # Log injection possible
+  # "S701",   # Using jinja2 templates with autoescape=False is dangerous
+  # "S702",   # Use of mako templates, which can lead to XSS
 
-  # ============================================================================
-  # 🔒 FLAKE8-BANDIT (S) - Security issues
-  # ============================================================================
-  "S101",   # Allow assert statements - essential for ML tensor shape validation and model debugging
-  "S102",   # Allow exec() - needed for dynamic model loading and code generation in some ML frameworks
-  # "S103",   # set-bad-file-permissions
-  # "S104",   # hardcoded-bind-all-interfaces
-  # "S105",   # hardcoded-password-string
-  # "S106",   # hardcoded-password-funcarg
-  # "S107",   # hardcoded-password-default
-  "S108",   # Allow hardcoded temp files - ML models need predictable cache locations for checkpoints
-  "S110",   # Allow broad except patterns - ML models can fail in many unpredictable ways (CUDA, memory, etc.)
-  # "S112",   # try-except-continue
-  "S113",   # Allow requests without timeout - ML model downloads can take unpredictable time
-  # "S201",   # flask-debug-true
-  "S202",   # Allow unsafe tarfile extraction - ML datasets often come as compressed archives
-  "S301",   # Allow pickle usage - standard for ML model serialization (PyTorch, scikit-learn)
-  # "S302",   # marshal
-  # "S303",   # md5
-  # "S304",   # insecure-cipher
-  # "S305",   # insecure-cipher-mode
-  # "S306",   # insecure-cipher-mode-ecb
-  # "S307",   # insecure-cipher-mode-cbc
-  # "S308",   # mark-safe
-  # "S310",   # urllib-urlopen
-  "S311",   # Allow random module - ML often needs reproducible randomness for data augmentation and sampling
-  # "S312",   # telnetlib
-  # "S313",   # xml-bad-cElementTree
-  # "S314",   # xml-bad-ElementTree
-  # "S315",   # xml-bad-expatreader
-  # "S316",   # xml-bad-expatbuilder
-  # "S317",   # xml-bad-sax
-  # "S318",   # xml-bad-minidom
-  # "S319",   # xml-bad-pulldom
-  # "S320",   # xml-bad-etree
-  # "S321",   # ftplib
-  # "S322",   # input
-  # "S323",   # unverified-context
-  # "S324",   # insecure-hash-function
-  # "S401",   # import-telnetlib
-  "S402",   # import-ftplib
-  "S403",   # Allow pickle imports - standard for ML model serialization and caching
-  "S404",   # Allow subprocess imports - needed for ML preprocessing tools and external model utilities
-  "S603",   # Allow subprocess calls - needed for ML tools like ffmpeg, imagemagick, external model converters
-  # "S405",   # import-xml-etree
-  # "S406",   # import-xml-sax
-  # "S407",   # import-xml-expat
-  # "S408",   # import-xml-minidom
-  # "S409",   # import-xml-pulldom
-  # "S410",   # import-lxml
-  # "S411",   # import-xmlrpclib
-  # "S412",   # import-httpoxy
-  # "S413",   # import-pycrypto
-  # "S501",   # request-with-no-cert-validation
-  # "S502",   # ssl-insecure-version
-  # "S503",   # ssl-bad-defaults
-  # "S504",   # ssl-with-bad-version
-  # "S505",   # weak-cryptographic-key
-  "S506",   # Allow yaml.load() - ML config files and model metadata often require full YAML loading
-  # "S507",   # ssh-no-host-key-verification
-  # "S508",   # snmp-insecure-version
-  # "S509",   # snmp-weak-cryptography
-  # "S601",   # paramiko-calls
-  # "S602",   # subprocess-popen-with-shell-equals-true
-  # "S604",   # call-with-shell-equals-true
-  # "S605",   # start-process-with-a-shell
-  # "S606",   # start-process-with-no-shell
-  "S607",   # Allow partial subprocess paths - ML tools often use relative paths for model binaries
-  # "S608",   # hardcoded-sql-expression
-  # "S609",   # unix-command-wildcard-injection
-  # "S701",   # jinja2-autoescape-false
-  # "S702",   # use-of-mako-templates
+  # FLAKE8-USE-PATHLIB (PTH) - Use pathlib instead of os.path
+  # "PTH100", # `os.path.abspath()` should be replaced by `Path.resolve()`
+  # "PTH101", # `os.chmod()` should be replaced by `Path.chmod()`
+  # "PTH102", # `os.mkdir()` should be replaced by `Path.mkdir()`
+  # "PTH103", # `os.makedirs()` should be replaced by `Path.mkdir(parents=True)`
+  # "PTH104", # `os.rename()` should be replaced by `Path.rename()`
+  # "PTH105", # `os.replace()` should be replaced by `Path.replace()`
+  # "PTH106", # `os.rmdir()` should be replaced by `Path.rmdir()`
+  # "PTH107", # `os.remove()` should be replaced by `Path.unlink()`
+  # "PTH108", # `os.unlink()` should be replaced by `Path.unlink()`
+  # "PTH109", # `os.getcwd()` should be replaced by `Path.cwd()`
+  # "PTH110", # `os.path.exists()` should be replaced by `Path.exists()`
+  # "PTH111", # `os.path.expanduser()` should be replaced by `Path.expanduser()`
+  # "PTH112", # `os.path.isdir()` should be replaced by `Path.is_dir()`
+  # "PTH113", # `os.path.isfile()` should be replaced by `Path.is_file()`
+  # "PTH114", # `os.path.islink()` should be replaced by `Path.is_symlink()`
+  # "PTH115", # `os.path.readlink()` should be replaced by `Path.readlink()`
+  # "PTH116", # `os.stat()` should be replaced by `Path.stat()` or `Path.owner()` or `Path.group()`
+  # "PTH117", # `os.path.isabs()` should be replaced by `Path.is_absolute()`
+  # "PTH118", # `os.path.join()` should be replaced by `Path` with `/` operator
+  # "PTH119", # `os.path.basename()` should be replaced by `Path.name`
+  # "PTH120", # `os.path.dirname()` should be replaced by `Path.parent`
+  # "PTH121", # `os.path.samefile()` should be replaced by `Path.samefile()`
+  # "PTH122", # `os.path.splitext()` should be replaced by `Path.suffix`, `Path.stem`, and `Path.parent`
+  # "PTH123", # `open()` should be replaced by `Path.open()`
+  # "PTH124", # `py.path.local` is in maintenance mode, use `pathlib.Path`
+  # "PTH201", # Use `pathlib.Path.iterdir()` instead of `os.listdir()`
+  # "PTH202", # Use `pathlib.Path.glob()` instead of `glob.glob()`
+  # "PTH203", # Use `pathlib.Path.glob()` instead of `glob.iglob()`
+  # "PTH204", # Use `pathlib.Path.read_text()` instead of `open()` and `.read()`
+  # "PTH207", # Use `pathlib.Path.glob()` instead of `glob.glob()` with `recursive` flag
 
-  # ============================================================================
-  # 🚨 FLAKE8-BLIND-EXCEPT (BLE) - Exception handling
-  # ============================================================================
-  "BLE001", # Allow broad Exception catching - ML models can fail in unpredictable ways requiring catch-all handling
+  # FLAKE8-SIMPLIFY (SIM) - Simplify code patterns
+  # "SIM101", # Use a dictionary comprehension instead of a for-loop
+  # "SIM102", # Use a single if-statement instead of nested if-statements
+  # "SIM103", # Return the condition directly
+  # "SIM105", # Use `contextlib.suppress(Exception)` instead of try-except-pass
+  # "SIM106", # `elif` after `raise` statement
+  # "SIM107", # Don't use `hasattr(x, "__call__")` to test if `x` is callable
+  # "SIM108", # Use ternary operator instead of if-else-block for simple variable assignments
+  # "SIM109", # Use a tuple to compare a value against multiple values
+  # "SIM110", # Use `any()` instead of this for-loop
+  # "SIM111", # Use `all()` instead of this for-loop
+  # "SIM112", # Use `str.lower()` and `str.upper()` 
+  # "SIM113", # Use `.enumerate()` for index variable instead of range(len(...))
+  # "SIM114", # Use `.sort()` instead of `sorted()` when not using the return value
+  # "SIM115", # Use `.open()` for opening files instead of try-finally
+  # "SIM116", # Use a dictionary instead of many if-elif statements
+  # "SIM117", # Use a single with-statement with multiple contexts instead of nested with-statements
+  # "SIM118", # Use `in` to test membership of an element in a dictionary instead of `keys()`
+  # "SIM201", # Use `!=` instead of `not ==`
+  # "SIM208", # Use the `not in` operator instead of `not ... in ...`
+  # "SIM210", # Use `bool(...)` instead of `True if ... else False`
+  # "SIM211", # Use `not ...` instead of `False if ... else True`
+  # "SIM212", # Use `... if ... else ...` instead of `... and ... or ...`
+  # "SIM220", # Use `False` instead of `a and not a`
+  # "SIM221", # Use `True` instead of `a or not a`
+  # "SIM222", # Use `True` instead of `... or True`
+  # "SIM223", # Use `False` instead of `... and False`
+  # "SIM300", # Yoda condition detected
+  # "SIM401", # Use a dictionary comprehension instead of a for-loop
+  # "SIM910", # Use `dict.get(key, "default")` instead of conditional assignment
+  # "SIM911", # Use `zip()` instead of `enumerate()` when you only need the values
 
-  # ============================================================================
-  # 📝 FLAKE8-ANNOTATIONS (ANN) - Type annotations
-  # ============================================================================
-   "ANN001", # function arguments don't need types everywhere
-  "ANN002", # Allow missing *args types - ML frameworks often use dynamic arguments for model parameters
-  "ANN003", # Allow missing **kwargs types - ML model constructors frequently use flexible keyword arguments
-  "ANN201", # Allow missing return type annotations - ML test functions and scripts often don't need explicit return types
-  # "ANN201", # return types not required everywhere
-   "ANN202", # missing return type annotation for private function
-  # "ANN204", # missing return type annotation for special method
-  # "ANN205", # missing return type annotation for staticmethod
-  # "ANN206", # missing return type annotation for classmethod
-  # "ANN207", # missing return type annotation for property
-  "ANN204", # Allow missing return type for special methods (__init__, __call__, etc.) - ML model constructors rarely need explicit None annotation
-  # "ANN209", # missing return type annotation for __new__
-  # "ANN210", # This rule doesn't exist in Ruff - __call__ is covered by ANN204 (special methods)
-  # "ANN211", # missing return type annotation for __getitem__
-  # "ANN212", # missing return type annotation for __setitem__
-  # "ANN213", # missing return type annotation for __delitem__
-  # "ANN214", # missing return type annotation for __iter__
-  # "ANN215", # missing return type annotation for __next__
-  # "ANN216", # missing return type annotation for __len__
-  # "ANN217", # missing return type annotation for __contains__
-  # "ANN218", # missing return type annotation for __bool__
-  # "ANN219", # missing return type annotation for __reversed__
-  # "ANN220", # missing return type annotation for __enter__
-  # "ANN221", # missing return type annotation for __exit__
-  "ANN401", # Allow Any type - ML frameworks often have dynamic tensor shapes and model architectures
+  # RUFF-SPECIFIC (RUF) - Unique Ruff rules
+  # "RUF001", # String contains ambiguous unicode character
+  # "RUF002", # Docstring contains ambiguous unicode character
+  # "RUF003", # Comment contains ambiguous unicode character
+  # "RUF005", # Consider `{expression}` instead of concatenation
+  # "RUF006", # Store a reference to the return value of `asyncio.create_task`
+  # "RUF007", # Prefer `itertools.pairwise()` over `zip()` when iterating over successive pairs
+  # "RUF008", # Do not use mutable default values for dataclass fields
+  # "RUF009", # Do not perform function call in dataclass defaults
+  # "RUF010", # Use explicit conversion flag
+  # "RUF011", # Ruff-specific rule to avoid a specific anti-pattern
+  # "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
+  # "RUF013", # PEP 484 prohibits implicit `Optional`
+  # "RUF015", # Prefer `next(iter(x))` over single element slice
+  # "RUF016", # Slice in indexed access to type
+  # "RUF017", # Avoid quadratic list summation
+  # "RUF018", # Avoid assignment expressions in `assert` statements
+  # "RUF019", # Use `contextlib.suppress` instead of try-except-pass
+  # "RUF020", # `never` type used in non-return annotation
+  # "RUF021", # Parenthesize `a and b` expressions when chaining `and` and `or` together
+  # "RUF022", # `__all__` is not sorted
+  # "RUF023", # `__slots__` is not sorted
+  # "RUF024", # Use `str.removeprefix()` instead of manual prefix removal
+  # "RUF025", # Use `str.removesuffix()` instead of manual suffix removal
+  # "RUF026", # `defaultdict` in `__init__` should be a method
+  # "RUF027", # Possible f-string without an `f` prefix
+  # "RUF028", # Invalid formatter suppression comment
+  # "RUF029", # Function is declared `async`, but doesn't `await` or use `async` features
+  # "RUF030", # `print` found
+  # "RUF031", # `logging.exception` does not take an exception
+  # "RUF100", # Unused `noqa` directive
+  # "RUF200", # Failed to parse pyproject.toml
 
-
-  # ============================================================================
-  # 🖨️ FLAKE8-PRINT (T20) - Print statements
-  # ============================================================================
-  "T201",   # Allow print() statements - essential for ML training progress, model debugging, and Jupyter notebooks
-  "T203",   # Allow pprint() - useful for debugging complex ML model architectures and tensor structures
-
-
-  # ============================================================================
-  # 📊 FLAKE8-LOGGING-FORMAT (G) - Logging format
-  # ============================================================================
-  # "G001",   # logging .format() string
-  # "G002",   # logging % string
-  "G003",   # Allow logging + string concatenation - ML models often log dynamic tensor info and model states
-  "G004",   # Allow f-strings in logging - more readable for ML metrics, model paths, and performance data
-  # "G010",   # logging warn instead of warning
-  # "G101",   # logging extra not a dict
-  # "G201",   # logging .exception(...) should be logging.exception(...)
-  # "G202",   # logging .exception(...) should be logging.exception(...)
-
-  # ============================================================================
-  # 🥧 FLAKE8-PIE (PIE) - Miscellaneous improvements
-  # ============================================================================
-  "PIE790", # Allow unnecessary pass statements - ML code often has placeholder methods during development
-  # "PIE794", # duplicate class field definition
-  # "PIE796", # prefer unique enums
-  "PIE800", # Allow unnecessary spread ** - ML function calls often use explicit ** for clarity
-  "PIE804", # Allow unnecessary dict kwargs - ML config passing often clearer with explicit dict()
-  # "PIE807", # prefer list() over useless lambda
-  # "PIE810", # single starts-with/ends-with
-
-  # ============================================================================
-  # 🔄 FLAKE8-SIMPLIFY (SIM) - Code simplification
-  # ============================================================================
-  "SIM102", # Allow if/else over ternary - ML code often benefits from explicit conditionals for model logic clarity
-  # "SIM103", # return condition directly
-  "SIM105",
-  "SIM108", # Allow if/else for boolean assignment - ML model conditions often clearer with explicit blocks
-  # "SIM110", # use any(...) instead of for loop AND all(...) instead of for loop (remapped from SIM111)
-  # "SIM112", # use CAPITAL_ENVIRONMENT_VARIABLES
-  "SIM113", # Allow manual counter increment - ML training loops often need explicit index control
-  "SIM114", # Allow separate if branches - ML model logic often clearer with separate conditions
-  "SIM115", # Allow manual file handling - ML often needs specific file handling patterns for models/data
-  "SIM116", # Allow conditional assignment over dict.get - ML config handling often clearer with explicit conditionals
-  "SIM117", # Allow nested with-statements - ML file operations often clearer with separate context managers
-  "SIM118", # Allow explicit .keys() - ML code often more readable with explicit key checking
-  # "SIM201", # use != instead of not ==
-  # "SIM202", # use == instead of not !=
-  # "SIM208", # use != instead of not ==
-  # "SIM210", # use bool(...) instead of True if ... else False
-  # "SIM211", # use bool(...) instead of False if ... else True
-  # "SIM212", # use value if condition else other_value instead of other_value if not condition else value
-  # "SIM220", # use False instead of a == b and a != b
-  # "SIM221", # use True instead of a == b or a != b
-  # "SIM222", # use True instead of ... or True
-  # "SIM223", # use False instead of ... and False
-  # "SIM300", # yoda condition detected
-  # "SIM401", # use dict.get(key, "default") instead of conditional assignment
-
-  # ============================================================================
-  # 🚀 PYUPGRADE (UP) - Modern Python syntax
-  # ============================================================================
-  # "UP001",  # use {} instead of format()
-  # "UP003",  # use {} instead of format()
-  # "UP004",  # use {} instead of format()
-  # "UP005",  # use {} instead of format()
-  # "UP006",  # use {} instead of format()
-  # "UP007",  # use {} instead of format()
-  # "UP008",  # use super() instead of super(__class__, self)
-  # "UP009",  # use UTF-8 encoding declaration
-  # "UP010",  # use {} instead of format()
-  # "UP011",  # use {} instead of format()
-  # "UP012",  # use {} instead of format()
-  # "UP013",  # use {} instead of format()
-  # "UP014",  # use {} instead of format()
-  # "UP015",  # use {} instead of format()
-  # "UP017",  # use datetime.timezone.utc
-  # "UP018",  # use {} instead of format()
-  # "UP019",  # use {} instead of format()
-  # "UP020",  # use {} instead of format()
-  # "UP021",  # use {} instead of format()
-  # "UP022",  # use {} instead of format()
-  # "UP023",  # use {} instead of format()
-  # "UP024",  # use {} instead of format()
-  # "UP025",  # use {} instead of format()
-  # "UP026",  # use {} instead of format()
-  # "UP027",  # use {} instead of format()
-  # "UP028",  # use {} instead of format()
-  # "UP029",  # use {} instead of format()
-  # "UP030",  # use implicit references for positional format fields
-  # "UP031",  # use format specifiers instead of percent format
-  "UP032",  # Allow .format() calls - ML logging and string formatting often needs .format() for compatibility
-  # "UP033",  # use {} instead of format()
-  # "UP034",  # use {} instead of format()
-  # "UP035",  # use {} instead of format()
-  # "UP036",  # use {} instead of format()
-  # "UP037",  # use {} instead of format()
-  "UP038",  # use {} instead of format()
-
-  # ============================================================================
-  # 🔄 TRYCERATOPS (TRY) - Exception handling improvements
-  # ============================================================================
-  "TRY003", # Allow long exception messages - ML models need detailed error context (model path, tensor shapes, CUDA errors)
-  "TRY300", # Don't require 'else' blocks - ML pipelines often use early returns for model failures
-  "TRY301", # Don't require specific exception patterns - different ML components (vision/audio/text) need different error handling
-  "TRY400", # Allow logging.error vs logging.exception - model warnings vs critical failures need different log levels
-  "TRY401", # Allow verbose exception logging - ML debugging needs full stack traces for tensor/model issues
-
-  # ============================================================================
-  # 📁 FLAKE8-USE-PATHLIB (PTH) - Use pathlib instead of os.path
-  # ============================================================================
-  # "PTH100", # os.path.abspath() should be replaced by Path.resolve()
-  # "PTH101", # os.chmod() should be replaced by Path.chmod()
-  # "PTH102", # os.mkdir() should be replaced by Path.mkdir()
-  # "PTH103", # os.makedirs() should be replaced by Path.mkdir(parents=True)
-  # "PTH104", # os.rename() should be replaced by Path.rename()
-  # "PTH105", # os.replace() should be replaced by Path.replace()
-  # "PTH106", # os.rmdir() should be replaced by Path.rmdir()
-  # "PTH107", # os.remove() should be replaced by Path.unlink()
-  # "PTH108", # os.unlink() should be replaced by Path.unlink()
-  "PTH109", # Allow os.getcwd() - ML scripts often need current directory for relative model paths
-  "PTH110", # Allow os.path.exists() - gradual migration to pathlib in existing ML codebases
-  # "PTH111", # os.path.expanduser() should be replaced by Path.expanduser()
-  # "PTH112", # os.path.isdir() should be replaced by Path.is_dir()
-  # "PTH113", # os.path.isfile() should be replaced by Path.is_file()
-  # "PTH114", # os.path.islink() should be replaced by Path.is_symlink()
-  # "PTH115", # os.path.readlink() should be replaced by Path.readlink()
-  # "PTH116", # os.stat() should be replaced by Path.stat()
-  # "PTH117", # os.path.isabs() should be replaced by Path.is_absolute()
-  "PTH118", # Allow os.path.join() - gradual migration to pathlib in ML projects with legacy path handling
-  "PTH119", # Allow os.path.basename() - common in ML dataset processing and model file handling
-  "PTH120", # Allow os.path.dirname() - frequently used in ML for model checkpoint directory management
-  # "PTH121", # os.path.samefile() should be replaced by Path.samefile()
-  # "PTH122", # os.path.splitext() should be replaced by Path.suffix
-  "PTH123", # Allow open() instead of Path.open() - ML code often uses traditional file handling for compatibility
-  # "PTH124", # os.path.isdir() should be replaced by Path.is_dir()
-
-  # ============================================================================
-  # 🔧 RUFF-SPECIFIC (RUF) - Ruff-specific rules
-  # ============================================================================
-  # "RUF001", # ambiguous unicode character in string
-  # "RUF002", # ambiguous unicode character in docstring
-  # "RUF003", # ambiguous unicode character in comment
-  "RUF005", # Allow explicit concatenation over unpacking - ML tensor operations often clearer with explicit syntax
-  # "RUF006", # store a reference to the return value of asyncio.create_task
-  # "RUF007", # prefer itertools.pairwise() over zip() when iterating over successive pairs
-  # "RUF008", # do not use mutable default values for dataclass fields
-  # "RUF009", # do not perform function call in dataclass defaults
-  # "RUF010", # use explicit conversion flag
-  # "RUF011", # ruff-static-key-dict-comprehension
-  "RUF012", # Allow mutable class attributes without ClassVar - ML model classes often have mutable state
-  "RUF013", # Allow implicit Optional - ML function signatures often have implicit None returns
-  # "RUF100", # unused noqa directive
-
-  # ============================================================================
-  # ⚡ PERFLINT (PERF) - Performance improvements
-  # ============================================================================
-  "PERF101", # Allow list() casting before iteration - ML data loading often needs materialized lists for batching
-  # "PERF102", # when using only the keys of a dict use the keys() method
-  "PERF203", # Allow try-except in loops - ML batch processing often needs per-item error handling
-  "PERF401", # Allow explicit loops over list comprehensions - ML transformations often clearer with explicit loops
-  "PERF402", # Allow for-loops over comprehensions - ML data processing often needs explicit loop control
-  "PERF403", # Allow for-loops over dict comprehensions - ML config building often clearer with explicit loops
-  "F706", #
-  # ============================================================================
-  # 📦 FLAKE8-TIDY-IMPORTS (TID) - Import organization
-  # ============================================================================
-  # "TID251", # banned imports
-  "TID252", # Allow relative imports - ML model modules often benefit from relative imports for clarity
-
-  # ============================================================================
-  # 🧠 PYLINT (PL) - Code structure and logic
-  # ============================================================================
-  # PLR - Pylint Refactor
-  # "PLR0124", # name compared with itself
-  # "PLR0133", # two constants compared
-  # "PLR0206", # property with parameters
-  "PLR0402", # Allow import over from import - ML often needs full module names for clarity (torch.nn vs nn)
-  "PLR0911", # Allow many return statements - ML functions often have multiple exit points for different conditions
-  "PLR0912", # Allow many branches - ML model selection and data preprocessing often require complex conditionals
-  "PLR0913", # Allow many arguments - ML model constructors and training functions need extensive configuration
-  "PLR0915", # Allow many statements - complex ML pipelines and model architectures require detailed implementations
-  # "PLR1701", # merge isinstance calls
-  # "PLR1722", # use sys.exit() instead of exit()
-  # "PLR1733", # unnecessary dictionary index lookup
-  # "PLR1736", # unnecessary list index lookup
-  "PLR2004", # Allow magic values - ML hyperparameters, model dimensions, and neural network constants are often numeric literals
-  # "PLR2044", # line with empty comment
-  # "PLR5501", # consider using elif instead of else if
-
-  # PLW - Pylint Warning
-  # "PLW0120", # else clause on loop without a break statement
-  # "PLW0127", # self-assigning variable (sometimes used for type narrowing)
-  # "PLW0129", # assert on string literal
-  # "PLW0131", # named expression used without context
-  # "PLW0133", # exception statement has no effect
-  # "PLW0245", # super without brackets
-  # "PLW0406", # import self
-  # "PLW0602", # global variable not assigned
-  "PLW0603", # Allow global variables - ML models often use global state for model instances and device management
-  # "PLW0604", # global at module level
-  # "PLW1508", # invalid envvar default
-  # "PLW1509", # subprocess-popen-preexec-fn
-  # "PLW1510", # subprocess.run without explicit check (sometimes not needed)
-  "PLW1514", # Allow unspecified encoding - ML datasets and model files often have mixed encodings
-  # "PLW1641", # eq-without-hash
-  # "PLW2101", # useless-with-lock
-  "PLW2901", # Allow loop variable overwriting - common in ML batch processing and nested training loops
-   "PLW3301", # nested-min-max
-
-  # PLE - Pylint Error
-  # "PLE0101", # return in __init__
-  # "PLE0116", # continue in finally
-  # "PLE0117", # nonlocal without binding
-  # "PLE0118", # used prior global declaration
-  # "PLE0241", # duplicate bases
-  # "PLE0302", # unexpected special method signature
-  # "PLE0307", # invalid str return type
-  # "PLE0604", # invalid object in all
-  # "PLE0605", # invalid format for all
-  # "PLE1142", # await outside async function
-  # "PLE1205", # too many arguments for logging format string
-  # "PLE1206", # not enough arguments for logging format string
-  # "PLE1300", # unsupported format character
-  # "PLE1307", # bad string format type
-  # "PLE1310", # bad str strip arg
-  # "PLE1507", # invalid envvar value
-  # "PLE1700", # yield from in async generator
-  # "PLE2502", # contains duplicate key
-  # "PLE2510", # invalid unpack sequence
-  # "PLE2512", # invalid star expression target
-  # "PLE2513", # invalid star expression target
-  # "PLE2514", # invalid star expression target
-  # "PLE2515", # invalid star expression target
-
-  # ============================================================================
-  # 🔧 ADDITIONAL RULE CATEGORIES - Future-ready and optional
-  # ============================================================================
-
-  # 🧪 PYTEST (PT) - Testing best practices (uncomment individual rules to enable)
-  # "PT001",  # use @pytest.fixture() over @pytest.fixture
-  # "PT002",  # configuration for fixture should be moved into a conftest.py file
-  # "PT003",  # scope='function' is implied in @pytest.fixture()
-  # "PT004",  # fixture does not return anything, add leading underscore
-  # "PT005",  # fixture returns a value, remove leading underscore
-  # "PT006",  # wrong name(s) type in @pytest.mark.parametrize, expected tuple
-  # "PT007",  # wrong values type in @pytest.mark.parametrize expected list of tuples
-  # "PT008",  # use return_value= instead of patching with lambda
-  # "PT009",  # use a regular assert instead of unittest-style method
-  # "PT010",  # set the expected exception in pytest.raises()
-  # "PT011",  # pytest.raises({exception}) is too broad, set the match parameter
-  # "PT012",  # pytest.raises() block should contain a single simple statement
-  # "PT013",  # found incorrect import of pytest, use simple import pytest instead
-  # "PT014",  # found duplicate test cases {indexes} in @pytest.mark.parametrize
-  # "PT015",  # assertion always fails, replace with pytest.fail()
-  # "PT016",  # no message passed to pytest.fail()
-  # "PT017",  # found assertion on exception {name} in except block, use pytest.raises() instead
-  # "PT018",  # assertion should be broken down into multiple parts
-  # "PT019",  # fixture {name} without value is injected as parameter, use @pytest.mark.usefixtures instead
-  # "PT020",  # @pytest.yield_fixture is deprecated, use @pytest.fixture
-  # "PT021",  # use yield instead of request.addfinalizer
-  # "PT022",  # no teardown in fixture {name}, use return instead of yield
-  # "PT023",  # use @pytest.mark.foo() over @pytest.mark.foo
-  # "PT024",  # pytest.mark.asyncio is unnecessary for fixtures
-  # "PT025",  # pytest.mark.asyncio is unnecessary for fixtures
-  # "PT026",  # useless pytest.mark.asyncio on non-async function
-  # "PT027",  # use pytest.raises() instead of unittest-style method
-
-  # 🎨 FLAKE8-COMMAS (COM) - Trailing commas (uncomment individual rules to enable)
-  "COM812", # Allow missing trailing commas - ML code often has dynamic parameter lists where trailing commas aren't always needed
-  # "COM818", # trailing comma on bare tuple prohibited
-  # "COM819", # trailing comma prohibited
-
-  # 📝 FLAKE8-QUOTES (Q) - Quote consistency (uncomment individual rules to enable)
-  # "Q000",   # single quotes found but double quotes preferred
-  # "Q001",   # single quote multiline found but double quotes preferred
-  # "Q002",   # single quote docstring found but double quotes preferred
-  # "Q003",   # change outer quotes to avoid escaping inner quotes
-
-  # 🔍 ERADICATE (ERA) - Commented-out code (uncomment to enable)
-  "ERA001", # Allow commented-out code - ML experiments often keep alternative implementations for comparison
-
-  # 🔘 FLAKE8-BOOLEAN-TRAP (FBT) - Boolean trap anti-pattern (uncomment individual rules to enable)
-  "FBT001", # Allow boolean positional args - ML functions commonly use training=True, eval=False patterns
-  "FBT002", # Allow boolean default values - ML model constructors often have boolean configuration flags
-  "FBT003", # Allow boolean positional values - ML training calls frequently use boolean mode switches
-
-  # 🔧 FLAKE8-UNUSED-ARGUMENTS (ARG) - Unused function arguments (uncomment individual rules to enable)
-  "ARG001", # Allow unused function arguments - ML interfaces often have compatibility parameters
-  "ARG002", # Allow unused method arguments - ML model methods may not use all inherited parameters
-  "ARG003", # Allow unused class method arguments - ML factory methods often have unused config parameters
-  "ARG004", # Allow unused static method arguments - ML utility functions may have interface compatibility args
-  "ARG005", # Allow unused lambda arguments - ML data processing lambdas often ignore some parameters
-
-  # 🔄 FLAKE8-2020 (YTT) - Python 2/3 compatibility (uncomment individual rules to enable)
-  # "YTT101", # sys.version[:3] referenced (python3.10+), use sys.version_info
-  # "YTT102", # sys.version[2] referenced (python3.10+), use sys.version_info
-  # "YTT103", # sys.version compared to string (python3.10+), use sys.version_info
-  # "YTT201", # sys.version_info[0] == 3 referenced (python3.10+), use sys.version_info
-  # "YTT202", # six.PY3 referenced (python3.10+), use sys.version_info
-  # "YTT203", # sys.version_info[1] referenced (python3.10+), use sys.version_info
-  # "YTT204", # sys.version_info.minor referenced (python3.10+), use sys.version_info
-  # "YTT301", # sys.version[0] referenced (python3.10+), use sys.version_info
-  # "YTT302", # sys.version compared to string (python3.10+), use sys.version_info
-  # "YTT303", # sys.version[:1] referenced (python3.10+), use sys.version_info
-
-  # 🌐 FLAKE8-DJANGO (DJ) - Django best practices (uncomment individual rules to enable)
-  # "DJ001",  # avoid using null=True on string-based fields
-  # "DJ003",  # avoid using null=True on string-based fields
-  # "DJ006",  # avoid using exclude with ModelForm, use fields instead
-  # "DJ007",  # avoid using __all__ with ModelForm, use fields instead
-  # "DJ008",  # model's __str__ method should return a string
-  # "DJ012",  # avoid using null=True on string-based fields
-  # "DJ013",  # avoid using null=True on string-based fields
-
-  # 📊 PANDAS-VET (PD) - Pandas best practices (uncomment individual rules to enable)
-  "PD002",  # Allow inplace=True - ML data preprocessing often uses inplace operations for memory efficiency
-  # "PD003",  # .isna is preferred to .isnull; functionality is equivalent
-  # "PD004",  # .notna is preferred to .notnull; functionality is equivalent
-  # "PD007",  # .ix is deprecated; use more explicit .loc or .iloc
-  # "PD008",  # use .loc instead of .at. If speed is important, use numpy
-  # "PD009",  # use .iloc instead of .iat. If speed is important, use numpy
-  # "PD010",  # .pivot_table is preferred to .pivot or .unstack; provides same functionality
-  "PD011",  # Allow .values instead of .to_numpy() - legacy ML code often uses .values for compatibility
-  # "PD012",  # .read_csv is preferred to .read_table; provides same functionality
-  # "PD013",  # .melt is preferred to .stack; provides same functionality
-  # "PD015",  # use .merge method instead of pd.merge function. They have equivalent functionality
-  "PD901",  # Allow 'df' variable name - very common and clear in ML data processing contexts
-
-  # 🔄 REFURB (FURB) - Code modernization (uncomment individual rules to enable)
-  "FURB101", # Allow open() and read() - ML model loading often needs traditional file handling for compatibility
-  "FURB103", # Allow open() and write() - ML checkpoint saving often uses traditional file operations
-  "FURB105", # Allow print() and open() - ML logging and file operations often combined
-  # "FURB110", # if-exp-else-none should be replaced by and
-  "FURB113", # Allow repeated append() - ML data building often clearer with explicit append operations
-  # "FURB116", # f-string-number-format should be replaced by format specifier
-  # "FURB118", # operator.methodcaller should be replaced by lambda
-  # "FURB129", # read-whole-file should be replaced by pathlib
-  # "FURB131", # delete-full-slice should be replaced by clear
-  # "FURB132", # check-and-remove-from-set should be replaced by discard
-  # "FURB136", # if-expr-min-max should be replaced by min/max
-  # "FURB140", # reimplemented-starmap should be replaced by itertools.starmap
-  "FURB142", # Allow for-loop set mutations - ML data processing often clearer with explicit loops
-  # "FURB145", # slice-copy should be replaced by copy
-  "FURB148", # Allow enumerate() over zip() - ML batch processing often needs explicit indexing
-  # "FURB152", # math-constant should be replaced by constant
-  # "FURB154", # repeated-global should be replaced by global
-  # "FURB157", # verbose-decimal-constructor should be replaced by literal
-  # "FURB161", # bit-count should be replaced by int.bit_count
-  # "FURB163", # redundant-log-base should be replaced by math.log
-  # "FURB164", # unnecessary-from-float should be replaced by literal
-  # "FURB166", # int-on-sliced-str should be replaced by str methods
-  # "FURB167", # regex-flag-alias should be replaced by flag
-  # "FURB168", # isinstance-type-none should be replaced by is-none check
-  # "FURB169", # type-none-comparison should be replaced by is-none check
-  # "FURB171", # single-item-membership-test should be replaced by comparison
-  # "FURB177", # implicit-cwd should be replaced by pathlib
-  # "FURB180", # meta-class-abc should be replaced by abc.ABC
-  # "FURB181", # hashlib-digest-hex should be replaced by hexdigest
-  # "FURB187", # list-reverse-copy should be replaced by slicing
-
+  # FLAKE8-PYTEST-STYLE (PT) - Pytest best practices
+  # "PT001",  # Use @pytest.fixture() over @pytest.fixture
+  # "PT002",  # Configuration for fixture should be passed as keyword arguments
+  # "PT003",  # `scope='function'` is implied in `@pytest.fixture()`
+  # "PT004",  # Fixture `{}` does not return anything, add leading underscore
+  # "PT005",  # Fixture `{}` returns a value, remove leading underscore
+  # "PT006",  # Wrong name(s) type in `@pytest.mark.parametrize`, expected `{expected}` 
+  # "PT007",  # Wrong values type in `@pytest.mark.parametrize` expected `{expected}`
+  # "PT008",  # Use `return` instead of `yield` in `@pytest.fixture` if the fixture does not use the `yield` syntax
+  # "PT009",  # Use a regular `assert` instead of unittest-style `{assertion}`
+  # "PT010",  # `pytest.raises()` is too broad, set the `match` parameter or use a more specific exception
+  # "PT011",  # `pytest.raises({exception})` is too broad, set the `match` parameter or use a more specific exception
+  # "PT012",  # `pytest.raises()` block should contain a single simple statement
+  # "PT013",  # Found incorrect import of pytest, use simple `import pytest` instead
+  # "PT014",  # Found duplicate test cases {indexes} in `@pytest.mark.parametrize`
+  # "PT015",  # Assertion always fails, replace with `pytest.fail()`
+  # "PT016",  # No message passed to `pytest.fail()`
+  # "PT017",  # Found assertion on exception `{name}` in `except` block, use `pytest.raises()` instead
+  # "PT018",  # Assertion should be broken down into multiple parts
+  # "PT019",  # Fixture `{name}` without value is injected as parameter, use `@pytest.mark.usefixtures` instead
+  # "PT020",  # `@pytest.yield_fixture` is deprecated, use `@pytest.fixture`
+  # "PT021",  # Use `yield` instead of `request.addfinalizer`
+  # "PT022",  # No teardown in fixture `{name}`, use `return` instead of `yield`
+  # "PT023",  # Use `@pytest.mark.foo()` over `@pytest.mark.foo`
+  # "PT024",  # `pytest.mark.asyncio` is unnecessary for fixtures
+  # "PT025",  # `pytest.mark.usefixtures` has no effect on fixtures
+  # "PT026",  # Useless `pytest.mark.usefixtures` without parameters
+  # "PT027",  # Use `pytest.raises()` instead of `unittest`-style `{assertion}`
 ]
 
 # 📦 Import Organization - Keep imports clean and organized
@@ -1253,72 +843,41 @@ ignore = [
 # 🏠 Our code (PlantGuard modules)
 known-first-party = ["plantguard", "src"]
 
-# 🌐 External libraries we use (organized by category for ADHD-friendly reading)
+# 🌐 External libraries we use (organized by category)
 known-third-party = [
   # 🧠 AI/ML Core
   "torch", "torchvision", "torchaudio", "torchmetrics",
-
+  
   # 📊 Data Science
   "numpy", "pandas", "sklearn",
-
+  
   # 👁️ Computer Vision
   "cv2", "PIL",
-
+  
   # 🤗 Hugging Face
-  "transformers", "datasets", "accelerate",
-
+  "transformers", "datasets", "accelerate", "huggingface_hub", "tokenizers", "safetensors",
+  
   # 🎵 Audio
-  "librosa", "soundfile", "speech_recognition",
-
+  "librosa", "soundfile", "speech_recognition", "whisper",
+  
   # 🌐 Web Interface
-  "streamlit", "streamlit_webrtc",
-
+  "streamlit", "streamlit_webrtc", "streamlit_option_menu",
+  
   # 📈 Visualization
   "matplotlib", "seaborn", "plotly",
-
+  
   # 🧪 Testing & ML Tools
   "pytest", "wandb", "optuna",
 ]
 
-# 📋 Import order (top to bottom in files)
-section-order = [
-  "future",          # from __future__ import ...
-  "standard-library", # Built-in Python modules (os, sys, etc.)
-  "third-party",     # External packages (torch, numpy, etc.)
-  "first-party",     # Our PlantGuard code
-  "local-folder",    # Relative imports (from . import ...)
-]
-
 split-on-trailing-comma = true  # Split long import lists nicely
 force-single-line = false       # Allow multiple imports per line when short
-
-# 📝 Documentation Style - How we write docstrings
-[tool.ruff.lint.pydocstyle]
-convention = "google"  # Use Google-style docstrings (clear and readable)
-
-# 🧠 Complexity Limits - Keep functions simple (ADHD-friendly!)
-[tool.ruff.lint.mccabe]
-max-complexity = 20    # Max cyclomatic complexity (how many paths through a function)
-
-[tool.ruff.lint.pylint]
-max-args = 10          # Max function arguments (ML functions need more params)
-max-branches = 20     # Max if/elif branches
-max-returns = 10       # Max return statements
-max-statements = 50   # Max lines in a function
 
 # 📝 Quote Style - Consistent string quotes
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "double"      # Use "double quotes" for strings
 multiline-quotes = "double"   # Use """double quotes""" for multi-line
 docstring-quotes = "double"   # Use """double quotes""" for docstrings
-avoid-escape = true           # Avoid escaping quotes when possible
-
-# 🏷️ Type Annotations - Gradual typing approach
-[tool.ruff.lint.flake8-annotations]
-mypy-init-return = true       # __init__ methods should return None
-suppress-dummy-args = true    # Don't require types for *args, **kwargs
-allow-star-arg-any = false    # Require specific types for *args
-ignore-fully-untyped = false # Check all functions, even without types
 
 # 🔒 Security Settings
 [tool.ruff.lint.flake8-bandit]
@@ -1329,37 +888,25 @@ check-typed-exception = true  # Check exception handling
 # 🧪 Test files - Allow assert statements and missing docstrings
 "tests/**/*.py" = [
   "S101",   # Allow assert statements in tests
-  "D103",   # Allow missing docstrings in test functions
-  "D102",   # Allow missing docstrings in test methods
-  "D107",   # Allow missing docstrings in test __init__
   "T201",   # Allow print statements in tests for debugging
+  "E402",   # Allow module-level imports after sys.path manipulation in tests
 ]
 
 # 📓 Scripts and notebooks - Allow subprocess calls and missing docstrings
 "scripts/**/*.py" = [
   "S603",   # Allow subprocess calls in scripts
   "S607",   # Allow partial executable paths in scripts
-  "D103",   # Allow missing docstrings in script functions
-  "S101",   # Allow assert statements in scripts
   "T201",   # Allow print statements in scripts for output
+  "E402",   # Allow module-level imports after sys.path manipulation in scripts
 ]
 
-# 📓 Jupyter notebooks - Allow subprocess calls and other notebook-specific patterns
-"notebooks/**/*.ipynb" = [
-  "S603",   # Allow subprocess calls in notebooks
-  "S607",   # Allow partial executable paths in notebooks
-  "T201",   # Allow print statements in notebooks for interactive output
+# Files that intentionally manipulate sys.path at module import time (pages/app)
+"pages/**/*.py" = [
+  "E402",   # Allow module-level imports after sys.path manipulation in page modules
 ]
 
-# 🏃 Run scripts - Allow subprocess calls
-"run_*.py" = [
-  "S603",   # Allow subprocess calls in run scripts
-  "T201",   # Allow print statements in run scripts for output
-]
-
-# 📦 Package init files - Allow missing docstrings
-"src/**/__init__.py" = [
-  "D104",   # Allow missing docstrings in package __init__.py
+"app.py" = [
+  "E402",   # Allow module-level imports after sys.path manipulation in app.py
 ]
 
 # 🎨 Code Formatting - How code looks
@@ -1368,20 +915,33 @@ quote-style = "double"    # Use "double quotes"
 indent-style = "space"    # Use spaces, not tabs
 line-ending = "auto"      # Auto-detect line endings (Windows/Mac/Linux)
 
-# 📦 Setuptools - Python packaging tool
-[tool.setuptools]
-package-dir = { "" = "src" }          # Source code is in src/ folder
+# 📦 Hatchling - Modern Python packaging tool
+[tool.hatch.build.targets.wheel]
+packages = ["src/plantguard"]
 
-[tool.setuptools.packages.find]
-where = ["src"]                       # Look for packages in src/
-include = ["plantguard*"]             # Include all plantguard packages
-exclude = ["tests*"]                  # Don't include test packages
-
-[tool.setuptools.package-data]
-plantguard = [
-  "py.typed",                         # Type information file
-  "*.json",                           # Configuration files
-  "*.yaml", "*.yml",                  # YAML configuration files
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/config", 
+  "/requirements.txt",
+  "/README.md",
+  "/LICENSE",
+]
+exclude = [
+  "/.git",
+  "/.venv", 
+  "/build",
+  "/dist",
+  "/__pycache__",
+  "/.pytest_cache",
+  "/.mypy_cache", 
+  "/.ruff_cache",
+  "/logs",
+  "/runs",
+  "/data",
+  "/notebooks",
+  "/htmlcov",
+  "/tests/", 
 ]
 
 # ============================================================================
@@ -1404,33 +964,3 @@ plantguard = [
 #   make clean   - Clean up temporary files
 #   make fresh   - Fresh installation
 # ============================================================================
-# ============================================================================
-# 🔧 PYLINT CONFIGURATION - Traditional pylint settings
-# ============================================================================
-# Additional pylint configuration for compatibility with direct pylint runs
-
-[tool.pylint.messages_control]
-disable = [
-    "W1203",  # logging-fstring-interpolation - Allow f-strings in logging for ML readability
-    "W0718",  # broad-exception-caught - Allow broad exception handling in ML model operations
-    "W0612",  # unused-variable - Allow unused variables in ML experiments and debugging
-    "W0201",  # attribute-defined-outside-init - Allow dynamic attributes in ML classes
-    "W0611",  # unused-import - Allow unused imports in ML experimental code
-    "W0104",  # pointless-statement - Allow statements that seem to have no effect in ML code
-    "W0212",  # protected-access - Allow access to protected members in ML frameworks
-    "C0413",  # wrong-import-position - Allow conditional imports in ML code
-    "C0301",  # line-too-long - Allow longer lines for ML parameter lists
-    "C0302",  # too-many-lines - Allow large ML training modules
-    "C0415",  # import-outside-toplevel - Allow conditional imports for ML dependencies
-    "C0303",  # trailing-whitespace - Allow trailing whitespace in ML code
-    "C0103",  # invalid-name - Allow ML naming conventions like T_max for schedulers
-    "E0401",  # import-error - Allow import errors for optional ML dependencies
-]
-
-[tool.pylint.format]
-max-line-length = 200  # Match ruff line length setting
-
-[tool.pylint.design]
-max-args = 10          # Allow more arguments for ML model constructors
-max-branches = 20      # Allow complex branching in ML pipelines
-max-statements = 60    # Allow longer functions for ML model definitions

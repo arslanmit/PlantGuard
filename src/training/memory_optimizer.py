@@ -6,7 +6,6 @@ automatic memory management, memory profiling, and dynamic batch size adjustment
 
 import gc
 import logging
-import time
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -339,7 +338,10 @@ class DynamicBatchSizeManager:
         """
         if self.can_increase_batch_size():
             old_batch_size = self.current_batch_size
-            new_batch_size = min(int(self.current_batch_size / self.config.batch_size_adjustment_factor), min(self.original_batch_size, self.config.max_batch_size))
+            new_batch_size = min(
+                int(self.current_batch_size / self.config.batch_size_adjustment_factor),
+                min(self.original_batch_size, self.config.max_batch_size),
+            )
 
             if new_batch_size > old_batch_size:
                 self.current_batch_size = new_batch_size

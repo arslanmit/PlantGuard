@@ -14,11 +14,9 @@ import shutil
 import sys
 import time
 from pathlib import Path
-from typing import Optional
 
 import psutil
 import torch
-from torch.utils.tensorboard import SummaryWriter
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -84,10 +82,6 @@ class ProductionWorkflow:
         legacy_train = Path("data/PlantVillage/train")
         legacy_val = Path("data/PlantVillage/val")
 
-        # Check for dummy dataset
-        dummy_train = Path("data/plantvillage_dummy_improved/train")
-        dummy_val = Path("data/plantvillage_dummy_improved/val")
-
         if processed_train.exists() and processed_val.exists():
             self.logger.info("✅ Found processed PlantVillage dataset")
             # Validate dataset integrity
@@ -101,11 +95,8 @@ class ProductionWorkflow:
         elif legacy_train.exists() and legacy_val.exists():
             self.logger.info("✅ Found legacy PlantVillage dataset")
 
-        elif dummy_train.exists() and dummy_val.exists():
-            self.logger.warning("⚠️  Using dummy dataset - not recommended for production")
-
         else:
-            errors.append("No suitable dataset found. Please run one of:\n  - make download-dataset && make prepare-dataset (recommended)\n  - make dummy-dataset (testing only)")
+            errors.append("No suitable dataset found. Please run:\n  - make dataset-download && make dataset-prepare (recommended)")
 
         return len(errors) == 0, errors
 
@@ -168,9 +159,7 @@ class ProductionWorkflow:
         selected_template: Path | None = None
 
         if templates_dir.exists():
-            if has_gpu and memory_gb >= 16:
-                selected_template = templates_dir / "production_training.json"
-            elif has_gpu and memory_gb >= 8:
+            if (has_gpu and memory_gb >= 16) or (has_gpu and memory_gb >= 8):
                 selected_template = templates_dir / "production_training.json"
             elif has_gpu:
                 selected_template = templates_dir / "memory_efficient.json"
@@ -240,12 +229,10 @@ class ProductionWorkflow:
 
     def _get_best_dataset_path(self) -> Path:
         """Get the best available dataset path."""
-        # Priority order: processed > legacy > dummy
+        # Priority order: processed > legacy
         candidates = [
             Path("data/processed/plantvillage"),
             Path("data/PlantVillage"),
-            Path("data/plantvillage_dummy_improved"),
-            Path("data/plantvillage_dummy"),
         ]
 
         for path in candidates:
@@ -295,9 +282,7 @@ class ProductionWorkflow:
                 self.logger.info(f"📄 Loading configuration template: {candidate}")
                 return load_config(candidate)
 
-        raise FileNotFoundError(
-            f"Template '{template}' not found as a file or in config/training_templates(/**)/"
-        )
+        raise FileNotFoundError(f"Template '{template}' not found as a file or in config/training_templates(/**)/")
 
     def _prepare_dataset_for_training(self) -> None:
         """Ensure dataset is available at the expected location for training."""
@@ -325,7 +310,8 @@ class ProductionWorkflow:
 
         except Exception as e:
             self.logger.error(f"❌ Failed to prepare dataset: {e}")
-            raise RuntimeError(f"Could not prepare dataset for training: {e}")
+            # Preserve original exception context for easier debugging
+            raise RuntimeError(f"Could not prepare dataset for training: {e}") from e
 
     def run_production_training(self, config: TrainingConfig) -> bool:
         """Run the complete production training pipeline.
@@ -385,6 +371,10 @@ class ProductionWorkflow:
 
         except Exception as e:
             self.logger.error(f"❌ Production training failed: {e}")
+            # Preserve original exception context when returning failure
+            logger_exc = getattr(self, "logger", None)
+            if logger_exc:
+                logger_exc.debug("Exception details:", exc_info=True)
             return False
 
     def send_notification(self, success: bool, message: str) -> None:
@@ -468,8 +458,7 @@ def main():
         "--template",
         type=str,
         help=(
-            "Template to use (name: quick_test, production_training, fine_tuning, memory_efficient, "
-            "auto_optimized) or a direct path to a JSON/YAML file"
+            "Template to use (name: quick_test, production_training, fine_tuning, memory_efficient, auto_optimized) or a direct path to a JSON/YAML file"
         ),
     )
     parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], default="INFO", help="Logging level")

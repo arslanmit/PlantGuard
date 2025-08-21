@@ -7,6 +7,7 @@ monitoring with TensorBoard integration, real-time metrics logging, and visualiz
 import json
 import logging
 import subprocess  # nosec B404: subprocess is required for TensorBoard integration
+import sys
 import threading
 import time
 import webbrowser
@@ -20,7 +21,7 @@ import numpy as np
 import seaborn as sns
 import torch
 import torch.nn.functional as F
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import confusion_matrix
 from torch.utils.tensorboard import SummaryWriter
 
 from .progress import MetricsCollector, ProgressTracker
@@ -127,7 +128,8 @@ class TrainingMonitor:
             epoch: Current epoch (optional)
         """
         # Log to TensorBoard
-        for name, value in metrics.items():
+        _metrics = metrics
+        for name, value in _metrics.items():
             if value is not None:
                 self.writer.add_scalar(name, value, step)
 
@@ -148,11 +150,11 @@ class TrainingMonitor:
         self.metrics_history.append(training_metrics)
 
         # Update best metrics
-        for name, value in metrics.items():
+        for name, value in _metrics.items():
             if value is not None:
-                if "Loss" in name and (name not in self.best_metrics or value < self.best_metrics[name]):
-                    self.best_metrics[name] = value
-                elif "Accuracy" in name and (name not in self.best_metrics or value > self.best_metrics[name]):
+                if ("Loss" in name and (name not in self.best_metrics or value < self.best_metrics[name])) or (
+                    "Accuracy" in name and (name not in self.best_metrics or value > self.best_metrics[name])
+                ):
                     self.best_metrics[name] = value
 
         logger.debug(f"Logged metrics for step {step}: {metrics}")
@@ -448,15 +450,19 @@ class TrainingMonitor:
                 val_accuracy=val_accuracy,
                 learning_rate=learning_rate,
             )
-            # Safely get attributes with defaults
+
+            # Safely get attributes with defaults and return a summary dict
             metrics: dict[str, float | None] = {
-                "epoch": getattr(progress_metrics, 'epoch', 0.0),
-                "train_loss": getattr(progress_metrics, 'train_loss', 0.0),
+                "epoch": getattr(progress_metrics, "epoch", 0.0),
+                "train_loss": getattr(progress_metrics, "train_loss", 0.0),
                 "val_loss": val_loss,
                 "val_accuracy": val_accuracy,
                 "learning_rate": learning_rate,
-                "eta": getattr(progress_metrics, 'eta', 0.0),
+                "eta": getattr(progress_metrics, "eta", 0.0),
             }
+
+            return metrics
+
         return {}
 
     def analyze_model_layers(self, model: torch.nn.Module) -> dict[str, Any]:
@@ -670,6 +676,9 @@ class TrainingMonitor:
 
             # Launch TensorBoard
             cmd = [
+                sys.executable,
+                "-m",
+                "tensorboard.main",
                 "tensorboard",
                 "--logdir",
                 str(self.log_dir),
@@ -678,10 +687,6 @@ class TrainingMonitor:
                 "--reload_interval",
                 "1",
             ]
-
-            # Use full path to Python executable and proper argument handling
-            python_path = sys.executable
-            cmd = [python_path, "-m", "tensorboard.main"] + cmd
 
             self.tensorboard_process = subprocess.Popen(  # nosec B603: shell=False, inputs are sanitized
                 cmd,

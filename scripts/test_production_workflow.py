@@ -25,11 +25,27 @@ def test_production_workflow() -> bool:
         from src.training.model_registry import ModelRegistry
         from src.training.production_trainer import ProductionTrainer
 
-        # Check if dummy dataset exists
-        dataset_path = Path("data/plantvillage_dummy")
-        if not dataset_path.exists():
-            logger.error("❌ Dummy dataset not found. Run 'make dummy-dataset' first.")
+        # Find real dataset (processed preferred, fallback to legacy)
+        candidates = [
+            Path("data/processed/plantvillage"),
+            Path("data/PlantVillage"),
+        ]
+        dataset_path = None
+        for c in candidates:
+            if (c / "train").exists() and (c / "val").exists():
+                dataset_path = c
+                break
+        if dataset_path is None:
+            logger.error("❌ No dataset found. Run 'make dataset-download' and then 'make dataset-prepare' first.")
             return False
+
+        # Infer number of classes from dataset structure
+        val_dir = dataset_path / "val"
+        if not val_dir.exists():
+            logger.error(f"❌ Validation directory not found at {val_dir}")
+            return False
+        class_dirs = [p for p in val_dir.iterdir() if p.is_dir()]
+        num_classes = len(class_dirs) if class_dirs else 38
 
         # Create minimal training configuration
         config = TrainingConfig(
@@ -37,7 +53,7 @@ def test_production_workflow() -> bool:
             epochs=2,  # Very minimal for testing
             batch_size=4,  # Small batch size
             learning_rate=0.001,
-            num_classes=8,  # Dummy dataset has 8 classes
+            num_classes=num_classes,
             save_every_n_epochs=1,
             mixed_precision=False,  # Disable for compatibility
             device="cpu",  # Force CPU for testing
@@ -80,10 +96,11 @@ def test_production_workflow() -> bool:
         import torch
 
         dummy_model_path = trainer.output_dir / "test_model.pt"
+        class_names = [p.name for p in sorted(class_dirs)] if class_dirs else [f"class_{i}" for i in range(num_classes)]
         dummy_checkpoint = {
-            "model_state_dict": {"fc.weight": torch.randn(8, 2048), "fc.bias": torch.randn(8)},
-            "num_classes": 8,
-            "class_names": [f"class_{i}" for i in range(8)],
+            "model_state_dict": {"fc.weight": torch.randn(num_classes, 2048), "fc.bias": torch.randn(num_classes)},
+            "num_classes": num_classes,
+            "class_names": class_names,
             "model_version": "1.0.0",
             "training_metadata": {
                 "experiment_name": config.experiment_name,
@@ -98,7 +115,7 @@ def test_production_workflow() -> bool:
             model_path=dummy_model_path,
             name="test_production_model",
             architecture="resnet50",
-            dataset_version="dummy_v1.0",
+            dataset_version="plantvillage",
             hyperparameters=config.to_dict(),
             performance_metrics={"accuracy": 0.85, "f1_score": 0.83},
             description="Test model from production workflow",

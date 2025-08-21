@@ -47,7 +47,13 @@ class TestVisionAdapterRegistryIntegration:
             "num_classes": 38,
             "class_names": [f"class_{i}" for i in range(38)],
             "model_version": "1.0.0",
-            "training_metadata": {"training_date": "2024-08-17", "dataset": "plantvillage", "accuracy": 0.94, "architecture": "resnet50", "epochs": 50},
+            "training_metadata": {
+                "training_date": "2024-08-17",
+                "dataset": "plantvillage",
+                "accuracy": 0.94,
+                "architecture": "resnet50",
+                "epochs": 50,
+            },
         }
         torch.save(checkpoint, model_path)
 
@@ -203,7 +209,10 @@ class TestVisionAdapterRegistryIntegration:
         for config in model_configs:
             model_path = temp_workspace / f"{config['name']}.pt"
             checkpoint = {
-                "model_state_dict": {"fc.weight": torch.randn(config["num_classes"], 2048), "fc.bias": torch.randn(config["num_classes"])},
+                "model_state_dict": {
+                    "fc.weight": torch.randn(config["num_classes"], 2048),
+                    "fc.bias": torch.randn(config["num_classes"]),
+                },
                 "num_classes": config["num_classes"],
                 "class_names": [f"class_{i}" for i in range(config["num_classes"])],
                 "model_version": "1.0.0",
@@ -296,7 +305,11 @@ class TestVisionAdapterRegistryIntegration:
             adapter.load_from_registry(sample_registry_model)
 
             # Test batch prediction
-            test_images = [Image.new("RGB", (224, 224), color="red"), Image.new("RGB", (224, 224), color="green"), Image.new("RGB", (224, 224), color="blue")]
+            test_images = [
+                Image.new("RGB", (224, 224), color="red"),
+                Image.new("RGB", (224, 224), color="green"),
+                Image.new("RGB", (224, 224), color="blue"),
+            ]
 
             with patch.object(adapter, "_preprocess_batch") as mock_preprocess:
                 mock_tensor = torch.randn(batch_size, 3, 224, 224)
@@ -459,9 +472,10 @@ class TestVisionAdapterRegistryIntegration:
             description="Corrupted model for testing",
         )
 
-        with pytest.raises(RuntimeError):  # Should raise model creation error
-            with patch.object(adapter, "_create_model") as mock_create_model:
-                mock_create_model.side_effect = RuntimeError("Model creation failed")
+        # Should raise model creation error when model creation fails
+        with patch.object(adapter, "_create_model") as mock_create_model:
+            mock_create_model.side_effect = RuntimeError("Model creation failed")
+            with pytest.raises(RuntimeError):
                 adapter.load_from_registry(corrupted_id)
 
         # Test recovery after error

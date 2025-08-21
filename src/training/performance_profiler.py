@@ -5,7 +5,6 @@ performance bottlenecks in the training pipeline, including data loading, model
 forward/backward passes, and memory usage patterns.
 """
 
-import gc
 import logging
 import time
 from collections import defaultdict
@@ -219,7 +218,8 @@ class TrainingProfiler:
 
     def _record_memory_snapshot(self, batch_idx: int) -> None:
         """Record memory usage snapshot."""
-        snapshot = {"batch_idx": batch_idx}
+        # Explicitly type as float-valued metrics to satisfy static typing
+        snapshot: dict[str, float] = {"batch_idx": float(batch_idx)}
 
         if torch.cuda.is_available():
             snapshot.update(

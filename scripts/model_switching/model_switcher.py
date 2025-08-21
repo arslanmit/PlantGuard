@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 """Easy model switcher for PlantGuard - Switch between models with simple commands."""
 
 import argparse
-import json
 import sys
 from pathlib import Path
 
@@ -11,6 +12,17 @@ from PIL import Image
 # Add project src to path (repo root / src)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
+# Always try to expose ModelRegistry and VisionAdapter for tests/CLI re-exports
+try:  # soft import, may fail in pure-legacy setups
+    from src.training.model_registry import ModelRegistry  # type: ignore
+except Exception:  # pragma: no cover - optional
+    ModelRegistry = None  # type: ignore
+
+try:  # soft import; adapter may be needed by tests
+    from src.core.vision import VisionAdapter  # type: ignore
+except Exception:  # pragma: no cover - optional
+    VisionAdapter = None  # type: ignore
+
 try:
     from src.core.model_manager import PlantGuardModelManager
 
@@ -18,12 +30,14 @@ try:
 except ImportError:
     # Fallback to new registry system
     LEGACY_MODE = True
-    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-    from src.core.vision import VisionAdapter
-    from src.training.model_registry import ModelRegistry
+    # Ensure re-exports are available in legacy mode too
+    if VisionAdapter is None:
+        from src.core.vision import VisionAdapter  # type: ignore
+    if ModelRegistry is None:
+        from src.training.model_registry import ModelRegistry  # type: ignore
 
 
-def list_models_legacy(manager: "PlantGuardModelManager") -> None:
+def list_models_legacy(manager: PlantGuardModelManager) -> None:
     """List all available models (legacy mode)."""
     models = manager.list_available_models()
 
@@ -74,7 +88,7 @@ def list_models(manager=None) -> None:
         list_models_legacy(manager)
 
 
-def switch_model_legacy(manager: "PlantGuardModelManager", model_id: str) -> None:
+def switch_model_legacy(manager: PlantGuardModelManager, model_id: str) -> None:
     """Switch to a specific model (legacy mode)."""
     print(f"🔄 Switching to model: {model_id}")
 
@@ -93,7 +107,7 @@ def switch_model_legacy(manager: "PlantGuardModelManager", model_id: str) -> Non
         print(f"❌ Failed to switch to model: {model_id}")
 
 
-def switch_model_registry(model_id: str) -> VisionAdapter:
+def switch_model_registry(model_id: str) -> VisionAdapter | None:
     """Switch to a specific model (registry mode)."""
     print(f"🔄 Loading model from registry: {model_id}")
 
@@ -113,12 +127,19 @@ def switch_model_registry(model_id: str) -> VisionAdapter:
 
         # Show model info
         print("\n📊 Model Info:")
-        print(f"   Version: {model_info.metadata.version}")
-        print(f"   Architecture: {model_info.metadata.architecture}")
+        print(f"   Version: {getattr(model_info.metadata, 'version', 'unknown')}")
+        print(f"   Architecture: {getattr(model_info.metadata, 'architecture', 'unknown')}")
         print(f"   Classes: {len(adapter.get_class_names())}")
-        print(f"   Training Date: {model_info.metadata.training_date.strftime('%Y-%m-%d %H:%M')}")
+        td = getattr(model_info.metadata, "training_date", None)
+        if td is not None:
+            try:
+                print(f"   Training Date: {td.strftime('%Y-%m-%d %H:%M')}")
+            except Exception:
+                print(f"   Training Date: {td}")
+        else:
+            print("   Training Date: Unknown")
 
-        if model_info.metadata.performance_metrics:
+        if getattr(model_info.metadata, "performance_metrics", None):
             accuracy = model_info.metadata.performance_metrics.get("accuracy", 0)
             print(f"   Accuracy: {accuracy:.1%}")
 
@@ -129,7 +150,7 @@ def switch_model_registry(model_id: str) -> VisionAdapter:
         return None
 
 
-def switch_model(manager, model_id: str):
+def switch_model(manager, model_id: str) -> VisionAdapter | None:
     """Switch to a specific model."""
     if LEGACY_MODE:
         return switch_model_registry(model_id)
@@ -137,7 +158,7 @@ def switch_model(manager, model_id: str):
         return switch_model_legacy(manager, model_id)
 
 
-def test_model_legacy(manager: "PlantGuardModelManager", image_path: str) -> None:
+def test_model_legacy(manager: PlantGuardModelManager, image_path: str) -> None:
     """Test current model on an image (legacy mode)."""
     if not Path(image_path).exists():
         print(f"❌ Image not found: {image_path}")
@@ -182,7 +203,7 @@ def test_model_registry(adapter: VisionAdapter, image_path: str) -> None:
         print(f"❌ Failed to test image: {e}")
 
 
-def test_model(manager, image_path: str, adapter: VisionAdapter = None) -> None:
+def run_test_model(manager, image_path: str, adapter: VisionAdapter = None) -> None:
     """Test current model on an image."""
     if LEGACY_MODE:
         if adapter is None:
@@ -193,36 +214,17 @@ def test_model(manager, image_path: str, adapter: VisionAdapter = None) -> None:
         test_model_legacy(manager, image_path)
 
 
-def quick_test(manager: "PlantGuardModelManager") -> None:
-    """Quick test on sample images."""
-    test_images = [
-        "data/pictures/apple_scab_sample.jpg",
-        "data/pictures/tomato_healthy_sample.jpg",
-        "data/pictures/potato_late_blight_sample.jpg",
-    ]
+def quick_test(manager: PlantGuardModelManager) -> None:
+    """Quick test disabled.
 
-    print("🧪 Quick Test on Sample Images")
-    print("=" * 50)
-
-    for img_path in test_images:
-        if Path(img_path).exists():
-            try:
-                image = Image.open(img_path)
-                result = manager.get_readable_prediction(image)
-
-                print(f"\n📸 {Path(img_path).name}")
-                print(f"   Plant: {result['plant_type']}")
-                print(f"   Disease: {result['disease']}")
-                print(f"   Confidence: {result['confidence_percentage']}")
-                print(f"   Healthy: {'Yes' if result['is_healthy'] else 'No'}")
-
-            except Exception as e:
-                print(f"   ❌ Error: {e}")
-        else:
-            print(f"\n📸 {Path(img_path).name} - Not found")
+    Sample-image based quick tests have been disabled in this repository per project
+    policy. Use --test IMAGE_PATH to test with your own images placed under
+    data/raw/ or provide a custom path.
+    """
+    print("❌ Quick test on sample images is disabled in this repository.")
 
 
-def benchmark_models(manager: "PlantGuardModelManager") -> None:
+def benchmark_models(manager: PlantGuardModelManager) -> None:
     """Benchmark all available models on test images."""
     models = manager.list_available_models()
     enabled_models = [m for m in models if m["enabled"]]
@@ -231,82 +233,9 @@ def benchmark_models(manager: "PlantGuardModelManager") -> None:
         print("❌ No enabled models found")
         return
 
-    # Load test metadata
-    metadata_path = "data/pictures/sample_images_metadata.json"
-    if not Path(metadata_path).exists():
-        print(f"❌ Test metadata not found: {metadata_path}")
-        return
-
-    with Path(metadata_path).open() as f:
-        metadata = json.load(f)
-
-    print("🏁 Benchmarking Models on Test Dataset")
-    print("=" * 60)
-
-    results = {}
-
-    for model_info in enabled_models:
-        model_id = model_info["id"]
-        print(f"\n🔄 Testing model: {model_info['name']}")
-
-        if not manager.switch_model(model_id):
-            print(f"❌ Failed to load model: {model_id}")
-            continue
-
-        correct = 0
-        total = 0
-        confidences = []
-
-        for sample in metadata["sample_images"][:5]:  # Test first 5 for speed
-            image_path = Path("data/pictures") / sample["filename"]
-
-            if not image_path.exists():
-                continue
-
-            try:
-                image = Image.open(image_path)
-                result = manager.get_readable_prediction(image)
-
-                # Simple accuracy check (plant type match)
-                gt_plant = sample["plant"].lower()
-                pred_plant = result["plant_type"].lower()
-
-                if gt_plant in pred_plant or pred_plant in gt_plant:
-                    correct += 1
-
-                total += 1
-                confidences.append(result["confidence"])
-
-            except Exception as e:
-                print(f"   ❌ Error processing {sample['filename']}: {e}")
-
-        if total > 0:
-            accuracy = correct / total
-            avg_confidence = sum(confidences) / len(confidences)
-
-            results[model_id] = {
-                "name": model_info["name"],
-                "accuracy": accuracy,
-                "avg_confidence": avg_confidence,
-                "total_tested": total,
-            }
-
-            print(f"   ✅ Accuracy: {accuracy:.1%} ({correct}/{total})")
-            print(f"   📊 Avg Confidence: {avg_confidence:.1%}")
-
-    # Show comparison
-    if results:
-        print("\n🏆 MODEL COMPARISON")
-        print("=" * 60)
-
-        sorted_results = sorted(results.items(), key=lambda x: x[1]["accuracy"], reverse=True)
-
-        for i, (_, result) in enumerate(sorted_results):
-            rank = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else f"{i + 1}."
-            print(f"{rank} {result['name']}")
-            print(f"    Accuracy: {result['accuracy']:.1%}")
-            print(f"    Confidence: {result['avg_confidence']:.1%}")
-            print()
+    # Benchmark disabled for sample-based dataset
+    print("❌ Benchmarking on bundled sample images is disabled in this repository.")
+    print("Use your own validation dataset and the evaluator APIs to benchmark models.")
 
 
 def main() -> None:
@@ -315,7 +244,6 @@ def main() -> None:
     parser.add_argument("--list", "-l", action="store_true", help="List available models")
     parser.add_argument("--switch", "-s", type=str, help="Switch to model by ID")
     parser.add_argument("--test", "-t", type=str, help="Test current model on image")
-    parser.add_argument("--quick-test", "-q", action="store_true", help="Quick test on sample images")
     parser.add_argument("--benchmark", "-b", action="store_true", help="Benchmark all models")
     parser.add_argument("--current", "-c", action="store_true", help="Show current model info")
     parser.add_argument("--migrate", "-m", type=str, help="Migrate legacy model to registry format")
@@ -345,7 +273,7 @@ def main() -> None:
             current_adapter = result
 
     elif args.test:
-        test_model(manager, args.test, current_adapter)
+        run_test_model(manager, args.test, current_adapter)
 
     elif args.migrate and LEGACY_MODE:
         # Migrate legacy model to registry format
@@ -396,11 +324,7 @@ def main() -> None:
         else:
             print("❌ Bulk migration only available with model manager")
 
-    elif args.quick_test:
-        if LEGACY_MODE:
-            print("❌ Quick test not available in registry mode. Use --test with specific image.")
-        else:
-            quick_test(manager)
+    # --quick-test flag removed: sample-based quick tests disabled per project policy
 
     elif args.benchmark:
         if LEGACY_MODE:

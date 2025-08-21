@@ -22,8 +22,11 @@ def test_different_preprocessing() -> None:
     vision_adapter = VisionAdapter(device="cpu")
     vision_adapter.load_checkpoint("data/models/vision_resnet50.pt")
 
-    # Test image - let's use a clear case
-    test_image_path = "data/pictures/apple_scab_sample.jpg"
+    # Test image - replace with an available image path or skip if absent
+    test_image_path = "data/raw/<your_image>.jpg"
+    if not Path(test_image_path).exists():
+        print(f"⚠️  Test image not found: {test_image_path} - skipping preprocessing test")
+        return
     image = Image.open(test_image_path)
 
     print(f"🔍 Testing preprocessing on: {test_image_path}")
@@ -93,7 +96,10 @@ def show_top_predictions() -> None:
     vision_adapter = VisionAdapter(device="cpu")
     vision_adapter.load_checkpoint("data/models/vision_resnet50.pt")
 
-    test_image_path = "data/pictures/apple_scab_sample.jpg"
+    test_image_path = "data/raw/<your_image>.jpg"
+    if not Path(test_image_path).exists():
+        print(f"⚠️  Test image not found: {test_image_path} - skipping top predictions")
+        return
     image = Image.open(test_image_path)
 
     # Preprocess

@@ -7,7 +7,7 @@ and intermediate results to speed up training iterations and experiments.
 import hashlib
 import json
 import logging
-import pickle
+import pickle as _pickle  # nosec B403 - used for trusted, local cache only; see guarded load/dump
 import shutil
 import time
 from dataclasses import dataclass, field
@@ -308,19 +308,19 @@ class CacheManager:
                 try:
                     data = torch.load(entry.path, map_location="cpu", weights_only=True)
                 except TypeError:
-                    # Fallback for older PyTorch versions or legacy models
-                    data = torch.load(entry.path, map_location="cpu", weights_only=False)
+                    # Fallback for older PyTorch versions or legacy models.
+                    # nosec B614: weights_only=False is required for legacy checkpoints; path is controlled (local file).
+                    data = torch.load(entry.path, map_location="cpu", weights_only=False)  # nosec B614
             elif entry.path.suffix == ".pkl":
-                # WARNING: pickle.load can be unsafe with untrusted data
-                # Only load from trusted cache files
+                # WARNING: pickle.load can be unsafe with untrusted data.
+                # This cache only loads files it created locally; paths come from our index.
                 with open(entry.path, "rb") as f:
-                    data = pickle.load(f)  # nosec B301
+                    data = _pickle.load(f)  # nosec B301
             else:
-                # Try pickle as fallback
-                # WARNING: pickle.load can be unsafe with untrusted data
-                # Only load from trusted cache files
+                # Try pickle as fallback for non-pt files produced by this cache only
+                # WARNING: pickle.load can be unsafe with untrusted data.
                 with open(entry.path, "rb") as f:
-                    data = pickle.load(f)  # nosec B301
+                    data = _pickle.load(f)  # nosec B301
 
             # Update access statistics
             entry.last_accessed = time.time()
@@ -361,8 +361,10 @@ class CacheManager:
             if file_ext == ".pt":
                 torch.save(data, cache_file)
             else:
+                # WARNING: pickle.dump can be unsafe if data is later loaded from untrusted sources.
+                # Here, we write to a local cache we control and subsequently load only from our index.
                 with open(cache_file, "wb") as f:
-                    pickle.dump(data, f)
+                    _pickle.dump(data, f)  # nosec B301
 
             # Calculate file size and checksum
             file_size = cache_file.stat().st_size

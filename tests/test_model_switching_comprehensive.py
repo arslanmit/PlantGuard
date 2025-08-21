@@ -4,7 +4,6 @@ This module provides extensive testing for model switching functionality,
 including integration with the model registry and UI components.
 """
 
-import json
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -13,7 +12,6 @@ import pytest
 import torch
 from PIL import Image
 
-from src.core.vision import VisionAdapter
 from src.features.model_switching.model_manager import PlantGuardModelManager
 from src.training.model_registry import ModelRegistry
 
@@ -37,7 +35,15 @@ class TestModelSwitchingComprehensive:
 
         # Model configurations for testing
         model_configs = [
-            {"name": "plantguard_base", "accuracy": 0.88, "f1_score": 0.86, "inference_time": 0.05, "model_size": 25.2, "description": "Base PlantGuard model", "tags": ["base", "production", "fast"]},
+            {
+                "name": "plantguard_base",
+                "accuracy": 0.88,
+                "f1_score": 0.86,
+                "inference_time": 0.05,
+                "model_size": 25.2,
+                "description": "Base PlantGuard model",
+                "tags": ["base", "production", "fast"],
+            },
             {
                 "name": "plantguard_accurate",
                 "accuracy": 0.95,
@@ -100,7 +106,12 @@ class TestModelSwitchingComprehensive:
                 architecture="resnet50",
                 dataset_version="plantvillage_v1.0",
                 hyperparameters={"num_classes": 38, "epochs": 50 + i * 10, "batch_size": 32, "learning_rate": 0.001},
-                performance_metrics={"accuracy": config["accuracy"], "f1_score": config["f1_score"], "inference_time": config["inference_time"], "model_size_mb": config["model_size"]},
+                performance_metrics={
+                    "accuracy": config["accuracy"],
+                    "f1_score": config["f1_score"],
+                    "inference_time": config["inference_time"],
+                    "model_size_mb": config["model_size"],
+                },
                 description=config["description"],
                 tags=config["tags"],
             )
@@ -357,7 +368,10 @@ class TestModelSwitchingComprehensive:
 
         # Modify model configurations
         for model in registry_models[:2]:
-            model_manager.update_model_config(model["id"], {"confidence_threshold": 0.8, "enabled": True, "custom_setting": f"test_value_{model['id']}"})
+            model_manager.update_model_config(
+                model["id"],
+                {"confidence_threshold": 0.8, "enabled": True, "custom_setting": f"test_value_{model['id']}"},
+            )
 
         # Save configuration
         model_manager.save_config()
@@ -496,11 +510,23 @@ class TestModelSwitchingComprehensive:
 
             # Different model structures for different architectures
             if arch == "resnet50":
-                state_dict = {"conv1.weight": torch.randn(64, 3, 7, 7), "fc.weight": torch.randn(38, 2048), "fc.bias": torch.randn(38)}
+                state_dict = {
+                    "conv1.weight": torch.randn(64, 3, 7, 7),
+                    "fc.weight": torch.randn(38, 2048),
+                    "fc.bias": torch.randn(38),
+                }
             elif arch == "efficientnet":
-                state_dict = {"features.0.0.weight": torch.randn(32, 3, 3, 3), "classifier.1.weight": torch.randn(38, 1280), "classifier.1.bias": torch.randn(38)}
+                state_dict = {
+                    "features.0.0.weight": torch.randn(32, 3, 3, 3),
+                    "classifier.1.weight": torch.randn(38, 1280),
+                    "classifier.1.bias": torch.randn(38),
+                }
             else:  # vit
-                state_dict = {"patch_embed.proj.weight": torch.randn(768, 3, 16, 16), "head.weight": torch.randn(38, 768), "head.bias": torch.randn(38)}
+                state_dict = {
+                    "patch_embed.proj.weight": torch.randn(768, 3, 16, 16),
+                    "head.weight": torch.randn(38, 768),
+                    "head.bias": torch.randn(38),
+                }
 
             checkpoint = {
                 "model_state_dict": state_dict,

@@ -300,10 +300,11 @@ def test_new_adapter() -> None:
         return
 
     # Test on a few images
+    # Replace test_images with your own local image paths if present
     test_images = [
-        "data/pictures/apple_scab_sample.jpg",
-        "data/pictures/tomato_healthy_sample.jpg",
-        "data/pictures/potato_late_blight_sample.jpg",
+        "data/raw/<your_image_1>.jpg",
+        "data/raw/<your_image_2>.jpg",
+        "data/raw/<your_image_3>.jpg",
     ]
 
     logger.info("Test Results:")

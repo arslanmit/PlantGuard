@@ -283,7 +283,9 @@ class ModelEvaluator:
 
         return class_metrics
 
-    def _calculate_roc_metrics(self, y_true: list[int], y_proba: np.ndarray, class_names: list[str]) -> tuple[float, float, dict[str, dict[str, list[float]]]]:
+    def _calculate_roc_metrics(
+        self, y_true: list[int], y_proba: np.ndarray, class_names: list[str]
+    ) -> tuple[float, float, dict[str, dict[str, list[float]]]]:
         """Calculate ROC AUC metrics and curves.
 
         Args:
@@ -541,7 +543,7 @@ class ModelEvaluator:
             metrics_comparison["roc_auc_macro"] = roc_auc_values
             if "roc_auc_macro" not in ranking_weights:
                 # Adjust weights to include ROC AUC
-                total_weight = sum(ranking_weights.values())
+                _total_weight = sum(ranking_weights.values())
                 for key in ranking_weights:
                     ranking_weights[key] *= 0.8  # Scale down existing weights
                 ranking_weights["roc_auc_macro"] = 0.2
@@ -585,9 +587,14 @@ class ModelEvaluator:
             Dictionary of p-values for pairwise comparisons
         """
         try:
-            from scipy import stats
-        except ImportError:
-            logger.warning("SciPy not available, skipping statistical significance tests")
+            # SciPy is optional for statistical tests; if unavailable, skip significance
+            import importlib
+
+            if importlib.util.find_spec("scipy") is None:
+                logger.warning("SciPy not available, skipping statistical significance tests")
+                return {}
+        except Exception:
+            logger.warning("Error checking for SciPy availability, skipping statistical significance tests")
             return {}
 
         model_names = list(model_metrics.keys())

@@ -5,7 +5,7 @@ from typing import Literal
 
 import streamlit as st
 
-from .components import ModelSwitcher, ModeSwitcher, ThemeSwitcher, render_status_indicator
+from .components import ModelSwitcher, ModeSwitcher, render_status_indicator
 
 logger = logging.getLogger(__name__)
 
@@ -131,12 +131,11 @@ def render_text_mode() -> None:
             st.markdown(prompt)
 
         # Generate and display assistant response
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                # Placeholder for text model inference
-                response = "🚧 Text processing model integration pending. Your question has been received!"
-                st.markdown(response)
-                st.session_state.chat_history.append({"role": "assistant", "content": response})
+        with st.chat_message("assistant"), st.spinner("Thinking..."):
+            # Placeholder for text model inference
+            response = "🚧 Text processing model integration pending. Your question has been received!"
+            st.markdown(response)
+            st.session_state.chat_history.append({"role": "assistant", "content": response})
 
 
 def render_system_status() -> None:
@@ -161,7 +160,7 @@ def render_system_status() -> None:
 
 def main() -> None:
     """Main Streamlit application."""
-    st.set_page_config(page_title="🌱 PlantGuard", page_icon="🌱", layout="wide", initial_sidebar_state="collapsed")
+    st.set_page_config(page_title="🌱 PlantGuard", page_icon="🌱", layout="wide", initial_sidebar_state="expanded")
 
     # Header
     st.title("🌱 PlantGuard Assistant")
@@ -174,15 +173,13 @@ def main() -> None:
 
     # Initialize switchers
     mode_switcher = ModeSwitcher()
-    theme_switcher = ThemeSwitcher()
     model_switcher = ModelSwitcher()
 
-    # Render theme switcher in sidebar
-    with st.sidebar:
-        st.markdown("### ⚙️ Settings")
-        theme_switcher.render(location="sidebar")
+    # Model switcher - render into left column to make sidebar static
+    left_col, right_col = st.columns([1, 4])
 
-        # Model switcher
+    with left_col:
+        st.markdown("### ⚙️ Settings")
         st.markdown("---")
         available_models = {
             "vision": ["resnet50_plantvillage_v1", "efficientnet_b0_plants", "vit_base_plants"],
@@ -191,8 +188,10 @@ def main() -> None:
         }
         model_switcher.render(available_models)
 
-    # Mode switcher
-    selected_mode = mode_switcher.render()
+    # Render main UI in the right column
+    with right_col:
+        # Mode switcher
+        selected_mode = mode_switcher.render()
 
     st.markdown("---")
 

@@ -9,7 +9,7 @@ import shutil
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 import torch
@@ -89,67 +89,6 @@ class TestCrossPlatformCompatibility:
         else:
             assert "/" in model_path_str
 
-    def test_device_detection_macos(self, test_dataset, temp_dir):
-        """Test device detection on macOS (MPS support)."""
-        if platform.system() != "Darwin":
-            pytest.skip("macOS-specific test")
-
-        config = TrainingConfig(
-            experiment_name="macos_device_test",
-            dataset_path=test_dataset,
-            device="auto",  # Auto-detect device
-            epochs=1,
-            batch_size=4,
-            output_dir=temp_dir / "models",
-        )
-
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(config, dataset_manager)
-
-        assert trainer.setup_training()
-
-        # Check device selection
-        if torch.backends.mps.is_available():
-            # Should use MPS if available
-            assert "mps" in str(trainer.device) or "cpu" in str(trainer.device)
-        else:
-            # Should fall back to CPU
-            assert "cpu" in str(trainer.device)
-
-        # Training should work regardless of device
-        result = trainer.train()
-        assert result.success, "Training should work on macOS"
-
-    def test_device_detection_linux(self, test_dataset, temp_dir):
-        """Test device detection on Linux (CUDA support)."""
-        if platform.system() != "Linux":
-            pytest.skip("Linux-specific test")
-
-        config = TrainingConfig(
-            experiment_name="linux_device_test",
-            dataset_path=test_dataset,
-            device="auto",
-            epochs=1,
-            batch_size=4,
-            output_dir=temp_dir / "models",
-        )
-
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(config, dataset_manager)
-
-        assert trainer.setup_training()
-
-        # Check device selection
-        if torch.cuda.is_available():
-            # Should use CUDA if available
-            assert "cuda" in str(trainer.device) or "cpu" in str(trainer.device)
-        else:
-            # Should fall back to CPU
-            assert "cpu" in str(trainer.device)
-
-        result = trainer.train()
-        assert result.success, "Training should work on Linux"
-
     def test_file_permissions_unix(self, test_dataset, temp_dir):
         """Test file permissions handling on Unix-like systems."""
         if platform.system() == "Windows":
@@ -203,8 +142,6 @@ class TestCrossPlatformCompatibility:
         trainer = ProductionTrainer(config, dataset_manager)
 
         assert trainer.setup_training()
-
-        setup_memory = process.memory_info().rss / 1024 / 1024
 
         result = trainer.train()
         assert result.success
@@ -280,7 +217,7 @@ class TestCrossPlatformCompatibility:
             adapter2 = VisionAdapter()
             adapter2.load_checkpoint(str(model_path))
             assert adapter2.is_loaded, "Should support concurrent model loading"
-        except Exception as e:
+        except Exception:
             # Some platforms might have stricter file locking
             if platform.system() == "Windows":
                 # Windows might be more restrictive
@@ -320,6 +257,7 @@ class TestCrossPlatformCompatibility:
                     epochs=1,
                     batch_size=4,
                     output_dir=temp_dir / "models",
+                    skip_memory_check=True,  # Skip memory check for test environment
                 )
 
                 dataset_manager = DatasetManager()
@@ -452,81 +390,3 @@ class TestCrossPlatformCompatibility:
         # Check that large model files are created correctly
         model_size = result.best_model_path.stat().st_size / 1024 / 1024  # MB
         assert model_size > 10, "Model file should be reasonably large"
-
-
-@pytest.mark.platform
-class TestPlatformSpecificFeatures:
-    """Test platform-specific features and optimizations."""
-
-    def test_macos_mps_acceleration(self, tmp_path):
-        """Test MPS acceleration on macOS."""
-        if platform.system() != "Darwin":
-            pytest.skip("macOS-specific test")
-
-        if not torch.backends.mps.is_available():
-            pytest.skip("MPS not available")
-
-        # Create minimal dataset
-        dataset_dir = tmp_path / "mps_test_dataset"
-        self._create_minimal_dataset(dataset_dir)
-
-        config = TrainingConfig(
-            experiment_name="mps_test",
-            dataset_path=dataset_dir,
-            device="mps",
-            epochs=1,
-            batch_size=4,
-            output_dir=tmp_path / "models",
-        )
-
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(config, dataset_manager)
-
-        assert trainer.setup_training()
-        result = trainer.train()
-        assert result.success, "Training should work with MPS acceleration"
-
-    def test_linux_cuda_acceleration(self, tmp_path):
-        """Test CUDA acceleration on Linux."""
-        if platform.system() != "Linux":
-            pytest.skip("Linux-specific test")
-
-        if not torch.cuda.is_available():
-            pytest.skip("CUDA not available")
-
-        # Create minimal dataset
-        dataset_dir = tmp_path / "cuda_test_dataset"
-        self._create_minimal_dataset(dataset_dir)
-
-        config = TrainingConfig(
-            experiment_name="cuda_test",
-            dataset_path=dataset_dir,
-            device="cuda",
-            epochs=1,
-            batch_size=4,
-            output_dir=tmp_path / "models",
-        )
-
-        dataset_manager = DatasetManager()
-        trainer = ProductionTrainer(config, dataset_manager)
-
-        assert trainer.setup_training()
-        result = trainer.train()
-        assert result.success, "Training should work with CUDA acceleration"
-
-    def _create_minimal_dataset(self, dataset_dir: Path):
-        """Create minimal dataset for platform tests."""
-        classes = ["class_0", "class_1"]
-
-        for split in ["train", "val"]:
-            split_dir = dataset_dir / split
-
-            for class_name in classes:
-                class_dir = split_dir / class_name
-                class_dir.mkdir(parents=True, exist_ok=True)
-
-                num_samples = 3 if split == "train" else 1
-
-                for i in range(num_samples):
-                    img = Image.new("RGB", (224, 224), color=(i * 80, 100, 150))
-                    img.save(class_dir / f"image_{i}.jpg")

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This specification defines the requirements for enhancing PlantGuard's training pipeline to be production-ready. Currently, the training pipeline works with dummy datasets for testing, but needs improvements for real-world deployment including proper dataset management, advanced training features, monitoring capabilities, and model evaluation tools.
+This specification defines the requirements for enhancing PlantGuard's training pipeline to be production-ready. Currently, the training pipeline has been validated with small internal test data, but needs improvements for real-world deployment including proper dataset management, advanced training features, monitoring capabilities, and model evaluation tools.
 
 ## Requirements
 

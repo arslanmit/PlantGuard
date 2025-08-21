@@ -257,7 +257,7 @@ python -m src.training.model_registry cleanup --keep=5
 
 Models follow semantic versioning:
 - **MAJOR**: Architecture changes, breaking compatibility
-- **MINOR**: Performance improvements, new features  
+- **MINOR**: Performance improvements, new features
 - **PATCH**: Bug fixes, minor improvements
 
 Example: `plantguard_v1.2.3`
@@ -368,21 +368,21 @@ The evaluation system provides:
 
 ### Common Issues & Solutions
 
-1. **CUDA out of memory**: 
+1. **CUDA out of memory**:
    - Use `CONFIG=config/memory_efficient.json`
    - Enable gradient accumulation: `"gradient_accumulation_steps": 4`
    - Reduce batch size: `"batch_size": 16`
 
-2. **Dataset not found**: 
+2. **Dataset not found**:
    - Run `make setup-dataset` for status and guidance
    - Use `make download-dataset` for automatic download
 
-3. **Low accuracy**: 
+3. **Low accuracy**:
    - Increase epochs: `"epochs": 200`
    - Use learning rate scheduler: `"scheduler": {"type": "cosine"}`
    - Enable transfer learning: `"freeze_backbone": true`
 
-4. **Slow training**: 
+4. **Slow training**:
    - Enable mixed precision: `"mixed_precision": true`
    - Use model compilation: `"compile_model": true`
    - Increase workers: `"num_workers": 8`
@@ -394,7 +394,7 @@ The evaluation system provides:
 # NVIDIA GPU optimization
 make train-production CONFIG=config/nvidia_optimized.json
 
-# Apple Silicon (MPS) optimization  
+# Apple Silicon (MPS) optimization
 make train-production CONFIG=config/apple_silicon.json
 
 # CPU optimization

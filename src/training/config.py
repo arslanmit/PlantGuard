@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 try:
-    import yaml
+    import yaml  # type: ignore[import-untyped]
 
     YAML_AVAILABLE = True
 except ImportError:
@@ -172,11 +172,17 @@ class TrainingConfig:
     warmup_epochs: int = 5
 
     # Dataset configuration
+    # Accept both legacy/explicit dataset path and ratios
+    # If dataset_path is provided by callers/tests, map it to data_dir for internal use
+    dataset_path: str | Path | None = None
+    data_dir: str | Path | None = None
     train_ratio: float = 0.8
     val_ratio: float = 0.2
     random_seed: int = 42
 
     # Checkpointing and logging
+    # Allow callers/tests to specify a base output directory
+    output_dir: str | Path | None = None
     save_every_n_epochs: int = 10
     log_every_n_steps: int = 100
     max_checkpoints_to_keep: int = 5
@@ -184,12 +190,24 @@ class TrainingConfig:
     # Performance optimization
     enable_performance_optimization: bool = False
     target_throughput_samples_per_sec: float = 100.0
-    max_memory_usage_gb: float = 12.0
+    max_memory_usage_gb: float = 4.0  # Updated to 4GB limit for all systems
     enable_profiling: bool = False
     enable_distributed_training: bool = False
+    skip_memory_check: bool = False  # Skip memory checks for test environments
 
     def __post_init__(self) -> None:
         """Validate all configuration parameters."""
+        # Normalize dataset path fields for backward compatibility
+        if self.data_dir is None and self.dataset_path is not None:
+            self.data_dir = self.dataset_path
+        # Ensure types are Path where applicable
+        if isinstance(self.data_dir, str):
+            self.data_dir = Path(self.data_dir)
+        if isinstance(self.dataset_path, str):
+            self.dataset_path = Path(self.dataset_path)
+        if isinstance(self.output_dir, str):
+            self.output_dir = Path(self.output_dir)
+
         self._validate_model_params()
         self._validate_training_params()
         self._validate_resource_params()

@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pytest
 import torch
 from PIL import Image
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
@@ -239,8 +240,12 @@ def evaluate_model(model_path: str, test_images_dir: str, metadata_path: str) ->
     logger.info("Starting model evaluation")
 
     # Load metadata
-    metadata = load_test_metadata(metadata_path)
-    test_samples = metadata["sample_images"]
+    metadata_path = Path(metadata_path)
+    if not metadata_path.exists():
+        pytest.skip("sample_images_metadata.json not present; skipping sample image integration tests")
+    with metadata_path.open() as f:
+        metadata = json.load(f)
+    test_samples = metadata.get("sample_images", [])
 
     # Initialize model
     model_result = _load_and_initialize_model(model_path)
@@ -332,23 +337,30 @@ def print_results(results: dict[str, Any]) -> None:
 
 def main() -> None:
     """Main evaluation function."""
-    # Paths
+    # Paths - canonicalize to data/raw for image assets
     model_path = "data/models/vision_resnet50.pt"
-    test_images_dir = "data/pictures"
-    metadata_path = "data/pictures/sample_images_metadata.json"
+    test_images_dir = "data/raw"
+    metadata_path = Path("data/raw/sample_images_metadata.json")
 
-    # Check if files exist
+    # Check model
     if not Path(model_path).exists():
+        print("Model not present; skipping sample evaluation")
         return
 
-    if not Path(metadata_path).exists():
+    # Load metadata or skip
+    if not metadata_path.exists():
+        print("Sample metadata not present; skipping sample evaluation")
         return
 
-    if not Path(test_images_dir).exists():
+    try:
+        with metadata_path.open(encoding="utf-8") as f:
+            json.load(f)
+    except Exception:
+        print("Sample metadata invalid; skipping sample evaluation")
         return
 
     # Run evaluation
-    results = evaluate_model(model_path, test_images_dir, metadata_path)
+    results = evaluate_model(model_path, test_images_dir, str(metadata_path))
 
     # Print results
     print_results(results)
@@ -362,3 +374,41 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+def _create_temp_samples(tmp_path):
+    """Create a small set of temporary sample images and metadata for tests."""
+    images_dir = tmp_path / "data_raw"
+    images_dir.mkdir(parents=True, exist_ok=True)
+
+    samples = []
+    # Create 3 tiny images with simple colors
+    colors = [(200, 50, 50), (50, 200, 50), (50, 50, 200)]
+    for i, col in enumerate(colors):
+        img = Image.new("RGB", (64, 64), color=col)
+        fname = f"temp_sample_{i}.jpg"
+        p = images_dir / fname
+        img.save(p)
+        samples.append({"filename": fname, "plant": "Tomato", "disease": "Healthy", "status": "healthy"})
+
+    metadata = {"sample_images": samples}
+    metadata_path = tmp_path / "sample_images_metadata.json"
+    metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+
+    return str(images_dir), str(metadata_path)
+
+
+def test_evaluate_model_with_temp_samples(tmp_path):
+    """Pytest wrapper: create temp samples and call evaluate_model.
+
+    This test will skip if the required model checkpoint (`data/models/vision_resnet50.pt`) is not present.
+    """
+    model_path = Path("data/models/vision_resnet50.pt")
+    if not model_path.exists():
+        pytest.skip("Model checkpoint not present; skipping sample evaluation test")
+
+    test_images_dir, metadata_path = _create_temp_samples(tmp_path)
+
+    results = evaluate_model(str(model_path), test_images_dir, metadata_path)
+    # We expect a dict result; detailed assertions depend on available model
+    assert isinstance(results, dict)

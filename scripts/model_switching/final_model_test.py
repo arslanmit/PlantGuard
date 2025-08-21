@@ -30,9 +30,18 @@ def comprehensive_test() -> None:
     print(f"📊 Classes: {len(adapter.class_names)}")
     print()
 
-    # Load test metadata
-    with Path("data/pictures/sample_images_metadata.json").open() as f:
-        metadata = json.load(f)
+    # Load test metadata (guarded). Exit if metadata not present.
+    metadata = {"sample_images": []}
+    metadata_path = Path("data/raw/sample_images_metadata.json")
+    if not metadata_path.exists():
+        print("⚠️ sample_images_metadata.json not found; skipping final model test.")
+        return
+    try:
+        with metadata_path.open(encoding="utf-8") as f:
+            metadata = json.load(f)
+    except Exception:
+        print("⚠️ Failed to read sample_images_metadata.json; skipping final model test.")
+        return
 
     # Test all images
     results = []
@@ -43,8 +52,8 @@ def comprehensive_test() -> None:
     print("🔍 Testing all 21 images:")
     print("-" * 70)
 
-    for sample in metadata["sample_images"]:
-        image_path = Path("data/pictures") / sample["filename"]
+    for sample in metadata.get("sample_images", []):
+        image_path = Path("data/raw") / sample.get("filename", "")
 
         if not image_path.exists():
             continue

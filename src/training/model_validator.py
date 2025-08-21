@@ -11,7 +11,6 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 import torch
 from PIL import Image
 from torch import nn
@@ -286,8 +285,9 @@ class AutomatedModelValidator:
             try:
                 checkpoint = torch.load(model_path, map_location=self.device, weights_only=True)
             except TypeError:
-                # Fallback for older PyTorch versions or legacy models
-                checkpoint = torch.load(model_path, map_location=self.device, weights_only=False)
+                # Fallback for older PyTorch versions or legacy models.
+                # nosec B614: weights_only=False is required for legacy checkpoints; path is controlled (local file).
+                checkpoint = torch.load(model_path, map_location=self.device, weights_only=False)  # nosec B614
 
             # Extract model architecture info
             if isinstance(checkpoint, dict) and "config" in checkpoint:
@@ -706,7 +706,7 @@ class AutomatedModelValidator:
         validation_time = time.time() - start_time
 
         # Create dummy metrics validation
-        from .evaluator import ClassMetrics, ModelMetrics
+        from .evaluator import ModelMetrics
 
         dummy_metrics = ModelMetrics(
             accuracy=0.0,

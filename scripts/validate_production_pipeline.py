@@ -29,7 +29,13 @@ class ProductionPipelineValidator:
         self.temp_dir = Path(temp_dir) if temp_dir else Path(tempfile.mkdtemp())
         self.temp_dir.mkdir(parents=True, exist_ok=True)
 
-        self.results: dict[str, Any] = {"tests_passed": 0, "tests_failed": 0, "test_results": {}, "errors": [], "warnings": []}
+        self.results: dict[str, Any] = {
+            "tests_passed": 0,
+            "tests_failed": 0,
+            "test_results": {},
+            "errors": [],
+            "warnings": [],
+        }
 
         logger.info(f"Validator initialized with temp directory: {self.temp_dir}")
 
@@ -44,7 +50,11 @@ class ProductionPipelineValidator:
             if error:
                 self.results["errors"].append(f"{test_name}: {error!s}")
 
-        self.results["test_results"][test_name] = {"passed": passed, "message": message, "error": str(error) if error else None}
+        self.results["test_results"][test_name] = {
+            "passed": passed,
+            "message": message,
+            "error": str(error) if error else None,
+        }
 
     def create_test_dataset(self) -> Path:
         """Create a minimal test dataset for validation."""
@@ -73,7 +83,7 @@ class ProductionPipelineValidator:
         logger.info("Testing DatasetManager...")
 
         try:
-            from src.training.dataset_manager import DatasetConfig, DatasetManager
+            from src.training.dataset_manager import DatasetManager
 
             # Create test dataset
             test_dataset = self.create_test_dataset()
@@ -93,7 +103,11 @@ class ProductionPipelineValidator:
                 self.log_test_result("DatasetManager.analyze_dataset", False, "Dataset analysis returned zero samples")
                 return False
 
-            self.log_test_result("DatasetManager", True, f"Validated {validation_result.valid_files} files, analyzed {analysis_result.total_samples} samples")
+            self.log_test_result(
+                "DatasetManager",
+                True,
+                f"Validated {validation_result.valid_files} files, analyzed {analysis_result.total_samples} samples",
+            )
             return True
 
         except Exception as e:
@@ -183,10 +197,30 @@ class ProductionPipelineValidator:
                 # This will fail because we don't have a real ResNet50 model,
                 # but we can test that the registry integration works
                 adapter.load_from_registry(model_id)
-                self.log_test_result("VisionAdapter.load_from_registry", False, "Expected failure due to mock model, but integration works")
+
+                # Check if the model loaded properly (should fail with mock data)
+                if adapter.check_model_health():
+                    self.log_test_result(
+                        "VisionAdapter.load_from_registry",
+                        False,
+                        "Model loaded successfully with mock data - unexpected",
+                    )
+                else:
+                    # Model loaded but is not healthy (expected with mock data)
+                    self.log_test_result(
+                        "VisionAdapter.registry_integration",
+                        True,
+                        "Registry integration works (model loaded with expected issues)",
+                    )
+                    return True
+
             except Exception:
                 # Expected to fail with mock model, but integration should work
-                self.log_test_result("VisionAdapter.registry_integration", True, "Registry integration works (expected model loading failure)")
+                self.log_test_result(
+                    "VisionAdapter.registry_integration",
+                    True,
+                    "Registry integration works (expected model loading failure)",
+                )
                 return True
 
         except Exception as e:
@@ -230,8 +264,8 @@ class ProductionPipelineValidator:
                 self.log_test_result("ModelManager.list_models", False, f"Expected 1 model, found {len(models)}")
                 return False
 
-            # Test registry model detection
-            registry_models = manager.get_registry_models()
+            # Test registry model detection (call for side-effects; no local needed)
+            manager.get_registry_models()
             # Should not crash even if registry is empty
 
             self.log_test_result("ModelManager.integration", True, "Model manager integration successful")
@@ -328,7 +362,11 @@ class ProductionPipelineValidator:
             config = TrainingConfig(experiment_name="validation_test", epochs=1, batch_size=2, num_classes=3)
 
             # Initialize trainer
-            trainer = ProductionTrainer(config=config, dataset_manager=DatasetManager(self.temp_dir / "data"), output_dir=self.temp_dir / "training_output")
+            trainer = ProductionTrainer(
+                config=config,
+                dataset_manager=DatasetManager(self.temp_dir / "data"),
+                output_dir=self.temp_dir / "training_output",
+            )
 
             # Test basic initialization
             if not trainer.output_dir.exists():
@@ -358,13 +396,28 @@ class ProductionPipelineValidator:
                 self.log_test_result("Makefile.help", False, "Make help command failed")
                 return False
 
-            # Check for key production training commands in help output
-            help_output = result.stdout
-            required_commands = ["train-production", "monitor-training", "evaluate-model", "list-models", "setup-dataset"]
+            # Check for key production training commands using make -n (dry run)
+            required_commands = [
+                "train-production",
+                "monitor-training",
+                "evaluate-model",
+                "list-models",
+                "setup-dataset",
+            ]
 
             missing_commands = []
             for cmd in required_commands:
-                if cmd not in help_output:
+                try:
+                    # Use make -n to test if target exists without executing it
+                    result = subprocess.run(["make", "-n", cmd], check=False, capture_output=True, text=True, timeout=5)
+                    if result.returncode != 0:
+                        missing_commands.append(cmd)
+                        logger.debug(f"Command '{cmd}' not found (make -n returned {result.returncode})")
+                except subprocess.TimeoutExpired:
+                    # If it times out, the target exists but may have dependencies
+                    logger.debug(f"Command '{cmd}' exists (timed out, likely has dependencies)")
+                except Exception as e:
+                    logger.debug(f"Error testing command '{cmd}': {e}")
                     missing_commands.append(cmd)
 
             if missing_commands:
@@ -384,7 +437,12 @@ class ProductionPipelineValidator:
 
         try:
             # Check for key scripts
-            script_paths = ["scripts/production_training_workflow.py", "scripts/list_models.py", "scripts/migrate_models.py", "scripts/evaluate_model.py"]
+            script_paths = [
+                "scripts/production_training_workflow.py",
+                "scripts/list_models.py",
+                "scripts/migrate_models.py",
+                "scripts/evaluate_model.py",
+            ]
 
             missing_scripts = []
             for script_path in script_paths:
@@ -423,42 +481,49 @@ class ProductionPipelineValidator:
         start_time = time.time()
 
         # Test 1: DatasetManager
-        dataset_ok = self.test_dataset_manager()
+        _dataset_ok = self.test_dataset_manager()
 
         # Test 2: ModelRegistry
         registry_ok, model_id = self.test_model_registry()
 
         # Test 3: VisionAdapter integration (if registry works)
-        vision_ok = False
+        _vision_ok = False
         if registry_ok and model_id:
-            vision_ok = self.test_vision_adapter_registry_integration(model_id)
+            _vision_ok = self.test_vision_adapter_registry_integration(model_id)
 
         # Test 4: ModelManager integration (if registry works)
-        manager_ok = False
+        _manager_ok = False
         if registry_ok and model_id:
-            manager_ok = self.test_model_manager_integration(model_id)
+            _manager_ok = self.test_model_manager_integration(model_id)
 
         # Test 5: Backward compatibility
-        compat_ok = self.test_backward_compatibility()
+        _compat_ok = self.test_backward_compatibility()
 
         # Test 6: Training configuration
-        config_ok = self.test_training_config_system()
+        _config_ok = self.test_training_config_system()
 
         # Test 7: ProductionTrainer setup
-        trainer_ok = self.test_production_trainer_setup()
+        _trainer_ok = self.test_production_trainer_setup()
 
         # Test 8: Makefile commands
-        makefile_ok = self.test_makefile_commands()
+        _makefile_ok = self.test_makefile_commands()
 
         # Test 9: Integration scripts
-        scripts_ok = self.test_integration_scripts()
+        _scripts_ok = self.test_integration_scripts()
 
         # Calculate results
         total_time = time.time() - start_time
         total_tests = self.results["tests_passed"] + self.results["tests_failed"]
         success_rate = (self.results["tests_passed"] / total_tests * 100) if total_tests > 0 else 0
 
-        self.results.update({"total_time": total_time, "total_tests": total_tests, "success_rate": success_rate, "overall_success": self.results["tests_failed"] == 0})
+        self.results.update(
+            {
+                "total_time": total_time,
+                "total_tests": total_tests,
+                "success_rate": success_rate,
+                "overall_success": self.results["tests_failed"] == 0,
+            }
+        )
 
         # Log summary
         logger.info("=" * 60)

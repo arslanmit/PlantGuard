@@ -45,7 +45,18 @@ def validate_knowledge_base():
         print(f"⚠️  Extra diseases: {extra}")
 
     # Validate each disease entry
-    required_disease_fields = ["disease_name", "plant_type", "severity", "description", "symptoms", "treatment", "prevention", "affected_parts", "season", "economic_impact"]
+    required_disease_fields = [
+        "disease_name",
+        "plant_type",
+        "severity",
+        "description",
+        "symptoms",
+        "treatment",
+        "prevention",
+        "affected_parts",
+        "season",
+        "economic_impact",
+    ]
 
     valid_count = 0
     for class_name, disease_info in diseases.items():

@@ -1,190 +1,1515 @@
 {
-    "schema_version": "1.0",
-    "last_updated": "2025-01-17",
-    "medical_discla",
-    "usage_guidelines": {
-        "confidence_thresholds": {
-            "high": 0.8,
-            "medium": 0.6,
-            "low": 0.4
-        },
-        "response_templates": {
-            "disease_detected": "Based on the image analysis, your e.",
-            "healthy_plant": "Great news! Your {plant_type} app",
-            "low_confidence": "I'm not entirce."
-        }
+  "schema_version": "1.0",
+  "last_updated": "2025-01-17",
+  "medical_disclaimer": "This information is for educational purposes only. Always consult qualified experts for serious plant health issues.",
+  "usage_guidelines": {
+    "confidence_thresholds": {
+      "high": 0.8,
+      "medium": 0.6,
+      "low": 0.4
     },
-    "diseases": {
-        "Apple___Apple_scab": {
-            "disease_name": "Apple Scab",
-            "scientific_name": "Venturia inaequalis",
-            "plant_type": "Apple",
-            "severity": "medium",
-            "description": "Apple scab is a fd.",
-      "symptom"Dark, olive-green,"Scabby, corky lesions","Premature leaf drop",
-            "Cracked or distorted fruit",
-            "Reduced fruit quality and marketability"
+    "response_templates": {
+      "disease_detected": "Based on analysis, your plant appears to have {disease_name} with {confidence}% confidence.",
+      "healthy_plant": "Great news! Your {plant_type} appears healthy with no signs of disease.",
+      "low_confidence": "I'm not entirely certain about this diagnosis. Consider consulting a plant pathologist.",
+      "treatment_advice": "For {disease_name}, I recommend: {treatment}",
+      "prevention_advice": "To prevent {disease_name}: {prevention}"
+    }
+  },
+  "diseases": {
+    "Apple___Apple_scab": {
+      "disease_name": "Apple Scab",
+      "scientific_name": "Venturia inaequalis",
+      "plant_type": "Apple",
+      "severity": "medium",
+      "description": "Apple scab is a fungal disease causing dark, scabby lesions on leaves, fruit, and twigs.",
+      "symptoms": [
+        "Dark spots on leaves",
+        "Scabby lesions on fruit",
+        "Premature leaf drop",
+        "Cracked fruit"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply fungicide",
+          "Improve air circulation"
         ],
-        "causes": [
-            "Fungal pathogen Ventur"Cool, wet weather conditions","Poor air circulation",
-            "Overhead irrigation",
-            "Infected plant debris"
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Preventive spraying"
         ],
-        "treatment": {
-            "immediate": [
-                "Remove and destroy infected leaves and fruit",
-                "Improve air circulation by pruni",
-                "Apply fungicide spray (coppe",
-                "Avoid overhead watering"
-            ],
-            "preve["Choose scab-resities","Rake and dispose of fallen leaves in autumn",
-            "Prune trees for better air circulation",
-            "Apply dormant season fungicide spray",
-            "Maintain proper tree spacing"
-        ],
-        "organ": [
-            "Baking soda spray (1 water)",
-            "Neem oil appli,"Copper fungicide","Sulfur-baseddes"
+        "organic": [
+          "Baking soda spray",
+          "Neem oil",
+          "Copper fungicide"
         ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good air circulation",
+        "Clean up debris"
+      ],
+      "affected_parts": [
+        "leaves",
+        "fruit",
+        "twigs"
+      ],
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "economic_impact": "Can reduce yield by 50-70%"
     },
-    "prevention": [
-        "Plant resistant"Ensurees","Clean up fallen leaves and frbris",
-        "Apply preventive fungicing",
-        "Avoid wetting foliage when 
-    ],
-    "affectegs"
-],
-"season": [
-    "spring",
-    "summer"
-],
-"env"
-],
-"economic_impact": "Can es"
-},
-"Apple___Black_rot": {
-"disease_name": "Apple BlackRot",
-"scientific_name": "Botrysa",
-"plant_type": "Apple",
-"severity": "high",
-"description": "Black rot is a serious fungal disease affecting apple tree",
-"symptoms": [
-"Brown to black circular spots on leaves with c"Black, mummified fruit that reee","Sunken cankers on branches and trunk",
-"Prema,"Yellowing and s"
-],
-"causes": [
-"Fungal pathogen Botryosphaeria obtus"Warm, humid weather","Wounds or injuries to tree",
-"Stres,"Poor sanitation pactices"
-],
-"treatment": {
-"immediate": [
-    "Remove and destroy all infected fruit and leaves",
-    "Prune out infected branches and cankers",
-    "Apply fhyl",
-    "Disinfect pruning to"
-],
-"preventive": [
-    "Maintain tree vigor through proper fertilization",
-    "Prune for good air circulation",
-    "Remove mummified fruit from tree and ground",
-    "Apply dngicide",
-          "Avoid mechanical 
-],
-"organic": [
-    "Copper-based fungicides",
-    "Bordeaux mixture",
-    "Lime spray",
-    "Pro"
-]
-},
-"prevention": [
-"Choose resistant apple varieties",
-"Maintain proper tree nutrition and",
-"Remove all mummified fruit and infected de,"Prune","Apply preventive fungi"
-],
-"affected_parts": [unk"],"season": ["summer",
-,
-"environmental_fans"
-],
-      "economi
-},
-"Apple___Cedar_apple_"disease_name": st",
-"scientinae",
-"plant_type": "Apple",
-"severity": "medium",
-"description": "Cedar appl.",
-"symptoms": [
-"Brighe",
-"Small, tube-like projections on leaf undersides",
-"O",
-"Premature leaf drop",
-"Reduced fruit quality"
-],
-"causes": [
-"Fungal pathogen Gymnospo",
-"Presence of cedar or juniper trees nearby",
-"Wet spring weather",
-"Wind-dispersed spores",
-"Two-host life cycle requirement"
-],
-"treatment": {
-"immediate": [
-"Appge",
-"Remove nearbssible",
-"Rake and destroy infected leaves",
-"Continue fungicide applications through summer"
-],
-"preventive": [
-"Plant rust-resistant apple varieties",
-"Remiles",
-"Apply preventiv"Improve air circula"
-],
-"organic": [
-"Sulfur-based fungicides",
-"Copper fungicides",
-"Neem oi"Proper sanitation prs"
-]
-},
-"prevention": [
-"Choose rust-resistant varieties like Liberty or Ese",
-"Remove al"Apply fungicide spr","Maintain good tree health and vigor"
-],
-"affected_parts": [
-"leaves",
-"fruit"
-],
-"season": [
-"spring",
-"early summer"
-],
-"environmen,"economi"
-},
-"Apple___healthy": {
-"disease_name": "Healthy Apple",
-"scientific_name": null,
-"plant_type": "Apple",
-"severite",
-"description": "Healthy aormal.",
-"symptoms": [],
-"causes": [],
-"treatme": {
-"immediate": [],
-"preventive": [
-"Continue regular mon",
-"Mai"Ensure good air circulation","Practice good sanitation"
-],
-"organ": [
-"Regular inspection and monitoring",
-         e",
-     n"
-]
-},
-"prevention": [
-        "Regular monitoring "Maintain optimal ,"Practice integ","Ensure proper nutrition and water management"
-],
-"affected_p,"season": [""environmental_facs"
-],
-"economic_impact"
-}
-}
+    "Apple___Black_rot": {
+      "disease_name": "Apple Black Rot",
+      "scientific_name": "Botryosphaeria obtusa",
+      "plant_type": "Apple",
+      "severity": "high",
+      "description": "Black rot causes fruit rot, leaf spots, and cankers on apple trees.",
+      "symptoms": [
+        "Black spots on leaves",
+        "Mummified fruit",
+        "Branch cankers",
+        "Premature fruit drop"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Prune cankers",
+          "Apply fungicide"
+        ],
+        "preventive": [
+          "Maintain tree vigor",
+          "Good sanitation",
+          "Proper pruning"
+        ],
+        "organic": [
+          "Copper fungicides",
+          "Bordeaux mixture",
+          "Proper sanitation"
+        ]
+      },
+      "prevention": [
+        "Choose resistant varieties",
+        "Proper nutrition",
+        "Remove debris"
+      ],
+      "affected_parts": [
+        "fruit",
+        "leaves",
+        "branches"
+      ],
+      "season": [
+        "summer",
+        "fall"
+      ],
+      "economic_impact": "Can cause 100% fruit loss"
+    },
+    "Apple___Cedar_apple_rust": {
+      "disease_name": "Apple Cedar Rust",
+      "scientific_name": "Gymnosporangium juniperi-virginianae",
+      "plant_type": "Apple",
+      "severity": "medium",
+      "description": "Cedar apple rust requires both apple and cedar trees to complete its life cycle.",
+      "symptoms": [
+        "Orange spots on leaves",
+        "Tube-like projections",
+        "Fruit spots"
+      ],
+      "treatment": {
+        "immediate": [
+          "Apply fungicide at pink bud",
+          "Remove cedar trees",
+          "Destroy infected leaves"
+        ],
+        "preventive": [
+          "Plant resistant varieties",
+          "Remove alternate hosts",
+          "Preventive spraying"
+        ],
+        "organic": [
+          "Sulfur fungicides",
+          "Copper fungicides",
+          "Neem oil"
+        ]
+      },
+      "prevention": [
+        "Choose resistant varieties",
+        "Remove cedar trees",
+        "Fungicide sprays"
+      ],
+      "affected_parts": [
+        "leaves",
+        "fruit"
+      ],
+      "season": [
+        "spring",
+        "early summer"
+      ],
+      "economic_impact": "Moderate impact on fruit quality"
+    },
+    "Apple___healthy": {
+      "disease_name": "Healthy Apple",
+      "scientific_name": null,
+      "plant_type": "Apple",
+      "severity": "none",
+      "description": "Healthy apple plant with no signs of disease.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good sanitation"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - quality fruit production"
+    },
+    "Blueberry___healthy": {
+      "disease_name": "Healthy Blueberry",
+      "scientific_name": null,
+      "plant_type": "Blueberry",
+      "severity": "none",
+      "description": "Healthy blueberry plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Cherry_(including_sour)___Powdery_mildew": {
+      "disease_name": "Cherry Powdery Mildew",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Cherry Including Sour",
+      "severity": "medium",
+      "description": "Cherry Powdery Mildew is a plant disease affecting cherry including sour plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Cherry_(including_sour)___healthy": {
+      "disease_name": "Healthy Cherry",
+      "scientific_name": null,
+      "plant_type": "Cherry Including Sour",
+      "severity": "none",
+      "description": "Healthy cherry including sour plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
+      "disease_name": "Corn Gray Leaf Spot",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Corn Maize",
+      "severity": "medium",
+      "description": "Corn Gray Leaf Spot is a plant disease affecting corn maize plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Corn_(maize)___Common_rust_": {
+      "disease_name": "Corn Common Rust",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Corn Maize",
+      "severity": "medium",
+      "description": "Corn Common Rust is a plant disease affecting corn maize plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Corn_(maize)___Northern_Leaf_Blight": {
+      "disease_name": "Corn Northern Leaf Blight",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Corn Maize",
+      "severity": "medium",
+      "description": "Corn Northern Leaf Blight is a plant disease affecting corn maize plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Corn_(maize)___healthy": {
+      "disease_name": "Healthy Corn",
+      "scientific_name": null,
+      "plant_type": "Corn Maize",
+      "severity": "none",
+      "description": "Healthy corn maize plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Grape___Black_rot": {
+      "disease_name": "Grape Black Rot",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Grape",
+      "severity": "medium",
+      "description": "Grape Black Rot is a plant disease affecting grape plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Grape___Esca_(Black_Measles)": {
+      "disease_name": "Grape Black Measles",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Grape",
+      "severity": "medium",
+      "description": "Grape Black Measles is a plant disease affecting grape plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
+      "disease_name": "Grape Leaf Blight",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Grape",
+      "severity": "medium",
+      "description": "Grape Leaf Blight is a plant disease affecting grape plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Grape___healthy": {
+      "disease_name": "Healthy Grape",
+      "scientific_name": null,
+      "plant_type": "Grape",
+      "severity": "none",
+      "description": "Healthy grape plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Orange___Haunglongbing_(Citrus_greening)": {
+      "disease_name": "Citrus Greening Disease",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Orange",
+      "severity": "medium",
+      "description": "Citrus Greening Disease is a plant disease affecting orange plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Peach___Bacterial_spot": {
+      "disease_name": "Peach Bacterial Spot",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Peach",
+      "severity": "medium",
+      "description": "Peach Bacterial Spot is a plant disease affecting peach plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Peach___healthy": {
+      "disease_name": "Healthy Peach",
+      "scientific_name": null,
+      "plant_type": "Peach",
+      "severity": "none",
+      "description": "Healthy peach plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Pepper,_bell___Bacterial_spot": {
+      "disease_name": "Bell Pepper Bacterial Spot",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Pepper Bell",
+      "severity": "medium",
+      "description": "Bell Pepper Bacterial Spot is a plant disease affecting pepper bell plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Pepper,_bell___healthy": {
+      "disease_name": "Healthy Bell Pepper",
+      "scientific_name": null,
+      "plant_type": "Pepper Bell",
+      "severity": "none",
+      "description": "Healthy pepper bell plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Potato___Early_blight": {
+      "disease_name": "Potato Early Blight",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Potato",
+      "severity": "medium",
+      "description": "Potato Early Blight is a plant disease affecting potato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Potato___Late_blight": {
+      "disease_name": "Potato Late Blight",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Potato",
+      "severity": "medium",
+      "description": "Potato Late Blight is a plant disease affecting potato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Potato___healthy": {
+      "disease_name": "Healthy Potato",
+      "scientific_name": null,
+      "plant_type": "Potato",
+      "severity": "none",
+      "description": "Healthy potato plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Raspberry___healthy": {
+      "disease_name": "Healthy Raspberry",
+      "scientific_name": null,
+      "plant_type": "Raspberry",
+      "severity": "none",
+      "description": "Healthy raspberry plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Soybean___healthy": {
+      "disease_name": "Healthy Soybean",
+      "scientific_name": null,
+      "plant_type": "Soybean",
+      "severity": "none",
+      "description": "Healthy soybean plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Squash___Powdery_mildew": {
+      "disease_name": "Squash Powdery Mildew",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Squash",
+      "severity": "medium",
+      "description": "Squash Powdery Mildew is a plant disease affecting squash plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Strawberry___Leaf_scorch": {
+      "disease_name": "Strawberry Leaf Scorch",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Strawberry",
+      "severity": "medium",
+      "description": "Strawberry Leaf Scorch is a plant disease affecting strawberry plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Strawberry___healthy": {
+      "disease_name": "Healthy Strawberry",
+      "scientific_name": null,
+      "plant_type": "Strawberry",
+      "severity": "none",
+      "description": "Healthy strawberry plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    },
+    "Tomato___Bacterial_spot": {
+      "disease_name": "Tomato Bacterial Spot",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Tomato",
+      "severity": "medium",
+      "description": "Tomato Bacterial Spot is a plant disease affecting tomato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Tomato___Early_blight": {
+      "disease_name": "Tomato Early Blight",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Tomato",
+      "severity": "medium",
+      "description": "Tomato Early Blight is a plant disease affecting tomato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Tomato___Late_blight": {
+      "disease_name": "Tomato Late Blight",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Tomato",
+      "severity": "medium",
+      "description": "Tomato Late Blight is a plant disease affecting tomato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Tomato___Leaf_Mold": {
+      "disease_name": "Tomato Leaf Mold",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Tomato",
+      "severity": "medium",
+      "description": "Tomato Leaf Mold is a plant disease affecting tomato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Tomato___Septoria_leaf_spot": {
+      "disease_name": "Tomato Septoria Leaf Spot",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Tomato",
+      "severity": "medium",
+      "description": "Tomato Septoria Leaf Spot is a plant disease affecting tomato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Tomato___Spider_mites Two-spotted_spider_mite": {
+      "disease_name": "Tomato Spider Mites",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Tomato",
+      "severity": "medium",
+      "description": "Tomato Spider Mites is a plant disease affecting tomato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Tomato___Target_Spot": {
+      "disease_name": "Tomato Target Spot",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Tomato",
+      "severity": "medium",
+      "description": "Tomato Target Spot is a plant disease affecting tomato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Tomato___Tomato_Yellow_Leaf_Curl_Virus": {
+      "disease_name": "Tomato Yellow Leaf Curl Virus",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Tomato",
+      "severity": "medium",
+      "description": "Tomato Yellow Leaf Curl Virus is a plant disease affecting tomato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Tomato___Tomato_mosaic_virus": {
+      "disease_name": "Tomato Mosaic Virus",
+      "scientific_name": "Various pathogens",
+      "plant_type": "Tomato",
+      "severity": "medium",
+      "description": "Tomato Mosaic Virus is a plant disease affecting tomato plants.",
+      "symptoms": [
+        "Visible lesions or spots",
+        "Discoloration",
+        "Reduced plant vigor"
+      ],
+      "treatment": {
+        "immediate": [
+          "Remove infected material",
+          "Apply appropriate treatment",
+          "Improve growing conditions"
+        ],
+        "preventive": [
+          "Choose resistant varieties",
+          "Proper sanitation",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Organic fungicides",
+          "Beneficial microorganisms",
+          "Proper nutrition"
+        ]
+      },
+      "prevention": [
+        "Plant resistant varieties",
+        "Good cultural practices",
+        "Regular monitoring"
+      ],
+      "affected_parts": [
+        "leaves",
+        "stems",
+        "fruit"
+      ],
+      "season": [
+        "growing season"
+      ],
+      "economic_impact": "Can reduce yield and quality if not managed"
+    },
+    "Tomato___healthy": {
+      "disease_name": "Healthy Tomato",
+      "scientific_name": null,
+      "plant_type": "Tomato",
+      "severity": "none",
+      "description": "Healthy tomato plant with no signs of disease or pest damage.",
+      "symptoms": [],
+      "treatment": {
+        "immediate": [],
+        "preventive": [
+          "Regular monitoring",
+          "Proper nutrition",
+          "Good cultural practices"
+        ],
+        "organic": [
+          "Regular inspection",
+          "Proper maintenance",
+          "Balanced fertilization"
+        ]
+      },
+      "prevention": [
+        "Regular monitoring",
+        "Optimal growing conditions",
+        "IPM practices"
+      ],
+      "affected_parts": [],
+      "season": [
+        "all seasons"
+      ],
+      "economic_impact": "Positive - healthy plants produce quality crops"
+    }
+  }
 }

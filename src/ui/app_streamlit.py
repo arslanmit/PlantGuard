@@ -1,10 +1,11 @@
 """PlantGuard Streamlit application for multimodal plant disease detection."""
+# ruff: noqa: E402
 
 import json
+import logging
 import platform
 import subprocess  # nosec B404: subprocess is required for
-
-# TensorBoard integration
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -19,10 +20,7 @@ if TYPE_CHECKING:
 else:
     AudioFrame = Any
 
-# Import the actual classes and methods that exist
-import sys
-
-# Add src to path if not already there
+# Ensure src is on sys.path for local imports before importing project modules
 src_path = Path(__file__).parent.parent
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
@@ -30,9 +28,11 @@ if str(src_path) not in sys.path:
 from core.audio import AudioAdapter
 from core.nlp import TextAdapter
 from core.vision import VisionAdapter
-from ui.components import ModelSwitcher, render_status_indicator
+from ui.components import ModelSwitcher
 
-st.set_page_config(page_title="PlantGuard", page_icon="🌿", layout="wide", initial_sidebar_state="collapsed")
+logger = logging.getLogger(__name__)
+
+st.set_page_config(page_title="PlantGuard", page_icon="🌿", layout="wide", initial_sidebar_state="expanded")
 
 # Custom CSS for improved UI
 st.markdown(
@@ -167,6 +167,26 @@ st.markdown(
 """,
     unsafe_allow_html=True,
 )
+# Inject JS to force static sidebar across entrypoints
+st.markdown(
+    """
+    <script>
+    (function(){
+        function ensureStatic(){
+            try{
+                const toggle = document.querySelector('button[title="Toggle sidebar"]');
+                if(toggle) toggle.style.display='none';
+                const sidebar = document.querySelector('div[data-testid="stSidebar"]') || document.querySelector('.css-1d391kg');
+                if(sidebar){ sidebar.style.transform='none'; sidebar.style.left='0'; sidebar.style.width='320px'; sidebar.style.visibility='visible'; }
+            }catch(e){}
+        }
+        window.addEventListener('load', ensureStatic);
+        setTimeout(ensureStatic, 800);
+    })();
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Header
 st.markdown(
@@ -183,19 +203,55 @@ st.markdown(
 # Initialize model switcher
 model_switcher = ModelSwitcher()
 
+# Try to initialize Model Manager early so we can autoload the configured default model
+try:
+    from src.features.model_switching.model_manager import PlantGuardModelManager
+
+    try:
+        model_manager = PlantGuardModelManager(autoload_default=True)
+    except Exception as exc:
+        logger.exception("Failed to initialize PlantGuardModelManager: %s", exc)
+        model_manager = None
+except Exception as exc:
+    logger.exception("Failed to import PlantGuardModelManager: %s", exc)
+    model_manager = None
+
 
 # Initialize adapters (cached for performance)
 @st.cache_resource
 def load_adapters() -> tuple[VisionAdapter, AudioAdapter, TextAdapter]:
     """Load and cache the ML adapters."""
-    # Load vision model with checkpoint
-    vision_model_path = "data/models/vision_resnet50.pt"
-    vision = VisionAdapter(model_path=vision_model_path)
+    # Preferred behavior: use the ModelManager's autoloaded adapter when available
+    vision = None
+    try:
+        if model_manager and getattr(model_manager, "current_adapter", None):
+            # Use the autoloaded adapter (usually a Hugging Face model by default)
+            vision = model_manager.current_adapter
+    except Exception:
+        vision = None
+
+    # Fallback to local checkpoint adapter when no manager/adapter is available
+    if vision is None:
+        vision_model_path = "data/models/vision_resnet50.pt"
+        try:
+            if Path(vision_model_path).exists():
+                vision = VisionAdapter(model_path=vision_model_path, lazy_load=False)
+            else:
+                # No local checkpoint: create adapter without a checkpoint so UI uses model manager or empty adapter
+                vision = VisionAdapter(model_path=None)
+        except Exception:
+            # Fall back to a bare adapter; predict calls will surface errors if not loaded
+            vision = VisionAdapter(model_path=None)
 
     # Load class mapping
     classes_path = "data/knowledge_base/plantvillage_classes.json"
     if Path(classes_path).exists():
-        vision.load_class_mapping(classes_path)
+        try:
+            # Only call load_class_mapping when the adapter exposes it (VisionAdapter)
+            if hasattr(vision, "load_class_mapping"):
+                vision.load_class_mapping(classes_path)
+        except Exception as exc:
+            logger.exception("Failed to load class mapping for vision adapter: %s", exc)
 
     audio = AudioAdapter()
     text = TextAdapter()
@@ -302,27 +358,51 @@ model_configs = {
         "icon": "👁️",
         "title": "Vision Model",
         "description": "AI model for plant image analysis",
-        "options": {"vit_base_plants": "🏆 Vision Transformer (Best - 100%)", "resnet50_plantvillage_v1": "🔬 ResNet50 (Balanced - 95%)", "mobilenet_fast": "⚡ MobileNet (Fast - 90%)"},
-        "badges": {"vit_base_plants": ("🏆", "100%", "badge-green"), "resnet50_plantvillage_v1": ("🔬", "95%", "badge-blue"), "mobilenet_fast": ("⚡", "90%", "badge-orange")},
+        "options": {
+            "vit_base_plants": "🏆 Vision Transformer (Best - 100%)",
+            "resnet50_plantvillage_v1": "🔬 ResNet50 (Balanced - 95%)",
+            "mobilenet_fast": "⚡ MobileNet (Fast - 90%)",
+        },
+        "badges": {
+            "vit_base_plants": ("🏆", "100%", "badge-green"),
+            "resnet50_plantvillage_v1": ("🔬", "95%", "badge-blue"),
+            "mobilenet_fast": ("⚡", "90%", "badge-orange"),
+        },
     },
     "audio": {
         "icon": "🎤",
         "title": "Audio Model",
         "description": "AI model for voice processing",
-        "options": {"whisper_tiny_local": "🎯 Whisper Tiny (Local)", "wav2vec2_plant_sounds": "🌿 Wav2Vec2 (Plant Sounds)"},
-        "badges": {"whisper_tiny_local": ("🎯", "Local", "badge-green"), "wav2vec2_plant_sounds": ("🌿", "Beta", "badge-orange")},
+        "options": {
+            "whisper_tiny_local": "🎯 Whisper Tiny (Local)",
+            "wav2vec2_plant_sounds": "🌿 Wav2Vec2 (Plant Sounds)",
+        },
+        "badges": {
+            "whisper_tiny_local": ("🎯", "Local", "badge-green"),
+            "wav2vec2_plant_sounds": ("🌿", "Beta", "badge-orange"),
+        },
     },
     "text": {
         "icon": "💬",
         "title": "Text Model",
         "description": "AI model for plant care questions",
-        "options": {"distilbert_plant_qa_v1": "🧠 DistilBERT (Plant Q&A)", "roberta_plant_care": "🌱 RoBERTa (Advanced)", "t5_small_plant_qa": "📝 T5 Small (Creative)"},
-        "badges": {"distilbert_plant_qa_v1": ("🧠", "Stable", "badge-green"), "roberta_plant_care": ("🌱", "Advanced", "badge-blue"), "t5_small_plant_qa": ("📝", "Creative", "badge-purple")},
+        "options": {
+            "distilbert_plant_qa_v1": "🧠 DistilBERT (Plant Q&A)",
+            "roberta_plant_care": "🌱 RoBERTa (Advanced)",
+            "t5_small_plant_qa": "📝 T5 Small (Creative)",
+        },
+        "badges": {
+            "distilbert_plant_qa_v1": ("🧠", "Stable", "badge-green"),
+            "roberta_plant_care": ("🌱", "Advanced", "badge-blue"),
+            "t5_small_plant_qa": ("📝", "Creative", "badge-purple"),
+        },
     },
 }
 
 # Get current selections
-current_selections = st.session_state.get("selected_models", {"vision": "vit_base_plants", "audio": "whisper_tiny_local", "text": "distilbert_plant_qa_v1"})
+current_selections = st.session_state.get(
+    "selected_models", {"vision": "vit_base_plants", "audio": "whisper_tiny_local", "text": "distilbert_plant_qa_v1"}
+)
 
 col1, col2, col3 = st.columns(3)
 columns = [col1, col2, col3]
@@ -410,7 +490,9 @@ st.markdown("## 🚀 Current Model Status & Quick Actions")
 st.markdown("*Monitor your active models and perform quick actions*")
 
 # Get selected models from session state
-current_models = st.session_state.get("selected_models", {"vision": "vit_base_plants", "audio": "whisper_tiny_local", "text": "distilbert_plant_qa_v1"})
+current_models = st.session_state.get(
+    "selected_models", {"vision": "vit_base_plants", "audio": "whisper_tiny_local", "text": "distilbert_plant_qa_v1"}
+)
 
 # Model status display
 col1, col2, col3 = st.columns(3)
@@ -466,19 +548,11 @@ with tab1:
 
     with col1:
         st.subheader("📤 Upload Plant Image")
-        img_file = st.file_uploader("Choose a leaf photo for analysis", ["png", "jpg", "jpeg"], help="Upload clear images of plant leaves for best results")
-
-        # Sample images section
-        st.subheader("🖼️ Or Try Sample Images")
-        sample_images = list(Path("data/pictures").glob("*.jpg"))
-        if sample_images:
-            sample_names = ["None"] + [img.name for img in sample_images]
-            selected_sample = st.selectbox("Sample images:", sample_names)
-
-            if selected_sample != "None":
-                sample_path = Path("data/pictures") / selected_sample
-                if sample_path.exists():
-                    img_file = sample_path
+        img_file = st.file_uploader(
+            "Choose a leaf photo for analysis",
+            ["png", "jpg", "jpeg"],
+            help="Upload clear images of plant leaves for best results",
+        )
 
     with col2:
         if img_file:
@@ -535,7 +609,13 @@ with tab1:
 
                         # Technical details
                         with st.expander("🔧 Technical Details"):
-                            st.json({"raw_prediction": raw_class, "confidence_score": float(confidence), "model_used": selected_models["vision"]})
+                            st.json(
+                                {
+                                    "raw_prediction": raw_class,
+                                    "confidence_score": float(confidence),
+                                    "model_used": selected_models["vision"],
+                                }
+                            )
 
                     except Exception as e:
                         st.error(f"❌ Analysis failed: {e!s}")
@@ -647,42 +727,7 @@ with tab3:
     # Question input
     question_col1, question_col2 = st.columns([4, 1])
 
-    with question_col1:
-        user_question = st.text_input("Ask your question:", placeholder="e.g., 'How to treat powdery mildew?' or 'What causes leaf spots?'", key="user_question")
-
-    with question_col2:
-        ask_button = st.button("🚀 Ask", key="qa", type="primary", use_container_width=True)
-
-    # Process question
-    if (ask_button and user_question.strip()) or (user_question and st.session_state.get("auto_submit", False)):
-        with st.spinner("🤖 AI is thinking..."):
-            try:
-                response = text_adapter.generate_response("general", user_question)
-
-                # Add to chat history
-                st.session_state.chat_history.append({"question": user_question, "answer": response, "timestamp": "now"})
-
-                # Clear input
-                st.session_state.user_question = ""
-
-            except Exception as e:
-                st.error(f"❌ Failed to generate response: {e!s}")
-
-    # Display chat history
-    if st.session_state.chat_history:
-        st.markdown("### 💬 Conversation History")
-
-        for i, chat in enumerate(reversed(st.session_state.chat_history[-5:])):  # Show last 5
-            with st.expander(f"Q: {chat['question'][:50]}..." if len(chat["question"]) > 50 else f"Q: {chat['question']}", expanded=(i == 0)):
-                st.markdown(f"**❓ Question:** {chat['question']}")
-                st.markdown(f"**🤖 Answer:** {chat['answer']}")
-
-        # Clear history button
-        if st.button("🗑️ Clear History", help="Clear conversation history"):
-            st.session_state.chat_history = []
-            st.rerun()
-
-    # Sample questions
+    # Sample questions (placed BEFORE the input to allow prefill without state mutation errors)
     st.markdown("### 🔍 Sample Questions")
     sample_questions = [
         "How to treat powdery mildew?",
@@ -696,8 +741,64 @@ with tab3:
     for i, sample_q in enumerate(sample_questions):
         with sample_cols[i]:
             if st.button(f"💡 {sample_q}", key=f"sample_{i}", help="Click to use this question"):
-                st.session_state.user_question = sample_q
+                # Set preset value and rerun BEFORE input is instantiated
+                st.session_state["preset_user_question"] = sample_q
                 st.rerun()
+
+    # Determine default value for the text input
+    default_q = st.session_state.pop("preset_user_question", None)
+    if default_q is None:
+        # Handle clearing the input via flag on rerun
+        if st.session_state.pop("clear_user_question", False):
+            default_q = ""
+        else:
+            default_q = st.session_state.get("user_question", "")
+
+    with question_col1:
+        user_question = st.text_input(
+            "Ask your question:",
+            value=default_q,
+            placeholder="e.g., 'How to treat powdery mildew?' or 'What causes leaf spots?'",
+            key="user_question",
+        )
+
+    with question_col2:
+        ask_button = st.button("🚀 Ask", key="qa", type="primary", use_container_width=True)
+
+    # Process question
+    if (ask_button and user_question.strip()) or (user_question and st.session_state.get("auto_submit", False)):
+        with st.spinner("🤖 AI is thinking..."):
+            try:
+                response = text_adapter.generate_response("general", user_question)
+
+                # Add to chat history
+                st.session_state.chat_history.append({"question": user_question, "answer": response, "timestamp": "now"})
+
+                # Clear input safely on next run
+                st.session_state["clear_user_question"] = True
+                st.rerun()
+
+            except Exception as e:
+                st.error(f"❌ Failed to generate response: {e!s}")
+
+    # Display chat history
+    if st.session_state.chat_history:
+        st.markdown("### 💬 Conversation History")
+
+        for i, chat in enumerate(reversed(st.session_state.chat_history[-5:])):  # Show last 5
+            with st.expander(
+                f"Q: {chat['question'][:50]}..." if len(chat["question"]) > 50 else f"Q: {chat['question']}",
+                expanded=(i == 0),
+            ):
+                st.markdown(f"**❓ Question:** {chat['question']}")
+                st.markdown(f"**🤖 Answer:** {chat['answer']}")
+
+        # Clear history button
+        if st.button("🗑️ Clear History", help="Clear conversation history"):
+            st.session_state.chat_history = []
+            st.rerun()
+
+    # Sample questions moved above
 
 # Training Tab
 with tab4:
@@ -748,7 +849,7 @@ with tab4:
             st.metric("Best Val Loss", f"{report.get('best_metrics', {}).get('Loss/Validation', 'N/A')}")
         with col_c:
             duration = report.get("total_duration", None)
-            st.metric("Duration", f"{duration:.1f}s" if isinstance(duration, (int, float)) else "N/A")
+            st.metric("Duration", f"{duration:.1f}s" if isinstance(duration, int | float) else "N/A")
 
         # Visualizations
         vis_col1, vis_col2 = st.columns(2)
@@ -774,10 +875,20 @@ with tab4:
                 st.download_button("Download JSON", data=report_path.read_bytes(), file_name=report_path.name, mime="application/json")
         with dl_cols[1]:
             if text_summary_path.exists():
-                st.download_button("Download Summary", data=text_summary_path.read_bytes(), file_name=text_summary_path.name, mime="text/plain")
+                st.download_button(
+                    "Download Summary",
+                    data=text_summary_path.read_bytes(),
+                    file_name=text_summary_path.name,
+                    mime="text/plain",
+                )
         with dl_cols[2]:
             if html_report_path.exists():
-                st.download_button("Download HTML", data=html_report_path.read_bytes(), file_name=html_report_path.name, mime="text/html")
+                st.download_button(
+                    "Download HTML",
+                    data=html_report_path.read_bytes(),
+                    file_name=html_report_path.name,
+                    mime="text/html",
+                )
         with dl_cols[3]:
             if curves_path.exists():
                 st.download_button("Download Curves", data=curves_path.read_bytes(), file_name=curves_path.name, mime="image/png")
@@ -808,7 +919,15 @@ with tab4:
                         st.error("TensorBoard not found in PATH")
                         return False
 
-                    cmd = [tensorboard_path, "--logdir", shlex.quote(str(runs_dir)), "--port", str(int(tb_port)), "--reload_interval", "1"]
+                    cmd = [
+                        tensorboard_path,
+                        "--logdir",
+                        shlex.quote(str(runs_dir)),
+                        "--port",
+                        str(int(tb_port)),
+                        "--reload_interval",
+                        "1",
+                    ]
 
                     # Use full path and proper argument handling
                     subprocess.Popen(  # nosec B603: shell=False, inputs are sanitized
@@ -854,21 +973,30 @@ with tab5:
                 st.warning("⚠️ No enabled models found")
             else:
                 # Model selection dropdown
-                model_options = {f"{m['name']} ({m['accuracy']:.1%})": m["id"] for m in enabled_models}
+                # Preserve ordering from enabled_models and build parallel lists for labels and ids
+                model_option_items = [(f"{m['name']} ({m['accuracy']:.1%})", m["id"]) for m in enabled_models]
+                option_labels = [label for label, _ in model_option_items]
+                option_ids = [mid for _, mid in model_option_items]
 
                 current_model_info = model_manager.get_current_model_info()
                 current_model_name = current_model_info.get("name", "None")
 
-                # Find current selection
+                # Determine default index by checking the is_current flag on the enabled_models list
                 default_index = 0
-                for i, (display_name, model_id) in enumerate(model_options.items()):
-                    if model_id == current_model_info.get("model_id", "").split("/")[-1]:
+                for i, model in enumerate(enabled_models):
+                    if model.get("is_current"):
                         default_index = i
                         break
 
-                selected_display = st.selectbox("Choose Model:", options=list(model_options.keys()), index=default_index, help="Select a model to switch to", key="model_switcher_select")
+                selected_display = st.selectbox(
+                    "Choose Model:",
+                    options=option_labels,
+                    index=default_index,
+                    help="Select a model to switch to",
+                    key="model_switcher_select",
+                )
 
-                selected_model_id = model_options[selected_display]
+                selected_model_id = option_ids[option_labels.index(selected_display)]
 
                 # Switch model button
                 if st.button("🔄 Switch Model", type="primary", use_container_width=True, key="switch_model_btn"):
@@ -920,64 +1048,6 @@ with tab5:
                     )
 
                 st.dataframe(model_data, use_container_width=True)
-
-                # Quick benchmark button
-                if st.button("🏁 Quick Benchmark", help="Test all enabled models on sample images", key="benchmark_btn"):
-                    with st.spinner("Running benchmark..."):
-                        # Load test metadata
-                        metadata_path = "data/pictures/sample_images_metadata.json"
-                        if Path(metadata_path).exists():
-                            with Path(metadata_path).open(encoding="utf-8") as f:
-                                metadata = json.load(f)
-
-                            benchmark_results = []
-
-                            for model_info in enabled_models[:3]:  # Limit to 3 models for speed
-                                model_id = model_info["id"]
-
-                                if model_manager.switch_model(model_id):
-                                    correct = 0
-                                    total = 0
-
-                                    # Test on first 3 images for speed
-                                    for sample in metadata["sample_images"][:3]:
-                                        image_path = Path("data/pictures") / sample["filename"]
-
-                                        if image_path.exists():
-                                            try:
-                                                image = Image.open(image_path)
-                                                result = model_manager.get_readable_prediction(image)
-
-                                                # Simple accuracy check
-                                                gt_plant = sample["plant"].lower()
-                                                pred_plant = result["plant_type"].lower()
-
-                                                if gt_plant in pred_plant or pred_plant in gt_plant:
-                                                    correct += 1
-
-                                                total += 1
-
-                                            except Exception as e:
-                                                st.warning(f"Error processing image: {e}")
-                                                continue
-
-                                    if total > 0:
-                                        accuracy = correct / total
-                                        benchmark_results.append(
-                                            {
-                                                "Model": model_info["name"],
-                                                "Accuracy": f"{accuracy:.1%}",
-                                                "Tested": f"{correct}/{total}",
-                                            }
-                                        )
-
-                            if benchmark_results:
-                                st.markdown("### 🏆 Benchmark Results")
-                                st.dataframe(benchmark_results, use_container_width=True)
-                            else:
-                                st.warning("No benchmark results available")
-                        else:
-                            st.error("Test metadata not found")
             else:
                 st.info("No models available for comparison")
 
@@ -992,20 +1062,16 @@ with tab5:
 
     with test_col1:
         # Image upload for testing
-        test_image = st.file_uploader("Upload plant image for testing", type=["jpg", "jpeg", "png"], help="Upload an image of a plant leaf to test the current model", key="test_image_uploader")
+        test_image = st.file_uploader(
+            "Upload plant image for testing",
+            type=["jpg", "jpeg", "png"],
+            help="Upload an image of a plant leaf to test the current model",
+            key="test_image_uploader",
+        )
 
-        # Sample image selection for testing
-        st.markdown("**Or choose a sample image:**")
-
-        sample_images = list(Path("data/pictures").glob("*.jpg"))
-        if sample_images:
-            sample_names = [img.name for img in sample_images]
-            selected_test_sample = st.selectbox("Sample images:", options=["None", *sample_names], help="Select a sample image for testing", key="test_sample_select")
-
-            if selected_test_sample != "None":
-                sample_path = Path("data/pictures") / selected_test_sample
-                if sample_path.exists():
-                    test_image = sample_path
+    # Sample image selection for testing
+    st.markdown("**Or choose a sample image:**")
+    st.info("Sample image selection is disabled. Upload an image or provide images under `data/raw/` to test the model.")
 
     with test_col2:
         if test_image:

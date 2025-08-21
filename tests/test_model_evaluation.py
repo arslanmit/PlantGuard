@@ -57,7 +57,19 @@ def test_model_metrics_structure():
         from training.evaluator import ClassMetrics, ModelMetrics
 
         # Test that we can create a basic metrics object
-        class_metrics = [ClassMetrics(class_name="test_class", precision=0.8, recall=0.7, f1_score=0.75, support=100, true_positives=80, false_positives=20, false_negatives=30, true_negatives=70)]
+        class_metrics = [
+            ClassMetrics(
+                class_name="test_class",
+                precision=0.8,
+                recall=0.7,
+                f1_score=0.75,
+                support=100,
+                true_positives=80,
+                false_positives=20,
+                false_negatives=30,
+                true_negatives=70,
+            )
+        ]
 
         metrics = ModelMetrics(
             accuracy=0.85,

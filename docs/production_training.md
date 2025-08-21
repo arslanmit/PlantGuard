@@ -625,7 +625,7 @@ class FocalLoss(nn.Module):
         super().__init__()
         self.alpha = alpha
         self.gamma = gamma
-    
+
     def forward(self, inputs, targets):
         # Implement focal loss
         pass

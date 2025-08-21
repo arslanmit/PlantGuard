@@ -10,14 +10,19 @@ logger = logging.getLogger(__name__)
 class FileManager:
     """Utility class for secure file operations."""
 
-    def __init__(self, temp_dir: str = "data/temp") -> None:
+    def __init__(self, temp_dir: str = "data/tmp") -> None:
         """Initialize FileManager.
 
         Args:
             temp_dir: Directory for temporary files
         """
         self.temp_dir = Path(temp_dir)
-        self.temp_dir.mkdir(parents=True, exist_ok=True)
+        # Ensure the temp directory exists; use a safe default to avoid deleting user data
+        try:
+            self.temp_dir.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            # If creation fails, fallback to system temp
+            self.temp_dir = Path(tempfile.gettempdir())
         self._temp_files: list[str] = []
 
     def create_temp_file(self, suffix: str = "", prefix: str = "plantguard_") -> str:

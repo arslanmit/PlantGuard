@@ -3,20 +3,89 @@
 This module contains the AudioAdapter class for speech-to-text processing using Whisper.
 """
 
-import io
+import contextlib
 import logging
 import os
 import signal
+import sys
 import tempfile
 import time
 from pathlib import Path
-from typing import Union
 
 import librosa
 import soundfile as sf
+import streamlit as st
+
+# Disable Streamlit caching during pytest to avoid large in-memory caches
+if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
+
+    def _noop_cache(*args, **kwargs):
+        def _wrap(f):
+            return f
+
+        return _wrap
+
+    # Use contextlib.suppress to avoid hiding unexpected errors with a bare except
+    with contextlib.suppress(Exception):
+        st.cache_resource = _noop_cache
+        st.cache_data = _noop_cache
 from transformers import pipeline
 
 logger = logging.getLogger(__name__)
+
+
+@st.cache_resource(show_spinner=False)
+def load_whisper_pipeline(model_name: str = "openai/whisper-tiny") -> pipeline:
+    """Load and cache Whisper pipeline for speech-to-text.
+
+    Args:
+        model_name: Whisper model name to use
+
+    Returns:
+        Loaded Whisper pipeline
+    """
+    logger.info(f"Loading Whisper pipeline: {model_name}")
+
+    try:
+        whisper_pipeline = pipeline(
+            "automatic-speech-recognition",
+            model=model_name,
+            device=-1,  # Force CPU for compatibility and consistency
+        )
+
+        logger.info("Whisper pipeline loaded successfully")
+        return whisper_pipeline
+
+    except Exception as e:
+        logger.error(f"Failed to load Whisper pipeline: {e}")
+        raise RuntimeError(f"Failed to initialize Whisper model: {e}") from e
+
+
+@st.cache_data(show_spinner=False, ttl=300)
+def get_audio_info(file_path: str) -> tuple[float, int, bool]:
+    """Get and cache audio file information.
+
+    Args:
+        file_path: Path to audio file
+
+    Returns:
+        Tuple of (duration, sample_rate, is_valid)
+    """
+    try:
+        # Quick info check without loading full audio
+        import soundfile as sf
+
+        info = sf.info(file_path)
+        duration = info.duration
+        sample_rate = info.samplerate
+        is_valid = duration > 0 and sample_rate > 0
+
+        logger.debug(f"Audio info for {file_path}: {duration}s, {sample_rate}Hz")
+        return duration, sample_rate, is_valid
+
+    except Exception as e:
+        logger.warning(f"Failed to get audio info for {file_path}: {e}")
+        return 0.0, 0, False
 
 
 class AudioAdapter:
@@ -43,26 +112,22 @@ class AudioAdapter:
         logger.info("AudioAdapter initialized with model: %s", self.model_name)
 
     def _load_pipeline(self) -> None:
-        """Load Whisper pipeline lazily."""
+        """Load Whisper pipeline using cached function."""
         if self.pipeline is None:
             try:
-                logger.info("Loading Whisper pipeline: %s", self.model_name)
-                self.pipeline = pipeline(
-                    "automatic-speech-recognition",
-                    model=self.model_name,
-                    device=-1,  # Force CPU for compatibility
-                )
+                # Use cached pipeline loading for better performance
+                self.pipeline = load_whisper_pipeline(self.model_name)
                 logger.info("Whisper pipeline loaded successfully")
             except Exception as e:
                 logger.error("Failed to load Whisper pipeline: %s", e)
-                raise RuntimeError(f"Failed to initialize Whisper model: {e}")
+                raise RuntimeError(f"Failed to initialize Whisper model: {e}") from e
 
     def _timeout_handler(self, signum, frame):
         """Handle processing timeout."""
         raise TimeoutError("Audio processing timeout exceeded")
 
     def _is_audio_corrupted(self, audio_path: str) -> bool:
-        """Check if audio file is corrupted or empty.
+        """Check if audio file is corrupted or empty using cached info.
 
         Args:
             audio_path: Path to audio file
@@ -71,15 +136,21 @@ class AudioAdapter:
             True if file appears corrupted, False otherwise
         """
         try:
+            # Use cached audio info function
+            duration, sample_rate, is_valid = get_audio_info(audio_path)
+
+            if not is_valid:
+                logger.warning("Audio file appears invalid: %s", audio_path)
+                return True
+
             # Check file size
             if Path(audio_path).stat().st_size == 0:
                 logger.warning("Audio file is empty: %s", audio_path)
                 return True
 
-            # Try to load a small portion to check if readable
-            audio_data, _ = librosa.load(audio_path, duration=0.1)
-            if len(audio_data) == 0:
-                logger.warning("Audio file contains no data: %s", audio_path)
+            # Check duration
+            if duration <= 0:
+                logger.warning("Audio file has no duration: %s", audio_path)
                 return True
 
             return False
@@ -175,7 +246,7 @@ class AudioAdapter:
                 return self.process_audio_bytes(audio_file)
 
             # Validate file exists
-            if not os.path.exists(audio_file):
+            if not Path(audio_file).exists():
                 raise FileNotFoundError(f"Audio file not found: {audio_file}")
 
             # Check for corrupted or empty files

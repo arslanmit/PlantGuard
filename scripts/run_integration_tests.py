@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class IntegrationTestRunner:
     """Runner for comprehensive integration tests."""
 
-    def __init__(self, workspace_root: Path = None):
+    def __init__(self, workspace_root: Path | None = None):
         """Initialize test runner."""
         self.workspace_root = workspace_root or Path.cwd()
         self.test_results: dict[str, Any] = {
@@ -30,12 +30,18 @@ class IntegrationTestRunner:
             "end_time": None,
             "total_duration": 0,
             "test_suites": {},
-            "summary": {"total_tests": 0, "passed_tests": 0, "failed_tests": 0, "skipped_tests": 0, "success_rate": 0.0},
+            "summary": {
+                "total_tests": 0,
+                "passed_tests": 0,
+                "failed_tests": 0,
+                "skipped_tests": 0,
+                "success_rate": 0.0,
+            },
             "errors": [],
             "performance_metrics": {},
         }
 
-    def run_test_suite(self, test_file: str, test_name: str, markers: list[str] = None, timeout: int = 300) -> dict[str, Any]:
+    def run_test_suite(self, test_file: str, test_name: str, markers: list[str] | None = None, timeout: int = 300) -> dict[str, Any]:
         """Run a specific test suite."""
         logger.info(f"Running {test_name}...")
 
@@ -123,7 +129,18 @@ class IntegrationTestRunner:
 
         except Exception as e:
             logger.error(f"❌ {test_name} failed with exception: {e}")
-            return {"name": test_name, "file": test_file, "duration": 0, "return_code": -1, "success": False, "error": str(e), "tests_run": 0, "tests_passed": 0, "tests_failed": 1, "tests_skipped": 0}
+            return {
+                "name": test_name,
+                "file": test_file,
+                "duration": 0,
+                "return_code": -1,
+                "success": False,
+                "error": str(e),
+                "tests_run": 0,
+                "tests_passed": 0,
+                "tests_failed": 1,
+                "tests_skipped": 0,
+            }
 
     def run_all_integration_tests(self, include_performance: bool = True, include_slow: bool = False) -> dict[str, Any]:
         """Run all integration tests."""
@@ -133,25 +150,66 @@ class IntegrationTestRunner:
 
         # Define test suites
         test_suites = [
-            {"file": "tests/test_comprehensive_integration.py", "name": "Comprehensive Integration Tests", "timeout": 600, "markers": None},
-            {"file": "tests/test_vision_adapter_registry_integration.py", "name": "VisionAdapter Registry Integration", "timeout": 300, "markers": None},
-            {"file": "tests/test_model_switching_comprehensive.py", "name": "Model Switching Integration", "timeout": 400, "markers": None},
-            {"file": "tests/test_end_to_end_deployment.py", "name": "End-to-End Deployment", "timeout": 500, "markers": None},
-            {"file": "tests/test_production_training_integration.py", "name": "Production Training Integration", "timeout": 300, "markers": None},
+            {
+                "file": "tests/test_comprehensive_integration.py",
+                "name": "Comprehensive Integration Tests",
+                "timeout": 600,
+                "markers": None,
+            },
+            {
+                "file": "tests/test_vision_adapter_registry_integration.py",
+                "name": "VisionAdapter Registry Integration",
+                "timeout": 300,
+                "markers": None,
+            },
+            {
+                "file": "tests/test_model_switching_comprehensive.py",
+                "name": "Model Switching Integration",
+                "timeout": 400,
+                "markers": None,
+            },
+            {
+                "file": "tests/test_end_to_end_deployment.py",
+                "name": "End-to-End Deployment",
+                "timeout": 500,
+                "markers": None,
+            },
+            {
+                "file": "tests/test_production_training_integration.py",
+                "name": "Production Training Integration",
+                "timeout": 300,
+                "markers": None,
+            },
         ]
 
         # Add performance tests if requested
         if include_performance:
             test_suites.append(
-                {"file": "tests/test_performance_regression_comprehensive.py", "name": "Performance Regression Tests", "timeout": 800, "markers": ["performance"] if not include_slow else None}
+                {
+                    "file": "tests/test_performance_regression_comprehensive.py",
+                    "name": "Performance Regression Tests",
+                    "timeout": 800,
+                    "markers": ["performance"] if not include_slow else None,
+                }
             )
 
         # Add existing integration tests
-        existing_integration_tests = ["scripts/test_production_workflow.py", "scripts/test_end_to_end_integration.py", "scripts/test_model_switching_integration.py"]
+        existing_integration_tests = [
+            "scripts/test_production_workflow.py",
+            "scripts/test_end_to_end_integration.py",
+            "scripts/test_model_switching_integration.py",
+        ]
 
         for test_file in existing_integration_tests:
             if Path(test_file).exists():
-                test_suites.append({"file": test_file, "name": f"Legacy {Path(test_file).stem.replace('_', ' ').title()}", "timeout": 300, "markers": None})
+                test_suites.append(
+                    {
+                        "file": test_file,
+                        "name": f"Legacy {Path(test_file).stem.replace('_', ' ').title()}",
+                        "timeout": 300,
+                        "markers": None,
+                    }
+                )
 
         # Run each test suite
         for suite in test_suites:
@@ -159,7 +217,12 @@ class IntegrationTestRunner:
                 logger.warning(f"⚠️  Test file not found: {suite['file']}")
                 continue
 
-            result = self.run_test_suite(test_file=suite["file"], test_name=suite["name"], markers=suite.get("markers"), timeout=suite.get("timeout", 300))
+            result = self.run_test_suite(
+                test_file=suite["file"],
+                test_name=suite["name"],
+                markers=suite.get("markers"),
+                timeout=suite.get("timeout", 300),
+            )
 
             self.test_results["test_suites"][suite["name"]] = result
 
@@ -170,7 +233,13 @@ class IntegrationTestRunner:
             self.test_results["summary"]["skipped_tests"] += result.get("tests_skipped", 0)
 
             if not result["success"]:
-                self.test_results["errors"].append({"test_suite": suite["name"], "error": result.get("error", "Test failed"), "stderr": result.get("stderr", "")})
+                self.test_results["errors"].append(
+                    {
+                        "test_suite": suite["name"],
+                        "error": result.get("error", "Test failed"),
+                        "stderr": result.get("stderr", ""),
+                    }
+                )
 
         self.test_results["end_time"] = time.time()
         self.test_results["total_duration"] = self.test_results["end_time"] - self.test_results["start_time"]
@@ -182,7 +251,7 @@ class IntegrationTestRunner:
 
         return self.test_results
 
-    def generate_report(self, output_file: Path = None) -> None:
+    def generate_report(self, output_file: Path | None = None) -> None:
         """Generate comprehensive test report."""
         if output_file is None:
             output_file = self.workspace_root / "integration_test_report.json"
@@ -268,11 +337,19 @@ class IntegrationTestRunner:
             logger.error(f"❌ Missing test files: {missing_files}")
             return False
 
-        # Check if source modules are importable
+        # Check if source modules are importable (use find_spec to avoid unused-imports)
         try:
-            import src.core.vision
-            import src.features.model_switching.model_manager
-            import src.training.model_registry
+            import importlib
+
+            modules_to_check = [
+                "src.core.vision",
+                "src.features.model_switching.model_manager",
+                "src.training.model_registry",
+            ]
+
+            missing_modules = [m for m in modules_to_check if importlib.util.find_spec(m) is None]
+            if missing_modules:
+                raise ImportError(f"Missing required modules: {', '.join(missing_modules)}")
         except ImportError as e:
             logger.error(f"❌ Cannot import required modules: {e}")
             return False

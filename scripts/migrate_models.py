@@ -9,7 +9,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -163,7 +162,9 @@ def create_migration_report(
     # Add recommendations
     if migrated_models:
         report["recommendations"].append("Run 'python scripts/model_switching/model_switcher.py --list' to see migrated models")
-        report["recommendations"].append("Test migrated models with 'python scripts/model_switching/model_switcher.py --switch MODEL_ID --test IMAGE_PATH'")
+        report["recommendations"].append(
+            "Test migrated models with 'python scripts/model_switching/model_switcher.py --switch MODEL_ID --test IMAGE_PATH'"
+        )
 
     if failed_models:
         report["recommendations"].append("Check failed models manually - they may be corrupted or in an unsupported format")

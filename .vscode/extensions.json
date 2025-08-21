@@ -1,17 +1,14 @@
 {
     "recommendations": [
-        "ms-python.vscode-pylance",
         "charliermarsh.ruff",
-        "ms-python.mypy-type-checker",
-        "ms-python.jupyter",
         "github.copilot",
         "github.copilot-chat",
         "github.codespaces",
         "redhat.vscode-yaml",
         "ms-vscode.vscode-json",
         "tamasfe.even-better-toml",
-        "ms-python.black-formatter",
-        "anysphere.cursorpyright"
+        "ms-python.autopep8",
+        "ms-python.vscode-python-envs"
     ],
     "unwantedRecommendations": [
         "dart-code.dart-code",

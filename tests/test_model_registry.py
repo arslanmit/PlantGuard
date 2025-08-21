@@ -4,7 +4,6 @@ import json
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 import torch
@@ -109,7 +108,12 @@ def test_list_models(temp_registry, sample_model_file):
     """Test listing models."""
     # Register a model
     temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95},
     )
 
     models = temp_registry.list_models()
@@ -121,7 +125,12 @@ def test_list_models(temp_registry, sample_model_file):
 def test_get_model(temp_registry, sample_model_file):
     """Test getting specific model."""
     model_id = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95},
     )
 
     model_info = temp_registry.get_model(model_id)
@@ -175,12 +184,22 @@ def test_model_versioning(temp_registry, sample_model_file):
     """Test model versioning functionality."""
     # Register first version
     model_id_1 = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.90}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.90},
     )
 
     # Register second version (should auto-increment)
     model_id_2 = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95},
     )
 
     assert model_id_1 == "test_model_v1.0.0"
@@ -200,7 +219,12 @@ def test_model_versioning(temp_registry, sample_model_file):
 def test_validate_model(temp_registry, sample_model_file):
     """Test model validation."""
     model_id = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95},
     )
 
     # Should be valid initially
@@ -213,11 +237,21 @@ def test_validate_model(temp_registry, sample_model_file):
 def test_update_metadata(temp_registry, sample_model_file):
     """Test metadata updates."""
     model_id = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.90}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.90},
     )
 
     # Update metadata
-    success = temp_registry.update_metadata(model_id, performance_metrics={"accuracy": 0.95, "f1_score": 0.94}, description="Updated model", tags=["updated", "test"])
+    success = temp_registry.update_metadata(
+        model_id,
+        performance_metrics={"accuracy": 0.95, "f1_score": 0.94},
+        description="Updated model",
+        tags=["updated", "test"],
+    )
 
     assert success
 
@@ -235,7 +269,12 @@ def test_registry_persistence(sample_model_file):
         # Create first registry instance
         registry1 = ModelRegistry(temp_dir)
         model_id = registry1.register_model(
-            model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+            model_path=sample_model_file,
+            name="test_model",
+            architecture="simple",
+            dataset_version="test_v1",
+            hyperparameters={"lr": 0.001},
+            performance_metrics={"accuracy": 0.95},
         )
 
         # Create second registry instance (should load existing data)
@@ -248,7 +287,12 @@ def test_registry_persistence(sample_model_file):
 def test_checksum_calculation(temp_registry, sample_model_file):
     """Test checksum calculation and validation."""
     model_id = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95},
     )
 
     model_info = temp_registry.get_model(model_id)
@@ -263,11 +307,21 @@ def test_compare_models(temp_registry, sample_model_file):
     """Test model comparison functionality."""
     # Register multiple models
     model_id_1 = temp_registry.register_model(
-        model_path=sample_model_file, name="model_a", architecture="resnet50", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.90, "f1_score": 0.88}
+        model_path=sample_model_file,
+        name="model_a",
+        architecture="resnet50",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.90, "f1_score": 0.88},
     )
 
     model_id_2 = temp_registry.register_model(
-        model_path=sample_model_file, name="model_b", architecture="vit", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95, "f1_score": 0.92}
+        model_path=sample_model_file,
+        name="model_b",
+        architecture="vit",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95, "f1_score": 0.92},
     )
 
     # Compare models
@@ -292,11 +346,21 @@ def test_delete_model(temp_registry, sample_model_file):
     """Test model deletion functionality."""
     # Register multiple versions
     model_id_1 = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.90}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.90},
     )
 
     model_id_2 = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95},
     )
 
     # Verify we have 2 versions
@@ -371,7 +435,12 @@ def test_cleanup_old_models(temp_registry, sample_model_file):
     model_ids = []
     for i in range(5):
         model_id = temp_registry.register_model(
-            model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.90 + i * 0.01}
+            model_path=sample_model_file,
+            name="test_model",
+            architecture="simple",
+            dataset_version="test_v1",
+            hyperparameters={"lr": 0.001},
+            performance_metrics={"accuracy": 0.90 + i * 0.01},
         )
         model_ids.append(model_id)
 
@@ -404,11 +473,21 @@ def test_model_comparison_dataframe(temp_registry, sample_model_file):
     """Test DataFrame conversion for model comparison."""
     # Register models
     model_id_1 = temp_registry.register_model(
-        model_path=sample_model_file, name="model_a", architecture="resnet50", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.90, "f1_score": 0.88}
+        model_path=sample_model_file,
+        name="model_a",
+        architecture="resnet50",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.90, "f1_score": 0.88},
     )
 
     model_id_2 = temp_registry.register_model(
-        model_path=sample_model_file, name="model_b", architecture="vit", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95, "f1_score": 0.92}
+        model_path=sample_model_file,
+        name="model_b",
+        architecture="vit",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95, "f1_score": 0.92},
     )
 
     comparison = temp_registry.compare_models([model_id_1, model_id_2])
@@ -428,7 +507,12 @@ def test_export_model_pytorch(temp_registry, sample_model_file):
 
     # Register a model
     model_id = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95},
     )
 
     with tempfile.TemporaryDirectory() as export_dir:
@@ -490,7 +574,12 @@ def test_optimize_model_for_deployment(temp_registry, sample_model_file):
     """Test model optimization for deployment."""
     # Register a model
     model_id = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95},
     )
 
     # Optimize model
@@ -511,7 +600,12 @@ def test_export_unsupported_format(temp_registry, sample_model_file):
     """Test export with unsupported format."""
     # Register a model
     model_id = temp_registry.register_model(
-        model_path=sample_model_file, name="test_model", architecture="simple", dataset_version="test_v1", hyperparameters={"lr": 0.001}, performance_metrics={"accuracy": 0.95}
+        model_path=sample_model_file,
+        name="test_model",
+        architecture="simple",
+        dataset_version="test_v1",
+        hyperparameters={"lr": 0.001},
+        performance_metrics={"accuracy": 0.95},
     )
 
     # Try to export with unsupported format

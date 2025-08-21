@@ -10,7 +10,7 @@ This guide provides comprehensive strategies for optimizing PlantGuard's trainin
 
 **Training Performance (ResNet50, PlantVillage dataset)**:
 - **GPU (RTX 4090)**: ~45 seconds/epoch, 64 batch size
-- **GPU (RTX 3080)**: ~75 seconds/epoch, 32 batch size  
+- **GPU (RTX 3080)**: ~75 seconds/epoch, 32 batch size
 - **Apple M2 Max (MPS)**: ~120 seconds/epoch, 32 batch size
 - **CPU (16-core)**: ~15 minutes/epoch, 16 batch size
 
@@ -55,7 +55,7 @@ This guide provides comprehensive strategies for optimizing PlantGuard's trainin
   }
 }
 
-# RTX 3080 (10GB VRAM)  
+# RTX 3080 (10GB VRAM)
 {
   "training": {
     "batch_size": 64,
@@ -170,7 +170,7 @@ class AdaptiveBatchSize:
     def __init__(self, initial_batch_size=64, min_batch_size=8):
         self.batch_size = initial_batch_size
         self.min_batch_size = min_batch_size
-    
+
     def adjust_batch_size(self, oom_occurred=False):
         if oom_occurred and self.batch_size > self.min_batch_size:
             self.batch_size = max(self.batch_size // 2, self.min_batch_size)
@@ -188,7 +188,7 @@ class AdaptiveBatchSize:
 def create_optimized_dataloader(dataset, batch_size, num_workers=None):
     if num_workers is None:
         num_workers = min(8, os.cpu_count())
-    
+
     return DataLoader(
         dataset,
         batch_size=batch_size,
@@ -206,14 +206,14 @@ def create_optimized_dataloader(dataset, batch_size, num_workers=None):
 ```python
 def profile_dataloader(dataloader, num_batches=10):
     import time
-    
+
     start_time = time.time()
     for i, (images, labels) in enumerate(dataloader):
         if i >= num_batches:
             break
         # Simulate processing time
         time.sleep(0.01)
-    
+
     total_time = time.time() - start_time
     avg_time_per_batch = total_time / num_batches
     print(f"Average time per batch: {avg_time_per_batch:.3f}s")
@@ -263,7 +263,7 @@ class OptimizedAugmentation:
             ),
             transforms.RandomResizedCrop(224, scale=(0.8, 1.0))
         ])
-    
+
     def __call__(self, image):
         return self.augment(image)
 ```
@@ -278,27 +278,27 @@ class MemoryMappedDataset(Dataset):
         self.data_dir = Path(data_dir)
         self.transform = transform
         self.samples = self._load_samples()
-        
+
         # Pre-load small images into memory
         self.cache = {}
         self._preload_cache()
-    
+
     def _preload_cache(self):
         # Cache frequently accessed or small images
         for idx, (path, label) in enumerate(self.samples[:1000]):  # Cache first 1000
             if path.stat().st_size < 1024 * 1024:  # < 1MB
                 self.cache[idx] = Image.open(path).convert('RGB')
-    
+
     def __getitem__(self, idx):
         if idx in self.cache:
             image = self.cache[idx]
         else:
             path, label = self.samples[idx]
             image = Image.open(path).convert('RGB')
-        
+
         if self.transform:
             image = self.transform(image)
-        
+
         return image, label
 ```
 
@@ -312,7 +312,7 @@ class MemoryMappedDataset(Dataset):
 def create_optimized_model(num_classes=38):
     model = models.resnet50(pretrained=True)
     model.fc = nn.Linear(model.fc.in_features, num_classes)
-    
+
     # Compile model for optimization
     if hasattr(torch, 'compile'):
         model = torch.compile(
@@ -320,7 +320,7 @@ def create_optimized_model(num_classes=38):
             mode='default',  # Options: 'default', 'reduce-overhead', 'max-autotune'
             fullgraph=True
         )
-    
+
     return model
 ```
 
@@ -352,7 +352,7 @@ def prune_model(model, pruning_ratio=0.2):
         if isinstance(module, (nn.Conv2d, nn.Linear)):
             prune.l1_unstructured(module, name='weight', amount=pruning_ratio)
             prune.remove(module, 'weight')
-    
+
     return model
 ```
 
@@ -367,22 +367,22 @@ class OptimizedTrainer:
         self.device = device
         self.use_amp = use_amp
         self.scaler = torch.cuda.amp.GradScaler() if use_amp else None
-    
+
     def train_epoch(self, dataloader, optimizer, criterion):
         self.model.train()
         total_loss = 0
-        
+
         for batch_idx, (data, target) in enumerate(dataloader):
             data = optimize_input_format(data, self.device)
             target = target.to(self.device, non_blocking=True)
-            
+
             optimizer.zero_grad(set_to_none=True)  # More efficient than zero_grad()
-            
+
             if self.use_amp:
                 with torch.cuda.amp.autocast():
                     output = self.model(data)
                     loss = criterion(output, target)
-                
+
                 self.scaler.scale(loss).backward()
                 self.scaler.step(optimizer)
                 self.scaler.update()
@@ -391,33 +391,33 @@ class OptimizedTrainer:
                 loss = criterion(output, target)
                 loss.backward()
                 optimizer.step()
-            
+
             total_loss += loss.item()
-            
+
             # Memory cleanup every N batches
             if batch_idx % 50 == 0:
                 torch.cuda.empty_cache()
-        
+
         return total_loss / len(dataloader)
 ```
 
 #### Gradient Accumulation
 
 ```python
-def train_with_gradient_accumulation(model, dataloader, optimizer, criterion, 
+def train_with_gradient_accumulation(model, dataloader, optimizer, criterion,
                                    accumulation_steps=4):
     model.train()
     optimizer.zero_grad()
-    
+
     for batch_idx, (data, target) in enumerate(dataloader):
         data, target = data.to(device), target.to(device)
-        
+
         with torch.cuda.amp.autocast():
             output = model(data)
             loss = criterion(output, target) / accumulation_steps
-        
+
         scaler.scale(loss).backward()
-        
+
         if (batch_idx + 1) % accumulation_steps == 0:
             scaler.step(optimizer)
             scaler.update()
@@ -432,13 +432,13 @@ def train_with_gradient_accumulation(model, dataloader, optimizer, criterion,
 def optimize_for_inference(model, example_input):
     """Optimize model for inference"""
     model.eval()
-    
+
     # Convert to TorchScript
     traced_model = torch.jit.trace(model, example_input)
-    
+
     # Optimize for inference
     traced_model = torch.jit.optimize_for_inference(traced_model)
-    
+
     return traced_model
 
 # Usage
@@ -454,23 +454,23 @@ class BatchInferenceOptimizer:
         self.model = model
         self.device = device
         self.max_batch_size = max_batch_size
-    
+
     def predict_batch(self, images):
         """Optimize batch prediction"""
         self.model.eval()
-        
+
         # Process in optimal batch sizes
         results = []
         for i in range(0, len(images), self.max_batch_size):
             batch = images[i:i + self.max_batch_size]
             batch_tensor = torch.stack(batch).to(self.device)
-            
+
             with torch.no_grad(), torch.cuda.amp.autocast():
                 outputs = self.model(batch_tensor)
                 predictions = torch.softmax(outputs, dim=1)
-            
+
             results.extend(predictions.cpu().numpy())
-        
+
         return results
 ```
 
@@ -503,33 +503,33 @@ class LRFinder:
         self.optimizer = optimizer
         self.criterion = criterion
         self.device = device
-    
+
     def find_lr(self, dataloader, start_lr=1e-7, end_lr=10, num_iter=100):
         """Find optimal learning rate"""
         lrs = []
         losses = []
-        
+
         lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(
             self.optimizer, gamma=(end_lr/start_lr)**(1/num_iter)
         )
-        
+
         self.model.train()
         for i, (data, target) in enumerate(dataloader):
             if i >= num_iter:
                 break
-            
+
             data, target = data.to(self.device), target.to(self.device)
-            
+
             self.optimizer.zero_grad()
             output = self.model(data)
             loss = self.criterion(output, target)
             loss.backward()
             self.optimizer.step()
             lr_scheduler.step()
-            
+
             lrs.append(self.optimizer.param_groups[0]['lr'])
             losses.append(loss.item())
-        
+
         return lrs, losses
 ```
 
@@ -542,12 +542,12 @@ class ProgressiveUnfreezing:
     def __init__(self, model, unfreeze_schedule):
         self.model = model
         self.unfreeze_schedule = unfreeze_schedule  # {epoch: layers_to_unfreeze}
-        
+
     def update_frozen_layers(self, epoch):
         """Progressively unfreeze layers"""
         if epoch in self.unfreeze_schedule:
             layers_to_unfreeze = self.unfreeze_schedule[epoch]
-            
+
             for name, param in self.model.named_parameters():
                 if any(layer in name for layer in layers_to_unfreeze):
                     param.requires_grad = True
@@ -567,7 +567,7 @@ unfreeze_schedule = {
 ```python
 def create_discriminative_optimizer(model, base_lr=0.001):
     """Create optimizer with different learning rates for different layers"""
-    
+
     # Define layer groups with different learning rates
     layer_groups = [
         {'params': model.conv1.parameters(), 'lr': base_lr * 0.1},
@@ -577,7 +577,7 @@ def create_discriminative_optimizer(model, base_lr=0.001):
         {'params': model.layer4.parameters(), 'lr': base_lr * 0.8},
         {'params': model.fc.parameters(), 'lr': base_lr}
     ]
-    
+
     return torch.optim.AdamW(layer_groups, weight_decay=0.01)
 ```
 
@@ -591,7 +591,7 @@ def create_discriminative_optimizer(model, base_lr=0.001):
 def profile_training(model, dataloader, num_batches=10):
     """Profile training performance"""
     from torch.profiler import profile, record_function, ProfilerActivity
-    
+
     with profile(
         activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
         record_shapes=True,
@@ -602,22 +602,22 @@ def profile_training(model, dataloader, num_batches=10):
         for batch_idx, (data, target) in enumerate(dataloader):
             if batch_idx >= num_batches:
                 break
-            
+
             with record_function("data_loading"):
                 data, target = data.to(device), target.to(device)
-            
+
             with record_function("forward_pass"):
                 output = model(data)
-            
+
             with record_function("loss_computation"):
                 loss = criterion(output, target)
-            
+
             with record_function("backward_pass"):
                 loss.backward()
-    
+
     # Print profiling results
     print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
-    
+
     # Export trace for visualization
     prof.export_chrome_trace("training_trace.json")
 ```
@@ -628,9 +628,9 @@ def profile_training(model, dataloader, num_batches=10):
 def profile_memory_usage(model, input_size=(1, 3, 224, 224)):
     """Profile memory usage"""
     from torch.profiler import profile, ProfilerActivity
-    
+
     dummy_input = torch.randn(input_size).to(device)
-    
+
     with profile(
         activities=[ProfilerActivity.CUDA],
         profile_memory=True,
@@ -639,9 +639,9 @@ def profile_memory_usage(model, input_size=(1, 3, 224, 224)):
         output = model(dummy_input)
         loss = output.sum()
         loss.backward()
-    
+
     print(prof.key_averages().table(
-        sort_by="self_cuda_memory_usage", 
+        sort_by="self_cuda_memory_usage",
         row_limit=10
     ))
 ```
@@ -659,19 +659,19 @@ class PerformanceMonitor:
             'cpu_usage': [],
             'throughput': []
         }
-    
+
     def log_batch_metrics(self, batch_time, batch_size):
         """Log metrics for each batch"""
         self.metrics['batch_times'].append(batch_time)
         self.metrics['throughput'].append(batch_size / batch_time)
-        
+
         if torch.cuda.is_available():
             memory_used = torch.cuda.memory_allocated() / 1024**3
             self.metrics['gpu_memory'].append(memory_used)
-        
+
         cpu_percent = psutil.cpu_percent()
         self.metrics['cpu_usage'].append(cpu_percent)
-    
+
     def get_summary(self):
         """Get performance summary"""
         return {
@@ -779,45 +779,45 @@ class PerformanceMonitor:
 ```python
 def benchmark_training_performance():
     """Comprehensive training performance benchmark"""
-    
+
     # Test different batch sizes
     batch_sizes = [16, 32, 64, 128]
     results = {}
-    
+
     for batch_size in batch_sizes:
         print(f"Benchmarking batch size: {batch_size}")
-        
+
         # Create dataloader
         dataloader = create_optimized_dataloader(dataset, batch_size)
-        
+
         # Benchmark training
         start_time = time.time()
         total_samples = 0
-        
+
         for batch_idx, (data, target) in enumerate(dataloader):
             if batch_idx >= 50:  # Test 50 batches
                 break
-            
+
             data, target = data.to(device), target.to(device)
-            
+
             # Simulate training step
             with torch.cuda.amp.autocast():
                 output = model(data)
                 loss = criterion(output, target)
-            
+
             total_samples += data.size(0)
-        
+
         elapsed_time = time.time() - start_time
         throughput = total_samples / elapsed_time
-        
+
         results[batch_size] = {
             'throughput': throughput,
             'time_per_batch': elapsed_time / 50,
             'memory_usage': torch.cuda.max_memory_allocated() / 1024**3
         }
-        
+
         torch.cuda.reset_peak_memory_stats()
-    
+
     return results
 ```
 
@@ -834,13 +834,13 @@ configs=("high_performance" "memory_efficient" "balanced")
 
 for config in "${configs[@]}"; do
     echo "Testing configuration: $config"
-    
+
     # Run training benchmark
     python -m src.training.benchmark \
         --config="config/${config}_config.json" \
         --duration=300 \
         --output="benchmarks/${config}_results.json"
-    
+
     # Run inference benchmark
     python -m src.core.inference_benchmark \
         --config="config/${config}_config.json" \

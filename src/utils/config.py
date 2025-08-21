@@ -16,7 +16,7 @@ class Config:
 
     # Data paths
     dataset_path: str = "data/PlantVillage"
-    temp_dir: str = "data/temp"
+    temp_dir: str = "data/tmp"
     logs_dir: str = "logs"
 
     # Model parameters
@@ -36,7 +36,6 @@ class Config:
     def __post_init__(self) -> None:
         """Initialize default values after dataclass creation."""
         # Default values are now handled by field(default_factory)
-
         # Create directories if they don't exist
         for path in [self.temp_dir, self.logs_dir]:
             Path(path).mkdir(parents=True, exist_ok=True)

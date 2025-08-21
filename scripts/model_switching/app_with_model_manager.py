@@ -44,10 +44,11 @@ def main() -> None:
     except Exception as e:
         st.error(f"Failed to initialize PlantGuard: {e}")
         st.stop()
+    # Sidebar - Model Selection rendered into left column for static sidebar
+    left_col, main_col = st.columns([1, 4])
 
-    # Sidebar - Model Selection
-    with st.sidebar:
-        st.header("🤖 Model Selection")
+    with left_col:
+        st.header("\ud83e\udd16 Model Selection")
 
         # Get available models
         models = manager.list_available_models()
@@ -88,14 +89,14 @@ def main() -> None:
         if is_error or is_different:
             with st.spinner(f"Loading {selected_model_id}..."):
                 if manager.switch_model(selected_model_id):
-                    st.success(f"✅ Loaded: {selected_model_id}")
+                    st.success(f"\u2705 Loaded: {selected_model_id}")
                     st.rerun()
                 else:
-                    st.error(f"❌ Failed to load: {selected_model_id}")
+                    st.error(f"\u274c Failed to load: {selected_model_id}")
 
         # Current model info
         st.markdown("---")
-        st.subheader("📊 Current Model")
+        st.subheader("\ud83d\udcca Current Model")
 
         current_model_info = manager.get_current_model_info()
         if "error" not in current_model_info:
@@ -115,15 +116,20 @@ def main() -> None:
 
         # Quick model comparison
         st.markdown("---")
-        st.subheader("⚡ Quick Actions")
+        st.subheader("\u26a1 Quick Actions")
 
-        if st.button("🔄 Switch to Best Model") and manager.switch_model("vit_best"):
+        if st.button("\ud83d\udd04 Switch to Best Model") and manager.switch_model("vit_best"):
             st.success("Switched to Vision Transformer")
             st.rerun()
 
-        if st.button("🚀 Switch to Fast Model") and manager.switch_model("mobilenet_fast"):
+        if st.button("\ud83d\ude80 Switch to Fast Model") and manager.switch_model("mobilenet_fast"):
             st.success("Switched to MobileNet")
             st.rerun()
+
+    # Proceed with main content in main_col
+    with main_col:
+        # Main content area
+        tab1, tab2, tab3 = st.tabs(["🔍 Detection", "📊 Batch Analysis", "⚙️ Settings"])
 
     # Main content area
     tab1, tab2, tab3 = st.tabs(["🔍 Detection", "📊 Batch Analysis", "⚙️ Settings"])
@@ -142,26 +148,6 @@ def main() -> None:
                 type=["jpg", "jpeg", "png"],
                 help="Upload a clear image of a plant leaf",
             )
-
-            # Sample images
-            st.subheader("🖼️ Or Try Sample Images")
-
-            sample_images = list(Path("data/pictures").glob("*.jpg"))
-            if sample_images:
-                sample_cols = st.columns(3)
-
-                for i, img_path in enumerate(sample_images[:6]):  # Show first 6
-                    with sample_cols[i % 3]:
-                        try:
-                            img = Image.open(img_path)
-                            st.image(img, caption=img_path.name, use_column_width=True)
-
-                            if st.button("Analyze", key=f"sample_{i}"):
-                                # TODO: Add actual analysis logic here
-                                st.info("Analysis functionality to be implemented")
-                        except Exception as e:
-                            st.warning(f"Could not load image {img_path}: {e}")
-                            continue
 
         with col2:
             st.subheader("📋 Results")

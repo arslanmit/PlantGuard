@@ -65,7 +65,12 @@ class ImageValidator:
 
     def _check_image_dimensions(self, img: Image.Image, result: dict[str, Any]) -> bool:
         """Check if image dimensions are within acceptable range."""
-        if img.size[0] < self.MIN_IMAGE_SIZE[0] or img.size[1] < self.MIN_IMAGE_SIZE[1] or img.size[0] > self.MAX_IMAGE_SIZE[0] or img.size[1] > self.MAX_IMAGE_SIZE[1]:
+        if (
+            img.size[0] < self.MIN_IMAGE_SIZE[0]
+            or img.size[1] < self.MIN_IMAGE_SIZE[1]
+            or img.size[0] > self.MAX_IMAGE_SIZE[0]
+            or img.size[1] > self.MAX_IMAGE_SIZE[1]
+        ):
             error_msg = f"Invalid dimensions {img.size}, must be between {self.MIN_IMAGE_SIZE} and {self.MAX_IMAGE_SIZE}"
             result["error_message"] = error_msg
             self._raise_if_strict(error_msg)
@@ -168,7 +173,12 @@ class ImageValidator:
 
                 # Check image dimensions
                 width, height = img.size
-                if width < self.MIN_IMAGE_SIZE[0] or height < self.MIN_IMAGE_SIZE[1] or width > self.MAX_IMAGE_SIZE[0] or height > self.MAX_IMAGE_SIZE[1]:
+                if (
+                    width < self.MIN_IMAGE_SIZE[0]
+                    or height < self.MIN_IMAGE_SIZE[1]
+                    or width > self.MAX_IMAGE_SIZE[0]
+                    or height > self.MAX_IMAGE_SIZE[1]
+                ):
                     error_msg = f"Invalid dimensions {img.size}, must be between {self.MIN_IMAGE_SIZE} and {self.MAX_IMAGE_SIZE}"
                     result["error_message"] = error_msg
                     self._raise_if_strict(error_msg)
@@ -590,7 +600,9 @@ class DataIntegrityChecker:
         else:
             validation_rate_ok = False
 
-        overall_valid = bool(structure_check.get("valid_structure", False)) and validation_rate_ok and bool(consistency_check.get("consistent", False))
+        overall_valid = (
+            bool(structure_check.get("valid_structure", False)) and validation_rate_ok and bool(consistency_check.get("consistent", False))
+        )
 
         result = {
             "overall_valid": overall_valid,

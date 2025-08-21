@@ -31,7 +31,6 @@ def main() -> None:
             ("data/processed/plantvillage", "Processed PlantVillage"),
             ("data/PlantVillage", "Legacy PlantVillage"),
             ("data/raw/plantvillage", "Raw PlantVillage"),
-            ("data/plantvillage_dummy", "Dummy dataset"),
         ]
 
     found_dataset = False
@@ -87,7 +86,7 @@ def main() -> None:
 
     if not found_dataset:
         print("❌ No datasets found to analyze")
-        print("💡 Run 'make download-dataset' or 'make dummy-dataset' first")
+        print("💡 Run 'make dataset-download' first, then 'make dataset-prepare' if needed")
         sys.exit(1)
 
     print("✅ Dataset analysis complete")

@@ -4,7 +4,7 @@
 import sys
 from pathlib import Path
 
-# Add project src to path (repo root / src)
+# Add src to Python path (repo root / src)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 
@@ -34,7 +34,7 @@ logger = setup_logger("plantguard", log_file="logs/app.log")
 
 
 @st.cache_resource
-def get_model_manager():
+- **Best for**: Fast inference, mobile/edge devices
     """Get cached model manager instance."""
     return PlantGuardModelManager()
 
@@ -59,9 +59,11 @@ def main():
         st.error(f"Failed to initialize PlantGuard: {e}")
         st.stop()
 
-    # Sidebar - Model Selection
-    with st.sidebar:
-        st.header("🤖 Model Selection")
+    # Left column - Model Selection (static sidebar)
+    left_col, main_col = st.columns([1, 4])
+
+    with left_col:
+        st.header("\ud83e\udd16 Model Selection")
 
         # Get available models
         models = manager.list_available_models()
@@ -102,14 +104,14 @@ def main():
 
             with st.spinner(f"Loading {selected_model_id}..."):
                 if manager.switch_model(selected_model_id):
-                    st.success(f"✅ Loaded: {selected_model_id}")
-                    st.rerun()
+                    st.success(f"\u2705 Loaded: {selected_model_id}")
+                    st.experimental_rerun()
                 else:
-                    st.error(f"❌ Failed to load: {selected_model_id}")
+                    st.error(f"\u274c Failed to load: {selected_model_id}")
 
         # Current model info
         st.markdown("---")
-        st.subheader("📊 Current Model")
+        st.subheader("\ud83d\udcca Current Model")
 
         current_model_info = manager.get_current_model_info()
         if "error" not in current_model_info:
@@ -129,29 +131,31 @@ def main():
 
         # Quick model comparison
         st.markdown("---")
-        st.subheader("⚡ Quick Actions")
+        st.subheader("\u26a1 Quick Actions")
 
-        if st.button("🔄 Switch to Best Model"):
+        if st.button("\ud83d\udd04 Switch to Best Model"):
             if manager.switch_model("vit_best"):
                 st.success("Switched to Vision Transformer")
-                st.rerun()
+                st.experimental_rerun()
 
-        if st.button("🚀 Switch to Fast Model"):
+        if st.button("\ud83d\ude80 Switch to Fast Model"):
             if manager.switch_model("mobilenet_fast"):
                 st.success("Switched to MobileNet")
-                st.rerun()
+                st.experimental_rerun()
+
+    # Main content area will be rendered into main_col below
 
     # Main content area
-    tab1, tab2, tab3 = st.tabs(["🔍 Detection", "📊 Batch Analysis", "⚙️ Settings"])
+    tab1, tab2, tab3 = st.tabs(["\ud83d\udd0d Detection", "\ud83d\udcca Batch Analysis", "\u2699\ufe0f Settings"])
 
     with tab1:
-        st.header("🔍 Plant Disease Detection")
+        st.header("\ud83d\udd0d Plant Disease Detection")
 
         # Image input methods
         col1, col2 = st.columns([2, 1])
 
         with col1:
-            st.subheader("📸 Upload Image")
+            st.subheader("\ud83d\udcf8 Upload Image")
 
             uploaded_file = st.file_uploader(
                 "Choose a plant image",
@@ -159,26 +163,8 @@ def main():
                 help="Upload a clear image of a plant leaf"
             )
 
-            # Sample images
-            st.subheader("🖼️ Or Try Sample Images")
-
-            sample_images = list(Path("data/pictures").glob("*.jpg"))
-            if sample_images:
-                sample_cols = st.columns(3)
-
-                for i, img_path in enumerate(sample_images[:6]):  # Show first 6
-                    with sample_cols[i % 3]:
-                        try:
-                            img = Image.open(img_path)
-                            st.image(img, caption=img_path.name, use_column_width=True)
-
-                            if st.button(f"Analyze", key=f"sample_{i}"):
-                                uploaded_file = img_path
-                        except Exception:
-                            continue
-
         with col2:
-            st.subheader("📋 Results")
+            st.subheader("\ud83d\udccb Results")
 
             if uploaded_file is not None:
                 try:
@@ -195,31 +181,31 @@ def main():
 
                     # Get prediction
                     if "error" not in current_model_info:
-                        with st.spinner("🔍 Analyzing plant..."):
+                        with st.spinner("\ud83d\udd0d Analyzing plant..."):
                             result = manager.get_readable_prediction(image)
 
                         # Display results with styling
-                        st.markdown("### 🎯 Detection Results")
+                        st.markdown("### \ud83c\udfaf Detection Results")
 
                         # Main results
-                        st.metric("🌿 Plant Type", result['plant_type'])
-                        st.metric("🦠 Disease", result['disease'])
-                        st.metric("📊 Confidence", result['confidence_percentage'])
+                        st.metric("\ud83c\udf3f Plant Type", result['plant_type'])
+                        st.metric("\ud83e\udda0 Disease", result['disease'])
+                        st.metric("\ud83d\udcca Confidence", result['confidence_percentage'])
 
                         # Health status with color coding
                         if result['is_healthy']:
-                            st.success("💚 Plant is Healthy!")
+                            st.success("\ud83d\udc9a Plant is Healthy!")
                         else:
-                            st.warning("⚠️ Disease Detected")
+                            st.warning("\u26a0\ufe0f Disease Detected")
 
                         # Recommendation
-                        st.info(f"💡 {result['recommendation']}")
+                        st.info(f"\ud83d\udca1 {result['recommendation']}")
 
                         # Model info
-                        st.caption(f"🤖 Analyzed by: {result['model_info']['model_name']}")
+                        st.caption(f"\ud83e\udd16 Analyzed by: {result['model_info']['model_name']}")
 
                         # Detailed results in expander
-                        with st.expander("🔧 Technical Details"):
+                        with st.expander("\ud83d\udd27 Technical Details"):
                             st.json({
                                 "raw_prediction": result['raw_prediction'],
                                 "confidence_score": result['confidence'],
@@ -227,16 +213,16 @@ def main():
                             })
 
                     else:
-                        st.error("❌ No model loaded")
+                        st.error("\u274c No model loaded")
 
                 except Exception as e:
                     st.error(f"Error analyzing image: {e}")
 
             else:
-                st.info("👆 Upload an image or select a sample to start detection")
+                st.info("\ud83d\udc46 Upload an image or select a sample to start detection")
 
     with tab2:
-        st.header("📊 Batch Analysis")
+        st.header("\ud83d\udcca Batch Analysis")
         st.markdown("Analyze multiple images at once")
 
         # Multiple file upload
@@ -248,7 +234,7 @@ def main():
         )
 
         if uploaded_files:
-            st.subheader(f"📋 Analyzing {len(uploaded_files)} images")
+            st.subheader(f"\ud83d\udccb Analyzing {len(uploaded_files)} images")
 
             if "error" not in current_model_info:
                 progress_bar = st.progress(0)
@@ -297,13 +283,13 @@ def main():
                         st.metric("Diseased Plants", diseased_count)
 
             else:
-                st.error("❌ No model loaded for batch analysis")
+                st.error("\u274c No model loaded for batch analysis")
 
     with tab3:
-        st.header("⚙️ Settings & Configuration")
+        st.header("\u2699\ufe0f Settings & Configuration")
 
         # Model comparison
-        st.subheader("🏆 Model Comparison")
+        st.subheader("\ud83c\udfc6 Model Comparison")
 
         if models:
             model_data = []
@@ -313,14 +299,14 @@ def main():
                     "Status": status_icon,
                     "Model": model["name"],
                     "Type": model["type"],
-                    "Accuracy": f"{model['accuracy']:.1%}" if model['accuracy'] > 0 else "Unknown",
-                    "Description": model["description"]
+                    "Accuracy": f"{model['accuracy']:.1%}" if model["accuracy"] > 0 else "Unknown",
+                    "Description": model["description"],
                 })
 
             st.dataframe(model_data, use_container_width=True)
 
         # Configuration info
-        st.subheader("📝 Configuration")
+        st.subheader("\ud83d\udcdd Configuration")
         st.info("""
         **Model Configuration File:** `config/models.json`
 
@@ -332,7 +318,7 @@ def main():
         """)
 
         # System info
-        st.subheader("💻 System Information")
+        st.subheader("\ud83d\udcbb System Information")
         if "error" not in current_model_info:
             st.code(f"""
 Device: {current_model_info['device']}
@@ -342,18 +328,16 @@ Configuration: config/models.json
             """)
 
         # Quick benchmark
-        if st.button("🏁 Run Quick Benchmark"):
+        if st.button("\ud83c\udfc1 Run Quick Benchmark"):
             with st.spinner("Benchmarking models..."):
                 # This would run the benchmark from model_switcher.py
-                st.info(
-                    "Benchmark feature - run "
-                    "`python scripts/model_switching/model_switcher.py --benchmark` in terminal"
-                )
+                st.info("Benchmark feature - run `python scripts/model_switching/model_switcher.py --benchmark` in terminal")
 
 
 if __name__ == "__main__":
     logger.info("Starting PlantGuard application with Model Manager")
     main()
+
 '''
 
     # Write the enhanced app under feature scripts folder
@@ -361,14 +345,14 @@ if __name__ == "__main__":
     with output_path.open("w") as f:
         f.write(app_code)
 
-    print(f"✅ Created enhanced PlantGuard app: {output_path}")
+    print(f"\u2705 Created enhanced PlantGuard app: {output_path}")
 
 
 def create_quick_start_guide() -> None:
     """Create a quick start guide for the model switching system."""
-    guide = """# 🌱 PlantGuard Model Switching - Quick Start Guide
+    guide = """# \ud83c\udf31 PlantGuard Model Switching - Quick Start Guide
 
-## 🚀 Easy Model Switching Commands
+## \ud83d\ude80 Easy Model Switching Commands
 
 ### Command Line Interface
 
@@ -382,11 +366,12 @@ python scripts/model_switching/model_switcher.py --switch vit_best
 # Switch to the fast model (MobileNet)
 python scripts/model_switching/model_switcher.py --switch mobilenet_fast
 
-# Test current model on sample images
-python scripts/model_switching/model_switcher.py --quick-test
+# Test current model on a specific image (use your image path)
+# Use the --test flag with a path: python scripts/model_switching/model_switcher.py --test data/raw/<your_image>.jpg
 
 # Test on a specific image
-python scripts/model_switching/model_switcher.py --test data/pictures/apple_scab_sample.jpg
+    # Example: test on a specific image (replace with your image path)
+    # python scripts/model_switching/model_switcher.py --test data/raw/<your_image>.jpg
 
 # Compare all models
 python scripts/model_switching/model_switcher.py --benchmark
@@ -405,7 +390,7 @@ streamlit run scripts/model_switching/model_switcher_ui.py
 streamlit run scripts/model_switching/app_with_model_manager.py
 ```
 
-## 🤖 Available Models
+## \ud83e\udd16 Available Models
 
 ### 1. Vision Transformer (vit_best) - RECOMMENDED
 - **Accuracy**: 100% on your test set
@@ -414,8 +399,7 @@ streamlit run scripts/model_switching/app_with_model_manager.py
 - **Classes**: 44 plant diseases
 
 ### 2. MobileNet (mobilenet_fast)
-- **Accuracy**: 95% on your test set
-- **Best for**: Fast inference, mobile/edge devices
+```
 - **Model**: Diginsa/Plant-Disease-Detection-Project
 - **Classes**: 38 plant diseases
 
@@ -510,8 +494,8 @@ python scripts/model_switching/model_switcher.py --list
 # 2. Switch to best model
 python scripts/model_switching/model_switcher.py --switch vit_best
 
-# 3. Test on samples
-python scripts/model_switching/model_switcher.py --quick-test
+# 3. Test on a specific image (replace with your image path)
+# python scripts/model_switching/model_switcher.py --test data/raw/<your_image>.jpg
 
 # 4. Launch web UI
 streamlit run scripts/model_switching/model_switcher_ui.py
@@ -554,7 +538,7 @@ def main() -> None:
     print("\n🎯 **Quick Commands to Try**:")
     print("   python scripts/model_switching/model_switcher.py --list")
     print("   python scripts/model_switching/model_switcher.py --switch vit_best")
-    print("   python scripts/model_switching/model_switcher.py --quick-test")
+    print("   # For testing, run:\n   # python scripts/model_switching/model_switcher.py --test data/raw/<your_image>.jpg")
     print("   streamlit run scripts/model_switching/model_switcher_ui.py")
     print("   streamlit run scripts/model_switching/app_with_model_manager.py")
 

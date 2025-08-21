@@ -184,13 +184,19 @@ class ResourceManager:
 
         try:
             if platform.system() == "Darwin":  # macOS
-                result = subprocess.run(  # nosec S603 S607
-                    ["sysctl", "-n", "machdep.cpu.brand_string"],
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                )
-                cpu_name = result.stdout.strip()
+                import shutil
+
+                sysctl_path = shutil.which("sysctl")
+                if sysctl_path:
+                    result = subprocess.run(  # nosec S603
+                        [sysctl_path, "-n", "machdep.cpu.brand_string"],
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    )
+                    cpu_name = result.stdout.strip()
+                else:
+                    cpu_name = platform.processor() or "Unknown CPU"
             elif platform.system() == "Linux":
                 with Path("/proc/cpuinfo").open() as f:
                     for line in f:
@@ -293,7 +299,9 @@ class ResourceManager:
         # Ensure power of 2 for better performance
         optimal_batch_size = self._round_to_power_of_2(optimal_batch_size)
 
-        logger.info(f"Calculated optimal batch size: {optimal_batch_size} (Memory per sample: {memory_per_sample_mb:.1f}MB, Usable memory: {usable_memory_mb:.1f}MB)")
+        logger.info(
+            f"Calculated optimal batch size: {optimal_batch_size} (Memory per sample: {memory_per_sample_mb:.1f}MB, Usable memory: {usable_memory_mb:.1f}MB)"
+        )
 
         return optimal_batch_size
 

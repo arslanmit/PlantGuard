@@ -57,7 +57,7 @@ python -m src.utils.system_monitor
    mkdir -p ~/.kaggle
    cp kaggle.json ~/.kaggle/
    chmod 600 ~/.kaggle/kaggle.json
-   
+
    # Verify credentials
    kaggle datasets list --user=$(whoami)
    ```
@@ -67,7 +67,7 @@ python -m src.utils.system_monitor
    # Test Kaggle API connection
    curl -H "Authorization: Bearer $(cat ~/.kaggle/kaggle.json | jq -r .key)" \
         https://www.kaggle.com/api/v1/datasets/list
-   
+
    # Check DNS resolution
    nslookup www.kaggle.com
    ```
@@ -99,7 +99,7 @@ python -m src.utils.system_monitor
    ```bash
    # Check which files are corrupted
    python -m src.data.dataset_validator --verbose
-   
+
    # Re-download specific files
    python -m src.data.dataset_manager --repair-corrupted
    ```
@@ -115,7 +115,7 @@ python -m src.utils.system_monitor
    ```bash
    # Remove corrupted images
    find data/raw/plantvillage/ -name "*.jpg" -exec file {} \; | grep -v "JPEG image data" | cut -d: -f1 | xargs rm -f
-   
+
    # Regenerate dataset info
    python -m src.data.dataset_manager --regenerate-info
    ```
@@ -163,7 +163,7 @@ python -m src.utils.system_monitor
    ```bash
    # Analyze class distribution
    python -m src.data.class_analyzer --dataset=data/processed/plantvillage/
-   
+
    # Apply class balancing
    python -m src.data.dataset_balancer --method=oversample
    ```
@@ -210,7 +210,7 @@ python -m src.utils.system_monitor
    ```bash
    # Real-time GPU memory monitoring
    watch -n 1 nvidia-smi
-   
+
    # Memory profiling during training
    python -m src.training.memory_profiler --config=config/training_config.json
    ```
@@ -219,7 +219,7 @@ python -m src.utils.system_monitor
    ```bash
    # Use CPU training as fallback
    python -m src.training.production_trainer --device=cpu --batch-size=8
-   
+
    # Use model parallelism for large models
    python -m src.training.production_trainer --model-parallel
    ```
@@ -243,7 +243,7 @@ python -m src.utils.system_monitor
    ```bash
    # Find optimal learning rate
    python -m src.training.lr_finder --config=config/training_config.json
-   
+
    # Use learning rate scheduler
    ```
    ```json
@@ -274,7 +274,7 @@ python -m src.utils.system_monitor
    ```bash
    # Validate model architecture
    python -m src.training.model_validator --architecture=resnet50 --num-classes=38
-   
+
    # Try different architectures
    python -m src.training.architecture_search --dataset=plantvillage
    ```
@@ -309,7 +309,7 @@ python -m src.utils.system_monitor
    ```bash
    # Identify bottlenecks
    python -m src.training.profiler --mode=performance
-   
+
    # Data loading profiling
    python -m src.data.dataloader_profiler
    ```
@@ -346,7 +346,7 @@ python -m src.utils.system_monitor
    ```bash
    # Check checkpoint file
    python -c "import torch; print(torch.load('path/to/checkpoint.pt', map_location='cpu').keys())"
-   
+
    # Repair corrupted checkpoint
    python -m src.training.checkpoint_repair --checkpoint=path/to/checkpoint.pt
    ```
@@ -355,7 +355,7 @@ python -m src.utils.system_monitor
    ```bash
    # Check model compatibility
    python -m src.training.model_compatibility --checkpoint=path/to/checkpoint.pt --config=config/training_config.json
-   
+
    # Force architecture update
    python -m src.training.checkpoint_migrator --checkpoint=path/to/checkpoint.pt --target-arch=resnet50
    ```
@@ -364,7 +364,7 @@ python -m src.utils.system_monitor
    ```bash
    # Extract model weights only
    python -m src.training.weight_extractor --checkpoint=path/to/checkpoint.pt --output=weights_only.pt
-   
+
    # Start fresh training with pretrained weights
    python -m src.training.production_trainer --pretrained-weights=weights_only.pt
    ```
@@ -389,7 +389,7 @@ python -m src.utils.system_monitor
    ```bash
    # List available models
    make list-models
-   
+
    # Check model file integrity
    python -m src.training.model_registry validate --model=plantguard_v1.0.0
    ```
@@ -398,7 +398,7 @@ python -m src.utils.system_monitor
    ```bash
    # Update model registry
    python -m src.training.model_registry update-paths
-   
+
    # Regenerate model index
    python -m src.training.model_registry reindex
    ```
@@ -407,7 +407,7 @@ python -m src.utils.system_monitor
    ```bash
    # Migrate old model format
    python -m src.training.model_migrator --source=data/models/old_format/ --target=data/models/
-   
+
    # Update VisionAdapter configuration
    python -m src.core.vision_adapter update-config
    ```
@@ -431,7 +431,7 @@ python -m src.utils.system_monitor
    ```bash
    # Analyze dataset quality
    python -m src.data.quality_analyzer --dataset=data/processed/plantvillage/
-   
+
    # Remove low-quality images
    python -m src.data.quality_filter --threshold=0.8
    ```
@@ -440,7 +440,7 @@ python -m src.utils.system_monitor
    ```bash
    # Automated hyperparameter tuning
    python -m src.training.hyperopt --trials=50 --metric=val_accuracy
-   
+
    # Manual parameter sweep
    python -m src.training.param_sweep --param=learning_rate --values="0.001,0.0001,0.00001"
    ```
@@ -449,10 +449,10 @@ python -m src.utils.system_monitor
    ```bash
    # Detailed model evaluation
    make evaluate-model MODEL=plantguard_v1.0.0
-   
+
    # Confusion matrix analysis
    python -m src.training.confusion_analyzer --model=plantguard_v1.0.0
-   
+
    # Prediction confidence analysis
    python -m src.training.confidence_analyzer --model=plantguard_v1.0.0
    ```
@@ -477,10 +477,10 @@ python -m src.utils.system_monitor
    ```bash
    # Check GPU status
    nvidia-smi
-   
+
    # Check CUDA installation
    nvcc --version
-   
+
    # Test PyTorch CUDA support
    python -c "import torch; print(torch.cuda.is_available()); print(torch.cuda.device_count())"
    ```
@@ -490,7 +490,7 @@ python -m src.utils.system_monitor
    # Install CUDA-enabled PyTorch
    pip uninstall torch torchvision
    pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
-   
+
    # Verify installation
    python -c "import torch; print(torch.version.cuda)"
    ```
@@ -499,7 +499,7 @@ python -m src.utils.system_monitor
    ```bash
    # Check MPS availability
    python -c "import torch; print(torch.backends.mps.is_available())"
-   
+
    # Configure for MPS
    export PYTORCH_ENABLE_MPS_FALLBACK=1
    ```
@@ -522,10 +522,10 @@ python -m src.utils.system_monitor
    ```bash
    # Check available space
    df -h
-   
+
    # Find large files
    du -sh data/* logs/* runs/*
-   
+
    # Identify space usage by component
    python -m src.utils.disk_analyzer
    ```
@@ -534,10 +534,10 @@ python -m src.utils.system_monitor
    ```bash
    # Clean old checkpoints
    python -m src.training.checkpoint_cleaner --keep=5
-   
+
    # Clean old logs
    find logs/ -name "*.log" -mtime +30 -delete
-   
+
    # Clean TensorBoard runs
    python -m src.training.tensorboard_cleaner --keep-days=30
    ```
@@ -573,7 +573,7 @@ python -m src.utils.system_monitor
    # Fix data directory permissions
    chmod -R 755 data/
    chmod -R 644 data/**/*.json data/**/*.pt
-   
+
    # Fix log directory permissions
    chmod -R 755 logs/
    chmod -R 644 logs/*.log
@@ -583,7 +583,7 @@ python -m src.utils.system_monitor
    ```bash
    # Check file ownership
    ls -la data/ logs/
-   
+
    # Fix ownership if needed
    sudo chown -R $(whoami):$(whoami) data/ logs/
    ```
@@ -608,7 +608,7 @@ python -m src.utils.system_monitor
    ```bash
    # Test VisionAdapter with new model
    python -c "from src.core.vision import VisionAdapter; adapter = VisionAdapter(); adapter.load_model('plantguard_v1.0.0')"
-   
+
    # Test prediction pipeline
    python -m src.core.vision_adapter test --model=plantguard_v1.0.0 --image=test_image.jpg
    ```
@@ -617,7 +617,7 @@ python -m src.utils.system_monitor
    ```bash
    # Regenerate class mappings
    python -m src.training.class_mapper --model=plantguard_v1.0.0
-   
+
    # Validate class consistency
    python -m src.training.class_validator --model=plantguard_v1.0.0
    ```
@@ -626,7 +626,7 @@ python -m src.utils.system_monitor
    ```bash
    # Sync model configurations
    python -m src.training.config_sync --model=plantguard_v1.0.0
-   
+
    # Update UI model list
    python -m src.ui.model_updater
    ```
@@ -649,7 +649,7 @@ python -m src.utils.system_monitor
    ```bash
    # Clear Streamlit cache
    streamlit cache clear
-   
+
    # Restart Streamlit server
    pkill -f streamlit
    streamlit run app.py
@@ -659,11 +659,11 @@ python -m src.utils.system_monitor
    ```python
    # In Streamlit app, add memory management
    import gc
-   
+
    @st.cache_resource
    def load_models():
        return VisionAdapter()
-   
+
    # Clear memory after predictions
    if st.button("Clear Memory"):
        gc.collect()
@@ -699,7 +699,7 @@ python -m src.utils.system_monitor
    ```bash
    # Optimize model for inference
    python -m src.training.model_optimizer --model=plantguard_v1.0.0 --target=inference
-   
+
    # Convert to TorchScript
    python -m src.training.torchscript_converter --model=plantguard_v1.0.0
    ```
@@ -708,11 +708,11 @@ python -m src.utils.system_monitor
    ```python
    # Optimize image preprocessing
    from torchvision import transforms
-   
+
    transform = transforms.Compose([
        transforms.Resize((224, 224)),
        transforms.ToTensor(),
-       transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+       transforms.Normalize(mean=[0.485, 0.456, 0.406],
                           std=[0.229, 0.224, 0.225])
    ])
    ```
@@ -721,7 +721,7 @@ python -m src.utils.system_monitor
    ```bash
    # Ensure GPU inference
    python -c "from src.core.vision import VisionAdapter; adapter = VisionAdapter(); print(adapter.device)"
-   
+
    # Enable mixed precision inference
    python -m src.core.vision_adapter --enable-amp
    ```
@@ -756,7 +756,7 @@ python -m src.utils.system_monitor
    # Create log directories
    mkdir -p logs runs
    chmod 755 logs runs
-   
+
    # Test logging
    python -c "import logging; logging.basicConfig(filename='logs/test.log', level=logging.INFO); logging.info('Test message')"
    ```
@@ -765,10 +765,10 @@ python -m src.utils.system_monitor
    ```bash
    # Check TensorBoard logs
    ls -la runs/
-   
+
    # Launch TensorBoard with specific logdir
    tensorboard --logdir=runs --host=0.0.0.0 --port=6006
-   
+
    # Clear corrupted TensorBoard data
    rm -rf runs/corrupted_experiment/
    ```

@@ -18,6 +18,7 @@ from tqdm import tqdm
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 from core.models import PlantDiseaseResNet50
+from training.memory_limit import enforce_memory_limit
 from training.monitor import TrainingMonitor
 
 logger = logging.getLogger(__name__)
@@ -135,7 +136,9 @@ class ImprovedPlantVillageTrainer:
 
         return avg_loss, train_acc
 
-    def validate(self) -> tuple[float, float, list[int], list[int], torch.Tensor | None, torch.Tensor | None, torch.Tensor | None]:
+    def validate(
+        self,
+    ) -> tuple[float, float, list[int], list[int], torch.Tensor | None, torch.Tensor | None, torch.Tensor | None]:
         """Validate the model with improved metrics and collect predictions.
 
         Returns:
@@ -413,6 +416,12 @@ def main() -> None:
     parser.add_argument("--log_dir", type=str, default="runs", help="Directory to store training runs and reports")
     parser.add_argument("--tensorboard_port", type=int, default=6006, help="Port for TensorBoard server")
     parser.add_argument("--launch_tensorboard", action="store_true", help="Auto-launch TensorBoard during training")
+    parser.add_argument(
+        "--memory_limit",
+        type=str,
+        default=None,
+        help="Optional memory limit for the training process (e.g. 4GB or 4294967296)",
+    )
     # Control use of ImageNet pretrained weights
     parser.add_argument("--pretrained", dest="pretrained", action="store_true", help="Use ImageNet pretrained weights")
     parser.add_argument("--no-pretrained", dest="pretrained", action="store_false", help="Do not use pretrained weights")
@@ -425,6 +434,28 @@ def main() -> None:
         level=logging.INFO,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
+
+    # Parse and enforce memory limit if provided (CLI takes precedence over env var)
+    def _parse_size(val: str) -> int:
+        if val is None:
+            return 0
+        v = str(val).strip().upper()
+        try:
+            if v.endswith("GB"):
+                return int(float(v[:-2]) * 1024**3)
+            if v.endswith("MB"):
+                return int(float(v[:-2]) * 1024**2)
+            return int(v)
+        except Exception:
+            logger.warning("Unable to parse memory limit value: %s", val)
+            return 0
+
+    cli_limit = _parse_size(args.memory_limit)
+    if cli_limit > 0:
+        enforce_memory_limit(cli_limit)
+    else:
+        # enforce_memory_limit will also read PLANTGUARD_TRAIN_MEMORY_LIMIT_BYTES if set
+        enforce_memory_limit(None)
 
     # Setup device
     if args.device == "auto":
@@ -511,10 +542,11 @@ def main() -> None:
         logger.exception("Training failed")
         raise
     finally:
-        try:
+        # Suppress any errors during monitor cleanup; monitor close should be best-effort
+        import contextlib
+
+        with contextlib.suppress(Exception):
             monitor.close()
-        except Exception:
-            pass
 
 
 if __name__ == "__main__":

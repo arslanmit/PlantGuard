@@ -11,14 +11,12 @@ import queue
 import threading
 import time
 from collections.abc import Iterator
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset, Sampler
 from torchvision import transforms

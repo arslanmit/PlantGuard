@@ -24,7 +24,8 @@ def _load_model() -> VisionAdapter | None:
     try:
         vision_adapter.load_checkpoint(model_path)
         logger.info("✅ Model loaded successfully")
-        logger.info("📊 Model has %s classes", len(vision_adapter.class_names))
+        # Use explicit formatting to avoid logging-format interpretation issues
+        logger.info(f"📊 Model has {len(vision_adapter.class_names)} classes")
         logger.info("")
         return vision_adapter
     except Exception as e:
@@ -71,10 +72,14 @@ def _print_results(
     """Print test results summary."""
     logger.info("📊 RESULTS SUMMARY")
     logger.info("=" * 50)
-    logger.info("Total images tested: %s", total)
-    logger.info("Exact matches: %s/%s (%.1%%)", correct_exact, total, correct_exact / total * 100)
-    logger.info("Plant type correct: %s/%s (%.1%%)", correct_plant, total, correct_plant / total * 100)
-    logger.info("Health status correct: %s/%s (%.1%%)", correct_status, total, correct_status / total * 100)
+    logger.info(f"Total images tested: {total}")
+    # Use f-strings with explicit float formatting and percent sign
+    pct_exact = (correct_exact / total * 100) if total else 0.0
+    pct_plant = (correct_plant / total * 100) if total else 0.0
+    pct_status = (correct_status / total * 100) if total else 0.0
+    logger.info(f"Exact matches: {correct_exact}/{total} ({pct_exact:.1f}%)")
+    logger.info(f"Plant type correct: {correct_plant}/{total} ({pct_plant:.1f}%)")
+    logger.info(f"Health status correct: {correct_status}/{total} ({pct_status:.1f}%)")
     logger.info("")
 
     # Show available classes
@@ -94,9 +99,18 @@ def main() -> None:
     if vision_adapter is None:
         return
 
-    # Load test metadata
-    with Path("data/pictures/sample_images_metadata.json").open() as f:
-        metadata = json.load(f)
+    # Load test metadata (guarded). Exit if metadata not present.
+    metadata = {"sample_images": []}
+    metadata_path = Path("data/raw/sample_images_metadata.json")
+    if not metadata_path.exists():
+        logger.warning("sample_images_metadata.json not found; skipping sample image tests.")
+        return
+    try:
+        with metadata_path.open(encoding="utf-8") as f:
+            metadata = json.load(f)
+    except Exception:
+        logger.warning("Failed to read sample_images_metadata.json; skipping sample image tests.")
+        return
 
     # Test each image
     correct_exact = 0
@@ -107,8 +121,9 @@ def main() -> None:
     logger.info("🔍 Testing images:")
     logger.info("-" * 80)
 
-    for sample in metadata["sample_images"]:
-        image_path = Path("data/pictures") / sample["filename"]
+    for sample in metadata.get("sample_images", []):
+        # Prefer canonical data/raw location for images
+        image_path = Path("data/raw") / sample.get("filename", "")
 
         if not image_path.exists():
             continue

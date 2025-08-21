@@ -4,18 +4,14 @@ This module provides detailed training reports, model analysis tools, and traini
 curve visualization for production training workflows.
 """
 
-import json
 import logging
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
-import seaborn as sns
-import torch
 from torch import nn
 
 logger = logging.getLogger(__name__)

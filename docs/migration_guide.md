@@ -116,7 +116,7 @@ make health-check
    ```bash
    # Convert legacy models to registry format
    python -m src.training.model_migrator --legacy-format
-   
+
    # Update class mappings
    python -m src.training.class_mapper --update-all
    ```
@@ -135,7 +135,7 @@ make health-check
    python -m src.data.dataset_migrator \
        --source=data/plantvillage \
        --target=data/processed/plantvillage
-   
+
    # Validate migrated dataset
    make validate-dataset
    ```
@@ -144,7 +144,7 @@ make health-check
    ```bash
    # Update model switcher configuration
    python -m src.ui.model_switcher update-config
-   
+
    # Test UI functionality
    make run --validate
    ```
@@ -164,7 +164,7 @@ make health-check
    ```bash
    # Create new model configuration
    python -m src.core.model_manager create-config
-   
+
    # Register existing models
    python -m src.core.model_manager register-legacy-models
    ```
@@ -173,7 +173,7 @@ make health-check
    ```bash
    # Launch model switcher
    make switcher
-   
+
    # Test model switching functionality
    python -m src.core.model_manager test-switching
    ```

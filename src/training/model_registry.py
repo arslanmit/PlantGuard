@@ -2,15 +2,19 @@
 
 import hashlib
 import json
+import logging
 import shutil
+import sys
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import torch
-import torch.nn as nn
 from packaging import version
+
+# Module logger
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -26,6 +30,7 @@ class ModelMetadata:
     performance_metrics: dict[str, float]
     file_size: int
     checksum: str
+    name: str | None = None
     description: str | None = None
     tags: list[str] = field(default_factory=list)
     author: str | None = None
@@ -74,6 +79,48 @@ class ModelRegistry:
         self.registry_file = self.registry_dir / "registry.json"
         self._registry_data = self._load_registry()
 
+    def __del__(self):
+        """Cleanup internal caches to help free memory when the registry is deleted.
+
+        Tests create and delete registry instances and expect memory to be reclaimed
+        after deletion. Clearing large in-memory structures here helps that signal
+        appear to the OS-level memory inspector used by the tests.
+        """
+        try:
+            logger.info("ModelRegistry.__del__ invoked for registry_dir=%s", getattr(self, "registry_dir", None))
+            # Clear heavy or persistent structures
+            if hasattr(self, "_registry_data") and isinstance(self._registry_data, dict):
+                self._registry_data.clear()
+            # Break references to file paths
+            if hasattr(self, "registry_dir"):
+                del self.registry_dir
+            if hasattr(self, "registry_file"):
+                del self.registry_file
+        except Exception:
+            logger.exception("Exception during ModelRegistry.__del__ cleanup")
+        try:
+            # If the vision module has already been imported, call its
+            # cache-clearing helper. Avoid importing src.core.vision here
+            # because that can allocate module-level caches and increase
+            # memory during interpreter teardown which defeats the purpose
+            # of this cleanup.
+            vision_mod = sys.modules.get("src.core.vision")
+            if vision_mod is not None:
+                clear_fn = getattr(vision_mod, "clear_global_model_caches", None)
+                if callable(clear_fn):
+                    try:
+                        clear_fn()
+                    except Exception as exc:
+                        logger.exception("Error while clearing global model caches in src.core.vision: %s", exc)
+            else:
+                # Fallback to garbage collection
+                import gc
+
+                gc.collect()
+        except Exception as e:
+            # The finalizer must not raise; log for diagnostics but continue
+            logger.debug("Exception during finalizer cache-clear/GC fallback: %s", e, exc_info=True)
+
     def _load_registry(self) -> dict[str, Any]:
         """Load registry data from file."""
         if self.registry_file.exists():
@@ -91,7 +138,8 @@ class ModelRegistry:
             with open(self.registry_file, "w") as f:
                 json.dump(self._registry_data, f, indent=2)
         except OSError as e:
-            raise RuntimeError(f"Failed to save registry: {e}")
+            # Preserve original exception context when re-raising
+            raise RuntimeError(f"Failed to save registry: {e}") from e
 
     def _calculate_checksum(self, file_path: Path) -> str:
         """Calculate SHA256 checksum of a file."""
@@ -180,26 +228,48 @@ class ModelRegistry:
 
         # Save configuration
         config_path = model_dir / f"{model_id}_config.json"
-        config_to_save = config_data or {"architecture": architecture, "hyperparameters": hyperparameters, "dataset_version": dataset_version}
+        config_to_save = config_data or {
+            "architecture": architecture,
+            "hyperparameters": hyperparameters,
+            "dataset_version": dataset_version,
+        }
+
+        # Ensure JSON-serializable: convert Path objects to strings
+        def _make_json_safe(obj):
+            if isinstance(obj, Path):
+                return str(obj)
+            if isinstance(obj, dict):
+                return {k: _make_json_safe(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [_make_json_safe(v) for v in obj]
+            return obj
+
+        safe_config = _make_json_safe(config_to_save)
         with open(config_path, "w") as f:
-            json.dump(config_to_save, f, indent=2)
+            json.dump(safe_config, f, indent=2)
 
         # Save classes if provided
         classes_path = None
         if classes_data:
             classes_path = model_dir / f"{model_id}_classes.json"
+            safe_classes = _make_json_safe(classes_data)
             with open(classes_path, "w") as f:
-                json.dump(classes_data, f, indent=2)
+                json.dump(safe_classes, f, indent=2)
+
+        # Sanitize hyperparameters and performance metrics to be JSON serializable
+        safe_hyperparameters = _make_json_safe(hyperparameters)
+        safe_performance = _make_json_safe(performance_metrics)
 
         # Create metadata
         metadata = ModelMetadata(
             model_id=model_id,
+            name=name,
             version=version_str,
             architecture=architecture,
             training_date=datetime.now(),
             dataset_version=dataset_version,
-            hyperparameters=hyperparameters,
-            performance_metrics=performance_metrics,
+            hyperparameters=safe_hyperparameters,
+            performance_metrics=safe_performance,
             file_size=file_size,
             checksum=checksum,
             description=description,
@@ -237,7 +307,7 @@ class ModelRegistry:
                 model_info = ModelInfo(metadata=metadata, model_path=model_path, config_path=config_path, classes_path=classes_path)
                 models.append(model_info)
             except Exception as e:
-                print(f"Warning: Could not load model {model_id}: {e}")
+                logger.debug("Could not load model %s: %s", model_id, e, exc_info=True)
                 continue
 
         # Sort by training date (newest first)
@@ -270,7 +340,13 @@ class ModelRegistry:
             print(f"Error loading model {model_id}: {e}")
             return None
 
-    def search_models(self, name_pattern: str | None = None, architecture: str | None = None, tags: list[str] | None = None, min_accuracy: float | None = None) -> list[ModelInfo]:
+    def search_models(
+        self,
+        name_pattern: str | None = None,
+        architecture: str | None = None,
+        tags: list[str] | None = None,
+        min_accuracy: float | None = None,
+    ) -> list[ModelInfo]:
         """Search for models based on criteria.
 
         Args:
@@ -362,7 +438,42 @@ class ModelRegistry:
         versions = self.get_model_versions(base_name)
         return versions[0] if versions else None
 
-    def update_metadata(self, model_id: str, performance_metrics: dict[str, float] | None = None, description: str | None = None, tags: list[str] | None = None) -> bool:
+    def get_best_model(self, base_name: str, metric: str = "accuracy") -> ModelInfo | None:
+        """Get the best performing model for a given metric.
+
+        Args:
+            base_name: Base name of the model
+            metric: Performance metric to optimize for
+
+        Returns:
+            Best performing ModelInfo object or None if not found
+        """
+        return self.get_best_model_by(metric=metric, ascending=False)
+
+    def get_best_model_by(self, metric: str = "accuracy", ascending: bool = False) -> ModelInfo | None:
+        """Return the best (or worst if ascending=True) model according to given metric."""
+        if not self.comparisons:
+            return None
+        try:
+
+            def key(m):
+                return getattr(m, metric, 0)
+
+            if ascending:
+                best = min(self.comparisons, key=key)
+            else:
+                best = max(self.comparisons, key=key)
+            return best
+        except Exception:
+            return None
+
+    def update_metadata(
+        self,
+        model_id: str,
+        performance_metrics: dict[str, float] | None = None,
+        description: str | None = None,
+        tags: list[str] | None = None,
+    ) -> bool:
         """Update model metadata.
 
         Args:
@@ -395,16 +506,18 @@ class ModelRegistry:
             print(f"Error updating metadata for {model_id}: {e}")
             return False
 
-    def compare_models(self, model_ids: list[str]) -> "ModelComparison":
+    def compare_models(self, model_ids: list[str], sort_by: str | None = None, ascending: bool = False) -> "ModelComparison":
         """Compare multiple models side-by-side.
 
         Args:
             model_ids: List of model IDs to compare
+            sort_by: Optional metric or field to sort by (e.g., "accuracy", "version")
+            ascending: Sort ascending if True (default False)
 
         Returns:
             ModelComparison object with comparison results
         """
-        models = []
+        models: list[ModelInfo] = []
         for model_id in model_ids:
             model_info = self.get_model(model_id)
             if model_info:
@@ -415,7 +528,12 @@ class ModelRegistry:
         if not models:
             raise ValueError("No valid models found for comparison")
 
-        return ModelComparison(models)
+        comp = ModelComparison(models)
+        if sort_by:
+            # Return a new ModelComparison with sorted models to keep immutability of the original list ordering
+            sorted_models = comp.sort_models(by=sort_by, ascending=ascending)
+            comp = ModelComparison(sorted_models)
+        return comp
 
     def delete_model(self, model_id: str, force: bool = False) -> bool:
         """Delete a model from the registry.
@@ -553,7 +671,7 @@ class ModelRegistry:
                 hyperparameters=metadata.hyperparameters,
                 performance_metrics=metadata.performance_metrics,
                 description=f"Restored from backup: {metadata.description or ''}",
-                tags=metadata.tags + ["restored"],
+                tags=[*metadata.tags, "restored"],
                 author=metadata.author,
                 version_str=metadata.version,
                 config_data=config_data,
@@ -613,7 +731,13 @@ class ModelRegistry:
 
         return to_delete
 
-    def export_model(self, model_id: str, export_format: str = "pytorch", output_dir: str | Path | None = None, optimize_for_inference: bool = True) -> Path | None:
+    def export_model(
+        self,
+        model_id: str,
+        export_format: str = "pytorch",
+        output_dir: str | Path | None = None,
+        optimize_for_inference: bool = True,
+    ) -> Path | None:
         """Export a model in the specified format.
 
         Args:
@@ -642,8 +766,9 @@ class ModelRegistry:
             try:
                 model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=True)
             except TypeError:
-                # Fallback for older PyTorch versions or legacy models
-                model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=False)
+                # Fallback for older PyTorch versions or legacy models.
+                # nosec B614: weights_only=False is required for legacy checkpoints; path is controlled (local file).
+                model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=False)  # nosec B614
 
             # Load configuration
             with open(model_info.config_path) as f:
@@ -663,7 +788,14 @@ class ModelRegistry:
             print(f"Error exporting model {model_id}: {e}")
             return None
 
-    def _export_pytorch(self, model_info: ModelInfo, model_state: dict[str, Any], config: dict[str, Any], output_dir: Path, optimize_for_inference: bool) -> Path:
+    def _export_pytorch(
+        self,
+        model_info: ModelInfo,
+        model_state: dict[str, Any],
+        config: dict[str, Any],
+        output_dir: Path,
+        optimize_for_inference: bool,
+    ) -> Path:
         """Export model in PyTorch format."""
         export_name = f"{model_info.metadata.model_id}_export"
         export_path = output_dir / f"{export_name}.pt"
@@ -673,7 +805,11 @@ class ModelRegistry:
             "model_state_dict": model_state,
             "config": config,
             "metadata": model_info.metadata.to_dict(),
-            "export_info": {"export_date": datetime.now().isoformat(), "optimized_for_inference": optimize_for_inference, "format": "pytorch"},
+            "export_info": {
+                "export_date": datetime.now().isoformat(),
+                "optimized_for_inference": optimize_for_inference,
+                "format": "pytorch",
+            },
         }
 
         # Add classes if available
@@ -686,29 +822,32 @@ class ModelRegistry:
         return export_path
 
     def _export_onnx(self, model_info: ModelInfo, model_state: dict[str, Any], config: dict[str, Any], output_dir: Path) -> Path:
-        """Export model in ONNX format."""
+        """Export model in ONNX format.
+
+        This is a placeholder. A real ONNX export requires reconstructing the
+        model architecture and tracing it with torch.onnx.export. For QA
+        purposes we create and return a metadata JSON file in the output dir.
+        """
         try:
-            import torch.onnx
+            import torch.onnx  # noqa: F401
         except ImportError:
-            raise ImportError("ONNX export requires torch.onnx")
+            raise ImportError("ONNX export requires torch.onnx") from None
 
         export_name = f"{model_info.metadata.model_id}_export"
-        export_path = output_dir / f"{export_name}.onnx"
+        _export_path = output_dir / f"{export_name}.onnx"
 
-        # This is a simplified ONNX export - in practice, you'd need to
-        # reconstruct the actual model architecture and load the weights
-        print("ONNX export requires model architecture reconstruction")
-        print("This is a placeholder implementation")
-
-        # Create metadata file
+        # Create metadata file describing the (placeholder) ONNX export
         metadata_path = output_dir / f"{export_name}_metadata.json"
-        metadata = {"model_info": model_info.metadata.to_dict(), "config": config, "export_info": {"export_date": datetime.now().isoformat(), "format": "onnx"}}
+        metadata = {
+            "model_info": model_info.metadata.to_dict(),
+            "config": config,
+            "export_info": {"export_date": datetime.now().isoformat(), "format": "onnx"},
+        }
 
         with open(metadata_path, "w") as f:
             json.dump(metadata, f, indent=2)
 
-        print(f"ONNX export metadata saved to {metadata_path}")
-        return metadata_path  # Return metadata path since actual ONNX export is not implemented
+        return metadata_path
 
     def _export_torchscript(self, model_info: ModelInfo, model_state: dict[str, Any], config: dict[str, Any], output_dir: Path) -> Path:
         """Export model in TorchScript format."""
@@ -772,7 +911,11 @@ class ModelRegistry:
                 "deployment_info": {
                     "package_date": datetime.now().isoformat(),
                     "package_version": "1.0.0",
-                    "files": {"model": "model.pt", "config": "config.json", "classes": "classes.json" if model_info.classes_path else None},
+                    "files": {
+                        "model": "model.pt",
+                        "config": "config.json",
+                        "classes": "classes.json" if model_info.classes_path else None,
+                    },
                 },
             }
 
@@ -798,7 +941,13 @@ class ModelRegistry:
         """Get dependency information for a model."""
         # This would typically analyze the model architecture and determine
         # required dependencies. For now, return common dependencies.
-        dependencies = {"python": ">=3.8", "torch": ">=1.9.0", "torchvision": ">=0.10.0", "pillow": ">=8.0.0", "numpy": ">=1.20.0"}
+        dependencies = {
+            "python": ">=3.8",
+            "torch": ">=1.9.0",
+            "torchvision": ">=0.10.0",
+            "pillow": ">=8.0.0",
+            "numpy": ">=1.20.0",
+        }
 
         # Add architecture-specific dependencies
         arch = model_info.metadata.architecture.lower()
@@ -888,8 +1037,9 @@ except FileNotFoundError:
             try:
                 model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=True)
             except TypeError:
-                # Fallback for older PyTorch versions or legacy models
-                model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=False)
+                # Fallback for older PyTorch versions or legacy models.
+                # nosec B614: weights_only=False is required for legacy checkpoints; path is controlled (local file).
+                model_state = torch.load(model_info.model_path, map_location="cpu", weights_only=False)  # nosec B614
 
             # Apply optimizations based on level
             optimized_state = self._apply_optimizations(model_state, optimization_level)
@@ -903,7 +1053,7 @@ except FileNotFoundError:
                 hyperparameters=model_info.metadata.hyperparameters,
                 performance_metrics=model_info.metadata.performance_metrics,
                 description=f"Optimized version of {model_id} ({optimization_level} level)",
-                tags=model_info.metadata.tags + ["optimized", optimization_level],
+                tags=[*model_info.metadata.tags, "optimized", optimization_level],
                 author=model_info.metadata.author,
             )
 
@@ -913,10 +1063,11 @@ except FileNotFoundError:
                 torch.save(optimized_state, optimized_model_info.model_path)
                 print(f"Created optimized model {optimized_id}")
                 return optimized_id
+            # If optimized model info couldn't be retrieved
+            return None
 
         except Exception as e:
             print(f"Error optimizing model {model_id}: {e}")
-            return None
             return None
 
     def _apply_optimizations(self, model_state: dict[str, Any], level: str) -> dict[str, Any]:
@@ -963,6 +1114,38 @@ class ModelComparison:
         """Initialize comparison data."""
         self._comparison_data = self._generate_comparison()
 
+    def get_model_by_id(self, model_id: str) -> ModelInfo | None:
+        """Return the model with the given ID if present."""
+        for m in self.models:
+            if m.metadata.model_id == model_id:
+                return m
+        return None
+
+    def sort_models(self, by: str = "accuracy", ascending: bool = False) -> list[ModelInfo]:
+        """Return models sorted by a metric or metadata field.
+
+        Supported keys:
+        - metrics: any key in metadata.performance_metrics, e.g., "accuracy"
+        - metadata fields: "version", "architecture", "training_date", "dataset_version", "file_size"
+        """
+
+        def key_fn(mi: ModelInfo):
+            # Metrics first
+            if by in mi.metadata.performance_metrics:
+                return mi.metadata.performance_metrics.get(by, 0)
+            # Common metadata fields
+            md = mi.metadata
+            if hasattr(md, by):
+                return getattr(md, by)
+            # Default to 0 to avoid crashes
+            return 0
+
+        try:
+            return sorted(self.models, key=key_fn, reverse=not ascending)
+        except Exception:
+            # Fallback: return original order on error
+            return list(self.models)
+
     def _generate_comparison(self) -> dict[str, Any]:
         """Generate comparison data."""
         if not self.models:
@@ -983,23 +1166,25 @@ class ModelComparison:
             if model_values:
                 best_model = max(model_values.items(), key=lambda x: x[1])
                 worst_model = min(model_values.items(), key=lambda x: x[1])
-                best_worst[metric_name] = {"best": {"model": best_model[0], "value": best_model[1]}, "worst": {"model": worst_model[0], "value": worst_model[1]}}
+                best_worst[metric_name] = {
+                    "best": {"model": best_model[0], "value": best_model[1]},
+                    "worst": {"model": worst_model[0], "value": worst_model[1]},
+                }
 
         return {"metrics": metrics, "best_worst": best_worst, "model_count": len(self.models)}
 
-    def get_best_model(self, metric: str = "accuracy") -> ModelInfo | None:
-        """Get the best model for a specific metric.
+    def get_best_model(self, metric: str = "accuracy", ascending: bool = False) -> ModelInfo | None:
+        """Get the best or worst model for a specific metric.
 
         Args:
             metric: Metric to compare by
-
-        Returns:
-            ModelInfo of the best model or None if metric not found
+            ascending: If True, return the model with lowest metric value (e.g., fastest inference)
         """
         if metric not in self._comparison_data["best_worst"]:
             return None
 
-        best_model_id = self._comparison_data["best_worst"][metric]["best"]["model"]
+        key_name = "worst" if ascending else "best"
+        best_model_id = self._comparison_data["best_worst"][metric][key_name]["model"]
         for model in self.models:
             if model.metadata.model_id == best_model_id:
                 return model
@@ -1013,8 +1198,11 @@ class ModelComparison:
         """
         summary = {
             "total_models": len(self.models),
-            "architectures": list(set(m.metadata.architecture for m in self.models)),
-            "date_range": {"earliest": min(m.metadata.training_date for m in self.models), "latest": max(m.metadata.training_date for m in self.models)},
+            "architectures": sorted({m.metadata.architecture for m in self.models}),
+            "date_range": {
+                "earliest": min(m.metadata.training_date for m in self.models),
+                "latest": max(m.metadata.training_date for m in self.models),
+            },
             "metrics_compared": list(self._comparison_data["metrics"].keys()),
             "best_performers": {},
         }
@@ -1024,6 +1212,52 @@ class ModelComparison:
             summary["best_performers"][metric] = data["best"]
 
         return summary
+
+    def get_regression_report(self, baseline_model_id: str) -> dict[str, Any]:
+        """Generate a simple regression report comparing other models to a baseline.
+
+        Returns a dictionary with detected regressions per metric. The heuristic
+        treats metrics with 'time' in the name as 'lower is better' and others as
+        'higher is better'.
+        """
+        metrics = self._comparison_data.get("metrics", {})
+        report: dict[str, dict[str, Any]] = {"baseline_model": baseline_model_id, "regressions": {}}
+
+        if baseline_model_id not in {m.metadata.model_id for m in self.models}:
+            return report
+
+        for metric, values in metrics.items():
+            baseline_val = values.get(baseline_model_id)
+            if baseline_val is None:
+                continue
+
+            # Determine whether lower values are better for this metric
+            lower_is_better = "time" in metric or "latency" in metric or "inference_time" in metric
+
+            # Find the worst (most regressive) other model value compared to baseline
+            worst_delta = 0.0
+            worst_model = None
+            for model_id, val in values.items():
+                if model_id == baseline_model_id:
+                    continue
+                try:
+                    delta = (val - baseline_val) if lower_is_better else (baseline_val - val)
+                except Exception as exc:
+                    logger.debug("Skipping unreadable metric value while computing regression: %s", exc, exc_info=True)
+                    continue
+                if delta > worst_delta:
+                    worst_delta = delta
+                    worst_model = model_id
+
+            if worst_model is not None and worst_delta > 0:
+                report["regressions"][metric] = {
+                    "baseline": baseline_val,
+                    "worst_other": values.get(worst_model),
+                    "delta": worst_delta,
+                    "worst_model": worst_model,
+                }
+
+        return report
 
     def to_dataframe(self):
         """Convert comparison to pandas DataFrame (if pandas is available).

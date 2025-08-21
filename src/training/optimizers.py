@@ -9,15 +9,9 @@ from typing import Any
 
 import torch
 from torch import nn, optim
-from torch.optim.lr_scheduler import (
-    CosineAnnealingLR,
-    ExponentialLR,
-    LinearLR,
-    ReduceLROnPlateau,
-    StepLR,
-)
+from torch.optim.lr_scheduler import CosineAnnealingLR, ExponentialLR, LinearLR, ReduceLROnPlateau, StepLR
 
-from .config import EarlyStoppingConfig, SchedulerConfig, TrainingConfig
+from .config import EarlyStoppingConfig, TrainingConfig
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +79,7 @@ class SchedulerFactory:
     @staticmethod
     def create_scheduler(
         optimizer: optim.Optimizer,
-        scheduler_config: SchedulerConfig,
+        scheduler_config: Any,
     ) -> torch.optim.lr_scheduler.LRScheduler | None:
         """Create learning rate scheduler based on configuration.
 
@@ -99,53 +93,83 @@ class SchedulerFactory:
         Raises:
             ValueError: If scheduler type is not supported
         """
-        scheduler_type = scheduler_config.type.lower()
+        # Allow scheduler_config to be either a SchedulerConfig object, a plain
+        # string (e.g. "step"), or a dict containing a "type" key. This
+        # makes the factory more robust to tests and older callers that pass
+        # a simple string.
+        if scheduler_config is None:
+            scheduler_type = "none"
+        elif isinstance(scheduler_config, str):
+            scheduler_type = scheduler_config.lower()
+        elif isinstance(scheduler_config, dict):
+            scheduler_type = str(scheduler_config.get("type", "")).lower()
+        else:
+            # Fallback for dataclass-like objects with a `type` attribute
+            scheduler_type = str(getattr(scheduler_config, "type", "")).lower()
 
-        if scheduler_type == "none":
+        # Helper to safely read configuration fields whether scheduler_config is a dict or an object
+        def _cfg(field: str, default=None):
+            if isinstance(scheduler_config, dict):
+                return scheduler_config.get(field, default)
+            return getattr(scheduler_config, field, default)
+
+        if scheduler_type in {"none", ""}:
             logger.info("No learning rate scheduler configured")
             return None
 
         scheduler: torch.optim.lr_scheduler.LRScheduler
         if scheduler_type == "step":
+            step_size = _cfg("step_size", 10)
+            gamma = _cfg("gamma", 0.1)
             scheduler = StepLR(
                 optimizer,
-                step_size=scheduler_config.step_size,
-                gamma=scheduler_config.gamma,
+                step_size=step_size,
+                gamma=gamma,
             )
-            logger.info(f"Created StepLR scheduler: step_size={scheduler_config.step_size}, gamma={scheduler_config.gamma}")
+            logger.info(f"Created StepLR scheduler: step_size={step_size}, gamma={gamma}")
 
         elif scheduler_type == "exponential":
+            gamma = _cfg("gamma", 0.95)
             scheduler = ExponentialLR(
                 optimizer,
-                gamma=scheduler_config.gamma,
+                gamma=gamma,
             )
-            logger.info(f"Created ExponentialLR scheduler: gamma={scheduler_config.gamma}")
+            logger.info(f"Created ExponentialLR scheduler: gamma={gamma}")
 
         elif scheduler_type == "cosine":
+            T_max = _cfg("T_max", 50)
+            eta_min = _cfg("eta_min", 0.0)
             scheduler = CosineAnnealingLR(
                 optimizer,
-                T_max=scheduler_config.T_max,
-                eta_min=scheduler_config.eta_min,
+                T_max=T_max,
+                eta_min=eta_min,
             )
-            logger.info(f"Created CosineAnnealingLR scheduler: T_max={scheduler_config.T_max}, eta_min={scheduler_config.eta_min}")
+            logger.info(f"Created CosineAnnealingLR scheduler: T_max={T_max}, eta_min={eta_min}")
 
         elif scheduler_type == "plateau":
+            factor = _cfg("factor", 0.1)
+            patience = _cfg("patience", 10)
+            mode = _cfg("mode", "min")
             scheduler = ReduceLROnPlateau(
                 optimizer,
-                mode="min",  # Assume we're monitoring loss
-                factor=scheduler_config.factor,
-                patience=scheduler_config.patience,
+                mode=mode,  # Assume we're monitoring loss by default
+                factor=factor,
+                patience=patience,
             )
-            logger.info(f"Created ReduceLROnPlateau scheduler: factor={scheduler_config.factor}, patience={scheduler_config.patience}")
+            logger.info(f"Created ReduceLROnPlateau scheduler: factor={factor}, patience={patience}, mode={mode}")
 
         elif scheduler_type == "linear":
+            T_max = _cfg("T_max", 100)
+            eta_min = _cfg("eta_min", 0.0)
+            base_lr = float(optimizer.param_groups[0].get("lr", 1.0))
+            end_factor = eta_min / base_lr if base_lr != 0 else 0.0
             scheduler = LinearLR(
                 optimizer,
                 start_factor=1.0,
-                end_factor=scheduler_config.eta_min / float(optimizer.param_groups[0]["lr"]),
-                total_iters=scheduler_config.T_max,
+                end_factor=end_factor,
+                total_iters=T_max,
             )
-            logger.info(f"Created LinearLR scheduler: total_iters={scheduler_config.T_max}, end_factor={scheduler_config.eta_min}")
+            logger.info(f"Created LinearLR scheduler: total_iters={T_max}, end_factor={end_factor}")
 
         else:
             raise ValueError(f"Unsupported scheduler: {scheduler_type}. Supported schedulers: step, exponential, cosine, plateau, linear, none")
@@ -156,30 +180,55 @@ class SchedulerFactory:
 class EarlyStopping:
     """Early stopping mechanism to prevent overfitting."""
 
-    def __init__(self, config: EarlyStoppingConfig) -> None:
+    def __init__(self, config: EarlyStoppingConfig | dict) -> None:
         """Initialize early stopping.
 
         Args:
-            config: Early stopping configuration
+            config: Early stopping configuration dataclass or plain dict
         """
-        self.config = config
+        # Normalize config whether it's a dataclass or a plain dict used in tests
+        if isinstance(config, dict):
+            cfg = config
+            self.config = None
+            self.enabled = bool(cfg.get("enabled", False))
+            self.monitor = str(cfg.get("monitor", "val_loss"))
+            self.patience = int(cfg.get("patience", 10))
+            self.min_delta = float(cfg.get("min_delta", 0.0))
+            self.mode = str(cfg.get("mode", "min"))
+        else:
+            self.config = config
+            self.enabled = getattr(config, "enabled", False)
+            self.monitor = getattr(config, "monitor", "val_loss")
+            self.patience = getattr(config, "patience", 10)
+            self.min_delta = getattr(config, "min_delta", 0.0)
+            self.mode = getattr(config, "mode", "min")
+
         self.best_score: float | None = None
         self.counter = 0
         self.best_epoch = 0
         self.should_stop = False
 
         # Determine if we want to maximize or minimize the metric
-        self.is_better = self._is_better_max if config.mode == "max" else self._is_better_min
+        self.is_better = self._is_better_max if self.mode == "max" else self._is_better_min
 
-        logger.info(f"Early stopping initialized: monitor={config.monitor}, patience={config.patience}, min_delta={config.min_delta}, mode={config.mode}")
+        logger.info(f"Early stopping initialized: monitor={self.monitor}, patience={self.patience}, min_delta={self.min_delta}, mode={self.mode}")
 
     def _is_better_min(self, score: float, best_score: float) -> bool:
         """Check if score is better when minimizing."""
-        return score < best_score - self.config.min_delta
+        # Lower scores are better when minimizing (e.g., loss)
+        try:
+            return score < best_score - self.min_delta
+        except TypeError:
+            # If types are incompatible, be conservative and return False
+            return False
 
     def _is_better_max(self, score: float, best_score: float) -> bool:
         """Check if score is better when maximizing."""
-        return score > best_score + self.config.min_delta
+        try:
+            return score > best_score + self.min_delta
+        except TypeError:
+            # If types are incompatible, be conservative and return False
+            return False
 
     def __call__(self, score: float, epoch: int) -> bool:
         """Check if training should stop early.
@@ -191,7 +240,7 @@ class EarlyStopping:
         Returns:
             True if training should stop, False otherwise
         """
-        if not self.config.enabled:
+        if not self.enabled:
             return False
 
         if self.best_score is None:
@@ -205,11 +254,12 @@ class EarlyStopping:
             self.best_epoch = epoch
             self.counter = 0
             logger.info(f"Early stopping: new best score = {score:.6f} at epoch {epoch}")
+            return False
         else:
             self.counter += 1
-            logger.info(f"Early stopping: no improvement for {self.counter}/{self.config.patience} epochs")
+            logger.info(f"Early stopping: no improvement for {self.counter}/{self.patience} epochs")
 
-            if self.counter >= self.config.patience:
+            if self.counter >= self.patience:
                 self.should_stop = True
                 logger.info(f"Early stopping triggered! Best score: {self.best_score:.6f} at epoch {self.best_epoch}")
                 return True

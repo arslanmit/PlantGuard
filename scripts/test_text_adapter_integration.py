@@ -18,14 +18,22 @@ def test_integration_scenarios():
 
     # Scenario 1: High confidence disease detection with treatment query
     print("\n1. High confidence disease detection with treatment query")
-    response = adapter.generate_response(disease_class="Tomato___Early_blight", user_query="My tomato has brown spots. How do I treat this?", confidence=0.92)
+    response = adapter.generate_response(
+        disease_class="Tomato___Early_blight",
+        user_query="My tomato has brown spots. How do I treat this?",
+        confidence=0.92,
+    )
     print(f"   Response preview: {response[:100]}...")
     assert "high confidence" in response.lower()
     assert "treatment" in response.lower()
 
     # Scenario 2: Healthy plant with maintenance query
     print("\n2. Healthy plant with maintenance query")
-    response = adapter.generate_response(disease_class="Apple___healthy", user_query="My apple tree looks good. How do I keep it healthy?", confidence=0.88)
+    response = adapter.generate_response(
+        disease_class="Apple___healthy",
+        user_query="My apple tree looks good. How do I keep it healthy?",
+        confidence=0.88,
+    )
     print(f"   Response preview: {response[:100]}...")
     assert "healthy" in response.lower()
     assert "maintain" in response.lower()
@@ -39,13 +47,19 @@ def test_integration_scenarios():
 
     # Scenario 4: Organic treatment request
     print("\n4. Organic treatment request")
-    response = adapter.generate_response(disease_class="Cherry_(including_sour)___Powdery_mildew", user_query="I need organic treatment for powdery mildew", confidence=0.78)
+    response = adapter.generate_response(
+        disease_class="Cherry_(including_sour)___Powdery_mildew",
+        user_query="I need organic treatment for powdery mildew",
+        confidence=0.78,
+    )
     print(f"   Response preview: {response[:100]}...")
     assert "organic" in response.lower()
 
     # Scenario 5: Prevention-focused query
     print("\n5. Prevention-focused query")
-    response = adapter.generate_response(disease_class="Potato___Late_blight", user_query="How can I prevent late blight in the future?", confidence=0.85)
+    response = adapter.generate_response(
+        disease_class="Potato___Late_blight", user_query="How can I prevent late blight in the future?", confidence=0.85
+    )
     print(f"   Response preview: {response[:100]}...")
     assert "prevention" in response.lower()
 
@@ -63,7 +77,7 @@ def test_knowledge_base_consistency():
         class_data = json.load(f)
 
     with open("data/knowledge_base/disease_info.json") as f:
-        kb_data = json.load(f)
+        json.load(f)  # Removed unused variable 'kb_data' (F841)
 
     adapter = TextAdapter()
 

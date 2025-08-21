@@ -1,0 +1,11 @@
+[run]
+# Put the sqlite DB into the .coverage directory to avoid root-level .coverage permission issues
+data_file = .coverage/.coverage
+
+[report]
+# Omit external virtualenv packages
+omit =
+    */site-packages/*
+
+[html]
+directory = htmlcov

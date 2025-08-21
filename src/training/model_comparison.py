@@ -12,9 +12,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import torch
-from torch import nn
-from torch.utils.data import DataLoader
 
 from .evaluator import ModelEvaluator, ModelMetrics
 
@@ -666,7 +663,9 @@ class ModelComparator:
                 )
 
                 # Show significant improvements
-                significant_improvements = [f"{metric}: {improvement:+.2%}" for metric, improvement in result.performance_improvement.items() if improvement > 0.02]
+                significant_improvements = [
+                    f"{metric}: {improvement:+.2%}" for metric, improvement in result.performance_improvement.items() if improvement > 0.02
+                ]
 
                 if significant_improvements:
                     lines.append(f"  Improvements: {', '.join(significant_improvements)}")

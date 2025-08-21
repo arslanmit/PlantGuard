@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Validate that PlantGuard Streamlit applications can start without import errors."""
 
+import importlib
+import importlib.util
 import sys
 from pathlib import Path
 
@@ -8,42 +10,62 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 
+def _is_available(module_name: str) -> bool:
+    """Return True if the given module can be imported or discovered via find_spec."""
+    try:
+        if importlib.util.find_spec(module_name) is None:
+            return False
+        importlib.import_module(module_name)
+        return True
+    except Exception:
+        return False
+
+
 def validate_main_app() -> bool:
     """Validate main Streamlit app imports."""
-    try:
-        # Test core imports
-        from core.audio import AudioAdapter
-        from core.nlp import TextAdapter
-        from core.vision import VisionAdapter
-        from ui.components import ModelSwitcher, render_status_indicator
+    core_modules = [
+        "core.audio",
+        "core.nlp",
+        "core.vision",
+        "ui.components",
+    ]
 
-        print("✅ Main app: Core imports successful")
-        return True
-    except ImportError as e:
-        print(f"❌ Main app import error: {e}")
+    missing = []
+    for mod in core_modules:
+        if not _is_available(mod):
+            missing.append(mod)
+
+    if missing:
+        print(f"\u274c Main app missing modules: {missing}")
         return False
+
+    print("\u2705 Main app: Core imports successful")
+    return True
 
 
 def validate_switcher_app() -> bool:
     """Validate model switcher app imports."""
+    # Check optional model manager
+    manager_spec = importlib.util.find_spec("features.model_switching.model_manager")
+    if manager_spec is None:
+        print("\u26a0\ufe0f  Switcher app: Model manager not found, but app should still work")
+    else:
+        try:
+            importlib.import_module("features.model_switching.model_manager")
+            print("\u2705 Switcher app: Model manager import successful")
+        except Exception as e:
+            print(f"\u274c Switcher app import error: {e}")
+            return False
+
+    # Test basic PIL import which is used in switcher
     try:
-        # Test model manager import - check if it exists
-        switcher_path = Path(__file__).parent.parent / "src" / "features" / "model_switching" / "model_manager.py"
-        if switcher_path.exists():
-            from features.model_switching.model_manager import PlantGuardModelManager
-
-            print("✅ Switcher app: Model manager import successful")
-        else:
-            print("⚠️  Switcher app: Model manager not found, but app should still work")
-
-        # Test basic PIL import which is used in switcher
-        from PIL import Image
-
-        print("✅ Switcher app: Basic dependencies available")
-        return True
-    except ImportError as e:
-        print(f"❌ Switcher app import error: {e}")
+        importlib.import_module("PIL.Image")
+        print("\u2705 Switcher app: Basic dependencies available")
+    except Exception:
+        print("\u274c Switcher app: PIL not available")
         return False
+
+    return True
 
 
 def main() -> None:

@@ -21,9 +21,20 @@ def create_complete_disease_info():
                 "Cracked or distorted fruit",
                 "Reduced fruit quality and marketability",
             ],
-            "causes": ["Fungal pathogen Venturia inaequalis", "Cool, wet weather conditions", "Poor air circulation", "Overhead irrigation", "Infected plant debris"],
+            "causes": [
+                "Fungal pathogen Venturia inaequalis",
+                "Cool, wet weather conditions",
+                "Poor air circulation",
+                "Overhead irrigation",
+                "Infected plant debris",
+            ],
             "treatment": {
-                "immediate": ["Remove and destroy infected leaves and fruit", "Improve air circulation by pruning", "Apply fungicide spray (copper-based or sulfur)", "Avoid overhead watering"],
+                "immediate": [
+                    "Remove and destroy infected leaves and fruit",
+                    "Improve air circulation by pruning",
+                    "Apply fungicide spray (copper-based or sulfur)",
+                    "Avoid overhead watering",
+                ],
                 "preventive": [
                     "Choose scab-resistant apple varieties",
                     "Rake and dispose of fallen leaves in autumn",
@@ -31,7 +42,12 @@ def create_complete_disease_info():
                     "Apply dormant season fungicide spray",
                     "Maintain proper tree spacing",
                 ],
-                "organic": ["Baking soda spray (1 tsp per quart water)", "Neem oil application", "Copper fungicide", "Sulfur-based fungicides"],
+                "organic": [
+                    "Baking soda spray (1 tsp per quart water)",
+                    "Neem oil application",
+                    "Copper fungicide",
+                    "Sulfur-based fungicides",
+                ],
             },
             "prevention": [
                 "Plant resistant varieties like Liberty, Enterprise, or Pristine",
@@ -58,7 +74,13 @@ def create_complete_disease_info():
                 "Premature fruit drop",
                 "Yellowing and wilting of leaves",
             ],
-            "causes": ["Fungal pathogen Botryosphaeria obtusa", "Warm, humid weather", "Wounds or injuries to tree", "Stressed trees", "Poor sanitation practices"],
+            "causes": [
+                "Fungal pathogen Botryosphaeria obtusa",
+                "Warm, humid weather",
+                "Wounds or injuries to tree",
+                "Stressed trees",
+                "Poor sanitation practices",
+            ],
             "treatment": {
                 "immediate": [
                     "Remove and destroy all infected fruit and leaves",
@@ -73,7 +95,12 @@ def create_complete_disease_info():
                     "Apply dormant season fungicide",
                     "Avoid mechanical injuries to tree",
                 ],
-                "organic": ["Copper-based fungicides", "Bordeaux mixture", "Lime sulfur spray", "Proper sanitation and pruning"],
+                "organic": [
+                    "Copper-based fungicides",
+                    "Bordeaux mixture",
+                    "Lime sulfur spray",
+                    "Proper sanitation and pruning",
+                ],
             },
             "prevention": [
                 "Choose resistant apple varieties",
@@ -114,8 +141,18 @@ def create_complete_disease_info():
                     "Rake and destroy infected leaves",
                     "Continue fungicide applications through summer",
                 ],
-                "preventive": ["Plant rust-resistant apple varieties", "Remove cedar/juniper trees within 1-2 miles", "Apply preventive fungicide sprays", "Improve air circulation around trees"],
-                "organic": ["Sulfur-based fungicides", "Copper fungicides", "Neem oil applications", "Proper sanitation practices"],
+                "preventive": [
+                    "Plant rust-resistant apple varieties",
+                    "Remove cedar/juniper trees within 1-2 miles",
+                    "Apply preventive fungicide sprays",
+                    "Improve air circulation around trees",
+                ],
+                "organic": [
+                    "Sulfur-based fungicides",
+                    "Copper fungicides",
+                    "Neem oil applications",
+                    "Proper sanitation practices",
+                ],
             },
             "prevention": [
                 "Choose rust-resistant varieties like Liberty or Enterprise",
@@ -130,7 +167,7 @@ def create_complete_disease_info():
         },
         "Apple___healthy": {
             "disease_name": "Healthy Apple",
-            "scientific_name": null,
+            "scientific_name": None,
             "plant_type": "Apple",
             "severity": "none",
             "description": "Healthy apple plant showing no signs of disease or pest damage. Leaves are green and vigorous, fruit development is normal.",
@@ -138,8 +175,17 @@ def create_complete_disease_info():
             "causes": [],
             "treatment": {
                 "immediate": [],
-                "preventive": ["Continue regular monitoring for early disease detection", "Maintain proper nutrition and watering", "Ensure good air circulation", "Practice good sanitation"],
-                "organic": ["Regular inspection and monitoring", "Proper pruning and maintenance", "Balanced organic fertilization"],
+                "preventive": [
+                    "Continue regular monitoring for early disease detection",
+                    "Maintain proper nutrition and watering",
+                    "Ensure good air circulation",
+                    "Practice good sanitation",
+                ],
+                "organic": [
+                    "Regular inspection and monitoring",
+                    "Proper pruning and maintenance",
+                    "Balanced organic fertilization",
+                ],
             },
             "prevention": [
                 "Regular monitoring for early problem detection",
@@ -166,10 +212,20 @@ def create_complete_disease_info():
             "causes": [],
             "treatment": {
                 "immediate": [],
-                "preventive": ["Maintain acidic soil pH (4.5-5.5)", "Ensure adequate moisture without waterlogging", "Provide proper mulching", "Regular pruning for air circulation"],
+                "preventive": [
+                    "Maintain acidic soil pH (4.5-5.5)",
+                    "Ensure adequate moisture without waterlogging",
+                    "Provide proper mulching",
+                    "Regular pruning for air circulation",
+                ],
                 "organic": ["Organic mulching with pine needles or bark", "Compost application", "Regular monitoring"],
             },
-            "prevention": ["Maintain proper soil acidity", "Ensure good drainage", "Regular monitoring for pests and diseases", "Proper pruning and maintenance"],
+            "prevention": [
+                "Maintain proper soil acidity",
+                "Ensure good drainage",
+                "Regular monitoring for pests and diseases",
+                "Proper pruning and maintenance",
+            ],
             "affected_parts": [],
             "season": ["all seasons"],
             "environmental_factors": ["acidic soil", "good drainage", "adequate moisture"],

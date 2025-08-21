@@ -442,10 +442,10 @@ class OptimizedDataLoader:
         # Profile data loaders if enabled
         if self.profiler:
             logger.info("Profiling train data loader...")
-            train_profile = self.profiler.profile_data_loader(train_loader)
+            _train_profile = self.profiler.profile_data_loader(train_loader)
 
             logger.info("Profiling validation data loader...")
-            val_profile = self.profiler.profile_data_loader(val_loader)
+            _val_profile = self.profiler.profile_data_loader(val_loader)
 
         return train_loader, val_loader, class_names
 
@@ -498,19 +498,21 @@ class OptimizedDataLoader:
         val_size = int(total_size * validation_split)
         train_size = total_size - val_size
 
-        # Split dataset
-        train_indices, val_indices = random_split(range(total_size), [train_size, val_size], generator=torch.Generator().manual_seed(42))
+        # Split dataset into Subset objects. Pass the full dataset (not a range)
+        # so that random_split returns Subset objects which reference the
+        # underlying dataset; this preserves indexes and allows setting the
+        # transforms on the underlying dataset instance.
+        train_subset, val_subset = random_split(full_dataset, [train_size, val_size], generator=torch.Generator().manual_seed(42))
 
-        # Create subset datasets with transforms
-        from torch.utils.data import Subset
+        # Use the returned Subset objects as datasets
+        train_dataset = train_subset
+        val_dataset = val_subset
 
-        # Apply transforms to subsets
-        train_dataset = Subset(full_dataset, train_indices.indices)
-        val_dataset = Subset(full_dataset, val_indices.indices)
-
-        # Set transforms
-        train_dataset.dataset.transform = train_transform
-        val_dataset.dataset.transform = val_transform
+        # Set transforms on the underlying dataset if present
+        if hasattr(train_dataset, "dataset"):
+            train_dataset.dataset.transform = train_transform
+        if hasattr(val_dataset, "dataset"):
+            val_dataset.dataset.transform = val_transform
 
         class_names = full_dataset.classes
         return train_dataset, val_dataset, class_names
@@ -550,8 +552,9 @@ def create_optimized_data_loaders(
         dataset_dir: Path to dataset directory
         batch_size: Batch size for data loaders
         augmentation_config: Data augmentation configuration
+        validation_split: Validation split ratio (float between 0.0 and 1.0) used when creating
+            a train/validation split from a single dataset directory.
         data_loading_config: Data loading configuration (optional)
-        validation_split: Validation split ratio if no val dir exists
 
     Returns:
         Tuple of (train_loader, val_loader, class_names)
@@ -561,3 +564,62 @@ def create_optimized_data_loaders(
 
     loader_factory = OptimizedDataLoader(data_loading_config)
     return loader_factory.create_data_loaders(dataset_dir, batch_size, augmentation_config, validation_split)
+
+
+# Backward compatibility shim for tests that import create_data_loaders
+def create_data_loaders(
+    dataset_dir: Path | None = None,
+    batch_size: int | None = None,
+    augmentation_config: dict[str, Any] | None = None,
+    data_loading_config: DataLoadingConfig | None = None,
+    validation_split: float = 0.2,
+    # Backward compatibility alias used by some tests
+    dataset_path: Path | None = None,
+    **kwargs: Any,
+):
+    """Compatibility wrapper that forwards to create_optimized_data_loaders.
+
+    Accepts additional keyword arguments for backward-compatibility with older
+    call sites, such as `num_workers` and `img_size`. Unknown extra kwargs are
+    ignored with a warning to maintain compatibility without breaking callers.
+    """
+    resolved_dir = dataset_dir or dataset_path
+    # Fallback to the project's default processed dataset location if none provided
+    if resolved_dir is None:
+        resolved_dir = Path("data/processed/plantvillage")
+        logger.warning("create_data_loaders: no dataset path provided, falling back to %s", resolved_dir)
+
+    # Allow callers to omit batch_size and use a conservative default
+    if batch_size is None:
+        batch_size = 8
+    if augmentation_config is None:
+        augmentation_config = {}
+
+    # Back-compat: allow callers to pass num_workers directly
+    num_workers = kwargs.pop("num_workers", None)
+    # Back-compat: some callers provide img_size; current pipeline uses defaults
+    # We accept and ignore it for now to avoid TypeError, but may wire it later.
+    _img_size = kwargs.pop("img_size", None)
+
+    # Log and ignore any other unexpected kwargs to avoid surprising errors
+    if kwargs:
+        logger.warning(
+            "create_data_loaders: ignoring unexpected kwargs: %s",
+            ", ".join(sorted(map(str, kwargs.keys()))),
+        )
+
+    if data_loading_config is None:
+        data_loading_config = DataLoadingConfig()
+    if num_workers is not None:
+        try:
+            data_loading_config.num_workers = int(num_workers)
+        except Exception:
+            logger.warning("create_data_loaders: could not parse num_workers=%r; using default", num_workers)
+
+    return create_optimized_data_loaders(
+        dataset_dir=resolved_dir,
+        batch_size=batch_size,
+        augmentation_config=augmentation_config,
+        data_loading_config=data_loading_config,
+        validation_split=validation_split,
+    )

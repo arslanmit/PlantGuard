@@ -2,7 +2,6 @@
 """Complete the disease knowledge base with all 38 PlantVillage classes."""
 
 import json
-from pathlib import Path
 
 
 def get_all_diseases():
@@ -119,7 +118,11 @@ def get_all_diseases():
                     "description": f"{readable_name} is a plant disease affecting {plant_type.lower()} plants.",
                     "symptoms": ["Visible lesions or spots", "Discoloration", "Reduced plant vigor"],
                     "treatment": {
-                        "immediate": ["Remove infected material", "Apply appropriate treatment", "Improve growing conditions"],
+                        "immediate": [
+                            "Remove infected material",
+                            "Apply appropriate treatment",
+                            "Improve growing conditions",
+                        ],
                         "preventive": ["Choose resistant varieties", "Proper sanitation", "Good cultural practices"],
                         "organic": ["Organic fungicides", "Beneficial microorganisms", "Proper nutrition"],
                     },

@@ -17,7 +17,7 @@ from torch.utils.data import DataLoader, Dataset
 
 from .advanced_data_loading import AdvancedDataLoadingConfig, create_advanced_data_loader
 from .distributed_training import DistributedConfig, DistributedTrainingManager
-from .performance_profiler import PerformanceProfile, ProfilerConfig, TrainingProfiler
+from .performance_profiler import ProfilerConfig, TrainingProfiler
 from .training_cache import CacheConfig, CacheManager, ModelStateCache
 
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ class PerformanceOptimizationConfig:
     # Memory optimization
     enable_memory_optimization: bool = True
     gradient_accumulation_steps: int = 1
-    max_memory_usage_gb: float = 12.0
+    max_memory_usage_gb: float = 4.0  # Updated to 4GB limit for all systems
 
     # Performance targets
     target_throughput_samples_per_sec: float = 100.0
@@ -413,7 +413,12 @@ class PerformanceOptimizer:
 
         for metric in initial:
             if metric in final and initial[metric] > 0:
-                if metric in ["avg_batch_time_ms", "data_loading_time_ms", "forward_pass_time_ms", "backward_pass_time_ms"]:
+                if metric in [
+                    "avg_batch_time_ms",
+                    "data_loading_time_ms",
+                    "forward_pass_time_ms",
+                    "backward_pass_time_ms",
+                ]:
                     # Lower is better for time metrics
                     improvement = (initial[metric] - final[metric]) / initial[metric] * 100
                 else:
@@ -433,7 +438,9 @@ class PerformanceOptimizer:
         final_batch_time = final.get("avg_batch_time_ms", float("inf"))
 
         if final_throughput < self.config.target_throughput_samples_per_sec:
-            recommendations.append(f"Throughput ({final_throughput:.1f} samples/sec) below target ({self.config.target_throughput_samples_per_sec:.1f} samples/sec)")
+            recommendations.append(
+                f"Throughput ({final_throughput:.1f} samples/sec) below target ({self.config.target_throughput_samples_per_sec:.1f} samples/sec)"
+            )
 
         if final_batch_time > self.config.target_batch_time_ms:
             recommendations.append(f"Batch time ({final_batch_time:.1f}ms) above target ({self.config.target_batch_time_ms:.1f}ms)")
@@ -515,7 +522,7 @@ class PerformanceOptimizer:
 def create_performance_optimization_config(
     enable_all_optimizations: bool = True,
     target_throughput: float = 100.0,
-    max_memory_gb: float = 12.0,
+    max_memory_gb: float = 4.0,  # Updated to 4GB limit for all systems
     output_dir: Path | None = None,
 ) -> PerformanceOptimizationConfig:
     """Create performance optimization configuration with sensible defaults.
@@ -523,7 +530,7 @@ def create_performance_optimization_config(
     Args:
         enable_all_optimizations: Whether to enable all optimization features
         target_throughput: Target throughput in samples per second
-        max_memory_gb: Maximum memory usage in GB
+        max_memory_gb: Maximum memory usage in GB (default 4GB)
         output_dir: Output directory for optimization results
 
     Returns:

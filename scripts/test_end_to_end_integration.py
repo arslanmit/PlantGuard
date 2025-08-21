@@ -38,7 +38,11 @@ class EndToEndIntegrationTest:
             if error:
                 self.results["errors"].append(f"{test_name}: {error!s}")
 
-        self.results["test_results"][test_name] = {"passed": passed, "message": message, "error": str(error) if error else None}
+        self.results["test_results"][test_name] = {
+            "passed": passed,
+            "message": message,
+            "error": str(error) if error else None,
+        }
 
     def test_makefile_integration(self) -> bool:
         """Test Makefile commands integration."""
@@ -53,7 +57,15 @@ class EndToEndIntegrationTest:
 
             # Check for production training commands
             help_output = result.stdout
-            required_commands = ["train-production", "monitor-training", "evaluate-model", "list-models", "setup-dataset", "validate-dataset", "analyze-dataset"]
+            required_commands = [
+                "train-production",
+                "monitor-training",
+                "evaluate-model",
+                "list-models",
+                "setup-dataset",
+                "validate-dataset",
+                "analyze-dataset",
+            ]
 
             missing_commands = [cmd for cmd in required_commands if cmd not in help_output]
             if missing_commands:
@@ -105,12 +117,6 @@ class EndToEndIntegrationTest:
         try:
             # Test core training components
             # Test integration components
-            from src.core.vision import VisionAdapter
-            from src.features.model_switching.model_manager import PlantGuardModelManager
-            from src.training.config import TrainingConfig
-            from src.training.dataset_manager import DatasetManager
-            from src.training.model_registry import ModelRegistry
-            from src.training.production_trainer import ProductionTrainer
 
             self.log_test_result("Component.imports", True, "All components imported successfully")
             return True
@@ -175,12 +181,21 @@ class EndToEndIntegrationTest:
 
             # Create a simple test model file
             model_path = self.temp_dir / "test_model.pt"
-            test_data = {"model_state_dict": {"test": torch.tensor([1, 2, 3])}, "num_classes": 10, "class_names": [f"class_{i}" for i in range(10)]}
+            test_data = {
+                "model_state_dict": {"test": torch.tensor([1, 2, 3])},
+                "num_classes": 10,
+                "class_names": [f"class_{i}" for i in range(10)],
+            }
             torch.save(test_data, model_path)
 
             # Test registration
             model_id = registry.register_model(
-                model_path=model_path, name="test_model", architecture="test", dataset_version="test_v1", hyperparameters={"test": True}, performance_metrics={"accuracy": 0.95}
+                model_path=model_path,
+                name="test_model",
+                architecture="test",
+                dataset_version="test_v1",
+                hyperparameters={"test": True},
+                performance_metrics={"accuracy": 0.95},
             )
 
             # Test retrieval
@@ -215,7 +230,7 @@ class EndToEndIntegrationTest:
         try:
             from PIL import Image
 
-            from src.training.dataset_manager import DatasetConfig, DatasetManager
+            from src.training.dataset_manager import DatasetManager
 
             # Create test dataset
             dataset_dir = self.temp_dir / "test_dataset"
@@ -351,7 +366,11 @@ class EndToEndIntegrationTest:
             # Test that scripts can be imported (syntax check)
             import importlib.util
 
-            scripts_to_test = ["scripts/production_training_workflow.py", "scripts/list_models.py", "scripts/evaluate_model.py"]
+            scripts_to_test = [
+                "scripts/production_training_workflow.py",
+                "scripts/list_models.py",
+                "scripts/evaluate_model.py",
+            ]
 
             for script_path in scripts_to_test:
                 if not Path(script_path).exists():
@@ -400,7 +419,14 @@ class EndToEndIntegrationTest:
         total_tests = self.results["tests_passed"] + self.results["tests_failed"]
         success_rate = (self.results["tests_passed"] / total_tests * 100) if total_tests > 0 else 0
 
-        self.results.update({"total_time": total_time, "total_tests": total_tests, "success_rate": success_rate, "overall_success": self.results["tests_failed"] == 0})
+        self.results.update(
+            {
+                "total_time": total_time,
+                "total_tests": total_tests,
+                "success_rate": success_rate,
+                "overall_success": self.results["tests_failed"] == 0,
+            }
+        )
 
         # Log summary
         logger.info("=" * 60)

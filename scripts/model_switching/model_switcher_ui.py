@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Simple Streamlit UI for switching between PlantGuard models."""
 
-import json
 import sys
 from pathlib import Path
 
@@ -165,27 +164,8 @@ def main() -> None:
             help="Upload an image of a plant leaf to test the current model",
         )
 
-        # Sample image selection
-        st.markdown("**Or choose a sample image:**")
-
-        sample_images = list(Path("data/pictures").glob("*.jpg"))
-        if sample_images:
-            sample_names = [img.name for img in sample_images]
-            selected_sample = st.selectbox(
-                "Sample images:",
-                options=["None", *sample_names],
-                help="Select a sample image for testing",
-            )
-
-            if selected_sample != "None":
-                sample_path = Path("data/pictures") / selected_sample
-                if sample_path.exists():
-                    # Process sample image directly
-                    image = Image.open(sample_path)
-                    image_name = selected_sample
-
-                    # Process the sample image
-                    process_image(image, image_name, manager, current_model_info)
+        # Sample image selection disabled
+        st.markdown("**Sample image selection disabled.** Use the upload control to test your own images.")
 
         # Process uploaded image
         if uploaded_file is not None:
@@ -219,77 +199,19 @@ def main() -> None:
 
             st.dataframe(model_data, use_container_width=True)
 
-        # Quick benchmark button
-        if st.button("🏁 Quick Benchmark", help="Test all enabled models on sample images"):
-            with st.spinner("Running benchmark..."):
-                # Load test metadata
-                metadata_path = "data/pictures/sample_images_metadata.json"
-                if Path(metadata_path).exists():
-                    with Path(metadata_path).open(encoding="utf-8") as f:
-                        metadata = json.load(f)
+            # Model configuration
+            st.markdown("---")
+            st.subheader("⚙️ Configuration")
 
-                    benchmark_results = []
-
-                    for model_info in enabled_models[:3]:  # Limit to 3 models for speed
-                        model_id = model_info["id"]
-
-                        if manager.switch_model(model_id):
-                            correct = 0
-                            total = 0
-
-                            # Test on first 3 images for speed
-                            for sample in metadata["sample_images"][:3]:
-                                image_path = Path("data/pictures") / sample["filename"]
-
-                                if image_path.exists():
-                                    try:
-                                        image = Image.open(image_path)
-                                        result = manager.get_readable_prediction(image)
-
-                                        # Simple accuracy check
-                                        gt_plant = sample["plant"].lower()
-                                        pred_plant = result["plant_type"].lower()
-
-                                        if gt_plant in pred_plant or pred_plant in gt_plant:
-                                            correct += 1
-
-                                        total += 1
-
-                                    except Exception as e:
-                                        st.warning(f"Error processing image: {e}")
-                                        continue
-
-                            if total > 0:
-                                accuracy = correct / total
-                                benchmark_results.append(
-                                    {
-                                        "Model": model_info["name"],
-                                        "Accuracy": f"{accuracy:.1%}",
-                                        "Tested": f"{correct}/{total}",
-                                    }
-                                )
-
-                    if benchmark_results:
-                        st.markdown("### 🏆 Benchmark Results")
-                        st.dataframe(benchmark_results, use_container_width=True)
-                    else:
-                        st.warning("No benchmark results available")
-                else:
-                    st.error("Test metadata not found")
-
-        # Model configuration
-        st.markdown("---")
-        st.subheader("⚙️ Configuration")
-
-        if st.button("📝 Edit Model Config"):
-            st.info("Model configuration file: `config/models.json`")
-            st.markdown("""
-            You can edit the configuration file to:
-            - Add new models
-            - Change model settings
-            - Enable/disable models
-            - Set confidence thresholds
-            """)
+            if st.button("📝 Edit Model Config"):
+                st.info("Model configuration file: `config/models.json`")
+                st.markdown("""
+                You can edit the configuration file to:
+                - Add new models
+                - Change model settings
+                - Enable/disable models
+                - Set confidence thresholds
+                """)
 
 
 if __name__ == "__main__":

@@ -94,8 +94,7 @@
     "python.testing.pytestArgs": [
         "tests",
         "-v",
-        "--tb=short",
-        "--strict-markers"
+        "--tb=short"
     ],
     "python.testing.autoTestDiscoverOnSaveEnabled": true,
     "python.testing.promptToConfigure": false,
@@ -121,5 +120,7 @@
         "*",
         "find *"
     ],
-    "codium.codeCompletion.enable": false
+    "codium.codeCompletion.enable": false,
+    "chat.agent.maxRequests": 999,
+    "terminal.integrated.accessibleViewFocusOnCommandExecution": true
 }

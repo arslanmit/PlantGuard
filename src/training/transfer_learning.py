@@ -9,7 +9,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-import torch
 import torch.nn as nn
 from torch.optim import Optimizer
 
@@ -386,7 +385,9 @@ class TransferLearningOptimizer:
         group_stats = []
         for group in self.layer_groups:
             group_total = sum(self.layer_info[name]["parameters"] for name in group.layer_names if name in self.layer_info)
-            group_trainable = sum(self.layer_info[name]["parameters"] for name in group.layer_names if name in self.layer_info and name not in self.frozen_layers)
+            group_trainable = sum(
+                self.layer_info[name]["parameters"] for name in group.layer_names if name in self.layer_info and name not in self.frozen_layers
+            )
 
             group_stats.append(
                 {
@@ -422,7 +423,9 @@ class TransferLearningOptimizer:
         logger.info("Layer Groups:")
         for group_stat in stats["group_statistics"]:
             status = "FROZEN" if group_stat["frozen"] else "TRAINABLE"
-            logger.info(f"  {group_stat['name']}: {group_stat['trainable_params']:,}/{group_stat['total_params']:,} params, LRx{group_stat['lr_multiplier']:.2f}, {status}")
+            logger.info(
+                f"  {group_stat['name']}: {group_stat['trainable_params']:,}/{group_stat['total_params']:,} params, LRx{group_stat['lr_multiplier']:.2f}, {status}"
+            )
 
     def evaluate_transfer_learning_effectiveness(
         self,

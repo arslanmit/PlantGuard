@@ -48,7 +48,7 @@ PlantGuard is a production-ready multimodal AI system for plant disease detectio
 - [x] **Text Q&A interface** with knowledge base responses
 - [x] **Model caching** with `@st.cache_resource` for performance
 - [x] **Responsive design** with proper error handling and user feedback
-- [x] **Sample image testing** with pre-loaded test images
+- [x] **Sample image testing**: bundled sample images have been removed from this repository; provide your own images under `data/raw/` or upload them via the UI
 - [x] **Application management** - Start, stop, restart, and validate configurations
 
 #### **Production Training Pipeline** ✅
@@ -254,7 +254,6 @@ make download-dataset # Download PlantVillage dataset from Kaggle
 make prepare-dataset # Prepare dataset with train/val splits
 make validate-dataset # Validate dataset integrity and quality
 make analyze-dataset # Analyze dataset statistics and distribution
-make dummy-dataset   # Create dummy dataset for testing
 make train           # Basic model training (legacy)
 make models          # Show model information and sizes
 make notebook        # Open Jupyter notebook for development
@@ -638,9 +637,6 @@ make validate-dataset # Checks for corrupted files and validates structure
 
 # 5. Analyze dataset statistics
 make analyze-dataset # Shows class distribution and dataset metrics
-
-# Alternative: Create dummy dataset for testing
-make dummy-dataset   # Creates synthetic dataset for development/testing
 ```
 
 #### **Dataset Management Features**
@@ -677,8 +673,7 @@ make dummy-dataset   # Creates synthetic dataset for development/testing
 # Check what datasets are available
 make setup-dataset
 # Output:
-# ✅ Dummy dataset found
-# ❌ No processed PlantVillage dataset found
+# ✅ Processed PlantVillage dataset found at data/processed/plantvillage
 # ❌ Raw PlantVillage dataset not found
 
 # Download PlantVillage dataset (requires Kaggle API setup)
@@ -688,25 +683,25 @@ make download-dataset
 # Validate dataset integrity
 make validate-dataset
 # Output:
-# 🔍 Validating Dummy dataset at data/plantvillage_dummy...
-# 📊 Results for Dummy dataset:
-#   Total files: 400
-#   Valid files: 400
+# 🔍 Validating PlantVillage dataset at data/processed/plantvillage...
+# 📊 Results for PlantVillage dataset:
+#   Total files: 54305
+#   Valid files: 54305
 #   Corrupted files: 0
-#   Classes found: 8
+#   Classes found: 38
 #   ✅ Dataset is valid
 
 # Analyze dataset statistics
 make analyze-dataset
 # Output:
-# 📊 Analyzing Dummy dataset at data/plantvillage_dummy...
-# 📈 Dataset Analysis for Dummy dataset:
-#   Name: plantvillage_dummy
-#   Total samples: 400
-#   Number of classes: 8
-#   Dataset size: 14.7 MB
-#   Train samples: 320
-#   Validation samples: 80
+# 📊 Analyzing PlantVillage dataset at data/processed/plantvillage...
+# 📈 Dataset Analysis for PlantVillage dataset:
+#   Name: plantvillage
+#   Total samples: 54305
+#   Number of classes: 38
+#   Dataset size: 27.2 GB
+#   Train samples: 43429
+#   Validation samples: 10876
 ```
 
 #### **Kaggle API Setup**
@@ -741,9 +736,6 @@ data/
 │       ├── train/             # Training images by class
 │       ├── val/               # Validation images by class
 │       └── dataset_config.json # Dataset configuration
-├── plantvillage_dummy/        # Dummy dataset for testing
-│   ├── train/                 # Synthetic training images
-│   └── val/                   # Synthetic validation images
 └── temp/                      # Temporary files (auto-cleaned)
 ```
 
@@ -761,13 +753,13 @@ dm = DatasetManager()
 success = dm.download_plantvillage()
 
 # Validate dataset
-result = dm.validate_dataset(Path("data/plantvillage_dummy"))
+result = dm.validate_dataset(Path("data/processed/plantvillage"))
 print(f"Valid: {result.is_valid}")
 print(f"Total files: {result.total_files}")
 print(f"Classes: {len(result.class_counts)}")
 
 # Analyze dataset
-info = dm.analyze_dataset(Path("data/plantvillage_dummy"))
+info = dm.analyze_dataset(Path("data/processed/plantvillage"))
 print(f"Total samples: {info.total_samples}")
 print(f"Classes: {info.num_classes}")
 print(f"Size: {info.dataset_size_mb:.1f} MB")
@@ -812,7 +804,6 @@ PlantGuard/
 │   ├── download_dataset.py    # ✅ Kaggle dataset download with error handling
 │   ├── validate_dataset.py    # ✅ Dataset integrity validation
 │   ├── analyze_dataset.py     # ✅ Dataset statistics and analysis
-│   ├── setup_dummy_dataset.py # ✅ Dummy dataset creation for testing
 │   ├── prepare_dataset_new.py # ✅ Dataset preparation with DatasetManager
 │   └── prepare_dataset.py     # ✅ Legacy dataset preparation utilities
 ├── config/
@@ -998,7 +989,7 @@ make switcher        # Model Switcher UI (http://localhost:8502)
 # 1. Switch between 3 AI models (Vision Transformer 100%, MobileNet 95%, ResNet50 trainable)
 # 2. Hot-swap models without restarting the application
 # 3. Upload plant images → Get disease classification with confidence scoring
-# 4. Test models with pre-loaded sample images or upload your own
+# 4. Test models with user-provided images (place under `data/raw/` or upload via UI)
 # 5. Compare model performance with built-in benchmarking tools
 # 6. Record audio via microphone → Basic transcription ready
 # 7. Ask text questions → Get knowledge base responses
@@ -1053,6 +1044,75 @@ make models-info     # Show model status
 - ✅ **Performance Tests**: Model inference benchmarking
 - ✅ **Security Tests**: Input validation and sanitization
 - ✅ **Type Safety**: Complete MyPy type checking coverage
+
+## Test Coverage Overview
+
+PlantGuard includes extensive automated tests to ensure reliability, performance, and cross-platform compatibility. Below is a summary of the main test suites and their coverage:
+
+### UI Component Tests
+- **InputRibbon & AnalysisCard**: Verifies presence, rendering, accessibility, and multimodal support.
+- **InputRibbon**: Tests mode activation/deactivation, state management, input validation, touch-friendly design, keyboard shortcuts, and error handling.
+
+### Performance Benchmarks
+- **Training Speed**: Measures setup and training time, validates accuracy thresholds.
+- **Memory Usage**: Monitors memory consumption during setup and training.
+- **Data Loading**: Benchmarks data loader creation and batch loading speed.
+- **Model Inference**: Tests single and batch inference speed.
+- **Disk I/O**: Validates checkpoint saving and disk usage.
+- **Scalability**: Assesses performance as dataset size increases.
+- **Concurrent Training**: Simulates multiple training jobs for concurrency.
+
+### Preprocessing Tests
+- **Image Preprocessing**: Compares different preprocessing pipelines and normalization strategies.
+- **Top Predictions**: Displays top-5 predictions for sample images.
+
+### Training Integration
+- **End-to-End Setup**: Validates full training pipeline, optimizer/scheduler/early stopping integration.
+- **Resource Manager**: Tests device and memory detection, config optimization.
+- **Config Templates**: Ensures all configuration templates are valid and serializable.
+
+### Cross-Platform Compatibility
+- **Path Handling**: Verifies dataset/model paths on macOS, Linux, Windows.
+- **Device Detection**: Tests auto-detection of CUDA/MPS/CPU.
+- **File Permissions**: Checks file and directory permissions on Unix-like systems.
+- **Memory Management**: Compares memory usage across platforms.
+- **Multiprocessing**: Validates data loading with multiple workers.
+- **File Locking**: Tests concurrent model loading.
+- **Environment Variables**: Ensures correct handling of CUDA/MPS env vars.
+- **Python/Torch Version**: Validates compatibility with different Python and PyTorch versions.
+- **Unicode Paths**: Tests support for non-ASCII file paths.
+- **Large Files**: Verifies handling of large datasets and model files.
+
+### Optimizer & Scheduler Factories
+- **Optimizer Creation**: Tests Adam, AdamW, SGD, RMSprop, and error handling for unsupported types.
+- **Scheduler Creation**: Validates StepLR, ExponentialLR, CosineAnnealingLR, ReduceLROnPlateau, LinearLR, and error handling.
+- **Early Stopping**: Tests minimize/maximize modes, min_delta, reset, and state persistence.
+- **Training Components**: Validates initialization, state dict operations, optimizer/scheduler stepping, and early stopping checks.
+
+### Hugging Face Model Tests
+- **Model Loading**: Loads and validates Hugging Face plant disease models.
+- **Prediction Accuracy**: Tests predictions on sample images, checks plant type, disease, and health status accuracy.
+- **Model Comparison**: Compares multiple Hugging Face models for best performance.
+
+### Comprehensive Integration
+- **End-to-End Workflow**: Validates training, model registration, deployment, and UI integration.
+- **Model Registry**: Tests registry/model manager/vision adapter integration.
+- **Model Switching**: Verifies switching and prediction consistency across multiple models.
+- **Performance Regression**: Detects regressions in accuracy and training time.
+- **Concurrent Training**: Validates registry and model access in concurrent scenarios.
+- **Memory & Resource Management**: Monitors memory usage and cleanup.
+
+---
+
+**How to run tests:**  
+- Run all tests: `make test`  
+- Run fast tests: `make test-fast`  
+- Run with coverage: `make test-coverage`  
+- Run unit tests only: `make test-unit`
+
+For more details, see the `tests/` directory and the [Testing and CI notes](#testing-and-ci-notes) section.
+
+---
 
 ### **Quality Assurance Metrics**
 ```bash
@@ -1150,11 +1210,11 @@ python scripts/model_switching/model_switcher.py --switch vit_best
 # Switch to the fast model (MobileNet)
 python scripts/model_switching/model_switcher.py --switch mobilenet_fast
 
-# Test current model on sample images
-python scripts/model_switching/model_switcher.py --quick-test
+# Test current model on user-provided images
+# Use the --test flag with a path to a specific image: python scripts/model_switching/model_switcher.py --test data/raw/<your_image>.jpg
 
-# Test on a specific image
-python scripts/model_switching/model_switcher.py --test data/pictures/apple_scab_sample.jpg
+# Test on a specific image (replace with your image path)
+# python scripts/model_switching/model_switcher.py --test data/raw/<your_image>.jpg
 
 # Compare all models
 python scripts/model_switching/model_switcher.py --benchmark
@@ -1286,8 +1346,8 @@ python scripts/model_switching/model_switcher.py --list
 # 2. Switch to best model
 python scripts/model_switching/model_switcher.py --switch vit_best
 
-# 3. Test on samples
-python scripts/model_switching/model_switcher.py --quick-test
+# 3. Test on a specific image (replace with your image path)
+# python scripts/model_switching/model_switcher.py --test data/raw/<your_image>.jpg
 
 # 4. Launch web UI (preferred)
 make switcher      # http://localhost:8502

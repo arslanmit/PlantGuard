@@ -10,7 +10,7 @@ This document describes the comprehensive performance optimization system implem
 
 **Requirements Addressed:**
 - 7.1: Profile and optimize training pipeline bottlenecks
-- 7.2: Implement advanced data loading optimizations for large datasets  
+- 7.2: Implement advanced data loading optimizations for large datasets
 - 7.4: Optimize memory usage during training and evaluation
 - 7.6: Implement training pipeline caching for faster iterations
 
@@ -119,7 +119,7 @@ New configuration options added:
 # Performance optimization settings
 enable_performance_optimization: bool = False
 target_throughput_samples_per_sec: float = 100.0
-max_memory_usage_gb: float = 12.0
+max_memory_usage_gb: float = 8.0
 enable_profiling: bool = False
 enable_distributed_training: bool = False
 ```
@@ -161,7 +161,7 @@ Three new commands have been added for performance optimization:
 # Run comprehensive performance optimization
 make optimize-performance
 
-# Profile training performance and identify bottlenecks  
+# Profile training performance and identify bottlenecks
 make profile-training
 
 # Benchmark data loading performance
@@ -188,7 +188,7 @@ from src.training.performance_optimizer import optimize_training_performance
 # Run optimization on existing training setup
 result = optimize_training_performance(
     model=model,
-    dataset=dataset, 
+    dataset=dataset,
     optimizer=optimizer,
     criterion=criterion,
     device=device,
@@ -238,7 +238,7 @@ The optimization system successfully addresses all requirements:
 
 ✅ **7.1 - Pipeline Bottleneck Analysis**: Comprehensive profiling identifies and quantifies all bottlenecks
 ✅ **7.2 - Advanced Data Loading**: Intelligent prefetching, GPU preprocessing, memory mapping
-✅ **7.4 - Memory Optimization**: Dynamic memory management, caching, efficient data structures  
+✅ **7.4 - Memory Optimization**: Dynamic memory management, caching, efficient data structures
 ✅ **7.6 - Training Pipeline Caching**: Model states, datasets, features cached for faster iterations
 
 ### 🔮 Future Enhancements
