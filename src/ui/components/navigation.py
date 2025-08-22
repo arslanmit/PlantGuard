@@ -70,7 +70,7 @@ class NavigationHeader:
                         f"{page_info['icon']} {page_name}",
                         key=f"sidebar_nav_{page_name}",
                         help=page_info["description"],
-                        type=button_type,
+                        type=button_type,  # type: ignore[arg-type]
                         use_container_width=True,
                     ):
                         selected_page = page_name

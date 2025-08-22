@@ -14,6 +14,7 @@ from .history_manager import HistoryEntry, HistoryManager, create_history_manage
 from .image_interface import ImageInterface, create_image_interface
 from .input_ribbon import InputRibbon
 from .interface_toggle import InterfaceToggle, create_interface_toggle
+from .mode_switcher import ModeSwitcher
 from .model_switcher import ModelSwitcher
 from .navigation import NavigationHeader, NavigationSidebar
 from .status_indicator import render_status_indicator
@@ -32,6 +33,7 @@ __all__ = [
     "ImageInterface",
     "InputRibbon",
     "InterfaceToggle",
+    "ModeSwitcher",
     "ModelSwitcher",
     "NavigationHeader",
     "NavigationSidebar",
