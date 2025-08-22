@@ -157,6 +157,19 @@ class NavigationHeader:
             unsafe_allow_html=True,
         )
 
+    # Backwards-compatible small helpers expected by callers elsewhere
+    def _render_header(self) -> None:
+        """Lightweight header renderer used by the navigation layout."""
+        try:
+            st.title("PlantGuard")
+        except Exception:
+            # Defensive: ignore in headless contexts
+            logger.debug("_render_header failed", exc_info=True)
+
+    def _render_status_indicator(self) -> None:
+        """Expose status indicator rendering for other components to call."""
+        self._render_status_indicator()
+
     def _render_navigation_tabs(self, current_page: str) -> str:
         """Render navigation tabs and return selected page."""
         # Create tab names from available pages

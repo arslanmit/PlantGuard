@@ -6,6 +6,7 @@ Follows ADHD-friendly design principles with clear visual hierarchy and touch-fr
 
 import logging
 from collections.abc import Callable
+from typing import Literal
 
 import streamlit as st
 import torch
@@ -379,7 +380,7 @@ class ResponsiveLayoutManager:
         """Get the responsive layout instance."""
         return self.layout
 
-    def configure_page_layout(self, page_title: str = "PlantGuard", layout: str = "wide", initial_sidebar_state: str = "auto"):
+    def configure_page_layout(self, page_title: str = "PlantGuard", layout: Literal["centered", "wide"] = "wide", initial_sidebar_state: Literal["auto", "expanded", "collapsed"] = "auto"):
         """Configure Streamlit page layout with responsive settings.
 
         Args:

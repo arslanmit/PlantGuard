@@ -34,7 +34,7 @@ class InterfaceToggle:
         """
         return st.session_state.interface_mode
 
-    def set_mode(self, mode: InterfaceMode) -> None:
+    def set_mode(self, mode: str) -> None:
         """Set the interface mode.
 
         Args:
