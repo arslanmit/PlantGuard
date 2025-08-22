@@ -10,7 +10,7 @@ import streamlit as st
 logger = logging.getLogger(__name__)
 
 
-def render_status_indicator(status: str, label: str = "", size: str = "medium") -> None:
+def render_status_indicator(status: object, label: str = "", size: str = "medium") -> None:
     """Render a status indicator with color-coded visual feedback.
 
     Args:
@@ -36,7 +36,9 @@ def render_status_indicator(status: str, label: str = "", size: str = "medium") 
         "large": {"font_size": "1.2rem", "padding": "0.75rem 1.5rem"},
     }
 
-    config = status_config.get(status, status_config["offline"])
+    # Allow non-str status values from session/state; coerce to str for lookup
+    status_key = status if isinstance(status, str) else str(status)
+    config = status_config.get(status_key, status_config["offline"])
     size_style = size_config.get(size, size_config["medium"])
 
     display_text = label if label else config["text"]
