@@ -208,33 +208,33 @@ class ModelSwitcher:
 
             st.table(comparison_data)
 
-        def render(self, available_models: dict | None = None) -> None:
-            """Compatibility render method used by legacy callers.
+    def render(self, available_models: dict | None = None) -> None:
+        """Compatibility render method used by legacy callers.
 
-            If `available_models` is provided, use it to populate selectors; otherwise
-            fall back to the internal `available_models` mapping.
-            """
-            models_to_use = available_models or self.available_models
-            # Render simple selectors for each type
-            for model_type in ("vision", "audio", "text"):
-                # Use provided mapping if present
-                if model_type in models_to_use:
-                    # If mapping gives dicts, update internal available_models for display
-                    if isinstance(models_to_use[model_type], dict):
-                        # nothing to do exactly; use existing render_model_selector
+        If `available_models` is provided, use it to populate selectors; otherwise
+        fall back to the internal `available_models` mapping.
+        """
+        models_to_use = available_models or self.available_models
+        # Render simple selectors for each type
+        for model_type in ("vision", "audio", "text"):
+            # Use provided mapping if present
+            if model_type in models_to_use:
+                # If mapping gives dicts, update internal available_models for display
+                if isinstance(models_to_use[model_type], dict):
+                    # nothing to do exactly; use existing render_model_selector
+                    self.render_model_selector(model_type)
+                else:
+                    # Provided a list of ids; create a temporary mapping
+                    tmp_map = {mid: {"name": mid, "accuracy": 0} for mid in models_to_use[model_type]}
+                    # Temporarily override for selector
+                    old = self.available_models.get(model_type)
+                    self.available_models[model_type] = tmp_map
+                    try:
                         self.render_model_selector(model_type)
-                    else:
-                        # Provided a list of ids; create a temporary mapping
-                        tmp_map = {mid: {"name": mid, "accuracy": 0} for mid in models_to_use[model_type]}
-                        # Temporarily override for selector
-                        old = self.available_models.get(model_type)
-                        self.available_models[model_type] = tmp_map
-                        try:
-                            self.render_model_selector(model_type)
-                        finally:
-                            # Restore
-                            if old is not None:
-                                self.available_models[model_type] = old
+                    finally:
+                        # Restore
+                        if old is not None:
+                            self.available_models[model_type] = old
 
     def get_model_performance_metrics(self, model_type: str, model_id: str) -> dict[str, Any]:
         """Get performance metrics for a specific model."""

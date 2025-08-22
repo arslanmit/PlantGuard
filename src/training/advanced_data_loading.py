@@ -72,7 +72,7 @@ class IntelligentPrefetcher:
             config: Advanced data loading configuration
         """
         self.config = config
-        self.prefetch_queue = queue.Queue(maxsize=config.prefetch_buffer_size)
+        self.prefetch_queue: queue.Queue[Any] = queue.Queue(maxsize=config.prefetch_buffer_size)
         self.prefetch_threads: list[threading.Thread] = []
         self.is_running = False
         self.access_patterns: dict[int, float] = {}
@@ -462,7 +462,13 @@ class AdaptiveBatchSampler(Sampler):
 
     def __iter__(self) -> Iterator[list[int]]:
         """Iterate over adaptive batches."""
-        indices = list(range(len(self.dataset)))
+        # Safely get dataset length
+        try:
+            dataset_len = len(self.dataset) if hasattr(self.dataset, "__len__") else 1000
+        except (TypeError, AttributeError):
+            dataset_len = 1000  # Default fallback
+
+        indices = list(range(dataset_len))
 
         # Shuffle indices
         np.random.shuffle(indices)
@@ -480,7 +486,13 @@ class AdaptiveBatchSampler(Sampler):
 
     def __len__(self) -> int:
         """Return number of batches."""
-        return (len(self.dataset) + self.current_batch_size - 1) // self.current_batch_size
+        # Safely get dataset length
+        try:
+            dataset_len = len(self.dataset) if hasattr(self.dataset, "__len__") else 1000
+        except (TypeError, AttributeError):
+            dataset_len = 1000  # Default fallback
+
+        return (dataset_len + self.current_batch_size - 1) // self.current_batch_size
 
     def _get_current_batch_size(self) -> int:
         """Get current adaptive batch size."""
@@ -556,7 +568,7 @@ class PipelinedDataLoader:
         """Setup pipeline processing stages."""
         # Create queues for each stage
         for i in range(self.config.pipeline_stages):
-            stage_queue = queue.Queue(maxsize=self.config.stage_buffer_size)
+            stage_queue: queue.Queue[Any] = queue.Queue(maxsize=self.config.stage_buffer_size)
             self.stage_queues.append(stage_queue)
 
         # Stage 1: Data loading
@@ -792,11 +804,11 @@ def benchmark_data_loading_performance(
         data_loader._prefetcher.stop_prefetching()
 
     metrics = {
-        "avg_batch_time_ms": avg_batch_time,
-        "throughput_samples_per_sec": throughput,
-        "total_time_sec": total_time,
-        "total_samples": total_samples,
-        "batches_processed": len(batch_times),
+        "avg_batch_time_ms": float(avg_batch_time),
+        "throughput_samples_per_sec": float(throughput),
+        "total_time_sec": float(total_time),
+        "total_samples": float(total_samples),
+        "batches_processed": float(len(batch_times)),
     }
 
     logger.info(f"Benchmark results: {avg_batch_time:.1f}ms/batch, {throughput:.1f} samples/sec")

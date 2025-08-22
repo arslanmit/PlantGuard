@@ -26,7 +26,7 @@ if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
         return _wrap
 
     try:
-        st.cache_data = _noop_cache
+        st.cache_data = _noop_cache  # type: ignore[assignment]
     except Exception as e:
         # Log instead of silently ignoring so lint rule S110 is satisfied and
         # we retain diagnostics for test-time failures.

@@ -297,7 +297,7 @@ class DistributedTrainingManager:
         logger.info(f"Checkpoint loaded from {checkpoint_path}")
         return {k: v for k, v in checkpoint.items() if k not in ["model_state_dict", "optimizer_state_dict"]}
 
-    def _broadcast_checkpoint(self, checkpoint: dict[str, Any] | None, device: torch.device, checkpoint_path: Path) -> dict[str, Any]:
+    def _broadcast_checkpoint(self, checkpoint: dict[str, Any] | None, device: torch.device, checkpoint_path: Path) -> dict[str, Any] | None:
         """Broadcast checkpoint from main process to all processes."""
         # This is a simplified implementation
         # In practice, you might want to use more efficient broadcasting

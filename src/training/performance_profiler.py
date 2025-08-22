@@ -425,6 +425,11 @@ class TrainingProfiler:
         """Export profiling results to various formats."""
         output_dir = self.config.output_dir
 
+        # Skip export if no output directory configured
+        if output_dir is None:
+            logger.warning("No output directory configured for profiling results")
+            return
+
         # Export Chrome trace
         if self.config.export_chrome_trace:
             trace_file = output_dir / "training_profile.json"

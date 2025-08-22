@@ -31,8 +31,8 @@ if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
 
     # Best-effort: replace Streamlit caches with no-op wrappers during pytest
     with contextlib.suppress(Exception):
-        st.cache_resource = _noop_cache
-        st.cache_data = _noop_cache
+        st.cache_resource = _noop_cache  # type: ignore[assignment]
+        st.cache_data = _noop_cache  # type: ignore[assignment]
 import torch
 import torch.nn.functional as F
 from PIL import Image
@@ -200,7 +200,7 @@ def load_vision_model(model_path: str | None = None, num_classes: int = 38, devi
         # Compile model for better performance (PyTorch 2.0+)
         if hasattr(torch, "compile") and torch_device.type != "mps":
             try:
-                model = torch.compile(model, mode="reduce-overhead")
+                model = torch.compile(model, mode="reduce-overhead")  # type: ignore[assignment]
                 logger.info("Model compiled for optimized inference")
             except Exception as e:
                 logger.warning(f"Model compilation failed: {e}")

@@ -342,9 +342,10 @@ class ProductionTrainer:
                 orig_fc = cast(nn.Linear, model.fc)
                 model.fc = nn.Linear(orig_fc.in_features, self.config.num_classes)
             elif self.config.model_architecture == "resnet18":
-                model: nn.Module = models.resnet18(pretrained=self.config.pretrained)
-                orig_fc = cast(nn.Linear, model.fc)
-                model.fc = nn.Linear(orig_fc.in_features, self.config.num_classes)
+                resnet18_model: nn.Module = models.resnet18(pretrained=self.config.pretrained)
+                orig_fc = cast(nn.Linear, resnet18_model.fc)
+                resnet18_model.fc = nn.Linear(orig_fc.in_features, self.config.num_classes)
+                model = resnet18_model
             else:
                 msg = f"Unsupported architecture: {self.config.model_architecture}"
                 raise ValueError(msg)
@@ -427,15 +428,22 @@ class ProductionTrainer:
                     for i in range(len(orig_fc) - 1, -1, -1):
                         if isinstance(orig_fc[i], nn.Linear):
                             in_features = orig_fc[i].in_features
-                            orig_fc[i] = nn.Linear(in_features, num_classes)
+                            orig_fc[i] = nn.Linear(int(in_features), num_classes)
                             self.model.fc = orig_fc
                             return
                     # Fallback: create new sequential with dropout preserved
-                    last_in = getattr(orig_fc[-1], "in_features", None) or orig_fc[-1].in_features
-                    self.model.fc = nn.Sequential(nn.Dropout(getattr(self.config, "dropout_rate", 0.0)), nn.Linear(last_in, num_classes))
+                    last_layer = orig_fc[-1]
+                    last_in_features = getattr(last_layer, "in_features", None)
+                    if last_in_features is None and hasattr(last_layer, "in_features"):
+                        last_in_features = last_layer.in_features
+                    if last_in_features is None:
+                        last_in_features = 512  # Default fallback
+                    self.model.fc = nn.Sequential(
+                        nn.Dropout(getattr(self.config, "dropout_rate", 0.0)), nn.Linear(int(last_in_features), num_classes)
+                    )
                     return
                 elif isinstance(orig_fc, nn.Linear):
-                    in_features = orig_fc.in_features
+                    in_features = int(orig_fc.in_features)
                     self.model.fc = nn.Linear(in_features, num_classes)
                     return
 
@@ -448,7 +456,7 @@ class ProductionTrainer:
                     obj = self.model
                     for p in parts[:-1]:
                         obj = getattr(obj, p)
-                    setattr(obj, parts[-1], nn.Linear(module.in_features, num_classes))
+                    setattr(obj, parts[-1], nn.Linear(int(module.in_features), num_classes))
                     return
 
         except Exception:
@@ -555,8 +563,14 @@ class ProductionTrainer:
                 validation_split=0.2,  # Fallback if no val dir exists
             )
 
-            logger.info(f"Train dataset: {len(self.train_loader.dataset)} samples")
-            logger.info(f"Validation dataset: {len(self.val_loader.dataset)} samples")
+            # Use cast to tell MyPy that dataset has __len__ method
+            from collections.abc import Sized
+            from typing import cast
+
+            train_dataset = cast(Sized, self.train_loader.dataset)
+            val_dataset = cast(Sized, self.val_loader.dataset)
+            logger.info(f"Train dataset: {len(train_dataset)} samples")
+            logger.info(f"Validation dataset: {len(val_dataset)} samples")
             logger.info(f"Number of classes: {len(self.class_names)}")
 
             # Save class names for later use
@@ -797,6 +811,8 @@ class ProductionTrainer:
             # Run optimization
             if self.training_components is None:
                 raise ValueError("Training components not initialized")
+            if self.model is None:
+                raise ValueError("Model not initialized")
             optimization_result = self.performance_optimizer.optimize_training_pipeline(
                 model=self.model,
                 dataset=dataset,

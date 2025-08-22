@@ -27,15 +27,15 @@ if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
 
     # Use contextlib.suppress to avoid hiding unexpected errors with a bare except
     with contextlib.suppress(Exception):
-        st.cache_resource = _noop_cache
-        st.cache_data = _noop_cache
-from transformers import pipeline
+        st.cache_resource = _noop_cache  # type: ignore[assignment]
+        st.cache_data = _noop_cache  # type: ignore[assignment]
+from transformers import Pipeline, pipeline
 
 logger = logging.getLogger(__name__)
 
 
 @st.cache_resource(show_spinner=False)
-def load_whisper_pipeline(model_name: str = "openai/whisper-tiny") -> pipeline:
+def load_whisper_pipeline(model_name: str = "openai/whisper-tiny") -> Pipeline:
     """Load and cache Whisper pipeline for speech-to-text.
 
     Args:
@@ -102,8 +102,8 @@ class AudioAdapter:
             model_name: Whisper model name to use (default: openai/whisper-tiny)
         """
         self.model_name = model_name
-        self.pipeline = None  # Will be loaded lazily
-        self.temp_files = []  # Track temporary files for cleanup
+        self.pipeline: Pipeline | None = None  # Will be loaded lazily
+        self.temp_files: list[str] = []  # Track temporary files for cleanup
         self.max_duration = 60  # Maximum audio duration in seconds
         self.min_duration = 1  # Minimum audio duration in seconds
         self.supported_formats = [".wav", ".mp3", ".m4a", ".flac"]
@@ -199,7 +199,7 @@ class AudioAdapter:
             audio_data, sample_rate = librosa.load(audio_path, sr=16000)  # Whisper expects 16kHz
 
             # Validate duration
-            is_valid, duration = self._validate_audio_duration(audio_data, sample_rate)
+            is_valid, duration = self._validate_audio_duration(audio_data, int(sample_rate))
             if not is_valid:
                 if duration > self.max_duration:
                     logger.warning("Audio duration %.2fs exceeds maximum %ds, truncating", duration, self.max_duration)
@@ -271,6 +271,9 @@ class AudioAdapter:
                 if hasattr(signal, "SIGALRM"):
                     signal.signal(signal.SIGALRM, self._timeout_handler)
                     signal.alarm(self.processing_timeout)
+
+                if self.pipeline is None:
+                    raise RuntimeError("Pipeline not initialized")
 
                 result = self.pipeline(processed_path)
                 transcription = result.get("text", "").strip()

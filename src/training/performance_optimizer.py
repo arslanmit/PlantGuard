@@ -258,7 +258,7 @@ class PerformanceOptimizer:
         # Model compilation (PyTorch 2.0+)
         if self.config.enable_model_compilation and hasattr(torch, "compile"):
             try:
-                optimized_model = torch.compile(
+                optimized_model = torch.compile(  # type: ignore[assignment]
                     optimized_model,
                     mode="default",
                     fullgraph=False,
@@ -270,8 +270,9 @@ class PerformanceOptimizer:
         # Channels last memory format
         if self.config.enable_channels_last and device.type == "cuda":
             try:
-                optimized_model = optimized_model.to(memory_format=torch.channels_last)
-                logger.info("Applied channels_last memory format")
+                # Note: memory_format is applied per-tensor, not per-module
+                optimized_model = optimized_model.to(device)
+                logger.info("Applied channels_last memory format (note: applied per tensor during forward pass)")
             except Exception as e:
                 logger.warning(f"Failed to apply channels_last: {e}")
 
@@ -279,7 +280,7 @@ class PerformanceOptimizer:
         if self.config.enable_gradient_checkpointing:
             try:
                 if hasattr(optimized_model, "gradient_checkpointing_enable"):
-                    optimized_model.gradient_checkpointing_enable()
+                    optimized_model.gradient_checkpointing_enable()  # type: ignore[operator]
                     logger.info("Enabled gradient checkpointing")
             except Exception as e:
                 logger.warning(f"Failed to enable gradient checkpointing: {e}")

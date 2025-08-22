@@ -353,6 +353,10 @@ class CacheManager:
             cache_dir = self.config.data_cache_dir
             file_ext = ".pkl"
 
+        # Ensure cache directory is available
+        if cache_dir is None:
+            raise ValueError(f"Cache directory not configured for cache type: {cache_type}")
+
         # Create cache file path
         cache_file = cache_dir / f"{key}{file_ext}"
 
@@ -366,11 +370,8 @@ class CacheManager:
                 with open(cache_file, "wb") as f:
                     _pickle.dump(data, f)  # nosec B301
 
-            # Calculate file size and checksum (guard cache_dir may be None)
-            if cache_file is None:
-                file_size = 0
-            else:
-                file_size = cache_file.stat().st_size
+            # Calculate file size and checksum
+            file_size = cache_file.stat().st_size
             checksum = self._calculate_checksum(cache_file) if self.config.validate_cache_integrity else None
 
             # Create cache entry
@@ -420,6 +421,10 @@ class CacheManager:
                 cache_dir = self.config.feature_cache_dir
             else:
                 cache_dir = self.config.data_cache_dir
+
+            if cache_dir is None:
+                logger.warning(f"Cache directory not configured for type: {cache_type}")
+                return
 
             keys_to_remove = [key for key, entry in self.cache_index.items() if entry.path.parent == cache_dir]
 
@@ -620,6 +625,12 @@ class DatasetCache:
             preprocessing_config,
         )
 
+        # Get dataset size safely
+        try:
+            dataset_size = len(dataset) if hasattr(dataset, "__len__") else 0
+        except (TypeError, AttributeError):
+            dataset_size = 0
+
         self.cache_manager.put_in_cache(
             cache_key,
             dataset,
@@ -627,7 +638,7 @@ class DatasetCache:
             metadata={
                 "dataset_path": str(dataset_path),
                 "preprocessing_config": preprocessing_config,
-                "dataset_size": len(dataset),
+                "dataset_size": dataset_size,
             },
         )
 

@@ -19,11 +19,15 @@ try:
     from streamlit_webrtc import RTCConfiguration, WebRtcMode, webrtc_streamer
 except Exception:
     # Fallback stubs for test environments where streamlit_webrtc isn't available
-    class RTCConfiguration(dict):
+    class RTCConfigurationStub(dict):
         pass
 
-    class WebRtcMode:
+    RTCConfiguration = RTCConfigurationStub  # type: ignore[misc,assignment]
+
+    class WebRtcModeStub:
         SENDONLY = "sendonly"
+
+    WebRtcMode = WebRtcModeStub  # type: ignore[misc,assignment]
 
     class _DummyState:
         def __init__(self):
@@ -33,9 +37,11 @@ except Exception:
         def __init__(self):
             self.state = _DummyState()
 
-    def webrtc_streamer(*args, **kwargs):
+    def webrtc_streamer_stub(*args, **kwargs):
         # Return a simple object with a state attribute used by the code
         return _DummyCtx()
+
+    webrtc_streamer = webrtc_streamer_stub  # type: ignore[misc,assignment]
 
 
 logger = logging.getLogger(__name__)
@@ -129,7 +135,7 @@ class VoiceInterface:
                     return None, 0
 
                 logger.info(f"Loaded audio file: {audio_file.name}, duration: {len(audio_data) / sr:.2f}s")
-                return audio_data, sr
+                return audio_data, int(sr)
 
             finally:
                 # Clean up temporary file

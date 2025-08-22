@@ -524,7 +524,7 @@ class HistoryManager:
             st.metric("Total Analyses", len(entries))
 
         with col2:
-            disease_counts = {}
+            disease_counts: dict[str, int] = {}
             for entry in entries:
                 disease = entry.analysis_result.prediction
                 disease_counts[disease] = disease_counts.get(disease, 0) + 1

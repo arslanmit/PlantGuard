@@ -43,7 +43,7 @@ class ModelConfig:
         self.enabled = config_dict.get("enabled", True)
         self.device_preference = config_dict.get("device", "auto")
         self.preprocessing = config_dict.get("preprocessing", {})
-        self.tags = config_dict.get("tags", [])
+        self.tags: list[str] = list(config_dict.get("tags", []))
         # Optional architecture field (may come from registry metadata)
         self.architecture = config_dict.get("architecture")
 
@@ -205,11 +205,13 @@ class PlantGuardModelManager:
         models = []
         for model_id, config in self.models_config.items():
             # Prefer tags from the raw config if present so we preserve registry tags
-            tags = []
+            tags: list[str] = []
             if hasattr(self, "_config_data"):
-                tags = self._config_data.get("models", {}).get(model_id, {}).get("tags") or []
+                raw_tags = self._config_data.get("models", {}).get(model_id, {}).get("tags")
+                tags = list(raw_tags) if raw_tags else []
             if not tags:
-                tags = getattr(config, "tags", []) or []
+                config_tags = getattr(config, "tags", []) or []
+                tags = list(config_tags)
 
             # Pull optional fields from the raw config if available so we expose
             # registry-provided metadata like architecture and inference_time.

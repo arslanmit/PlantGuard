@@ -225,5 +225,14 @@ def main() -> None:
         st.markdown("⏳ Real-time Processing")
 
 
+def create_app():
+    """Create and configure the Streamlit application.
+
+    Returns:
+        function: The main application function
+    """
+    return main
+
+
 if __name__ == "__main__":
     main()

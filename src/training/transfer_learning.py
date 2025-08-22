@@ -7,8 +7,9 @@ transfer learning evaluation, and fine-tuning optimization with different learni
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
+from typing import Any, cast
 
+import torch
 import torch.nn as nn
 from torch.optim import Optimizer
 
@@ -334,7 +335,7 @@ class TransferLearningOptimizer:
             # Standard optimizer for all parameters
             return optimizer_class(self.model.parameters(), lr=self.base_lr, **optimizer_kwargs)
         # Create parameter groups with different learning rates
-        optimizer_param_groups: list[dict[str, object]] = []
+        optimizer_param_groups: list[dict[str, Any]] = []
 
         for group in self.layer_groups:
             group_params = []
@@ -364,9 +365,10 @@ class TransferLearningOptimizer:
         optimizer = optimizer_class(optimizer_param_groups, **optimizer_kwargs)
 
         logger.info(f"Created optimizer with {len(optimizer_param_groups)} parameter groups:")
-        for i, group in enumerate(optimizer_param_groups):
-            num_params = sum(p.numel() for p in group["params"])
-            logger.info(f"  Group '{group['name']}': LR={group['lr']:.6f}, Params={num_params:,}")
+        for i, param_group in enumerate(optimizer_param_groups):
+            params = cast(list[torch.nn.Parameter], param_group["params"])
+            num_params = sum(p.numel() for p in params)
+            logger.info(f"  Group '{param_group['name']}': LR={param_group['lr']:.6f}, Params={num_params:,}")
 
         return optimizer
 

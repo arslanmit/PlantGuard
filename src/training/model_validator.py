@@ -9,7 +9,7 @@ import logging
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import torch
 from PIL import Image
@@ -128,9 +128,12 @@ class SampleDataset(Dataset):
         label = self.labels[idx]
 
         try:
-            image = Image.open(image_path).convert("RGB")
+            pil_image = Image.open(image_path).convert("RGB")
             if self.transform:
-                image = self.transform(image)
+                image = cast(torch.Tensor, self.transform(pil_image))  # Transform converts PIL Image to Tensor
+            else:
+                # If no transform, convert manually (fallback)
+                image = torch.zeros(3, 224, 224)
         except Exception as e:
             logger.warning(f"Failed to load image {image_path}: {e}")
             # Return a dummy image
@@ -224,7 +227,7 @@ class AutomatedModelValidator:
         metrics_validation.model_path = str(model_path)
 
         # 3. Sample testing (if enabled)
-        sample_test_results = []
+        sample_test_results: list[SampleTestResult] = []
         sample_accuracy = 0.0
         avg_confidence = 0.0
         high_confidence_ratio = 0.0
@@ -469,10 +472,10 @@ class AutomatedModelValidator:
         high_confidence_count = 0
 
         for i in range(len(test_data)):
-            true_label = test_labels[i].item()
+            true_label = int(test_labels[i].item())
             true_class = class_names[true_label] if true_label < len(class_names) else f"Class_{true_label}"
 
-            predicted_label = top_indices[i, 0].item()
+            predicted_label = int(top_indices[i, 0].item())
             predicted_class = class_names[predicted_label] if predicted_label < len(class_names) else f"Class_{predicted_label}"
 
             confidence = top_probs[i, 0].item()
@@ -488,7 +491,7 @@ class AutomatedModelValidator:
             # Create top-k predictions
             top_k_preds = []
             for j in range(self.config.top_k_predictions):
-                pred_idx = top_indices[i, j].item()
+                pred_idx = int(top_indices[i, j].item())
                 pred_prob = top_probs[i, j].item()
                 pred_class = class_names[pred_idx] if pred_idx < len(class_names) else f"Class_{pred_idx}"
 

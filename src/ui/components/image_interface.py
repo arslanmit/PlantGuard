@@ -8,13 +8,13 @@ for the PlantGuard multimodal plant disease detection system.
 import io
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 try:
     import cv2
 except Exception:
     # Provide a minimal fallback so tests can import this module without OpenCV installed
-    cv2: Any = None
+    cv2 = None  # type: ignore[assignment]
 import streamlit as st
 from PIL import ExifTags, Image
 
@@ -77,17 +77,17 @@ class ImageInterface:
             if hasattr(image_file, "read"):
                 # Streamlit uploaded file
                 image_bytes = image_file.read()
-                image = Image.open(io.BytesIO(image_bytes))
+                image = cast(Image.Image, Image.open(io.BytesIO(image_bytes)))
             elif isinstance(image_file, Image.Image):
                 # PIL Image
                 image = image_file
             else:
                 # Try to open as file path
-                image = Image.open(image_file)
+                image = cast(Image.Image, Image.open(image_file))
 
             # Convert to RGB if needed
             if image.mode != "RGB":
-                image = image.convert("RGB")
+                image = cast(Image.Image, image.convert("RGB"))
 
             # Check image dimensions
             width, height = image.size

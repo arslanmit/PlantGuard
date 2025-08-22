@@ -335,8 +335,8 @@ class TrainingMonitor:
             ax.imshow(img, cmap="gray" if img.dim() == 2 else None)
 
             # Add prediction info
-            pred_idx = sample_preds[i].item()
-            target_idx = sample_targets[i].item()
+            pred_idx = int(sample_preds[i].item())
+            target_idx = int(sample_targets[i].item())
             confidence = sample_probs[i, pred_idx].item()
 
             pred_name = class_names[pred_idx] if pred_idx < len(class_names) else f"Class_{pred_idx}"
@@ -452,13 +452,13 @@ class TrainingMonitor:
             )
 
             # Safely get attributes with defaults and return a summary dict
-            metrics: dict[str, float | None] = {
-                "epoch": getattr(progress_metrics, "epoch", 0.0),
-                "train_loss": getattr(progress_metrics, "train_loss", 0.0),
-                "val_loss": val_loss,
-                "val_accuracy": val_accuracy,
-                "learning_rate": learning_rate,
-                "eta": getattr(progress_metrics, "eta", 0.0),
+            metrics: dict[str, float] = {
+                "epoch": float(getattr(progress_metrics, "epoch", 0.0)),
+                "train_loss": float(getattr(progress_metrics, "train_loss", 0.0)),
+                "val_loss": float(val_loss) if val_loss is not None else 0.0,
+                "val_accuracy": float(val_accuracy) if val_accuracy is not None else 0.0,
+                "learning_rate": float(learning_rate) if learning_rate is not None else 0.0,
+                "eta": float(getattr(progress_metrics, "eta", 0.0)),
             }
 
             return metrics
@@ -529,17 +529,17 @@ class TrainingMonitor:
         total_duration = (end_time - self.start_time).total_seconds()
 
         # Get final metrics from last entry
-        final_metrics = {}
+        final_metrics: dict[str, float] = {}
         if self.metrics_history:
             last_metrics = self.metrics_history[-1]
-            final_metrics = {
+            raw_metrics = {
                 "train_loss": last_metrics.train_loss,
                 "val_loss": last_metrics.val_loss,
                 "train_accuracy": last_metrics.train_accuracy,
                 "val_accuracy": last_metrics.val_accuracy,
             }
-            # Remove None values
-            final_metrics = {k: v for k, v in final_metrics.items() if v is not None}
+            # Remove None values and ensure float type
+            final_metrics = {k: float(v) for k, v in raw_metrics.items() if v is not None}
 
         # Create training report
         report = TrainingReport(
