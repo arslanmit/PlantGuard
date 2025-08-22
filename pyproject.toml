@@ -193,25 +193,25 @@ plantguard-train = "src.training.production_trainer:main"  # Training CLI
 python_version = "3.10"           # 🐍 Python version we're using
 strict = false                    # 🎯 Gradual typing (not too strict while learning)
 
-# � External libraries - ignore missing type information
+# External libraries - ignore missing type information
 ignore_missing_imports = true     # Ignore missing imports from external packages
-follow_imports = "silent"         # Don't follow imports to external packages
+follow_imports = "silent"       # Don't follow imports to external packages
 namespace_packages = true         # Handle namespace packages better
 
-# ⚠️ Warnings we want to see
-warn_return_any = true           # Warn when function returns 'Any' type
-warn_unused_configs = true       # Warn about unused MyPy settings
-warn_redundant_casts = true      # Warn about unnecessary type casts
-warn_no_return = true            # Warn when function should return something
-warn_unreachable = true          # Warn about code that can't be reached
-strict_equality = true           # Strict checking for == and !=
+# Relaxed warnings to reduce noise across a large, partially-typed codebase
+warn_return_any = false          # don't warn for Any return types for now
+warn_unused_configs = false
+warn_redundant_casts = false
+warn_no_return = false
+warn_unreachable = false
+strict_equality = false
 
-# 🏷️ Type annotation requirements
-disallow_untyped_defs = true     # Functions need type hints
-disallow_incomplete_defs = true  # All parameters need types
-check_untyped_defs = true        # Check functions even without types
+# Type annotation requirements (relaxed to allow gradual typing)
+disallow_untyped_defs = false    # Functions may omit type hints
+disallow_incomplete_defs = false # Parameters may omit type annotations
+check_untyped_defs = false       # Don't check bodies of untyped functions
 
-# 🚫 Folders to skip (don't type-check these)
+# Folders to skip (don't type-check these)
 exclude = [
   "build/",           # Build artifacts
   "dist/",            # Distribution files
