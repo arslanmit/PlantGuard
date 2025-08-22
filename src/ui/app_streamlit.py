@@ -25,6 +25,8 @@ src_path = Path(__file__).parent.parent
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
+from typing import Optional
+
 from core.audio import AudioAdapter
 from core.nlp import TextAdapter
 from core.vision import VisionAdapter
@@ -208,7 +210,7 @@ try:
     from src.features.model_switching.model_manager import PlantGuardModelManager
 
     try:
-        model_manager = PlantGuardModelManager(autoload_default=True)
+        model_manager: Optional["PlantGuardModelManager"] = PlantGuardModelManager(autoload_default=True)
     except Exception as exc:
         logger.exception("Failed to initialize PlantGuardModelManager: %s", exc)
         model_manager = None
@@ -427,7 +429,8 @@ for i, (model_type, config) in enumerate(model_configs.items()):
         )
 
         # Get available models and normalize to lists for proper typing
-        available_for_type = list(available_models.get(model_type, list(config["options"].keys())))
+        # Normalize config options to concrete lists to satisfy type checker
+        available_for_type = list(available_models.get(model_type, list(config.get("options", {}).keys())))
         current_model = current_selections.get(model_type, available_for_type[0])
 
         # Create display options and parallel key list
@@ -460,9 +463,10 @@ for i, (model_type, config) in enumerate(model_configs.items()):
         selected_key = model_keys[display_options.index(selected_display)]
         selected_models[model_type] = selected_key
 
-        # Performance badge
-        if selected_key in config["badges"]:
-            icon, metric, badge_class = config["badges"][selected_key]
+        # Performance badge (guard against Collection typing and missing keys)
+        badges = config.get("badges", {})
+        if isinstance(badges, dict) and selected_key in badges:
+            icon, metric, badge_class = badges[selected_key]
             st.markdown(
                 f"""
             <div class="performance-badge {badge_class}">
@@ -472,12 +476,12 @@ for i, (model_type, config) in enumerate(model_configs.items()):
                 unsafe_allow_html=True,
             )
 
-    # Update session state
-    if selected_models != current_selections:
-        st.session_state["selected_models"] = selected_models
-        st.success("🔄 Model configuration updated!")
-    else:
-        st.session_state["selected_models"] = selected_models
+# Update session state
+if selected_models != current_selections:
+    st.session_state["selected_models"] = selected_models
+    st.success("🔄 Model configuration updated!")
+else:
+    st.session_state["selected_models"] = selected_models
 
 # Sidebar for model management (rotated from main area)
 # REMOVED: Sidebar functionality moved to Model Management tab

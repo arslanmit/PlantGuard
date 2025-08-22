@@ -8,12 +8,13 @@ for the PlantGuard multimodal plant disease detection system.
 import io
 import logging
 from pathlib import Path
+from typing import Any
 
 try:
     import cv2
 except Exception:
     # Provide a minimal fallback so tests can import this module without OpenCV installed
-    cv2 = None
+    cv2: Any = None
 import streamlit as st
 from PIL import ExifTags, Image
 
@@ -62,7 +63,7 @@ class ImageInterface:
 
         return True, ""
 
-    def load_and_validate_image(self, image_file) -> Image.Image | None:
+    def load_and_validate_image(self, image_file: Any) -> Image.Image | None:
         """Load and validate image file.
 
         Args:
