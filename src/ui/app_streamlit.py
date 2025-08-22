@@ -32,8 +32,10 @@ from core.nlp import TextAdapter
 from core.vision import VisionAdapter
 from ui.components import ModelSwitcher
 
+# Module logger
 logger = logging.getLogger(__name__)
 
+# Get current selections
 st.set_page_config(page_title="PlantGuard", page_icon="🌿", layout="wide", initial_sidebar_state="expanded")
 
 # Custom CSS for improved UI
@@ -249,8 +251,8 @@ def load_adapters() -> tuple[VisionAdapter, AudioAdapter, TextAdapter]:
     classes_path = "data/knowledge_base/plantvillage_classes.json"
     if Path(classes_path).exists():
         try:
-            # Only call load_class_mapping when the adapter exposes it (VisionAdapter)
-            if hasattr(vision, "load_class_mapping"):
+            # Only call load_class_mapping when the adapter exposes it and vision is not None
+            if hasattr(vision, "load_class_mapping") and vision is not None:
                 vision.load_class_mapping(classes_path)
         except Exception as exc:
             logger.exception("Failed to load class mapping for vision adapter: %s", exc)
@@ -264,6 +266,15 @@ def load_adapters() -> tuple[VisionAdapter, AudioAdapter, TextAdapter]:
 def get_model_status() -> dict[str, str]:
     """Get current model loading status."""
     return {"vision": "loaded", "audio": "loaded", "text": "loaded"}
+
+
+# Initialize adapters at module level so later code can reference them safely
+try:
+    vision_adapter, audio_adapter, text_adapter = load_adapters()
+except Exception:
+    vision_adapter = None  # type: ignore[assignment]
+    audio_adapter = None  # type: ignore[assignment]
+    text_adapter = None  # type: ignore[assignment]
 
 
 # Available models configuration
@@ -367,7 +378,6 @@ model_configs = {
         },
         "badges": {
             "vit_base_plants": ("🏆", "100%", "badge-green"),
-            "resnet50_plantvillage_v1": ("🔬", "95%", "badge-blue"),
             "mobilenet_fast": ("⚡", "90%", "badge-orange"),
         },
     },
@@ -415,30 +425,47 @@ for i, (model_type, config) in enumerate(model_configs.items()):
         # Enhanced container
         st.markdown(
             f"""
-        <div class="model-dropdown-container">
-            <div class="model-type-header">
-                <span class="model-icon">{config["icon"]}</span>
-                <div>
-                    <strong>{config["title"]}</strong>
-                    <div class="model-description">{config["description"]}</div>
+            <div class="model-dropdown-container">
+                <div class="model-type-header">
+                    <span class="model-icon">{config["icon"]}</span>
+                    <div>
+                        <strong>{config["title"]}</strong>
+                        <div class="model-description">{config["description"]}</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        """,
+            """,
             unsafe_allow_html=True,
         )
 
         # Get available models and normalize to lists for proper typing
-        # Normalize config options to concrete lists to satisfy type checker
-        available_for_type = list(available_models.get(model_type, list(config.get("options", {}).keys())))
-        current_model = current_selections.get(model_type, available_for_type[0])
+        # available_models entries may be lists or collections; prefer explicit handling
+        raw_avail = available_models.get(model_type)
+        options_raw = config.get("options", {})
+        # Determine fallback keys from config options safely
+        if isinstance(options_raw, dict):
+            fallback_keys = list(options_raw.keys())
+        else:
+            fallback_keys = list(options_raw) if options_raw is not None else []
+
+        # Normalize available models into a concrete list[str]
+        available_for_type: list[str]
+        if raw_avail is None:
+            available_for_type = fallback_keys
+        elif isinstance(raw_avail, dict):
+            available_for_type = list(raw_avail.keys())
+        else:
+            available_for_type = list(raw_avail)
+
+        current_model = current_selections.get(model_type, available_for_type[0] if available_for_type else "")
 
         # Create display options and parallel key list
         display_options: list[str] = []
         model_keys: list[str] = []
+        options_map = config.get("options", {})
         for key in available_for_type:
-            if key in config["options"]:
-                display_options.append(config["options"][key])
+            if isinstance(options_map, dict) and key in options_map:
+                display_options.append(options_map[key])
                 model_keys.append(key)
 
         # Find current index
@@ -469,25 +496,12 @@ for i, (model_type, config) in enumerate(model_configs.items()):
             icon, metric, badge_class = badges[selected_key]
             st.markdown(
                 f"""
-            <div class="performance-badge {badge_class}">
-                {icon} {metric}
-            </div>
-            """,
+                <div class="performance-badge {badge_class}">
+                    {icon} {metric}
+                </div>
+                """,
                 unsafe_allow_html=True,
             )
-
-# Update session state
-if selected_models != current_selections:
-    st.session_state["selected_models"] = selected_models
-    st.success("🔄 Model configuration updated!")
-else:
-    st.session_state["selected_models"] = selected_models
-
-# Sidebar for model management (rotated from main area)
-# REMOVED: Sidebar functionality moved to Model Management tab
-
-# Load adapters after model selection
-vision_adapter, audio_adapter, text_adapter = load_adapters()
 
 # Main content separator
 st.markdown("---")
