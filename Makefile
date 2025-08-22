@@ -476,7 +476,7 @@ security:
 	@$(BANDIT) -r $(SRC_DIR)/ -ll -f json -o security-report.json || true
 	@$(BANDIT) -r $(SRC_DIR)/ -ll || echo "$(YELLOW)⚠️  Security issues found - check security-report.json$(NC)"
 	@echo "$(YELLOW)Checking for known vulnerabilities...$(NC)"
-	@$(PIP) freeze | $(PY) -m safety check --stdin || echo "$(YELLOW)⚠️  Vulnerable packages found$(NC)"
+	@$(PIP) freeze | $(PY) -m safety scan --stdin --json || echo "$(YELLOW)⚠️  Vulnerable packages found$(NC)"
 	@echo "$(GREEN)✅ Security scan complete$(NC)"
 
 # ========== Testing ==========
