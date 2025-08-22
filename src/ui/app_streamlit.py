@@ -426,13 +426,13 @@ for i, (model_type, config) in enumerate(model_configs.items()):
             unsafe_allow_html=True,
         )
 
-        # Get available models
-        available_for_type = available_models.get(model_type, list(config["options"].keys()))
+        # Get available models and normalize to lists for proper typing
+        available_for_type = list(available_models.get(model_type, list(config["options"].keys())))
         current_model = current_selections.get(model_type, available_for_type[0])
 
-        # Create display options
-        display_options = []
-        model_keys = []
+        # Create display options and parallel key list
+        display_options: list[str] = []
+        model_keys: list[str] = []
         for key in available_for_type:
             if key in config["options"]:
                 display_options.append(config["options"][key])
@@ -443,13 +443,16 @@ for i, (model_type, config) in enumerate(model_configs.items()):
         if current_model in model_keys:
             current_index = model_keys.index(current_model)
 
-        # Selectbox
+        # Ensure help text uses a string
+        help_text = f"Choose the best {str(config['title']).lower()} for your needs"
+
+        # Selectbox: options is a Sequence[str]
         selected_display = st.selectbox(
             f"{config['icon']} Select {config['title']}",
             options=display_options,
             index=current_index,
             key=f"enhanced_{model_type}_select",
-            help=f"Choose the best {config['title'].lower()} for your needs",
+            help=help_text,
             label_visibility="collapsed",
         )
 

@@ -114,12 +114,16 @@ class ImageInterface:
             Corrected PIL Image
         """
         try:
-            # Get EXIF data
-            exif = image._getexif()
-            if exif is not None:
-                # Find orientation tag
-                for tag, value in exif.items():
-                    if tag in ExifTags.TAGS and ExifTags.TAGS[tag] == "Orientation":
+            # Get EXIF data (use public API when available)
+            exif = None
+            if hasattr(image, "getexif"):
+                exif = image.getexif()
+            elif hasattr(image, "_getexif"):
+                exif = image._getexif()
+
+            if exif:
+                for tag, value in dict(exif).items():
+                    if ExifTags.TAGS.get(tag) == "Orientation":
                         # Apply rotation based on orientation
                         if value == 3:
                             image = image.rotate(180, expand=True)
@@ -315,6 +319,7 @@ class ImageInterface:
             if st.button("🚀 Process All", type="primary"):
                 processed_images = []
 
+                # Use a progress bar only when available
                 with st.progress(0) as progress_bar:
                     for i, image in enumerate(images):
                         try:
@@ -324,7 +329,12 @@ class ImageInterface:
                                 processed_image = self.preprocess_image(processed_image)
 
                             processed_images.append(processed_image)
-                            progress_bar.progress((i + 1) / len(images))
+                            # Guard progress_bar in case st.progress returns None in test stubs
+                            if progress_bar is not None:
+                                import contextlib
+
+                                with contextlib.suppress(Exception):
+                                    progress_bar.progress((i + 1) / len(images))
 
                         except Exception as e:
                             logger.warning(f"Failed to process image {i}: {e}")

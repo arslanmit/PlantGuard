@@ -377,7 +377,7 @@ class MobileNavigationMenu:
                     icon,
                     key=f"mobile_bottom_nav_{page_name}",
                     help=page_name,
-                    type=button_type,
+                    type=button_type,  # type: ignore[arg-type]
                     use_container_width=True,
                 ):
                     selected_page = page_name

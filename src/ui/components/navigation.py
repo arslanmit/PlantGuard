@@ -138,28 +138,26 @@ class NavigationHeader:
 
         return selected_page
 
-    def _render_status_indicator(self):
-        """Render system status indicator."""
+    def _render_status_indicator_impl(self) -> None:
+        """Internal implementation: render system status indicator."""
         # Check model loading status
         model_status = st.session_state.get("model_load_status", {})
         loaded_models = sum(1 for status in model_status.values() if status == "loaded")
         total_models = len(model_status)
 
-        if loaded_models == total_models:
-            _status_color = "#22C55E"
-            status_text = "🟢 Ready"
+        if total_models == 0:
+            status_text = "6aa Initializing"
+        elif loaded_models == total_models:
+            status_text = "3f2 Ready"
         elif loaded_models > 0:
-            _status_color = "#F59E0B"
-            status_text = f"🟡 Loading ({loaded_models}/{total_models})"
+            status_text = f"3e1 Loading ({loaded_models}/{total_models})"
         else:
-            _status_color = "#64748B"
-            status_text = "⚪ Initializing"
+            status_text = "6aa Initializing"
 
         st.markdown(
             f"""
             <div class='status-container'>
-                <span class='status-text'>{status_text}</span><br>
-                <span class='status-offline'>🔒 Offline Mode</span>
+                <span class='status-text'>{status_text}</span>
             </div>
             """,
             unsafe_allow_html=True,
@@ -176,7 +174,8 @@ class NavigationHeader:
 
     def _render_status_indicator(self) -> None:
         """Expose status indicator rendering for other components to call."""
-        self._render_status_indicator()
+        # Delegate to the impl to avoid no-redef/name collisions
+        self._render_status_indicator_impl()
 
     def _render_navigation_tabs(self, current_page: str) -> str:
         """Render navigation tabs and return selected page."""

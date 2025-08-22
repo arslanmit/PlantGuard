@@ -82,7 +82,7 @@ class VoiceInterface:
 
         return True, ""
 
-    def validate_audio_duration(self, audio_data: np.ndarray, sample_rate: int) -> tuple[bool, str]:
+    def validate_audio_duration(self, audio_data: np.ndarray, sample_rate: int | float) -> tuple[bool, str]:
         """Validate audio duration.
 
         Args:
@@ -92,7 +92,8 @@ class VoiceInterface:
         Returns:
             Tuple of (is_valid, error_message)
         """
-        duration = len(audio_data) / sample_rate
+        # Allow float sample rates recorded from external sources
+        duration = len(audio_data) / float(sample_rate)
 
         if duration < self.min_duration:
             return False, f"Audio too short (min {self.min_duration}s)"
@@ -119,10 +120,10 @@ class VoiceInterface:
 
             try:
                 # Load audio with librosa
-                audio_data, sr = librosa.load(tmp_file_path, sr=self.sample_rate, mono=True)
+                audio_data, sr = librosa.load(tmp_file_path, sr=int(self.sample_rate), mono=True)
 
                 # Validate duration
-                is_valid, error_msg = self.validate_audio_duration(audio_data, sr)
+                is_valid, error_msg = self.validate_audio_duration(audio_data, int(sr))
                 if not is_valid:
                     st.toast(error_msg, icon="⚠️")
                     return None, 0
@@ -251,7 +252,7 @@ class VoiceInterface:
         rtc_configuration = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
 
         # Audio capture state
-        audio_frames = []
+        audio_frames: list[np.ndarray] = []
 
         def audio_frame_callback(frame: av.AudioFrame):
             """Callback for processing audio frames."""
@@ -266,12 +267,12 @@ class VoiceInterface:
             mode=WebRtcMode.SENDONLY,
             audio_receiver_size=1024,
             rtc_configuration=rtc_configuration,
-            media_stream_constraints={"video": False, "audio": {"sampleRate": self.sample_rate}},
+            media_stream_constraints={"video": False, "audio": {"sampleRate": int(self.sample_rate)}},
             audio_frame_callback=audio_frame_callback,
         )
 
         # Recording status
-        if webrtc_ctx.state.playing:
+        if getattr(webrtc_ctx, "state", None) is not None and getattr(webrtc_ctx.state, "playing", False):
             st.success("🔴 Recording... Click 'Stop' when finished")
             st.session_state.audio_recording = True
         elif st.session_state.audio_recording:
