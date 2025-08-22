@@ -333,9 +333,8 @@ class TransferLearningOptimizer:
         if not self.config.enable_layer_wise_lr:
             # Standard optimizer for all parameters
             return optimizer_class(self.model.parameters(), lr=self.base_lr, **optimizer_kwargs)
-
         # Create parameter groups with different learning rates
-        param_groups = []
+        optimizer_param_groups: list[dict[str, object]] = []
 
         for group in self.layer_groups:
             group_params = []
@@ -356,16 +355,16 @@ class TransferLearningOptimizer:
                         "lr": group_lr,
                         "name": group.name,
                     }
-                    param_groups.append(param_group)
+                    optimizer_param_groups.append(param_group)
 
-        if not param_groups:
+        if not optimizer_param_groups:
             # Fallback to standard optimizer
             return optimizer_class(self.model.parameters(), lr=self.base_lr, **optimizer_kwargs)
 
-        optimizer = optimizer_class(param_groups, **optimizer_kwargs)
+        optimizer = optimizer_class(optimizer_param_groups, **optimizer_kwargs)
 
-        logger.info(f"Created optimizer with {len(param_groups)} parameter groups:")
-        for i, group in enumerate(param_groups):
+        logger.info(f"Created optimizer with {len(optimizer_param_groups)} parameter groups:")
+        for i, group in enumerate(optimizer_param_groups):
             num_params = sum(p.numel() for p in group["params"])
             logger.info(f"  Group '{group['name']}': LR={group['lr']:.6f}, Params={num_params:,}")
 
@@ -443,7 +442,9 @@ class TransferLearningOptimizer:
         Returns:
             Dictionary with transfer learning evaluation metrics
         """
-        evaluation = {
+        from typing import Any
+
+        evaluation: dict[str, Any] = {
             "strategy": self.config.strategy.value,
             "total_epochs": len(train_losses),
             "unfrozen_epochs": self.unfrozen_epochs,

@@ -120,13 +120,21 @@ class NavigationHeader:
         if pending and pending != st.session_state.get("current_page"):
             st.session_state.current_page = pending
             self._track_page_change(pending)
-            try:
-                st.experimental_rerun()
-            except Exception:
+            # Use getattr to avoid mypy complaining about optional experimental API
+            rerun_fn = getattr(st, "experimental_rerun", None)
+            if callable(rerun_fn):
+                try:
+                    rerun_fn()
+                except Exception:
+                    try:
+                        st.rerun()
+                    except Exception:
+                        logger.exception("Both experimental_rerun and rerun failed during navigation")
+            else:
                 try:
                     st.rerun()
                 except Exception:
-                    logger.exception("Both experimental_rerun and rerun failed during navigation")
+                    logger.exception("Failed to rerun after navigation change")
 
         return selected_page
 
@@ -197,7 +205,7 @@ class NavigationHeader:
                     f"{page_info['icon']} {page_name}",
                     key=f"nav_{page_name}",
                     help=page_info["description"],
-                    type=button_type,
+                    type=button_type,  # type: ignore[arg-type]
                     use_container_width=True,
                 ):
                     selected_page = page_name
@@ -294,7 +302,7 @@ class NavigationHeader:
                 f"{page_info['icon']} {page_name}",
                 key=f"mobile_nav_{page_name}",
                 help=page_info["description"],
-                type=button_type,
+                type=button_type,  # type: ignore[arg-type]
                 use_container_width=True,
             ):
                 # Defer navigation to avoid component unregistration races
@@ -495,7 +503,7 @@ class NavigationSidebar:
                     f"{page_info['icon']} {page_name}",
                     key=f"sidebar_nav_{page_name}",
                     help=page_info["description"],
-                    type=button_type,
+                    type=button_type,  # type: ignore[arg-type]
                     use_container_width=True,
                 ):
                     st.session_state.current_page = page_name
@@ -512,7 +520,19 @@ class NavigationSidebar:
             # Session info
             self._render_session_info()
             # Status indicator
-            self._render_status_indicator()
+            # Use header's status indicator to render centrally
+            try:
+                self.nav_header._render_status_indicator()
+            except Exception:
+                # Fallback to a minimal indicator
+                st.markdown("<div class='status-container'>Status</div>", unsafe_allow_html=True)
+
+    def _render_status_indicator(self) -> None:
+        """Expose a sidebar-level status indicator for callers."""
+        try:
+            self.nav_header._render_status_indicator()
+        except Exception:
+            st.markdown("<div class='status-container'>Status</div>", unsafe_allow_html=True)
 
     def _render_session_info(self):
         """Render session information in sidebar."""
