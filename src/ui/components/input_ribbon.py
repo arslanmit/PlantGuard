@@ -670,21 +670,25 @@ class InputRibbon:
     def get_multimodal_input_summary(self) -> dict[str, Any]:
         """Get summary of all active input modes and their data."""
         active_modes = self.get_active_modes()
+        # Use typed locals to keep mypy happy about indexed assignments
+        input_data_map: dict[str, Any] = {}
+        validation_status_map: dict[str, str] = {}
+
         summary = {
             "active_modes": active_modes,
             "mode_count": len(active_modes),
             "has_valid_input": False,
-            "input_data": {},
-            "validation_status": {},
+            "input_data": input_data_map,
+            "validation_status": validation_status_map,
         }
 
         for mode in active_modes:
             input_data = self.get_input_data(mode)
             if input_data:
-                summary["input_data"][mode] = input_data
+                input_data_map[mode] = input_data
 
             validation_status = self._validate_mode_input(mode)
-            summary["validation_status"][mode] = validation_status
+            validation_status_map[mode] = validation_status
 
             if validation_status == "valid":
                 summary["has_valid_input"] = True
@@ -758,9 +762,10 @@ class InputRibbon:
         validation_results = self.validate_all_inputs()
         valid_modes = [mode for mode, status in validation_results.items() if status == "valid"]
 
+        combined_data_map: dict[str, Any] = {}
         combined_input = {
             "modes": valid_modes,
-            "data": {},
+            "data": combined_data_map,
             "metadata": {
                 "timestamp": st.session_state.get("current_time", ""),
                 "session_id": st.session_state.get("session_id", ""),
@@ -771,6 +776,6 @@ class InputRibbon:
         for mode in valid_modes:
             input_data = self.get_input_data(mode)
             if input_data:
-                combined_input["data"][mode] = input_data
+                combined_data_map[mode] = input_data
 
         return combined_input

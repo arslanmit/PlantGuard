@@ -285,7 +285,7 @@ class ModelEvaluator:
 
     def _calculate_roc_metrics(
         self, y_true: list[int], y_proba: np.ndarray, class_names: list[str]
-    ) -> tuple[float, float, dict[str, dict[str, list[float]]]]:
+    ) -> tuple[float | None, float | None, dict[str, dict[str, list[float]]] | None]:
         """Calculate ROC AUC metrics and curves.
 
         Args:
@@ -598,7 +598,7 @@ class ModelEvaluator:
             return {}
 
         model_names = list(model_metrics.keys())
-        significance_results = {}
+        significance_results: dict[str, dict[str, float]] = {}
 
         # For each pair of models, compute significance tests
         for i, model1 in enumerate(model_names):
@@ -637,7 +637,7 @@ class ModelEvaluator:
         """
         logger.info("Detecting performance regression...")
 
-        regression_results = {
+        regression_results: dict[str, Any] = {
             "has_regression": False,
             "regressions": [],
             "improvements": [],
@@ -778,10 +778,10 @@ class ModelEvaluator:
         # Check class-level performance
         class_f1_scores = [cm.f1_score for cm in metrics.class_metrics]
         if class_f1_scores:
-            f1_std = np.std(class_f1_scores)
-            f1_mean = np.mean(class_f1_scores)
+            f1_std = float(np.std(class_f1_scores))
+            f1_mean = float(np.mean(class_f1_scores))
 
-            if f1_mean > 0 and f1_std / f1_mean > quality_thresholds["max_class_imbalance"]:
+            if f1_mean > 0 and (f1_std / f1_mean) > quality_thresholds["max_class_imbalance"]:
                 validation_passed = False
                 issues.append(f"High class performance imbalance (CV: {f1_std / f1_mean:.3f})")
                 recommendations.append("Address class imbalance through resampling or class weights")
@@ -833,10 +833,10 @@ class ModelEvaluator:
         # Penalty for class imbalance
         class_f1_scores = [cm.f1_score for cm in metrics.class_metrics]
         if class_f1_scores:
-            f1_std = np.std(class_f1_scores)
-            f1_mean = np.mean(class_f1_scores)
+            f1_std = float(np.std(class_f1_scores))
+            f1_mean = float(np.mean(class_f1_scores))
             if f1_mean > 0:
-                imbalance_penalty = min(0.1, f1_std / f1_mean * 0.1)
+                imbalance_penalty = min(0.1, float(f1_std / f1_mean * 0.1))
                 score -= imbalance_penalty
 
         return max(0.0, min(1.0, score))
@@ -875,7 +875,7 @@ class ModelEvaluator:
             # Get top-k predictions
             top_probs, top_indices = torch.topk(probabilities, top_k, dim=1)
 
-        results = {
+        results: dict[str, Any] = {
             "num_samples": len(sample_data),
             "predictions": [],
             "summary": {
@@ -891,14 +891,15 @@ class ModelEvaluator:
         total_top1_confidence = 0.0
 
         for i in range(len(sample_data)):
-            true_label = sample_labels[i].item()
+            # .item() may return a float for some tensor dtypes; cast to int for indexing
+            true_label = int(sample_labels[i].item())
             true_class = eval_class_names[true_label] if true_label < len(eval_class_names) else f"Class_{true_label}"
 
             # Top-k predictions for this sample
             sample_predictions = []
             for j in range(top_k):
-                pred_idx = top_indices[i, j].item()
-                pred_prob = top_probs[i, j].item()
+                pred_idx = int(top_indices[i, j].item())
+                pred_prob = float(top_probs[i, j].item())
                 pred_class = eval_class_names[pred_idx] if pred_idx < len(eval_class_names) else f"Class_{pred_idx}"
 
                 sample_predictions.append(
@@ -912,6 +913,7 @@ class ModelEvaluator:
             # Check if prediction is correct
             is_correct = top_indices[i, 0].item() == true_label
             if is_correct:
+                # results is typed as dict[str, Any] so this mutation is safe
                 results["summary"]["correct"] += 1
 
             # Confidence metrics
@@ -935,8 +937,9 @@ class ModelEvaluator:
             )
 
         # Calculate summary statistics
-        results["summary"]["accuracy"] = results["summary"]["correct"] / results["summary"]["total"]
-        results["summary"]["avg_confidence"] = total_confidence / len(sample_data)
-        results["summary"]["avg_top1_confidence"] = total_top1_confidence / len(sample_data)
+        total_samples = len(sample_data)
+        results["summary"]["accuracy"] = results["summary"]["correct"] / results["summary"]["total"] if results["summary"]["total"] > 0 else 0.0
+        results["summary"]["avg_confidence"] = total_confidence / total_samples if total_samples > 0 else 0.0
+        results["summary"]["avg_top1_confidence"] = total_top1_confidence / total_samples if total_samples > 0 else 0.0
 
         return results

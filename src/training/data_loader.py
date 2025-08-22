@@ -7,7 +7,7 @@ memory-mapped dataset loading, and data loading profiling capabilities.
 import logging
 import multiprocessing as mp
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Sized
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -270,7 +270,7 @@ class DataLoadingProfiler:
         if num_batches is None:
             num_batches = self.config.profile_batches
 
-        batch_times = []
+        batch_times: list[float] = []
         total_samples = 0
         start_time = time.time()
 
@@ -288,7 +288,11 @@ class DataLoadingProfiler:
 
             batch_time = time.time() - batch_start
             batch_times.append(batch_time)
-            total_samples += len(data)
+            try:
+                total_samples += len(data)
+            except Exception:
+                # If data is not a sequence, ignore sample counting
+                total_samples += 0
 
             # Memory usage tracking
             if torch.cuda.is_available():
@@ -297,14 +301,16 @@ class DataLoadingProfiler:
 
         total_time = time.time() - start_time
 
-        # Calculate metrics
-        avg_batch_time = np.mean(batch_times) if batch_times else 0.0
-        min_batch_time = np.min(batch_times) if batch_times else 0.0
-        max_batch_time = np.max(batch_times) if batch_times else 0.0
-        throughput = total_samples / total_time if total_time > 0 else 0.0
-        avg_memory = np.mean(self.memory_usage) if self.memory_usage else 0.0
+        # Calculate metrics (cast numpy scalars to float for typing)
+        avg_batch_time: float = float(np.mean(batch_times)) if batch_times else 0.0
+        min_batch_time: float = float(np.min(batch_times)) if batch_times else 0.0
+        max_batch_time: float = float(np.max(batch_times)) if batch_times else 0.0
+        throughput: float = float(total_samples / total_time) if total_time > 0 else 0.0
+        avg_memory: float = float(np.mean(self.memory_usage)) if self.memory_usage else 0.0
 
         # Analyze bottlenecks and generate recommendations
+        bottlenecks: list[str]
+        recommendations: list[str]
         bottlenecks, recommendations = self._analyze_performance(batch_times, avg_batch_time, data_loader)
 
         profile = DataLoadingProfile(
@@ -329,8 +335,8 @@ class DataLoadingProfiler:
         data_loader: DataLoader,
     ) -> tuple[list[str], list[str]]:
         """Analyze performance and identify bottlenecks."""
-        bottlenecks = []
-        recommendations = []
+        bottlenecks: list[str] = []
+        recommendations: list[str] = []
 
         if not batch_times:
             return bottlenecks, recommendations
@@ -436,7 +442,18 @@ class OptimizedDataLoader:
 
         val_loader = self._create_optimized_loader(val_dataset, batch_size, shuffle=False, drop_last=False)
 
-        logger.info(f"Created data loaders: {len(train_dataset)} train, {len(val_dataset)} val samples")
+        # len() may not be available for some Dataset wrappers; guard accordingly
+        if isinstance(train_dataset, Sized):
+            train_count = len(train_dataset)
+        else:
+            train_count = -1
+
+        if isinstance(val_dataset, Sized):
+            val_count = len(val_dataset)
+        else:
+            val_count = -1
+
+        logger.info(f"Created data loaders: {train_count} train, {val_count} val samples")
         logger.info(f"Batch size: {batch_size}, Num workers: {self.config.num_workers}")
 
         # Profile data loaders if enabled
@@ -509,9 +526,9 @@ class OptimizedDataLoader:
         val_dataset = val_subset
 
         # Set transforms on the underlying dataset if present
-        if hasattr(train_dataset, "dataset"):
+        if hasattr(train_dataset, "dataset") and hasattr(train_dataset.dataset, "transform"):
             train_dataset.dataset.transform = train_transform
-        if hasattr(val_dataset, "dataset"):
+        if hasattr(val_dataset, "dataset") and hasattr(val_dataset.dataset, "transform"):
             val_dataset.dataset.transform = val_transform
 
         class_names = full_dataset.classes

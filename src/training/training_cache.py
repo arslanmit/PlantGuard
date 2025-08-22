@@ -366,8 +366,11 @@ class CacheManager:
                 with open(cache_file, "wb") as f:
                     _pickle.dump(data, f)  # nosec B301
 
-            # Calculate file size and checksum
-            file_size = cache_file.stat().st_size
+            # Calculate file size and checksum (guard cache_dir may be None)
+            if cache_file is None:
+                file_size = 0
+            else:
+                file_size = cache_file.stat().st_size
             checksum = self._calculate_checksum(cache_file) if self.config.validate_cache_integrity else None
 
             # Create cache entry
@@ -384,7 +387,12 @@ class CacheManager:
             # Add to index
             self.cache_index[key] = entry
 
-            logger.debug(f"Cached: {key} ({file_size / 1024:.1f} KB)")
+            # Guard division and formatting if file_size is undefined
+            try:
+                size_kb = file_size / 1024
+            except Exception:
+                size_kb = 0
+            logger.debug(f"Cached: {key} ({size_kb:.1f} KB)")
 
         except Exception as e:
             logger.error(f"Failed to cache {key}: {e}")
