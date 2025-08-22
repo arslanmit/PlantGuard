@@ -1,19 +1,19 @@
 {
   "errors": [],
-  "generated_at": "2025-08-22T00:02:00Z",
+  "generated_at": "2025-08-22T01:48:07Z",
   "metrics": {
     "_totals": {
-      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.HIGH": 1,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
       "CONFIDENCE.UNDEFINED": 0,
       "SEVERITY.HIGH": 0,
       "SEVERITY.LOW": 0,
-      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.MEDIUM": 1,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 23285,
+      "loc": 22604,
       "nosec": 1,
-      "skipped_tests": 25
+      "skipped_tests": 23
     },
     "src/__init__.py": {
       "CONFIDENCE.HIGH": 0,
@@ -336,7 +336,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 421,
+      "loc": 422,
       "nosec": 0,
       "skipped_tests": 2
     },
@@ -406,17 +406,17 @@
       "skipped_tests": 0
     },
     "src/training/model_registry.py": {
-      "CONFIDENCE.HIGH": 0,
+      "CONFIDENCE.HIGH": 1,
       "CONFIDENCE.LOW": 0,
       "CONFIDENCE.MEDIUM": 0,
       "CONFIDENCE.UNDEFINED": 0,
       "SEVERITY.HIGH": 0,
       "SEVERITY.LOW": 0,
-      "SEVERITY.MEDIUM": 0,
+      "SEVERITY.MEDIUM": 1,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 999,
+      "loc": 310,
       "nosec": 0,
-      "skipped_tests": 2
+      "skipped_tests": 0
     },
     "src/training/model_validator.py": {
       "CONFIDENCE.HIGH": 0,
@@ -518,7 +518,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 429,
+      "loc": 435,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -791,7 +791,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 317,
+      "loc": 318,
       "nosec": 0,
       "skipped_tests": 0
     },
@@ -913,5 +913,26 @@
       "skipped_tests": 0
     }
   },
-  "results": []
+  "results": [
+    {
+      "code": "333         try:\n334             model_state = torch.load(m.model_path, map_location=\"cpu\")\n335             with open(m.config_path) as f:\n",
+      "col_offset": 26,
+      "end_col_offset": 70,
+      "filename": "src/training/model_registry.py",
+      "issue_confidence": "HIGH",
+      "issue_cwe": {
+        "id": 502,
+        "link": "https://cwe.mitre.org/data/definitions/502.html"
+      },
+      "issue_severity": "MEDIUM",
+      "issue_text": "Use of unsafe PyTorch load",
+      "line_number": 334,
+      "line_range": [
+        334
+      ],
+      "more_info": "https://bandit.readthedocs.io/en/1.8.6/plugins/b614_pytorch_load.html",
+      "test_id": "B614",
+      "test_name": "pytorch_load"
+    }
+  ]
 }

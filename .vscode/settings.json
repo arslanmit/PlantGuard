@@ -121,6 +121,5 @@
         "find *"
     ],
     "codium.codeCompletion.enable": false,
-    "chat.agent.maxRequests": 999,
-    "terminal.integrated.accessibleViewFocusOnCommandExecution": true
+    "chat.agent.maxRequests": 9999
 }

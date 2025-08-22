@@ -84,7 +84,7 @@ class ModelComparator:
         Returns:
             Dictionary mapping baseline model names to their metrics
         """
-        baseline_metrics = {}
+        baseline_metrics: dict[str, ModelMetrics] = {}
 
         if not self.baseline_models_dir.exists():
             return baseline_metrics

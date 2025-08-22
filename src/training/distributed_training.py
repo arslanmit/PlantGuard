@@ -7,6 +7,7 @@ DistributedDataParallel (DDP) for scaling training across multiple GPUs.
 import logging
 import os
 import socket
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -358,7 +359,7 @@ def setup_distributed_environment(
 def distributed_training_worker(
     rank: int,
     world_size: int,
-    train_fn: callable,
+    train_fn: Callable,
     *args: Any,
     **kwargs: Any,
 ) -> None:
@@ -400,7 +401,7 @@ def distributed_training_worker(
 
 
 def launch_distributed_training(
-    train_fn: callable,
+    train_fn: Callable,
     world_size: int | None = None,
     *args: Any,
     **kwargs: Any,

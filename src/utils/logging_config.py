@@ -20,8 +20,8 @@ def setup_logging(level: str = "INFO", log_file: Path | None = None, format_stri
     if format_string is None:
         format_string = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
-    # Configure root logger
-    logging.basicConfig(level=getattr(logging, level.upper()), format=format_string, datefmt="%Y-%m-%d %H:%M:%S", handlers=[])
+    # Configure root logger (basicConfig used without handlers to avoid duplicate handling)
+    logging.basicConfig(level=getattr(logging, level.upper()), format=format_string, datefmt="%Y-%m-%d %H:%M:%S")
 
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
@@ -30,7 +30,7 @@ def setup_logging(level: str = "INFO", log_file: Path | None = None, format_stri
     console_handler.setFormatter(console_formatter)
 
     # File handler (optional)
-    handlers = [console_handler]
+    handlers: list[logging.Handler] = [console_handler]
     if log_file:
         log_file.parent.mkdir(parents=True, exist_ok=True)
         file_handler = logging.FileHandler(log_file)

@@ -66,9 +66,9 @@ class ModelAnalyzer:
         model_size_mb = (param_size + buffer_size) / 1024**2
 
         # Analyze layers
-        layer_details = {}
-        layer_count = 0
-        parameter_distribution = {}
+        layer_details: dict[str, dict[str, Any]] = {}
+        layer_count: int = 0
+        parameter_distribution: dict[str, int] = {}
 
         for name, module in model.named_modules():
             if len(list(module.children())) == 0:  # Leaf modules only
@@ -113,7 +113,7 @@ class ModelAnalyzer:
 
         for name, param in model.named_parameters():
             if param.grad is not None:
-                grad_norm = param.grad.norm().item()
+                grad_norm = float(param.grad.norm().item())
                 gradient_flow[name] = grad_norm
 
         return gradient_flow
@@ -143,10 +143,10 @@ class TrainingCurveAnalyzer:
         if len(train_losses) != len(val_losses):
             raise ValueError("Training and validation losses must have same length")
 
-        epochs = len(train_losses)
+        epochs: int = len(train_losses)
 
         # Find best epoch (lowest validation loss)
-        best_epoch = int(np.argmin(val_losses))
+        best_epoch: int = int(np.argmin(val_losses))
 
         # Detect convergence (when validation loss stops improving significantly)
         convergence_epoch = None
@@ -172,8 +172,8 @@ class TrainingCurveAnalyzer:
                 recent_val = val_losses[i - 5 : i]
 
                 # Check if training loss is decreasing while validation loss is increasing
-                train_trend = np.polyfit(range(len(recent_train)), recent_train, 1)[0]
-                val_trend = np.polyfit(range(len(recent_val)), recent_val, 1)[0]
+                train_trend = float(np.polyfit(range(len(recent_train)), recent_train, 1)[0])
+                val_trend = float(np.polyfit(range(len(recent_val)), recent_val, 1)[0])
 
                 if train_trend < -0.001 and val_trend > 0.001:
                     overfitting_detected = True
@@ -181,18 +181,18 @@ class TrainingCurveAnalyzer:
                     break
 
         # Calculate final gap between train and validation loss
-        final_gap = val_losses[-1] - train_losses[-1]
+        final_gap: float = float(val_losses[-1]) - float(train_losses[-1])
 
         # Calculate learning stability (inverse of loss variance)
-        train_stability = 1.0 / (np.var(train_losses[-10:]) + 1e-8) if epochs >= 10 else 1.0
-        val_stability = 1.0 / (np.var(val_losses[-10:]) + 1e-8) if epochs >= 10 else 1.0
-        learning_stability = min(train_stability, val_stability)
+        train_stability = float(1.0 / (np.var(train_losses[-10:]) + 1e-8)) if epochs >= 10 else 1.0
+        val_stability = float(1.0 / (np.var(val_losses[-10:]) + 1e-8)) if epochs >= 10 else 1.0
+        learning_stability: float = float(min(train_stability, val_stability))
 
         # Calculate improvement rate (loss reduction per epoch)
         if epochs > 1:
-            initial_loss = val_losses[0]
-            final_loss = val_losses[-1]
-            improvement_rate = (initial_loss - final_loss) / epochs
+            initial_loss = float(val_losses[0])
+            final_loss = float(val_losses[-1])
+            improvement_rate: float = float((initial_loss - final_loss) / epochs)
         else:
             improvement_rate = 0.0
 
@@ -318,7 +318,7 @@ class TrainingReportGenerator:
             axes[0].set_title("Parameter Distribution by Layer Type")
 
         # Layer statistics bar chart
-        layer_types = {}
+        layer_types: dict[str, int] = {}
         for layer_info in model_analysis.layer_details.values():
             layer_type = layer_info["type"]
             if layer_type in layer_types:
@@ -368,6 +368,19 @@ class TrainingReportGenerator:
         report_path = self.output_dir / "comprehensive_report.html"
 
         # Generate HTML content
+        # Precompute some strings that depend on optional ints to keep mypy happy
+        conv_str = (
+            "✅ Converged at epoch " + str(curve_analysis.convergence_epoch + 1)
+            if curve_analysis.convergence_epoch is not None
+            else "❌ No convergence detected"
+        )
+
+        overfit_str = (
+            "⚠️ Detected at epoch " + str(curve_analysis.overfitting_epoch + 1)
+            if curve_analysis.overfitting_detected and curve_analysis.overfitting_epoch is not None
+            else "✅ No overfitting detected"
+        )
+
         html_content = f"""
         <!DOCTYPE html>
         <html>
@@ -410,12 +423,8 @@ class TrainingReportGenerator:
 
             <div class="section">
                 <h3>🔍 Training Analysis</h3>
-                <p><strong>Convergence:</strong>
-                    {"✅ Converged at epoch " + str(curve_analysis.convergence_epoch + 1) if curve_analysis.convergence_epoch else "❌ No convergence detected"}
-                </p>
-                <p><strong>Overfitting:</strong>
-                    {"⚠️ Detected at epoch " + str(curve_analysis.overfitting_epoch + 1) if curve_analysis.overfitting_detected else "✅ No overfitting detected"}
-                </p>
+                <p><strong>Convergence:</strong> {conv_str}</p>
+                <p><strong>Overfitting:</strong> {overfit_str}</p>
                 <p><strong>Final Train-Val Gap:</strong> {curve_analysis.final_gap:.4f}</p>
                 <p><strong>Learning Stability:</strong> {curve_analysis.learning_stability:.2f}</p>
                 <p><strong>Improvement Rate:</strong> {curve_analysis.improvement_rate:.4f} loss reduction per epoch</p>
@@ -533,8 +542,8 @@ def generate_training_summary(
     # Generate comprehensive report if we have enough data
     if model_analysis and curve_analysis:
         training_metrics = {
-            "best_val_loss": min(val_losses) if val_losses else None,
-            "best_val_accuracy": max(val_accuracies) if val_accuracies else None,
+            "best_val_loss": float(min(val_losses)) if val_losses else None,
+            "best_val_accuracy": float(max(val_accuracies)) if val_accuracies else None,
             "total_duration": 0,  # This should be provided by the caller
         }
 

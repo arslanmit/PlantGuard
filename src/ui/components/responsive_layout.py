@@ -5,6 +5,7 @@ Follows ADHD-friendly design principles with clear visual hierarchy and touch-fr
 """
 
 import logging
+from collections.abc import Callable
 
 import streamlit as st
 import torch
@@ -310,7 +311,7 @@ class ResponsiveLayout:
             """
             st.markdown(mobile_css, unsafe_allow_html=True)
 
-    def render_mobile_navigation(self, pages: dict[str, callable]):
+    def render_mobile_navigation(self, pages: dict[str, Callable]):
         """Render mobile-friendly navigation.
 
         Args:

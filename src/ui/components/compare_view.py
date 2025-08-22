@@ -450,8 +450,8 @@ if __name__ == "__main__":
     compare_view = create_compare_view()
 
     # Mock data for testing
-    mock_images = []
-    mock_results = []
+    mock_images: list[Image.Image] = []
+    mock_results: list[AnalysisResult] = []
 
     st.info("This is a test interface. In practice, images and results would be provided by the main application.")
 

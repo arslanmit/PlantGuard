@@ -98,7 +98,9 @@ class AccessibilityTester:
     def _test_color_contrast(self) -> None:
         """Test color contrast requirements."""
         # Simulate contrast testing - in real implementation would use actual color values
-        _contrast_issues = []
+
+        # typed container for contrast issues: each issue is a tuple (element_id, issue_description)
+        _contrast_issues: list[tuple[str, str]] = []
 
         # Check our CSS implementations
         css_elements = [
