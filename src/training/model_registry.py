@@ -21,6 +21,25 @@ import torch
 logger = logging.getLogger(__name__)
 
 
+def _make_json_safe(obj: object) -> object:
+    """Recursively convert objects not JSON-serializable into safe types.
+
+    - Path -> str
+    - datetime -> isoformat string
+    - sets/tuples -> lists
+    - dict/list -> recursively processed
+    """
+    if isinstance(obj, Path):
+        return str(obj)
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, dict):
+        return {str(k): _make_json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple, set)):
+        return [_make_json_safe(v) for v in obj]
+    return obj
+
+
 @dataclass
 class ModelMetadata:
     model_id: str
@@ -152,8 +171,9 @@ class ModelComparison:
         except Exception:
             return list(self.models)
 
-    def get_best_model(self, metric: str) -> ModelInfo | None:
-        sorted_models = self.sort_models(by=metric, ascending=False)
+    def get_best_model(self, metric: str, ascending: bool = False) -> ModelInfo | None:
+        # ascending=True means lower is better (e.g., inference_time)
+        sorted_models = self.sort_models(by=metric, ascending=ascending)
         return sorted_models[0] if sorted_models else None
 
     def get_model_by_id(self, model_id: str) -> ModelInfo | None:
@@ -200,19 +220,33 @@ class ModelRegistry:
         self._registry_data.setdefault("version", "1.0.0")
 
     def _save_registry(self) -> None:
-        # Ensure all Path objects are converted to strings before writing JSON.
-        safe_data: dict[str, object] = dict(self._registry_data)
-        models = {}
-        for mid, entry in self._registry_data.get("models", {}).items():
-            safe_entry = dict(entry)
-            # Normalize any Path-like values to str for JSON serialization
-            for pkey in ("model_path", "config_path", "classes_path"):
-                if pkey in safe_entry and safe_entry[pkey] is not None:
-                    safe_entry[pkey] = str(safe_entry[pkey])
-            models[mid] = safe_entry
-        safe_data["models"] = models
-        with open(self.registry_file, "w") as f:
-            json.dump(safe_data, f, indent=2)
+        # Convert the entire registry structure into JSON-safe primitives
+        # (Path -> str, datetime -> isoformat, sets/tuples -> lists, etc.)
+        try:
+            safe = _make_json_safe(self._registry_data)
+            with open(self.registry_file, "w") as f:
+                json.dump(safe, f, indent=2)
+        except Exception:
+            # Fallback: try a best-effort manual normalization for models
+            safe_data: dict[str, object] = dict(self._registry_data)
+            models = {}
+            for mid, entry in self._registry_data.get("models", {}).items():
+                safe_entry = dict(entry)
+                for pkey in ("model_path", "config_path", "classes_path"):
+                    if pkey in safe_entry and safe_entry[pkey] is not None:
+                        safe_entry[pkey] = str(safe_entry[pkey])
+                # ensure metadata training_date is a string
+                if "metadata" in safe_entry and isinstance(safe_entry["metadata"], dict) and "training_date" in safe_entry["metadata"]:
+                    try:
+                        td = safe_entry["metadata"]["training_date"]
+                        if isinstance(td, datetime):
+                            safe_entry["metadata"]["training_date"] = td.isoformat()
+                    except Exception:
+                        pass
+                models[mid] = safe_entry
+            safe_data["models"] = models
+            with open(self.registry_file, "w") as f:
+                json.dump(safe_data, f, indent=2)
 
     def _calculate_checksum(self, path: Path) -> str:
         h = hashlib.sha256()
@@ -268,10 +302,12 @@ class ModelRegistry:
 
         target_dir = self.registry_dir / model_id
         target_dir.mkdir(parents=True, exist_ok=True)
-        target_model_path = target_dir / model_path.name
+        # Save model using canonical test-expected filename: <model_id>.pt
+        target_model_path = target_dir / f"{model_id}.pt"
         shutil.copy2(model_path, target_model_path)
 
-        config_path = target_dir / "config.json"
+        # Save config using canonical name: <model_id>_config.json
+        config_path = target_dir / f"{model_id}_config.json"
         if config_data is not None:
             with open(config_path, "w") as f:
                 json.dump(config_data, f, indent=2)
@@ -280,7 +316,7 @@ class ModelRegistry:
 
         classes_path = None
         if classes_data is not None:
-            classes_path = target_dir / "classes.json"
+            classes_path = target_dir / f"{model_id}_classes.json"
             with open(classes_path, "w") as f:
                 json.dump(classes_data, f, indent=2)
 
@@ -483,8 +519,10 @@ class ModelRegistry:
                 "deployment_info": {"created": datetime.utcnow().isoformat()},
                 "dependencies": [],
             }
+            # Ensure deployment dict contains only JSON-serializable values
+            safe_deployment = _make_json_safe(deployment)
             with open(dst / "deployment.json", "w") as f:
-                json.dump(deployment, f, indent=2)
+                json.dump(safe_deployment, f, indent=2)
             with open(dst / "README.md", "w") as f:
                 f.write(f"Deployment package for {model_id}\n")
             return dst
