@@ -333,16 +333,37 @@ class ProductionTrainer:
             logger.info(f"Setting up {self.config.model_architecture} model...")
 
             # Import here to avoid circular imports
+            import torchvision.models as models_module
             from torchvision import models
 
             # Create model based on architecture and use a local variable to narrow types
             if self.config.model_architecture == "resnet50":
-                model: nn.Module = models.resnet50(pretrained=self.config.pretrained)
+                try:
+                    # Use new weights parameter instead of deprecated pretrained
+                    if self.config.pretrained:
+                        model: nn.Module = models.resnet50(weights=models_module.ResNet50_Weights.IMAGENET1K_V1)
+                    else:
+                        model = models.resnet50(weights=None)
+                except (OSError, ConnectionError, Exception) as e:
+                    # Fallback for SSL/network issues or offline environments
+                    logger.warning(f"Failed to load pretrained weights: {e}. Using random initialization.")
+                    model = models.resnet50(weights=None)
+
                 # Final layer will be adapted later based on dataset class count
                 orig_fc = cast(nn.Linear, model.fc)
                 model.fc = nn.Linear(orig_fc.in_features, self.config.num_classes)
             elif self.config.model_architecture == "resnet18":
-                resnet18_model: nn.Module = models.resnet18(pretrained=self.config.pretrained)
+                try:
+                    # Use new weights parameter instead of deprecated pretrained
+                    if self.config.pretrained:
+                        resnet18_model: nn.Module = models.resnet18(weights=models_module.ResNet18_Weights.IMAGENET1K_V1)
+                    else:
+                        resnet18_model = models.resnet18(weights=None)
+                except (OSError, ConnectionError, Exception) as e:
+                    # Fallback for SSL/network issues or offline environments
+                    logger.warning(f"Failed to load pretrained weights: {e}. Using random initialization.")
+                    resnet18_model = models.resnet18(weights=None)
+
                 orig_fc = cast(nn.Linear, resnet18_model.fc)
                 resnet18_model.fc = nn.Linear(orig_fc.in_features, self.config.num_classes)
                 model = resnet18_model
@@ -354,7 +375,7 @@ class ProductionTrainer:
             if self.config.dropout_rate > 0 and hasattr(model, "fc"):
                 original_fc = model.fc
                 if isinstance(original_fc, nn.Module):
-                    model.fc = nn.Sequential(nn.Dropout(self.config.dropout_rate), original_fc)
+                    model.fc = nn.Sequential(nn.Dropout(self.config.dropout_rate), original_fc)  # type: ignore[assignment]
 
             # Move model to device
             model = model.to(self.device)
@@ -427,15 +448,9 @@ class ProductionTrainer:
                     # Replace last module if it's Linear
                     for i in range(len(orig_fc) - 1, -1, -1):
                         if isinstance(orig_fc[i], nn.Linear):
-                            in_features_value = orig_fc[i].in_features
-                            # Cast to int to handle Tensor|Module union type safely
-                            from typing import cast
-
-                            if hasattr(in_features_value, "__int__") or isinstance(in_features_value, (int, float)):
-                                in_features_int = int(cast("int | float", in_features_value))
-                            else:
-                                in_features_int = 512  # Default fallback
-                            orig_fc[i] = nn.Linear(in_features_int, num_classes)
+                            # Type ignore because we know it's nn.Linear and has in_features as int
+                            sequential_in_features: int = orig_fc[i].in_features  # type: ignore[assignment]
+                            orig_fc[i] = nn.Linear(sequential_in_features, num_classes)  # type: ignore[assignment]
                             self.model.fc = orig_fc
                             return
                     # Fallback: create new sequential with dropout preserved
@@ -446,19 +461,14 @@ class ProductionTrainer:
                     if last_in_features is None:
                         last_in_features = 512  # Default fallback
                     self.model.fc = nn.Sequential(
-                        nn.Dropout(getattr(self.config, "dropout_rate", 0.0)), nn.Linear(int(last_in_features), num_classes)
+                        nn.Dropout(getattr(self.config, "dropout_rate", 0.0)),
+                        nn.Linear(int(last_in_features), num_classes),  # type: ignore[arg-type]
                     )
                     return
                 elif isinstance(orig_fc, nn.Linear):
-                    in_features_value = orig_fc.in_features
-                    # Cast to int to handle Tensor|Module union type safely
-                    from typing import cast
-
-                    if hasattr(in_features_value, "__int__") or isinstance(in_features_value, (int, float)):
-                        in_features_int = int(cast("int | float", in_features_value))
-                    else:
-                        in_features_int = 512  # Default fallback
-                    self.model.fc = nn.Linear(in_features_int, num_classes)
+                    # Type ignore because we know it's nn.Linear and has in_features as int
+                    linear_in_features: int = orig_fc.in_features  # type: ignore[assignment]
+                    self.model.fc = nn.Linear(linear_in_features, num_classes)
                     return
 
             # Generic fallback: try to find last Linear module and replace
@@ -470,15 +480,9 @@ class ProductionTrainer:
                     obj = self.model
                     for p in parts[:-1]:
                         obj = getattr(obj, p)
-                    in_features_value = module.in_features
-                    # Cast to int to handle Tensor|Module union type safely
-                    from typing import cast
-
-                    if hasattr(in_features_value, "__int__") or isinstance(in_features_value, (int, float)):
-                        in_features_int = int(cast("int | float", in_features_value))
-                    else:
-                        in_features_int = 512  # Default fallback
-                    setattr(obj, parts[-1], nn.Linear(in_features_int, num_classes))
+                    # Type ignore because we know it's nn.Linear and has in_features as int
+                    fallback_in_features: int = module.in_features  # type: ignore[assignment]
+                    setattr(obj, parts[-1], nn.Linear(fallback_in_features, num_classes))  # type: ignore[assignment]
                     return
 
         except Exception:
@@ -768,8 +772,9 @@ class ProductionTrainer:
             return
 
         # Create transfer learning configuration
-        if hasattr(self.config, "transfer_learning_config"):
-            transfer_config = self.config.transfer_learning_config
+        transfer_config_attr = getattr(self.config, "transfer_learning_config", None)
+        if transfer_config_attr is not None:
+            transfer_config = transfer_config_attr
         # Create default configuration based on model architecture
         elif self.config.model_architecture.startswith("resnet"):
             from .transfer_learning import FreezingStrategy
@@ -1566,9 +1571,12 @@ class ProductionTrainer:
 
                 if self.scaler is not None:
                     with autocast():
-                        output = self.model(data)
+                        output = self.model(data) if self.model is not None else None
                 else:
-                    output = self.model(data)
+                    output = self.model(data) if self.model is not None else None
+
+                if output is None:
+                    continue
 
                 _, predicted = torch.max(output, 1)
 
@@ -1669,9 +1677,13 @@ class ProductionTrainer:
 
     def _export_torchscript(self, export_path: Path, model: torch.nn.Module | None) -> bool:
         """Export as TorchScript."""
+        if model is None:
+            logger.error("Cannot export TorchScript: model is None")
+            return False
+
         dummy_input = torch.randn(1, 3, 224, 224).to(self.device)
         traced_model = torch.jit.trace(model, dummy_input)
-        traced_model.save(str(export_path))
+        traced_model.save(str(export_path))  # type: ignore[attr-defined]
         return True
 
     def _export_onnx(self, export_path: Path, model: torch.nn.Module | None) -> bool:

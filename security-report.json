@@ -1,6 +1,6 @@
 {
   "errors": [],
-  "generated_at": "2025-08-22T20:47:18Z",
+  "generated_at": "2025-08-23T13:58:56Z",
   "metrics": {
     "_totals": {
       "CONFIDENCE.HIGH": 0,
@@ -11,9 +11,9 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 23047,
+      "loc": 23121,
       "nosec": 1,
-      "skipped_tests": 24
+      "skipped_tests": 26
     },
     "src/__init__.py": {
       "CONFIDENCE.HIGH": 0,
@@ -219,9 +219,9 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 199,
+      "loc": 223,
       "nosec": 0,
-      "skipped_tests": 2
+      "skipped_tests": 4
     },
     "src/features/model_switching/model_manager.py": {
       "CONFIDENCE.HIGH": 0,
@@ -232,7 +232,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 784,
+      "loc": 810,
       "nosec": 0,
       "skipped_tests": 2
     },
@@ -492,7 +492,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 1592,
+      "loc": 1615,
       "nosec": 0,
       "skipped_tests": 2
     },
@@ -843,7 +843,7 @@
       "SEVERITY.LOW": 0,
       "SEVERITY.MEDIUM": 0,
       "SEVERITY.UNDEFINED": 0,
-      "loc": 321,
+      "loc": 322,
       "nosec": 0,
       "skipped_tests": 0
     },

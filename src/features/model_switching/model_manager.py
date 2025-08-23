@@ -28,6 +28,14 @@ class VisionAdapterProtocol(Protocol):
         """Return a copy of the class names supported by the model."""
         ...
 
+    def get_model_architecture(self) -> str | None:
+        """Return the model architecture name or None if unknown."""
+        ...
+
+    def check_model_health(self) -> bool:
+        """Check if the model is loaded and functioning properly."""
+        ...
+
 
 class ModelConfig:
     """Configuration for a plant disease model."""
@@ -184,7 +192,7 @@ class PlantGuardModelManager:
                     "device": "auto",
                     "tags": model_tags,
                 }
-                default_config["models"][model_key] = model_config_dict
+                default_config["models"][model_key] = model_config_dict  # type: ignore[index]
 
                 # Set as default if it's a high-performing model
                 if accuracy > 0.9 and not default_config.get("default_model"):
@@ -336,6 +344,24 @@ class PlantGuardModelManager:
                 def get_class_names(self) -> list[str]:
                     return self.class_names.copy()
 
+                def get_model_architecture(self) -> str | None:
+                    """Return the model architecture name or None if unknown."""
+                    # Extract architecture from model name
+                    if "vit" in self.model_id.lower():
+                        return "vision_transformer"
+                    elif "resnet" in self.model_id.lower():
+                        return "resnet"
+                    elif "efficientnet" in self.model_id.lower():
+                        return "efficientnet"
+                    elif "mobilenet" in self.model_id.lower():
+                        return "mobilenet"
+                    else:
+                        return "transformer"  # Default for HuggingFace models
+
+                def check_model_health(self) -> bool:
+                    """Check if the model is loaded and functioning properly."""
+                    return bool(self.model is not None and self.processor is not None and len(self.class_names) > 0)
+
             device_str = config.device_preference if config.device_preference != "auto" else str(self.device)
             device = torch.device(device_str)
             return MinimalHFAdapter(config.model_id, device)
@@ -427,9 +453,9 @@ class PlantGuardModelManager:
 
         # Expose architecture if known (from config or adapter)
         arch = getattr(self.current_model, "architecture", None)
-        if not arch and hasattr(self.current_adapter, "get_architecture"):
+        if not arch and hasattr(self.current_adapter, "get_model_architecture"):
             try:
-                arch = self.current_adapter.get_architecture()
+                arch = self.current_adapter.get_model_architecture()
             except Exception:
                 arch = None
         metadata["architecture"] = arch

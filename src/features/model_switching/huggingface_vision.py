@@ -65,12 +65,22 @@ class HuggingFaceVisionAdapter:
                     "Model move using .to() failed (meta tensors); falling back to .to_empty(): %s",
                     e,
                 )
-                if hasattr(self.model, "to_empty"):
-                    # to_empty exists on torch.nn.Module in recent PyTorch versions
-                    self.model.to_empty(self.device)  # type: ignore
-                else:
-                    # Re-raise if to_empty is not available
-                    raise
+                try:
+                    # to_empty() doesn't take device as argument, need to use different approach
+                    # Create a new model instance on the target device for meta tensors
+                    logger.info("Attempting to reload model directly on target device")
+                    self.model = AutoModelForImageClassification.from_pretrained(
+                        self.model_name,
+                        revision="main",
+                        torch_dtype=torch.float32,
+                        device_map=self.device.type if hasattr(self.device, "type") else str(self.device),
+                    )  # type: ignore # nosec B615
+                except Exception as reload_error:
+                    logger.warning("Failed to reload on device, using CPU fallback: %s", reload_error)
+                    # Final fallback: use CPU and warn user
+                    self.device = torch.device("cpu")
+                    self.model = AutoModelForImageClassification.from_pretrained(self.model_name, revision="main", torch_dtype=torch.float32)  # type: ignore # nosec B615
+                    logger.warning("Model loaded on CPU due to device compatibility issues")
             self.model.eval()  # type: ignore
 
             # Extract class names
@@ -268,3 +278,21 @@ class HuggingFaceVisionAdapter:
             "class_names": self.class_names.copy(),
             "model_type": "HuggingFace Transformers",
         }
+
+    def get_model_architecture(self) -> str | None:
+        """Return the model architecture name or None if unknown."""
+        # Extract architecture from model name
+        if "vit" in self.model_name.lower():
+            return "vision_transformer"
+        elif "resnet" in self.model_name.lower():
+            return "resnet"
+        elif "efficientnet" in self.model_name.lower():
+            return "efficientnet"
+        elif "mobilenet" in self.model_name.lower():
+            return "mobilenet"
+        else:
+            return "transformer"  # Default for HuggingFace models
+
+    def check_model_health(self) -> bool:
+        """Check if the model is loaded and functioning properly."""
+        return bool(self.is_loaded and self.model is not None and self.processor is not None and len(self.class_names) > 0)
