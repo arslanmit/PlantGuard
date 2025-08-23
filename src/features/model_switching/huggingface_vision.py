@@ -52,7 +52,7 @@ class HuggingFaceVisionAdapter:
             logger.info("Loading model: %s", self.model_name)
 
             # Load processor and model with revision pinning for security
-            self.processor = AutoImageProcessor.from_pretrained(self.model_name, revision="main")  # type: ignore # nosec B615
+            self.processor = AutoImageProcessor.from_pretrained(self.model_name, revision="main", use_fast=True)  # type: ignore # nosec B615
             self.model = AutoModelForImageClassification.from_pretrained(self.model_name, revision="main")  # type: ignore # nosec B615
             # Attempt to move model to target device. Some HF/torch loading paths create
             # "meta" tensors (no data) which cannot be copied using `to()`; in that
