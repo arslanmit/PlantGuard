@@ -127,15 +127,16 @@ class VoiceInterface:
             try:
                 # Load audio with librosa
                 audio_data, sr = librosa.load(tmp_file_path, sr=int(self.sample_rate), mono=True)
+                sr_int = int(sr)  # Ensure sr is int for return type compatibility
 
                 # Validate duration
-                is_valid, error_msg = self.validate_audio_duration(audio_data, int(sr))
+                is_valid, error_msg = self.validate_audio_duration(audio_data, sr_int)
                 if not is_valid:
                     st.toast(error_msg, icon="⚠️")
                     return None, 0
 
-                logger.info(f"Loaded audio file: {audio_file.name}, duration: {len(audio_data) / sr:.2f}s")
-                return audio_data, int(sr)
+                logger.info(f"Loaded audio file: {audio_file.name}, duration: {len(audio_data) / sr_int:.2f}s")
+                return audio_data, sr_int
 
             finally:
                 # Clean up temporary file

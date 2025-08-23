@@ -427,8 +427,15 @@ class ProductionTrainer:
                     # Replace last module if it's Linear
                     for i in range(len(orig_fc) - 1, -1, -1):
                         if isinstance(orig_fc[i], nn.Linear):
-                            in_features = orig_fc[i].in_features
-                            orig_fc[i] = nn.Linear(int(in_features), num_classes)
+                            in_features_value = orig_fc[i].in_features
+                            # Cast to int to handle Tensor|Module union type safely
+                            from typing import cast
+
+                            if hasattr(in_features_value, "__int__") or isinstance(in_features_value, (int, float)):
+                                in_features_int = int(cast("int | float", in_features_value))
+                            else:
+                                in_features_int = 512  # Default fallback
+                            orig_fc[i] = nn.Linear(in_features_int, num_classes)
                             self.model.fc = orig_fc
                             return
                     # Fallback: create new sequential with dropout preserved
@@ -443,8 +450,15 @@ class ProductionTrainer:
                     )
                     return
                 elif isinstance(orig_fc, nn.Linear):
-                    in_features = int(orig_fc.in_features)
-                    self.model.fc = nn.Linear(in_features, num_classes)
+                    in_features_value = orig_fc.in_features
+                    # Cast to int to handle Tensor|Module union type safely
+                    from typing import cast
+
+                    if hasattr(in_features_value, "__int__") or isinstance(in_features_value, (int, float)):
+                        in_features_int = int(cast("int | float", in_features_value))
+                    else:
+                        in_features_int = 512  # Default fallback
+                    self.model.fc = nn.Linear(in_features_int, num_classes)
                     return
 
             # Generic fallback: try to find last Linear module and replace
@@ -456,7 +470,15 @@ class ProductionTrainer:
                     obj = self.model
                     for p in parts[:-1]:
                         obj = getattr(obj, p)
-                    setattr(obj, parts[-1], nn.Linear(int(module.in_features), num_classes))
+                    in_features_value = module.in_features
+                    # Cast to int to handle Tensor|Module union type safely
+                    from typing import cast
+
+                    if hasattr(in_features_value, "__int__") or isinstance(in_features_value, (int, float)):
+                        in_features_int = int(cast("int | float", in_features_value))
+                    else:
+                        in_features_int = 512  # Default fallback
+                    setattr(obj, parts[-1], nn.Linear(in_features_int, num_classes))
                     return
 
         except Exception:

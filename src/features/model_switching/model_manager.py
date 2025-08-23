@@ -170,7 +170,10 @@ class PlantGuardModelManager:
                 model_key = f"registry_{model_info.metadata.model_id}"
                 accuracy = model_info.metadata.performance_metrics.get("accuracy", 0.0)
 
-                default_config["models"][model_key] = {
+                # Ensure tags is list[str] to avoid Collection[str] inference
+                model_tags: list[str] = list(getattr(model_info.metadata, "tags", [])) or []
+
+                model_config_dict: dict[str, Any] = {
                     "name": f"{model_info.metadata.model_id} (Registry)",
                     "type": "local",
                     "model_id": f"registry:{model_info.metadata.model_id}",
@@ -179,7 +182,9 @@ class PlantGuardModelManager:
                     "confidence_threshold": 0.7,
                     "enabled": True,
                     "device": "auto",
+                    "tags": model_tags,
                 }
+                default_config["models"][model_key] = model_config_dict
 
                 # Set as default if it's a high-performing model
                 if accuracy > 0.9 and not default_config.get("default_model"):
@@ -608,10 +613,11 @@ class PlantGuardModelManager:
 
             comp = registry.compare_models(normalized)
 
-            # Serialize comparison
-            result = {"models": [], "summary": comp.get_summary()}
+            # Serialize comparison with explicit typing to avoid Collection[str] issues
+            result: dict[str, Any] = {"models": [], "summary": comp.get_summary()}
+            models_list: list[dict[str, Any]] = []
             for m in comp.models:
-                result["models"].append(
+                models_list.append(
                     {
                         "model_id": m.metadata.model_id,
                         "accuracy": m.metadata.performance_metrics.get("accuracy", 0.0),
@@ -619,6 +625,7 @@ class PlantGuardModelManager:
                         "description": m.metadata.description,
                     }
                 )
+            result["models"] = models_list
             return result
         except Exception as e:
             logger.error("Failed to compare models: %s", e)
@@ -811,7 +818,7 @@ class PlantGuardModelManager:
                     "confidence_threshold": 0.7,
                     "enabled": True,
                     "device": "auto",
-                    "tags": getattr(model_info.metadata, "tags", []) or [],
+                    "tags": list(getattr(model_info.metadata, "tags", [])) or [],
                     # Preserve architecture and any perf hints so UI/tests can use them
                     "architecture": getattr(model_info.metadata, "architecture", None),
                     "inference_time": model_info.metadata.performance_metrics.get("inference_time"),
@@ -851,7 +858,7 @@ class PlantGuardModelManager:
                                 "confidence_threshold": 0.7,
                                 "enabled": True,
                                 "device": "auto",
-                                "tags": meta.get("tags", []) or [],
+                                "tags": list(meta.get("tags", [])) or [],
                                 "architecture": meta.get("architecture"),
                                 "inference_time": (meta.get("performance_metrics", {}) or {}).get("inference_time"),
                             }
