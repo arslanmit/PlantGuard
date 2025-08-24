@@ -286,124 +286,234 @@ graph TD
     style E fill:#9C27B0,stroke:#333,color:white
 ```
 
-### AI Agent-Friendly Layout System
+### AI Agent Self-Healing and Issue Resolution
 
-```mermaid
-graph TD
-    A["MobileMainLayout<br/>(AI Entry Point)"] --> B["MobileContainer<br/>(Layout Wrapper)"]
-    B --> C["MobileSectionHeader<br/>(Section Identifier)"]
-    B --> D["MobileActionGrid<br/>(Input Controls)"]
-    B --> E["MobileContentArea<br/>(Dynamic Content)"]
-    
-    D --> F["MobileCameraInput<br/>(Camera Component)"]
-    D --> G["MobileVoiceInput<br/>(Voice Component)"]
-    D --> H["MobileTextInput<br/>(Text Component)"]
-    D --> I["MobileUploadInput<br/>(Upload Component)"]
-    
-    E --> J["MobileAnalysisDisplay<br/>(Results Component)"]
-    E --> K["MobileChatDisplay<br/>(Chat Component)"]
-    E --> L["MobileHistoryDisplay<br/>(History Component)"]
-    
-    style A fill:#4CAF50,stroke:#333,color:white
-    style B fill:#2196F3,stroke:#333,color:white
-    style D fill:#FF9800,stroke:#333,color:white
-    style E fill:#9C27B0,stroke:#333,color:white
-```
-
-### AI Agent Documentation Standards
-
-**Component Documentation Pattern**:
+**Autonomous Problem Solving Patterns**:
 ```python
-class MobileCameraInput(MobileComponentBase):
-    """Mobile camera input component for plant image capture.
+class AIAgentSelfHealing:
+    """Self-healing AI Agent system for autonomous issue resolution.
     
-    AI Agent Information:
-    - Purpose: Capture plant images using device camera
-    - Dependencies: navigator.mediaDevices.getUserMedia API
-    - State Keys: 'mobile_camera_state', 'mobile_camera_image'
-    - Triggers: Camera button click, image capture
-    - Outputs: Captured image data, camera status
-    - Error Handling: Camera permission denied, no camera available
-    
-    Usage Pattern for AI Agents:
-    ```python
-    camera = MobileCameraInput('camera', 'Camera Input')
-    camera.render()  # Displays camera interface
-    image_data = camera.get_captured_image()  # Gets captured image
-    ```
-    
-    State Structure:
-    {
-        'is_active': bool,      # Camera interface is active
-        'has_permission': bool,  # Camera permission granted
-        'captured_image': str,   # Base64 encoded image data
-        'timestamp': str,        # Capture timestamp
-        'error_message': str     # Error message if any
-    }
+    AI Agent Capabilities:
+    - Automatic error detection and classification
+    - Self-diagnosis of root causes
+    - Autonomous code fixes and improvements
+    - Self-validation of applied fixes
+    - Continuous monitoring and optimization
     """
     
-    def render(self) -> None:
-        """Render camera input interface.
-        
-        AI Agent Notes:
-        - Creates camera button with standard mobile touch target size
-        - Handles camera permission requests
-        - Displays image preview after capture
-        - Shows error messages if camera unavailable
-        """
-        # Implementation here
-        pass
+    def autonomous_problem_solving_cycle(self) -> dict:
+        """AI Agent: Complete autonomous problem-solving workflow."""
+        cycle_results = {
+            'detection_phase': self.detect_and_classify_issues(),
+            'diagnosis_phase': self.diagnose_root_causes(),
+            'resolution_phase': self.apply_autonomous_fixes(),
+            'validation_phase': self.validate_all_fixes(),
+            'optimization_phase': self.optimize_performance(),
+            'monitoring_phase': self.setup_continuous_monitoring()
+        }
+        return cycle_results
     
-    def get_captured_image(self) -> str | None:
-        """Get captured image data.
+    def fix_button_responsiveness(self, issue: dict) -> dict:
+        """AI Agent: Automatic button responsiveness fix."""
+        fix_actions = [
+            'Check button event handlers',
+            'Validate Streamlit key uniqueness',
+            'Ensure proper state management',
+            'Add touch-action CSS properties',
+            'Implement fallback click handlers'
+        ]
         
-        AI Agent Notes:
-        - Returns base64 encoded image string
-        - Returns None if no image captured
-        - Automatically clears after retrieval to prevent memory issues
-        """
-        # Implementation here
-        pass
-```
-
-**AI Agent Modification Guidelines**:
-```python
-# AI Agent Pattern: How to add new mobile components
-
-# Step 1: Create component following base pattern
-class MobileNewFeature(MobileComponentBase):
-    """New mobile feature component.
+        resolution = {
+            'status': 'resolving',
+            'actions_taken': [],
+            'code_changes': []
+        }
+        
+        # Action 1: Fix event handlers
+        if self.detect_missing_event_handler(issue['component']):
+            code_fix = self.generate_event_handler_code(issue['component'])
+            self.apply_code_fix(code_fix)
+            resolution['actions_taken'].append('Added missing event handler')
+            resolution['code_changes'].append(code_fix)
+        
+        # Action 2: Fix Streamlit key conflicts
+        if self.detect_key_conflicts(issue['component']):
+            key_fix = self.generate_unique_keys(issue['component'])
+            self.apply_code_fix(key_fix)
+            resolution['actions_taken'].append('Resolved Streamlit key conflicts')
+            resolution['code_changes'].append(key_fix)
+        
+        # Action 3: Fix state management
+        if self.detect_state_issues(issue['component']):
+            state_fix = self.fix_state_management_code(issue['component'])
+            self.apply_code_fix(state_fix)
+            resolution['actions_taken'].append('Fixed state management')
+            resolution['code_changes'].append(state_fix)
+        
+        # Validate fix
+        if self.test_button_responsiveness(issue['component']):
+            resolution['status'] = 'resolved'
+        else:
+            resolution['status'] = 'partially_resolved'
+            resolution['remaining_issues'] = self.identify_remaining_issues(issue['component'])
+        
+        return resolution
     
-    AI Agent Checklist:
-    [ ] Inherits from MobileComponentBase
-    [ ] Has clear docstring with AI Agent Information
-    [ ] Uses standard state management pattern
-    [ ] Implements render() method
-    [ ] Has predictable method naming
-    [ ] Includes error handling
-    """
+    def generate_event_handler_code(self, component: dict) -> dict:
+        """AI Agent: Generate proper event handler code."""
+        component_name = component['name']
+        component_id = component['id']
+        
+        code_template = f"""
+# AI Agent Generated: Event handler for {component_name}
+def handle_{component_id}_click():
+    """Handle {component_name} button click - AI Agent generated."""
+    try:
+        # Update component state
+        current_state = MobileStateManager.get_component_state('{component_id}')
+        current_state['last_clicked'] = datetime.now().isoformat()
+        current_state['click_count'] = current_state.get('click_count', 0) + 1
+        MobileStateManager.set_component_state('{component_id}', current_state)
+        
+        # Trigger component action
+        component = MobileComponentRegistry.create_component('{component['type']}', '{component_id}', '{component_name}')
+        result = component.handle_user_action('click')
+        
+        # Update UI state based on result
+        if result['status'] == 'success':
+            st.session_state[f'mobile_{component_id}_status'] = 'active'
+        else:
+            st.session_state[f'mobile_{component_id}_error'] = result.get('error', 'Unknown error')
+    
+    except Exception as e:
+        st.error(f"{component_name} error: {{str(e)}}")
+        st.session_state[f'mobile_{component_id}_error'] = str(e)
+
+# AI Agent Generated: Button implementation with proper event handling
+if st.button(
+    '{component_name}',
+    key=f'mobile_{component_id}_btn_{{int(time.time())}}',  # Unique key
+    on_click=handle_{component_id}_click,
+    use_container_width=True,
+    type='primary'
+):
+    # Button clicked - state already handled in callback
     pass
-
-# Step 2: Register in main layout
-def render_mobile_layout():
-    """Main mobile layout - AI Agent modification point.
+"""
+        
+        return {
+            'type': 'event_handler_fix',
+            'component': component_id,
+            'code': code_template,
+            'file_path': f'src/ui/mobile/components/input/{component_id}_input.py'
+        }
     
-    AI Agent Notes:
-    - Add new components in logical order
-    - Follow existing naming patterns
-    - Update state management accordingly
-    - Test component isolation
-    """
-    # Existing components...
-    new_feature = MobileNewFeature('new_feature', 'New Feature')
-    new_feature.render()
-
-# Step 3: Update state manager
-class MobileStateManager:
-    @staticmethod
-    def get_new_feature_state() -> dict:
-        """Get new feature state - follow existing pattern."""
-        return st.session_state.get('mobile_new_feature_state', {})
+    def autonomous_continuous_improvement(self) -> dict:
+        """AI Agent: Continuous improvement and optimization cycle."""
+        improvements = {
+            'performance_optimizations': self.analyze_and_optimize_performance(),
+            'user_experience_improvements': self.analyze_and_improve_ux(),
+            'code_quality_improvements': self.analyze_and_improve_code(),
+            'accessibility_improvements': self.analyze_and_improve_accessibility(),
+            'mobile_specific_optimizations': self.optimize_for_mobile()
+        }
+        return improvements
+    
+    def analyze_and_optimize_performance(self) -> list[dict]:
+        """AI Agent: Autonomous performance analysis and optimization."""
+        optimizations = []
+        
+        # Analyze component rendering performance
+        render_performance = self.analyze_render_performance()
+        if render_performance['issues']:
+            optimization = self.optimize_component_rendering(render_performance)
+            optimizations.append(optimization)
+        
+        # Analyze state management performance
+        state_performance = self.analyze_state_performance()
+        if state_performance['issues']:
+            optimization = self.optimize_state_management(state_performance)
+            optimizations.append(optimization)
+        
+        # Analyze mobile-specific performance
+        mobile_performance = self.analyze_mobile_performance()
+        if mobile_performance['issues']:
+            optimization = self.optimize_mobile_performance(mobile_performance)
+            optimizations.append(optimization)
+        
+        return optimizations
+    
+    def generate_comprehensive_test_suite(self) -> dict:
+        """AI Agent: Generate complete test suite for all components."""
+        test_suite = {
+            'unit_tests': self.generate_unit_tests(),
+            'integration_tests': self.generate_integration_tests(),
+            'ui_tests': self.generate_ui_tests(),
+            'performance_tests': self.generate_performance_tests(),
+            'accessibility_tests': self.generate_accessibility_tests(),
+            'mobile_specific_tests': self.generate_mobile_tests()
+        }
+        return test_suite
+    
+    def generate_unit_tests(self) -> list[str]:
+        """AI Agent: Generate unit tests for all components."""
+        unit_tests = []
+        
+        for component_type in MobileComponentRegistry.get_available_components():
+            test_code = f"""
+# AI Agent Generated: Unit tests for {component_type}
+class TestMobile{component_type.capitalize()}:
+    """AI Agent generated unit tests for Mobile{component_type.capitalize()}."""
+    
+    def setup_method(self):
+        """Setup test environment - AI Agent pattern."""
+        self.component = Mobile{component_type.capitalize()}('test_{component_type}', 'Test {component_type}')
+        self.mock_session_state = MockSessionState()
+    
+    def test_component_initialization(self):
+        """Test component initializes correctly - AI Agent generated."""
+        assert self.component.component_id == 'test_{component_type}'
+        assert self.component.title == 'Test {component_type}'
+        assert self.component.state_key == 'mobile_test_{component_type}'
+    
+    def test_component_render(self):
+        """Test component renders without errors - AI Agent generated."""
+        try:
+            self.component.render()
+            assert True  # No exception raised
+        except Exception as e:
+            pytest.fail(f"Component render failed: {{e}}")
+    
+    def test_state_management(self):
+        """Test component state management - AI Agent generated."""
+        test_state = {{'test_key': 'test_value', 'timestamp': datetime.now().isoformat()}}
+        self.component.set_state(test_state)
+        retrieved_state = self.component.get_state()
+        assert retrieved_state['test_key'] == 'test_value'
+    
+    def test_user_interactions(self):
+        """Test all user interactions - AI Agent generated."""
+        interactions = ['click', 'input', 'focus', 'blur']
+        for interaction in interactions:
+            try:
+                result = self.component.handle_user_action(interaction)
+                assert isinstance(result, dict)
+                assert 'status' in result
+            except NotImplementedError:
+                # Some components may not implement all interactions
+                pass
+    
+    def test_error_handling(self):
+        """Test component error handling - AI Agent generated."""
+        try:
+            self.component.handle_user_action('invalid_action')
+        except Exception as e:
+            # Should handle gracefully or raise specific exception
+            assert isinstance(e, (ValueError, NotImplementedError))
+"""
+            unit_tests.append(test_code)
+        
+        return unit_tests
 ```
 
 ### State Management Architecture
