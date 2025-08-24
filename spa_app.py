@@ -51,31 +51,91 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Initialize comprehensive session state
+def init_session_state():
+    """Initialize comprehensive session state with validation and defaults."""
+    
+    # Analysis history with metadata
+    if "analysis_history" not in st.session_state:
+        st.session_state.analysis_history = []
+    
+    # Chat messages with role-based structure
+    if "chat_messages" not in st.session_state:
+        st.session_state.chat_messages = []
+    
+    # Comparison mode state
+    if "comparison_mode" not in st.session_state:
+        st.session_state.comparison_mode = False
+    
+    # Current active models with validation
+    if "current_models" not in st.session_state:
+        st.session_state.current_models = {
+            "vision": "vit_best",
+            "audio": "whisper_tiny_local", 
+            "text": "distilbert_plant_qa_v1"
+        }
+    
+    # Processing state with detailed tracking
+    if "processing_state" not in st.session_state:
+        st.session_state.processing_state = "idle"
+    
+    # Processing metadata
+    if "processing_type" not in st.session_state:
+        st.session_state.processing_type = "analysis"
+    
+    # Batch processing state
+    if "current_batch_item" not in st.session_state:
+        st.session_state.current_batch_item = 0
+    
+    if "total_batch_items" not in st.session_state:
+        st.session_state.total_batch_items = 1
+    
+    # Error handling state
+    if "error_message" not in st.session_state:
+        st.session_state.error_message = ""
+    
+    # UI state management
+    if "show_audio_upload" not in st.session_state:
+        st.session_state.show_audio_upload = False
+    
+    # Session statistics
+    if "session_start_time" not in st.session_state:
+        st.session_state.session_start_time = datetime.now().isoformat()
+    
+    # Performance tracking
+    if "performance_history" not in st.session_state:
+        st.session_state.performance_history = []
+    
+    # User preferences
+    if "user_preferences" not in st.session_state:
+        st.session_state.user_preferences = {
+            "auto_clear_chat": False,
+            "show_debug_info": False,
+            "preferred_model": "vit_best",
+            "export_format": "json"
+        }
+
 # Initialize session state
-if "analysis_history" not in st.session_state:
-    st.session_state.analysis_history = []
-if "chat_messages" not in st.session_state:
-    st.session_state.chat_messages = []
-if "comparison_mode" not in st.session_state:
-    st.session_state.comparison_mode = False
-if "current_models" not in st.session_state:
-    st.session_state.current_models = {
-        "vision": "vit_best",
-        "audio": "whisper_tiny_local", 
-        "text": "distilbert_plant_qa_v1"
-    }
-if "processing_state" not in st.session_state:
-    st.session_state.processing_state = "idle"
+init_session_state()
 
 
 class PlantGuardSPA:
-    """Single Page Application for PlantGuard with all functionality."""
+    """Single Page Application for PlantGuard with all functionality.
+    
+    AI Agent Friendly Design:
+    - Programmatic interfaces for all core functions
+    - Structured response formats
+    - Error handling with fallback mechanisms
+    - Session state management
+    - Apple Silicon optimization
+    """
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.vision_adapter = None
         self.audio_adapter = None
         self.text_adapter = None
+        self._setup_performance_optimizations()
         
         # Available models (preserved from original system)
         self.models = {
@@ -126,118 +186,996 @@ class PlantGuardSPA:
             
         return getattr(self, f"{adapter_type}_adapter")
     
-    def render_header(self):
-        """Render the main application header."""
+    def _setup_performance_optimizations(self):
+        """Setup Apple Silicon and performance optimizations with memory management."""
+        import os
+        import torch
+        
+        # Apple Silicon MPS optimization
+        if torch.backends.mps.is_available():
+            os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+            # Enable TF32 for faster computation on Apple Silicon
+            torch.backends.mps.allow_tf32 = True
+            self.device = "mps"
+            self.logger.info("🚀 Apple Silicon MPS acceleration enabled with TF32")
+        else:
+            self.device = "cpu"
+            self.logger.info("💻 Using CPU processing")
+        
+        # Memory management settings
+        self._setup_memory_management()
+        
+        # Caching strategy setup
+        self._setup_caching_strategy()
+        
+        # Performance monitoring
+        self._setup_performance_monitoring()
+    
+    def _setup_memory_management(self):
+        """Setup memory management strategies."""
+        import gc
+        import psutil
+        
+        try:
+            # Get system memory info
+            memory = psutil.virtual_memory()
+            total_gb = memory.total / (1024**3)
+            
+            # Set memory limits based on available RAM
+            if total_gb >= 16:
+                self.memory_limit = 8  # GB
+                self.batch_size_limit = 32
+            elif total_gb >= 8:
+                self.memory_limit = 4  # GB
+                self.batch_size_limit = 16
+            else:
+                self.memory_limit = 2  # GB
+                self.batch_size_limit = 8
+            
+            # Enable garbage collection optimization
+            gc.set_threshold(700, 10, 10)
+            
+            self.logger.info(f"💾 Memory management: {self.memory_limit}GB limit, batch size {self.batch_size_limit}")
+            
+        except ImportError:
+            # Fallback if psutil not available
+            self.memory_limit = 4
+            self.batch_size_limit = 16
+            self.logger.warning("⚠️ psutil not available, using default memory settings")
+    
+    def _setup_caching_strategy(self):
+        """Setup intelligent caching strategies."""
+        from functools import lru_cache
+        
+        # Model caching settings
+        self.model_cache = {
+            "max_size": 3,  # Maximum number of models to keep in memory
+            "current_size": 0,
+            "cache": {}
+        }
+        
+        # Image preprocessing cache
+        self.image_cache_size = 50  # Number of preprocessed images to cache
+        
+        # Results caching
+        self.results_cache_ttl = 3600  # 1 hour TTL for cached results
+        
+        self.logger.info("🗄️ Caching strategy initialized")
+    
+    def _setup_performance_monitoring(self):
+        """Setup performance monitoring and profiling."""
+        import time
+        
+        self.performance_metrics = {
+            "start_time": time.time(),
+            "analysis_times": [],
+            "memory_usage": [],
+            "model_load_times": {}
+        }
+        
+        self.logger.info("📈 Performance monitoring enabled")
+    
+    def optimize_memory_usage(self):
+        """Optimize memory usage during runtime."""
+        import gc
+        import torch
+        
+        try:
+            # Force garbage collection
+            gc.collect()
+            
+            # Clear PyTorch cache if using GPU/MPS
+            if hasattr(torch, 'mps') and torch.backends.mps.is_available():
+                torch.mps.empty_cache()
+            elif torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            
+            # Check memory usage
+            try:
+                import psutil
+                memory = psutil.virtual_memory()
+                memory_percent = memory.percent
+                
+                # If memory usage is high, clear caches
+                if memory_percent > 85:
+                    self.clear_caches()
+                    self.logger.warning(f"⚠️ High memory usage ({memory_percent:.1f}%), cleared caches")
+                
+                return memory_percent
+            except ImportError:
+                return None
+                
+        except Exception as e:
+            self.logger.error(f"Memory optimization error: {e}")
+            return None
+    
+    def clear_caches(self):
+        """Clear all caches to free memory."""
+        # Clear model cache
+        for model_id in list(self.model_cache["cache"].keys()):
+            del self.model_cache["cache"][model_id]
+        self.model_cache["current_size"] = 0
+        
+        # Clear session caches
+        if hasattr(st.session_state, 'preprocessed_images'):
+            del st.session_state.preprocessed_images
+        
+        self.logger.info("🗄️ Caches cleared")
+    
+    # ========== Error Handling and Recovery ==========
+    
+    def handle_error(self, error: Exception, context: str, fallback_action: str = None) -> bool:
+        """Comprehensive error handling with fallback mechanisms.
+        
+        Args:
+            error: The exception that occurred
+            context: Context where the error occurred
+            fallback_action: Optional fallback action to attempt
+            
+        Returns:
+            bool: True if error was handled successfully, False otherwise
+        """
+        error_id = f"err_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        
+        # Log error with full context
+        self.logger.error(f"Error {error_id} in {context}: {str(error)}", exc_info=True)
+        
+        # Update session state
+        self.update_processing_state("error", error_msg=f"{context}: {str(error)}")
+        
+        # Attempt fallback strategies
+        fallback_success = False
+        
+        if isinstance(error, MemoryError):
+            fallback_success = self._handle_memory_error(error, context)
+        elif isinstance(error, ConnectionError):
+            fallback_success = self._handle_connection_error(error, context)
+        elif isinstance(error, FileNotFoundError):
+            fallback_success = self._handle_file_error(error, context)
+        elif "model" in str(error).lower():
+            fallback_success = self._handle_model_error(error, context)
+        else:
+            # Generic error handling
+            fallback_success = self._handle_generic_error(error, context, fallback_action)
+        
+        # Update UI with error information
+        self._display_error_ui(error, context, error_id, fallback_success)
+        
+        return fallback_success
+    
+    def _handle_memory_error(self, error: Exception, context: str) -> bool:
+        """Handle memory-related errors."""
+        try:
+            self.logger.warning(f"💾 Memory error in {context}, attempting recovery")
+            
+            # Clear caches and optimize memory
+            self.clear_caches()
+            self.optimize_memory_usage()
+            
+            # Reduce batch size if applicable
+            if hasattr(self, 'batch_size_limit'):
+                self.batch_size_limit = max(1, self.batch_size_limit // 2)
+                self.logger.info(f"🔄 Reduced batch size to {self.batch_size_limit}")
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Memory error recovery failed: {e}")
+            return False
+    
+    def _handle_connection_error(self, error: Exception, context: str) -> bool:
+        """Handle network/connection errors."""
+        try:
+            self.logger.warning(f"🌐 Connection error in {context}, enabling offline mode")
+            
+            # Switch to offline/local models if available
+            if hasattr(self, 'enable_offline_mode'):
+                self.enable_offline_mode()
+                return True
+            
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Connection error recovery failed: {e}")
+            return False
+    
+    def _handle_model_error(self, error: Exception, context: str) -> bool:
+        """Handle model loading/inference errors."""
+        try:
+            self.logger.warning(f"🤖 Model error in {context}, attempting model fallback")
+            
+            # Try fallback model
+            current_model = st.session_state.current_models.get("vision")
+            fallback_models = ["resnet50_plantvillage_v1", "mobilenet_fast"]
+            
+            for fallback_model in fallback_models:
+                if fallback_model != current_model and fallback_model in self.models["vision"]:
+                    st.session_state.current_models["vision"] = fallback_model
+                    self.logger.info(f"🔄 Switched to fallback model: {fallback_model}")
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Model error recovery failed: {e}")
+            return False
+    
+    def _handle_file_error(self, error: Exception, context: str) -> bool:
+        """Handle file-related errors."""
+        try:
+            self.logger.warning(f"📁 File error in {context}, checking alternatives")
+            
+            # For missing model files, try to download or use alternatives
+            if "model" in str(error).lower():
+                return self._handle_model_error(error, context)
+            
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"File error recovery failed: {e}")
+            return False
+    
+    def _handle_generic_error(self, error: Exception, context: str, fallback_action: str = None) -> bool:
+        """Handle generic errors with optional fallback action."""
+        try:
+            self.logger.warning(f"⚠️ Generic error in {context}, attempting basic recovery")
+            
+            # Reset processing state
+            st.session_state.processing_state = "idle"
+            
+            # Clear any partial state that might be causing issues
+            problematic_keys = ["current_batch_item", "total_batch_items"]
+            for key in problematic_keys:
+                if key in st.session_state:
+                    del st.session_state[key]
+            
+            # Execute fallback action if provided
+            if fallback_action:
+                self.logger.info(f"🔄 Executing fallback action: {fallback_action}")
+                # This could be extended to execute specific fallback functions
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Generic error recovery failed: {e}")
+            return False
+    
+    def _display_error_ui(self, error: Exception, context: str, error_id: str, fallback_success: bool):
+        """Display user-friendly error information in the UI."""
+        # Error message based on type
+        if isinstance(error, MemoryError):
+            error_msg = "💾 **Memory Error**: The system ran out of memory. Try using smaller images or reducing batch size."
+        elif isinstance(error, ConnectionError):
+            error_msg = "🌐 **Connection Error**: Network connection failed. Check your internet connection."
+        elif "model" in str(error).lower():
+            error_msg = "🤖 **Model Error**: There was an issue with the AI model. Trying alternative model..."
+        else:
+            error_msg = f"⚠️ **Error**: {str(error)[:100]}..."
+        
+        # Recovery status
+        if fallback_success:
+            st.warning(f"{error_msg}\n\n✅ **Recovery**: Automatic recovery successful. You can continue using the application.")
+        else:
+            st.error(f"{error_msg}\n\n❌ **Recovery**: Automatic recovery failed. Please refresh the page or contact support.")
+        
+        # Technical details in expandable section
+        with st.expander(f"🔍 Technical Details (Error ID: {error_id})"):
+            st.code(f"""
+Context: {context}
+Error Type: {type(error).__name__}
+Error Message: {str(error)}
+Timestamp: {datetime.now().isoformat()}
+Session ID: {id(st.session_state)}
+            """)
+    
+    def setup_error_monitoring(self):
+        """Setup error monitoring and reporting."""
+        # Error statistics tracking
+        if "error_stats" not in st.session_state:
+            st.session_state.error_stats = {
+                "total_errors": 0,
+                "error_types": {},
+                "recovery_success_rate": 0,
+                "last_error_time": None
+            }
+        
+        self.logger.info("🚨 Error monitoring enabled")
+    
+    # ========== Responsive Layout and Mobile Optimization ==========
+    
+    def detect_device_type(self) -> str:
+        """Detect device type for responsive layout."""
+        # Check if we can detect screen size (limited in Streamlit)
+        # This is a simple heuristic - in a real app, you'd use JavaScript
+        
+        # For now, we'll use a simple approach based on user agent if available
+        # or default to desktop
+        return "desktop"  # Could be enhanced with actual device detection
+    
+    def get_responsive_columns(self, device_type: str = None) -> tuple:
+        """Get responsive column layout based on device type."""
+        if device_type is None:
+            device_type = self.detect_device_type()
+        
+        # Define responsive layouts
+        layouts = {
+            "mobile": ([1], [1], [1]),  # Stack everything
+            "tablet": ([2, 1], [1], [1]),  # Some side-by-side
+            "desktop": ([7, 3], [2, 1], [4, 1])  # Full side-by-side
+        }
+        
+        return layouts.get(device_type, layouts["desktop"])
+    
+    def render_mobile_optimized_header(self):
+        """Render mobile-optimized header."""
+        # Compact header for mobile
         st.markdown("""
-        <div style='text-align: center; padding: 1.5rem 0; background: linear-gradient(135deg, #4CAF50, #45a049); 
-                    border-radius: 15px; margin-bottom: 1.5rem; color: white;'>
-            <h1 style='margin: 0; font-size: 2.5rem;'>🌿 PlantGuard AI</h1>
-            <p style='margin: 0; font-size: 1.1rem; opacity: 0.9;'>Complete Plant Disease Detection & Care Assistant</p>
-            <p style='margin: 0; font-size: 0.8rem; opacity: 0.8;'>All functionality in one interface - AI agent friendly</p>
+        <div style='text-align: center; padding: 1rem 0; background: linear-gradient(135deg, #4CAF50, #45a049); 
+                    border-radius: 10px; margin-bottom: 1rem; color: white;'>
+            <h2 style='margin: 0; font-size: 1.8rem;'>🌿 PlantGuard AI</h2>
+            <p style='margin: 0; font-size: 0.9rem; opacity: 0.9;'>Plant Disease Detection</p>
         </div>
         """, unsafe_allow_html=True)
     
+    def render_mobile_optimized_input(self):
+        """Render mobile-optimized input zone."""
+        st.markdown("### 🌱 Analysis")
+        
+        # Tabbed interface for mobile
+        tab1, tab2, tab3 = st.tabs(["📷 Image", "🎤 Voice", "💬 Chat"])
+        
+        with tab1:
+            # Image upload - full width
+            uploaded_file = st.file_uploader(
+                "Upload plant image",
+                type=["jpg", "jpeg", "png"],
+                accept_multiple_files=True,
+                key="mobile_image_upload"
+            )
+            
+            if uploaded_file:
+                if isinstance(uploaded_file, list):
+                    st.success(f"✅ {len(uploaded_file)} images uploaded")
+                    if st.button("🔄 Analyze All", type="primary", use_container_width=True):
+                        self.process_batch_images(uploaded_file)
+                else:
+                    self.process_single_image(uploaded_file)
+        
+        with tab2:
+            # Voice input - mobile friendly
+            st.markdown("🎤 **Voice Questions**")
+            
+            col_v1, col_v2 = st.columns(2)
+            with col_v1:
+                if st.button("🎤 Record", use_container_width=True):
+                    self.handle_voice_input()
+            
+            with col_v2:
+                if st.button("📁 Upload", use_container_width=True):
+                    st.session_state.show_audio_upload = True
+            
+            if st.session_state.get("show_audio_upload", False):
+                audio_file = st.file_uploader(
+                    "Audio file",
+                    type=["wav", "mp3", "m4a", "ogg"],
+                    key="mobile_audio_upload"
+                )
+                if audio_file:
+                    self.process_audio_file(audio_file)
+                    st.session_state.show_audio_upload = False
+        
+        with tab3:
+            # Text input - mobile optimized
+            text_query = st.text_area(
+                "Ask about plant care",
+                placeholder="What's wrong with my plant?",
+                height=100,
+                key="mobile_text_input"
+            )
+            
+            if st.button("💬 Send", disabled=not text_query, use_container_width=True):
+                self.process_text_query(text_query)
+    
+    def render_accessibility_features(self):
+        """Render accessibility features and options."""
+        # Add accessibility controls in sidebar or expandable section
+        with st.expander("♿ Accessibility Options"):
+            # Font size adjustment
+            font_size = st.selectbox(
+                "Text Size",
+                ["Small", "Medium", "Large", "Extra Large"],
+                index=1,
+                key="font_size_select"
+            )
+            
+            # High contrast mode
+            high_contrast = st.checkbox(
+                "High Contrast Mode",
+                key="high_contrast_mode"
+            )
+            
+            # Screen reader optimization
+            screen_reader = st.checkbox(
+                "Screen Reader Optimization",
+                key="screen_reader_mode"
+            )
+            
+            # Keyboard navigation hints
+            if st.checkbox("Show Keyboard Shortcuts", key="show_shortcuts"):
+                st.markdown("""
+                **Keyboard Shortcuts:**
+                - Tab: Navigate between elements
+                - Enter: Activate buttons
+                - Space: Select checkboxes
+                - Escape: Close dialogs
+                """)
+            
+            # Apply accessibility settings
+            self.apply_accessibility_settings(font_size, high_contrast, screen_reader)
+    
+    def apply_accessibility_settings(self, font_size: str, high_contrast: bool, screen_reader: bool):
+        """Apply accessibility settings to the interface."""
+        # Font size CSS
+        font_sizes = {
+            "Small": "0.8em",
+            "Medium": "1em",
+            "Large": "1.2em",
+            "Extra Large": "1.4em"
+        }
+        
+        # High contrast CSS
+        contrast_css = """
+        .stApp {
+            background-color: #000000 !important;
+            color: #FFFFFF !important;
+        }
+        .stButton > button {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+            border: 2px solid #FFFFFF !important;
+        }
+        """ if high_contrast else ""
+        
+        # Apply CSS
+        css = f"""
+        <style>
+        .stApp {{
+            font-size: {font_sizes.get(font_size, '1em')};
+        }}
+        {contrast_css}
+        </style>
+        """
+        
+        st.markdown(css, unsafe_allow_html=True)
+        
+        # Screen reader optimizations
+        if screen_reader:
+            # Add ARIA labels and descriptions
+            st.markdown("""
+            <script>
+            // Add ARIA labels for screen readers
+            document.addEventListener('DOMContentLoaded', function() {
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(button => {
+                    if (!button.getAttribute('aria-label')) {
+                        button.setAttribute('aria-label', button.textContent || 'Button');
+                    }
+                });
+            });
+            </script>
+            """, unsafe_allow_html=True)
+    
+    def render_adaptive_layout(self):
+        """Render layout that adapts to screen size and device capabilities."""
+        device_type = self.detect_device_type()
+        
+        if device_type == "mobile":
+            # Mobile layout - stacked
+            self.render_mobile_optimized_header()
+            self.render_mobile_optimized_input()
+            self.render_dynamic_results_area()
+            
+            # Mobile context panel as bottom sheet
+            with st.expander("⚙️ Settings & Controls", expanded=False):
+                self.render_context_panel()
+                
+        else:
+            # Desktop/tablet layout - side by side
+            self.render_header()
+            
+            # Get responsive column layout
+            main_cols, input_cols, text_cols = self.get_responsive_columns(device_type)
+            
+            col_main, col_context = st.columns(main_cols)
+            
+            with col_main:
+                self.render_primary_input_zone()
+                self.render_dynamic_results_area()
+            
+            with col_context:
+                self.render_context_panel()
+        
+        # Always render accessibility features
+        self.render_accessibility_features()
+    
+    # ========== AI Agent Programmatic Interfaces ==========
+    
+    def analyze_image_programmatic(self, image_path: str, model: str = None) -> Dict[str, Any]:
+        """Programmatic image analysis for AI agents.
+        
+        Args:
+            image_path: Path to image file
+            model: Optional model override
+            
+        Returns:
+            Structured analysis result with metadata
+        """
+        try:
+            from PIL import Image
+            
+            # Load image
+            image = Image.open(image_path)
+            
+            # Set model if specified
+            original_model = None
+            if model and model in self.models["vision"]:
+                original_model = st.session_state.current_models["vision"]
+                st.session_state.current_models["vision"] = model
+            
+            # Perform analysis
+            result = self.perform_image_analysis(image)
+            
+            # Restore original model
+            if original_model:
+                st.session_state.current_models["vision"] = original_model
+            
+            if result:
+                result.update({
+                    "timestamp": datetime.now().isoformat(),
+                    "filename": Path(image_path).name,
+                    "type": "programmatic_image",
+                    "request_id": f"img_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+                    "status": "success"
+                })
+                return result
+            else:
+                return {
+                    "status": "error",
+                    "error": "Analysis failed",
+                    "timestamp": datetime.now().isoformat()
+                }
+                
+        except Exception as e:
+            self.logger.error(f"Programmatic image analysis error: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
+    
+    def process_voice_programmatic(self, audio_path: str) -> Dict[str, Any]:
+        """Programmatic voice processing for AI agents.
+        
+        Args:
+            audio_path: Path to audio file
+            
+        Returns:
+            Structured transcription and response result
+        """
+        try:
+            adapter = self.get_adapter("audio")
+            if not adapter:
+                return {
+                    "status": "error",
+                    "error": "Audio adapter not available",
+                    "timestamp": datetime.now().isoformat()
+                }
+            
+            # Process audio
+            result = adapter.process_audio(audio_path)
+            
+            if result:
+                transcription = result.get("transcription", "")
+                
+                # Generate text response if transcription successful
+                text_response = None
+                if transcription:
+                    text_response = self.query_programmatic(transcription)
+                
+                return {
+                    "status": "success",
+                    "transcription": transcription,
+                    "confidence": result.get("confidence", 0),
+                    "text_response": text_response,
+                    "timestamp": datetime.now().isoformat(),
+                    "request_id": f"audio_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                }
+            else:
+                return {
+                    "status": "error",
+                    "error": "Audio processing failed",
+                    "timestamp": datetime.now().isoformat()
+                }
+                
+        except Exception as e:
+            self.logger.error(f"Programmatic voice processing error: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
+    
+    def query_programmatic(self, query: str, context: Dict = None) -> Dict[str, Any]:
+        """Programmatic text query for AI agents.
+        
+        Args:
+            query: Text query
+            context: Optional context dictionary
+            
+        Returns:
+            Structured response with metadata
+        """
+        try:
+            adapter = self.get_adapter("text")
+            if not adapter:
+                return {
+                    "status": "error",
+                    "error": "Text adapter not available",
+                    "timestamp": datetime.now().isoformat()
+                }
+            
+            # Generate response
+            response = adapter.generate_response(user_query=query)
+            
+            return {
+                "status": "success",
+                "query": query,
+                "response": response,
+                "context": context or {},
+                "timestamp": datetime.now().isoformat(),
+                "request_id": f"text_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Programmatic text query error: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
+    
+    def batch_analyze_programmatic(self, image_paths: List[str], model: str = None) -> List[Dict[str, Any]]:
+        """Programmatic batch analysis for AI agents.
+        
+        Args:
+            image_paths: List of image file paths
+            model: Optional model override
+            
+        Returns:
+            List of structured analysis results
+        """
+        results = []
+        
+        for path in image_paths:
+            result = self.analyze_image_programmatic(path, model)
+            results.append(result)
+        
+        return results
+    
+    def get_system_status_programmatic(self) -> Dict[str, Any]:
+        """Get system status for AI agents.
+        
+        Returns:
+            Structured system status information
+        """
+        try:
+            import torch
+            import psutil
+            
+            # Current models
+            current_models = st.session_state.get("current_models", {})
+            
+            # System info
+            memory_info = psutil.virtual_memory()
+            
+            # Model info
+            vision_model = current_models.get("vision", "unknown")
+            model_info = self.models["vision"].get(vision_model, {})
+            
+            # Analysis statistics
+            total_analyses = len(st.session_state.get("analysis_history", []))
+            
+            return {
+                "status": "active",
+                "timestamp": datetime.now().isoformat(),
+                "models": {
+                    "active_vision": vision_model,
+                    "vision_accuracy": model_info.get("accuracy", "Unknown"),
+                    "vision_speed": model_info.get("speed", "Unknown")
+                },
+                "system": {
+                    "device": self.device,
+                    "memory_usage": f"{memory_info.percent}%",
+                    "available_memory": f"{memory_info.available / (1024**3):.1f}GB",
+                    "mps_available": torch.backends.mps.is_available() if hasattr(torch.backends, 'mps') else False
+                },
+                "statistics": {
+                    "total_analyses": total_analyses,
+                    "session_active": True
+                }
+            }
+            
+        except Exception as e:
+            self.logger.error(f"System status error: {e}")
+            return {
+                "status": "error",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat()
+            }
+    
+    def render_header(self):
+        """Render the main application header with responsive design."""
+        # Get system status for header indicators
+        try:
+            import torch
+            device_indicator = "🚀 MPS" if torch.backends.mps.is_available() else "💻 CPU"
+        except:
+            device_indicator = "💻 CPU"
+        
+        # Header with device and model info
+        col_header1, col_header2 = st.columns([4, 1])
+        
+        with col_header1:
+            st.markdown(f"""
+            <div style='text-align: center; padding: 1.5rem 0; background: linear-gradient(135deg, #4CAF50, #45a049); 
+                        border-radius: 15px; margin-bottom: 1.5rem; color: white;'>
+                <h1 style='margin: 0; font-size: 2.5rem;'>🌿 PlantGuard AI</h1>
+                <p style='margin: 0; font-size: 1.1rem; opacity: 0.9;'>Complete Plant Disease Detection & Care Assistant</p>
+                <p style='margin: 0; font-size: 0.8rem; opacity: 0.8;'>All functionality in one interface - AI agent friendly</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col_header2:
+            # System indicators
+            st.markdown(f"**{device_indicator}**")
+            current_model = st.session_state.current_models.get("vision", "unknown")
+            model_info = self.models["vision"].get(current_model, {})
+            st.markdown(f"**Model:** {model_info.get('name', 'Unknown')[:15]}...")
+            
+            # Analysis count
+            total_analyses = len(st.session_state.get("analysis_history", []))
+            st.metric("Analyses", total_analyses)
+    
     def render_primary_input_zone(self):
-        """Primary input area with all interaction methods."""
+        """Primary input area with all interaction methods - responsive and accessible."""
         st.markdown("### 🌱 Plant Analysis & Care")
         
-        # Main input tabs - but compact, not navigation
+        # Responsive layout - adapt to mobile/desktop
         input_col1, input_col2 = st.columns([2, 1])
         
         with input_col1:
-            # Image upload (primary function)
+            # Image upload with accessibility
+            st.markdown("#### 📷 Image Analysis")
             uploaded_file = st.file_uploader(
-                "📷 Upload plant image for analysis",
+                "Upload plant image for analysis",
                 type=["jpg", "jpeg", "png"],
-                help="Drag and drop or click to upload. Supports batch upload.",
-                accept_multiple_files=True
+                help="Drag and drop or click to upload. Supports multiple images for batch analysis.",
+                accept_multiple_files=True,
+                key="main_image_upload"
             )
             
             # Process uploaded images
             if uploaded_file:
                 if isinstance(uploaded_file, list):
                     st.success(f"✅ {len(uploaded_file)} images uploaded")
-                    self.process_batch_images(uploaded_file)
+                    if st.button("🔄 Analyze All Images", type="primary", use_container_width=True, key="batch_analyze"):
+                        self.process_batch_images(uploaded_file)
                 else:
                     self.process_single_image(uploaded_file)
         
         with input_col2:
-            # Voice input
-            st.markdown("**🎤 Voice Questions:**")
-            if st.button("🎙️ Record Question", use_container_width=True):
-                self.handle_voice_input()
+            # Voice input with HTTPS detection
+            st.markdown("#### 🎤 Voice Questions")
             
-            # Audio file upload
-            audio_file = st.file_uploader(
-                "Or upload audio file",
-                type=["wav", "mp3", "m4a"],
+            col_voice1, col_voice2 = st.columns(2)
+            
+            with col_voice1:
+                if st.button("🎤 Record", use_container_width=True, key="voice_record"):
+                    self.handle_voice_input()
+            
+            with col_voice2:
+                if st.button("📁 Upload", use_container_width=True, key="voice_upload_btn"):
+                    st.session_state.show_audio_upload = True
+            
+            # Audio file upload (toggle)
+            if st.session_state.get("show_audio_upload", False):
+                audio_file = st.file_uploader(
+                    "Upload audio file",
+                    type=["wav", "mp3", "m4a", "ogg"],
+                    key="audio_file_upload",
+                    help="Supported: WAV, MP3, M4A, OGG"
+                )
+                if audio_file:
+                    self.process_audio_file(audio_file)
+                    st.session_state.show_audio_upload = False
+        
+        # Text input - full width accessibility
+        st.markdown("---")
+        st.markdown("#### 💬 Ask About Plant Care")
+        
+        text_col1, text_col2 = st.columns([4, 1])
+        
+        with text_col1:
+            text_query = st.text_input(
+                "Ask about plant care or describe symptoms",
+                placeholder="e.g., What disease is this? How often should I water tomatoes?",
+                key="main_text_input",
+                help="Natural language questions about plant care, diseases, or treatments",
                 label_visibility="collapsed"
             )
-            if audio_file:
-                self.process_audio_file(audio_file)
         
-        # Text input (always available)
-        st.markdown("---")
-        col_text1, col_text2 = st.columns([3, 1])
-        
-        with col_text1:
-            text_query = st.text_input(
-                "💬 Ask about plant care or describe symptoms",
-                placeholder="e.g., What disease is this? How often should I water?",
-                key="main_text_input"
-            )
-        
-        with col_text2:
-            if st.button("💬 Ask", use_container_width=True, disabled=not text_query):
+        with text_col2:
+            if st.button("💬 Ask", use_container_width=True, disabled=not text_query, key="text_submit"):
                 self.process_text_query(text_query)
+        
+        # Quick suggestion buttons
+        st.markdown("**Quick Questions:**")
+        suggestion_cols = st.columns(4)
+        
+        suggestions = [
+            "What disease is this?",
+            "How to treat this?", 
+            "Watering schedule?",
+            "Prevention tips?"
+        ]
+        
+        for i, suggestion in enumerate(suggestions):
+            with suggestion_cols[i]:
+                if st.button(suggestion, key=f"suggestion_{i}", use_container_width=True):
+                    self.process_text_query(suggestion)
     
     def render_dynamic_results_area(self):
-        """Dynamic results area that adapts to current content."""
-        if st.session_state.processing_state == "processing":
+        """Dynamic results area that adapts to current content with enhanced state management."""
+        current_state = st.session_state.processing_state
+        
+        if current_state == "processing":
+            # Processing state with progress indicators
             with st.spinner("🔄 Processing..."):
-                st.info("Analysis in progress...")
+                # Show progress based on processing type
+                processing_type = st.session_state.get("processing_type", "analysis")
                 
+                if processing_type == "batch":
+                    st.info("📊 Analyzing multiple images...")
+                    # Show batch progress if available
+                    current_batch = st.session_state.get("current_batch_item", 0)
+                    total_batch = st.session_state.get("total_batch_items", 1)
+                    if total_batch > 1:
+                        progress = current_batch / total_batch
+                        st.progress(progress, text=f"Processing {current_batch}/{total_batch}")
+                elif processing_type == "voice":
+                    st.info("🎤 Processing audio input...")
+                else:
+                    st.info("🔬 Analyzing plant image...")
+                
+        elif current_state == "error":
+            # Error state with recovery options
+            st.error("❌ Analysis failed. Please try again.")
+            error_msg = st.session_state.get("error_message", "Unknown error occurred")
+            st.warning(f"Error details: {error_msg}")
+            
+            col_err1, col_err2 = st.columns(2)
+            with col_err1:
+                if st.button("🔄 Retry Analysis", type="primary", key="retry_analysis"):
+                    st.session_state.processing_state = "idle"
+                    st.rerun()
+            
+            with col_err2:
+                if st.button("📞 Get Help", key="get_help"):
+                    self.show_help_panel()
+                    
         elif st.session_state.analysis_history or st.session_state.chat_messages:
-            # Show results based on most recent activity
-            if st.session_state.analysis_history:
+            # Active results state - show recent activity
+            
+            # Tabs for different result types
+            if st.session_state.analysis_history and st.session_state.chat_messages:
+                result_tab1, result_tab2 = st.tabs(["📊 Latest Analysis", "💬 Chat"])
+                
+                with result_tab1:
+                    latest_analysis = st.session_state.analysis_history[-1]
+                    self.display_analysis_result(latest_analysis)
+                
+                with result_tab2:
+                    self.display_chat_messages()
+                    
+            elif st.session_state.analysis_history:
+                # Only analysis results available
                 latest_analysis = st.session_state.analysis_history[-1]
                 self.display_analysis_result(latest_analysis)
-            
-            # Show chat if there are recent messages
-            if st.session_state.chat_messages:
+                
+            elif st.session_state.chat_messages:
+                # Only chat messages available
                 self.display_chat_messages()
         
         else:
-            # Welcome/getting started state
+            # Welcome/idle state - getting started content
             self.render_welcome_content()
+            
+        # Always show comparison mode if active
+        if st.session_state.get("comparison_mode", False):
+            st.markdown("---")
+            self.render_comparison_overlay()
     
     def render_context_panel(self):
-        """Context-aware side panel."""
-        st.markdown("### ⚙️ Controls")
+        """Context-aware side panel with enhanced functionality."""
+        st.markdown("### ⚙️ Controls & Status")
         
         # Model selector (contextual)
         self.render_model_selector()
         
-        # Quick actions
+        st.markdown("---")
+        
+        # Quick actions with smart enabling/disabling
         st.markdown("**🔧 Quick Actions:**")
         
+        # Action buttons in grid layout
         col_act1, col_act2 = st.columns(2)
+        
         with col_act1:
-            if st.button("📊 History", use_container_width=True):
+            # History button - only enable if there's history
+            has_history = bool(st.session_state.analysis_history)
+            if st.button("📊 History", use_container_width=True, disabled=not has_history, key="show_history"):
                 self.show_history_panel()
+                
+            # Clear results button
+            has_results = bool(st.session_state.analysis_history or st.session_state.chat_messages)
+            if st.button("🗑️ Clear", use_container_width=True, disabled=not has_results, key="clear_all"):
+                self.clear_all_results()
         
         with col_act2:
-            if st.button("🔄 Compare", use_container_width=True):
-                st.session_state.comparison_mode = True
-        
-        # Export options (if there's data)
-        if st.session_state.analysis_history:
-            st.markdown("**📤 Export:**")
-            if st.button("💾 Download Results", use_container_width=True):
+            # Compare button
+            if st.button("🔄 Compare", use_container_width=True, key="toggle_compare"):
+                st.session_state.comparison_mode = not st.session_state.get("comparison_mode", False)
+                st.rerun()
+                
+            # Export button - only enable if there's data
+            if st.button("💾 Export", use_container_width=True, disabled=not has_results, key="export_results"):
                 self.export_all_results()
         
-        # System status
+        st.markdown("---")
+        
+        # Performance metrics (real-time)
+        st.markdown("**📊 Performance:**")
+        self.render_performance_metrics()
+        
+        st.markdown("---")
+        
+        # System status with live updates
         self.render_system_status()
+        
+        st.markdown("---")
+        
+        # AI Agent API status
+        self.render_api_status()
     
     def render_model_selector(self):
         """Inline model selection."""
@@ -597,6 +1535,203 @@ class PlantGuardSPA:
             "Consider professional diagnosis"
         ])
     
+    def show_help_panel(self):
+        """Show help and troubleshooting information."""
+        st.info("📞 **Need Help?**")
+        st.markdown("""
+        **Common Issues:**
+        - 🖼️ **Image Quality**: Ensure good lighting and clear focus
+        - 📱 **File Size**: Images should be under 200MB
+        - 🎤 **Microphone**: Requires HTTPS connection (use `make tunnel`)
+        - 🌐 **Network**: Check internet connection for model downloads
+        
+        **Supported Formats:**
+        - Images: JPG, JPEG, PNG
+        - Audio: WAV, MP3, M4A, OGG
+        """)
+    
+    def render_comparison_overlay(self):
+        """Render comparison mode interface overlay."""
+        st.markdown("### 🔄 Comparison Mode Active")
+        st.info("🔄 Upload two images to compare analysis results side by side.")
+        
+        comp_col1, comp_col2, comp_col3 = st.columns([1, 1, 1])
+        
+        with comp_col1:
+            st.markdown("**📷 Image 1:**")
+            comp_file1 = st.file_uploader("First image", type=["jpg", "jpeg", "png"], key="comp1")
+        
+        with comp_col2:
+            st.markdown("**📷 Image 2:**")
+            comp_file2 = st.file_uploader("Second image", type=["jpg", "jpeg", "png"], key="comp2")
+        
+        with comp_col3:
+            st.markdown("**⚙️ Options:**")
+            if st.button("🔄 Compare", disabled=not (comp_file1 and comp_file2), key="perform_comparison"):
+                self.perform_comparison(comp_file1, comp_file2)
+            
+            if st.button("❌ Exit Comparison", key="exit_comparison"):
+                st.session_state.comparison_mode = False
+                st.rerun()
+    
+    def clear_all_results(self):
+        """Clear all analysis results and chat messages."""
+        st.session_state.analysis_history = []
+        st.session_state.chat_messages = []
+        st.session_state.processing_state = "idle"
+        st.success("✅ All results cleared!")
+        st.rerun()
+    
+    def render_performance_metrics(self):
+        """Render real-time performance metrics."""
+        try:
+            import psutil
+            
+            # Memory usage
+            memory = psutil.virtual_memory()
+            st.metric(
+                "💾 Memory", 
+                f"{memory.percent:.1f}%",
+                delta=f"{memory.available / (1024**3):.1f}GB free"
+            )
+            
+            # Analysis speed (if available)
+            if st.session_state.analysis_history:
+                recent_analyses = st.session_state.analysis_history[-5:]
+                if len(recent_analyses) >= 2:
+                    # Calculate average time between analyses
+                    times = [a.get("timestamp", "") for a in recent_analyses]
+                    if all(times):
+                        try:
+                            parsed_times = [datetime.fromisoformat(t) for t in times]
+                            if len(parsed_times) >= 2:
+                                time_diffs = [(parsed_times[i] - parsed_times[i-1]).total_seconds() 
+                                            for i in range(1, len(parsed_times))]
+                                avg_time = sum(time_diffs) / len(time_diffs)
+                                st.metric("⏱️ Avg Speed", f"{avg_time:.1f}s")
+                        except:
+                            pass
+            
+        except ImportError:
+            st.info("📈 Install psutil for performance metrics")
+        except Exception as e:
+            st.warning(f"⚠️ Metrics unavailable: {str(e)[:50]}")
+    
+    def render_api_status(self):
+        """Render AI Agent API status information."""
+        st.markdown("**🤖 AI Agent API:**")
+        
+        # Check adapter availability
+        adapters_status = {
+            "Vision": self.vision_adapter is not None,
+            "Audio": self.audio_adapter is not None,
+            "Text": self.text_adapter is not None
+        }
+        
+        for adapter_name, is_available in adapters_status.items():
+            status_icon = "✅" if is_available else "❌"
+            st.markdown(f"{status_icon} {adapter_name} Adapter")
+        
+        # Programmatic interface status
+        if all(adapters_status.values()):
+            st.success("🚀 All APIs Ready")
+        else:
+            unavailable = [name for name, status in adapters_status.items() if not status]
+            st.warning(f"⚠️ {', '.join(unavailable)} not ready")
+        
+        # API usage statistics
+        total_api_calls = len(st.session_state.get("analysis_history", [])) + \
+                         len(st.session_state.get("chat_messages", []))
+        st.metric("API Calls", total_api_calls)
+    
+    # ========== Session State Management ==========
+    
+    def save_analysis_result(self, result: Dict[str, Any], filename: str, analysis_type: str = "image"):
+        """Save analysis result to session state with metadata."""
+        enhanced_result = {
+            **result,
+            "timestamp": datetime.now().isoformat(),
+            "filename": filename,
+            "type": analysis_type,
+            "session_id": id(st.session_state),
+            "model_used": st.session_state.current_models.get("vision", "unknown"),
+            "device": getattr(self, 'device', 'unknown')
+        }
+        
+        st.session_state.analysis_history.append(enhanced_result)
+        
+        # Limit history size to prevent memory issues
+        max_history = 100
+        if len(st.session_state.analysis_history) > max_history:
+            st.session_state.analysis_history = st.session_state.analysis_history[-max_history:]
+    
+    def save_chat_message(self, role: str, content: str, metadata: Dict = None):
+        """Save chat message to session state with metadata."""
+        message = {
+            "role": role,
+            "content": content,
+            "timestamp": datetime.now().isoformat(),
+            "session_id": id(st.session_state),
+            "metadata": metadata or {}
+        }
+        
+        st.session_state.chat_messages.append(message)
+        
+        # Auto-clear old messages if preference is set
+        if st.session_state.user_preferences.get("auto_clear_chat", False):
+            max_messages = 50
+            if len(st.session_state.chat_messages) > max_messages:
+                st.session_state.chat_messages = st.session_state.chat_messages[-max_messages:]
+    
+    def update_processing_state(self, state: str, processing_type: str = None, 
+                               batch_info: Dict = None, error_msg: str = None):
+        """Update processing state with comprehensive tracking."""
+        st.session_state.processing_state = state
+        
+        if processing_type:
+            st.session_state.processing_type = processing_type
+        
+        if batch_info:
+            st.session_state.current_batch_item = batch_info.get("current", 0)
+            st.session_state.total_batch_items = batch_info.get("total", 1)
+        
+        if error_msg:
+            st.session_state.error_message = error_msg
+        
+        # Track performance
+        performance_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "state": state,
+            "type": processing_type,
+            "batch_info": batch_info
+        }
+        
+        st.session_state.performance_history.append(performance_entry)
+        
+        # Limit performance history
+        if len(st.session_state.performance_history) > 50:
+            st.session_state.performance_history = st.session_state.performance_history[-50:]
+    
+    def get_session_statistics(self) -> Dict[str, Any]:
+        """Get comprehensive session statistics."""
+        session_start = st.session_state.get("session_start_time", datetime.now().isoformat())
+        try:
+            start_time = datetime.fromisoformat(session_start)
+            session_duration = (datetime.now() - start_time).total_seconds()
+        except:
+            session_duration = 0
+        
+        return {
+            "session_duration_seconds": session_duration,
+            "total_analyses": len(st.session_state.analysis_history),
+            "total_chat_messages": len(st.session_state.chat_messages),
+            "current_state": st.session_state.processing_state,
+            "models_used": st.session_state.current_models,
+            "comparison_mode_active": st.session_state.comparison_mode,
+            "performance_entries": len(st.session_state.performance_history),
+            "session_id": id(st.session_state)
+        }
+    
     def export_all_results(self):
         """Export all analysis results."""
         if not st.session_state.analysis_history:
@@ -649,35 +1784,30 @@ class PlantGuardSPA:
         """)
     
     def run(self):
-        """Main application runner."""
+        """Main application runner with responsive layout."""
         try:
-            # Render header
-            self.render_header()
+            # Setup error monitoring
+            self.setup_error_monitoring()
             
-            # Main layout
-            col_main, col_context = st.columns([7, 3])
+            # Render adaptive layout based on device
+            self.render_adaptive_layout()
             
-            with col_main:
-                # Primary input zone
-                self.render_primary_input_zone()
-                
-                # Dynamic results area
-                self.render_dynamic_results_area()
-            
-            with col_context:
-                # Context panel
-                self.render_context_panel()
-            
-            # Comparison mode overlay
-            if st.session_state.comparison_mode:
-                self.render_comparison_mode()
+            # Comparison mode overlay (if active)
+            if st.session_state.get("comparison_mode", False):
+                self.render_comparison_overlay()
             
             self.logger.info("PlantGuard SPA rendered successfully")
             
         except Exception as e:
-            self.logger.error(f"SPA application error: {e}")
-            st.error("An unexpected error occurred. Please refresh the page.")
-            st.exception(e)
+            # Use comprehensive error handling
+            recovery_success = self.handle_error(e, "main_application_runner")
+            
+            if not recovery_success:
+                st.error("❌ An unexpected error occurred. Please refresh the page.")
+                
+                # Show error details for debugging
+                if st.session_state.user_preferences.get("show_debug_info", False):
+                    st.exception(e)
     
     def render_comparison_mode(self):
         """Render comparison mode interface."""

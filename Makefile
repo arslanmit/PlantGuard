@@ -350,9 +350,9 @@ health-check:
 
 # ========== Application & Development ==========
 
-# ========== Single Page Application Launch ==========
+# ========== Single Page Application (SPA) Commands ==========
 
-# Primary command - Launch PlantGuard SPA
+# Primary SPA command - Launch PlantGuard SPA
 run: check-venv validate-spa
 	@echo "$(GREEN)🌿 Launching PlantGuard Single Page Application$(NC)"
 	@if [ ! -x $(PY) ]; then \
@@ -374,11 +374,163 @@ run: check-venv validate-spa
 		--server.enableXsrfProtection false \
 		--server.maxUploadSize 200
 
-# Validate SPA setup
+# SPA Development mode with hot reload
+spa-dev: check-venv validate-spa
+	@echo "$(BLUE)🛠️ Starting PlantGuard SPA in development mode$(NC)"
+	@$(STREAMLIT) run spa_app.py \
+		--server.port 8501 \
+		--server.runOnSave true \
+		--server.fileWatcherType auto \
+		--server.maxUploadSize 200 \
+		--logger.level debug
+
+# SPA Production mode
+spa-prod: check-venv validate-spa
+	@echo "$(GREEN)🚀 Starting PlantGuard SPA in production mode$(NC)"
+	@$(STREAMLIT) run spa_app.py \
+		--server.port 8501 \
+		--server.headless true \
+		--server.enableCORS false \
+		--server.address 0.0.0.0 \
+		--server.maxUploadSize 200 \
+		--browser.gatherUsageStats false
+
+# SPA Testing
+spa-test: check-venv
+	@echo "$(BLUE)🧪 Testing PlantGuard SPA components$(NC)"
+	@$(PYTEST) tests/test_ui.py tests/test_comprehensive_integration.py \
+		-v --tb=short -k "spa or unified" \
+		--timeout=300
+
+# SPA Performance Testing
+spa-performance: check-venv
+	@echo "$(BLUE)📈 Testing SPA performance$(NC)"
+	@$(PY) -c """
+import time
+import requests
+import subprocess
+import signal
+import os
+
+# Start SPA in background
+proc = subprocess.Popen(['$(STREAMLIT)', 'run', 'spa_app.py', '--server.port', '8502'], 
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+try:
+    # Wait for startup
+    time.sleep(10)
+    
+    # Test basic connectivity
+    response = requests.get('http://localhost:8502', timeout=5)
+    print(f'✅ SPA responding: {response.status_code}')
+    
+    # Test health endpoint
+    health_response = requests.get('http://localhost:8502/healthz', timeout=5)
+    print(f'📊 Health check: {health_response.status_code}')
+    
+except Exception as e:
+    print(f'❌ SPA performance test failed: {e}')
+finally:
+    # Cleanup
+    proc.terminate()
+    proc.wait()
+"""
+
+# Validate SPA setup and dependencies
 validate-spa: check-venv
 	@echo "$(YELLOW)✅ Validating SPA setup...$(NC)"
 	@$(PY) -c "import spa_app; print('✅ SPA imports successful')" || { echo "$(RED)❌ SPA validation failed$(NC)"; exit 1; }
+	@$(PY) -c "import streamlit; print('✅ Streamlit available')" || { echo "$(RED)❌ Streamlit not found$(NC)"; exit 1; }
+	@$(PY) -c "import torch; print(f'✅ PyTorch available: {torch.__version__}')" || { echo "$(RED)❌ PyTorch not found$(NC)"; exit 1; }
+	@$(PY) -c "import PIL; print('✅ PIL available')" || { echo "$(RED)❌ PIL not found$(NC)"; exit 1; }
 	@echo "$(GREEN)✅ PlantGuard SPA ready!$(NC)"
+
+# SPA Configuration Management
+spa-config: check-venv
+	@echo "$(CYAN)⚙️ SPA Configuration Status$(NC)"
+	@echo "Device: $(shell $(PY) -c 'import torch; print("MPS" if torch.backends.mps.is_available() else "CPU")')" 
+	@echo "Memory: $(shell $(PY) -c 'import psutil; print(f"{psutil.virtual_memory().total/(1024**3):.1f}GB total")')" 
+	@echo "Models available: $(shell ls -1 data/models/ | wc -l | tr -d ' ')"
+	@echo "Config files: $(shell ls -1 config/*.json | wc -l | tr -d ' ')"
+
+# SPA Memory Optimization
+spa-optimize: check-venv
+	@echo "$(BLUE)📋 Optimizing SPA for current system$(NC)"
+	@$(PY) -c """
+import psutil
+import torch
+import json
+
+# Get system info
+memory_gb = psutil.virtual_memory().total / (1024**3)
+cpu_count = psutil.cpu_count()
+has_mps = torch.backends.mps.is_available() if hasattr(torch.backends, 'mps') else False
+
+# Generate optimized config
+config = {
+    'spa_config': {
+        'port': 8501,
+        'max_upload_size': min(200, int(memory_gb * 20)),
+        'session_timeout': 3600 if memory_gb >= 8 else 1800
+    },
+    'performance_config': {
+        'batch_size': min(32, int(memory_gb * 2)),
+        'max_concurrent': min(4, cpu_count),
+        'memory_limit': f'{int(memory_gb * 0.5)}GB',
+        'device': 'mps' if has_mps else 'cpu',
+        'cache_models': memory_gb >= 8
+    },
+    'optimization_timestamp': '$(shell date -Iseconds)'
+}
+
+with open('spa_config_optimized.json', 'w') as f:
+    json.dump(config, f, indent=2)
+
+print(f'✅ Optimized SPA config generated for {memory_gb:.1f}GB system')
+print(f'Device: {config["performance_config"]["device"]}')
+print(f'Batch size: {config["performance_config"]["batch_size"]}')
+"""
+
+# SPA API Documentation Generation
+spa-docs: check-venv
+	@echo "$(BLUE)📚 Generating SPA API documentation$(NC)"
+	@$(PY) -c """
+import spa_app
+import inspect
+import json
+from datetime import datetime
+
+# Extract programmatic API methods
+app_class = spa_app.PlantGuardSPA
+api_methods = {}
+
+for name, method in inspect.getmembers(app_class, predicate=inspect.isfunction):
+    if name.endswith('_programmatic') or name in ['get_system_status_programmatic']:
+        sig = inspect.signature(method)
+        doc = inspect.getdoc(method) or 'No documentation available'
+        
+        api_methods[name] = {
+            'signature': str(sig),
+            'docstring': doc,
+            'parameters': list(sig.parameters.keys())
+        }
+
+# Generate API documentation
+api_docs = {
+    'title': 'PlantGuard SPA Programmatic API',
+    'generated': datetime.now().isoformat(),
+    'description': 'AI Agent friendly API methods for programmatic access',
+    'methods': api_methods
+}
+
+with open('SPA_API_DOCS.json', 'w') as f:
+    json.dump(api_docs, f, indent=2)
+
+print(f'✅ Generated API documentation with {len(api_methods)} methods')
+for method_name in api_methods.keys():
+    print(f'  - {method_name}')
+"""
+	@echo "$(GREEN)✅ SPA API documentation saved to SPA_API_DOCS.json$(NC)"
 
 # Legacy support for development/testing
 run-legacy: check-venv
