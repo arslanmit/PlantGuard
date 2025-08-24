@@ -184,7 +184,7 @@ def main():
         
         The SPA provides the same powerful features with a simplified, streamlined design.
         """)
-        
+
         # Option to launch SPA
         if st.button("🚀 Launch New SPA Interface", type="primary"):
             st.info("Please run: `streamlit run spa_app.py` or `make run`")

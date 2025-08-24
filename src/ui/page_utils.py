@@ -52,7 +52,7 @@ class PlantGuardPageUtils:
             # Audio adapter initialization if available
             try:
                 self.audio_adapter = AudioAdapter()
-            except:
+            except Exception:
                 self.audio_adapter = None
         except Exception as e:
             self.logger.warning(f"Failed to initialize adapters: {e}")
@@ -83,7 +83,7 @@ class PlantGuardPageUtils:
         """Render a consistent page header."""
         st.markdown(
             f"""
-            <div style='text-align: center; padding: 1.5rem 0; background: linear-gradient(135deg, #4CAF50, #45a049); 
+            <div style='text-align: center; padding: 1.5rem 0; background: linear-gradient(135deg, #4CAF50, #45a049);
                         border-radius: 15px; margin-bottom: 2rem; color: white;'>
                 <h1 style='margin: 0; font-size: 2rem;'>🌿 {title}</h1>
                 <p style='margin: 0; font-size: 1rem; opacity: 0.9;'>{description}</p>
@@ -105,15 +105,14 @@ class PlantGuardPageUtils:
         except ValueError:
             current_idx = 0
 
-        selected_model = st.selectbox(
-            f"Choose {model_type} model:", options=model_options, index=current_idx, key=f"{model_type}_model_select"
-        )
+        selected_model = st.selectbox(f"Choose {model_type} model:", options=model_options, index=current_idx, key=f"{model_type}_model_select")
 
         # Update model if changed
         new_model_key = model_keys[model_options.index(selected_model)]
         if new_model_key != current_model:
             st.session_state.current_models[model_type] = new_model_key
             st.success(f"✅ Updated to {self.models_config[model_type][new_model_key]['name']}")
+
     def render_tips_card(self, tips: list):
         """Render a tips card with helpful information."""
         tips_html = "".join([f"<li>{tip}</li>" for tip in tips])

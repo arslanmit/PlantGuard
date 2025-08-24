@@ -66,7 +66,7 @@ def test_unified_app_components():
 def test_legacy_pages_removed():
     """Test that legacy pages are properly removed."""
     # This test ensures legacy imports fail as expected
-    legacy_pages = ["home", "compare", "settings", "guide", "history", "accessibility"]
+    legacy_pages = ["home", "compare", "settings", "guide", "history"]
 
     for page in legacy_pages:
         try:

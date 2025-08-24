@@ -337,27 +337,7 @@ class ResponsiveLayout:
         else:
             return "auto"  # Auto width on desktop
 
-    def render_accessibility_controls(self):
-        """Render accessibility controls for layout."""
-        with st.expander("♿ Accessibility Options"):
-            col1, col2 = st.columns(2)
-
-            with col1:
-                force_mobile = st.checkbox(
-                    "Force mobile layout",
-                    value=st.session_state.layout_config.get("mobile_view", False),
-                    help="Use mobile layout regardless of screen size",
-                )
-
-                if force_mobile != st.session_state.layout_config.get("mobile_view", False):
-                    st.session_state.layout_config["mobile_view"] = force_mobile
-                    st.rerun()
-
-            with col2:
-                high_contrast = st.checkbox("High contrast mode", help="Increase contrast for better visibility")
-
-                if high_contrast:
-                    st.markdown("<style>.stApp { filter: contrast(1.5) !important; }</style>", unsafe_allow_html=True)
+    # Accessibility controls removed per user request
 
 
 class ResponsiveLayoutManager:

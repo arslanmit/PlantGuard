@@ -22,7 +22,7 @@ using pre-trained models from Hugging Face Hub.
 """
 
 import logging
-from typing import Optional, Tuple
+from typing import Tuple
 
 import torch
 from PIL import Image
@@ -51,8 +51,8 @@ class HuggingFaceVisionAdapter:
         """
         self.device = torch.device(device)
         self.model_name = model_name
-        self.model: Optional[AutoModelForImageClassification] = None
-        self.processor: Optional[AutoImageProcessor] = None
+        self.model: AutoModelForImageClassification | None = None
+        self.processor: AutoImageProcessor | None = None
         self.class_names: list[str] = []
         self.is_loaded = False
 

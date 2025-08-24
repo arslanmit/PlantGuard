@@ -41,11 +41,6 @@ class NavigationHeader:
                 "description": "Preferences and configuration",
                 "keywords": ["settings", "config", "preferences", "theme"],
             },
-            "Accessibility": {
-                "icon": "♿",
-                "description": "Accessibility testing and validation",
-                "keywords": ["accessibility", "a11y", "test", "validation", "adhd"],
-            },
         }
 
     def render(self) -> str:

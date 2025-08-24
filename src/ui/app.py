@@ -5,7 +5,7 @@ from typing import Literal
 
 import streamlit as st
 
-from .components import ModelSwitcher, ModeSwitcher, render_status_indicator
+from .components import render_status_indicator
 
 logger = logging.getLogger(__name__)
 
@@ -162,7 +162,7 @@ def main() -> None:
     """Main Streamlit application - now using simplified interface."""
     # Import and run the simplified app
     from .simplified_app import SimplifiedPlantGuardApp
-    
+
     app = SimplifiedPlantGuardApp()
     app.run()
 

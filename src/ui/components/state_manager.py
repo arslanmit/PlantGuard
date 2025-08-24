@@ -65,12 +65,6 @@ class StateManager:
             "theme": "light",
             "language": "en",
             "units": "metric",
-            "accessibility": {
-                "high_contrast": False,
-                "large_text": False,
-                "reduced_motion": False,
-                "screen_reader": False,
-            },
             "interface": {
                 "simple_mode": False,
                 "expert_mode": False,

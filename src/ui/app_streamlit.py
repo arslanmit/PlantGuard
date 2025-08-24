@@ -25,7 +25,6 @@ src_path = Path(__file__).parent.parent
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
-from typing import Optional
 
 from core.audio import AudioAdapter
 from core.nlp import TextAdapter
@@ -193,7 +192,7 @@ try:
     from src.features.model_switching.model_manager import PlantGuardModelManager
 
     try:
-        model_manager: Optional["PlantGuardModelManager"] = PlantGuardModelManager(autoload_default=True)
+        model_manager: "PlantGuardModelManager" | None = PlantGuardModelManager(autoload_default=True)
     except Exception as exc:
         logger.exception("Failed to initialize PlantGuardModelManager: %s", exc)
         model_manager = None
@@ -831,7 +830,7 @@ with tab4:
 
         # Load report
         report_path = selected_run / "training_report.json"
-        report = {}
+        report: dict[str, Any] = {}
         try:
             report = json.loads(report_path.read_text()) if report_path.exists() else {}
         except Exception as e:

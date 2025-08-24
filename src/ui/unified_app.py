@@ -23,7 +23,6 @@ if str(src_path) not in sys.path:
 
 # Import adapters with compatibility fallback
 try:
-    from core.audio import AudioAdapter
     from core.nlp import TextAdapter
     from core.vision import VisionAdapter
 except ImportError:
@@ -72,7 +71,7 @@ class UnifiedPlantGuardApp:
         """Render the main application header."""
         st.markdown(
             """
-        <div style='text-align: center; padding: 2rem 0; background: linear-gradient(135deg, #4CAF50, #45a049); 
+        <div style='text-align: center; padding: 2rem 0; background: linear-gradient(135deg, #4CAF50, #45a049);
                     border-radius: 15px; margin-bottom: 2rem; color: white;'>
             <h1 style='margin: 0; font-size: 2.5rem;'>🌿 PlantGuard AI</h1>
             <p style='margin: 0; font-size: 1.1rem; opacity: 0.9;'>AI-Powered Plant Disease Detection & Care Assistant</p>
@@ -303,7 +302,7 @@ class UnifiedPlantGuardApp:
                         f"Select {model_type} model:",
                         options=model_options,
                         index=current_idx,
-                        format_func=lambda x: self.models[model_type][x]["name"],
+                        format_func=lambda x, mt=model_type: self.models[mt][x]["name"],
                         key=f"settings_{model_type}_model",
                     )
 
@@ -392,11 +391,11 @@ class UnifiedPlantGuardApp:
 
         st.markdown(
             f"""
-        <div style='background: white; padding: 1.5rem; border-radius: 15px; border-left: 5px solid {risk_color}; 
+        <div style='background: white; padding: 1.5rem; border-radius: 15px; border-left: 5px solid {risk_color};
                     box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin: 1rem 0;'>
             <h3 style='margin: 0 0 1rem 0; color: #333;'>🦠 {result.get("disease", "Unknown Disease")}</h3>
             <p style='margin: 0.5rem 0; font-size: 1.1rem;'><strong>🎯 Confidence:</strong> {result.get("confidence", 0):.1%}</p>
-            <p style='margin: 0.5rem 0;'><strong>⚠️ Risk Level:</strong> 
+            <p style='margin: 0.5rem 0;'><strong>⚠️ Risk Level:</strong>
                <span style='color: {risk_color}; font-weight: bold; text-transform: uppercase;'>{result.get("risk_level", "Medium")}</span></p>
         </div>
         """,
@@ -670,7 +669,7 @@ class UnifiedPlantGuardApp:
 
             with col2:
                 # Disease filter
-                diseases = ["All"] + list(set(analysis.get("disease", "Unknown") for analysis in st.session_state.analysis_history))
+                diseases = ["All", *list({analysis.get("disease", "Unknown") for analysis in st.session_state.analysis_history})]
                 disease_filter = st.selectbox("Disease:", diseases, key="history_disease_filter")
                 st.session_state.history_disease_filter = disease_filter
 

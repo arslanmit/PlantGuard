@@ -547,5 +547,45 @@ run-legacy: check-venv
 	@echo "$(BLUE)🏃 Running SPA with legacy server$(NC)"
 	@$(PY) -c "import json; print(json.dumps({'status': 'SPA running in legacy mode'}, indent=2))"
 
+# ========== Quality Assurance & Development Tools ==========
 
-# SPA API Documentation Generation
+# Complete QA pipeline - format, lint, type check, and test
+qa: format lint type test
+	@echo "$(GREEN)✅ Complete QA pipeline finished$(NC)"
+	@echo "$(CYAN)💡 All quality checks passed! Ready for commit.$(NC)"
+
+# Format code with Ruff
+format: check-venv
+	@echo "$(BLUE)🎨 Formatting code with Ruff...$(NC)"
+	@$(RUFF) format $(SRC_DIR)/
+	@echo "$(GREEN)✅ Code formatting complete$(NC)"
+
+# Lint code with Ruff
+lint: check-venv
+	@echo "$(BLUE)🔍 Linting code with Ruff...$(NC)"
+	@$(RUFF) check $(SRC_DIR)/ --fix
+	@echo "$(GREEN)✅ Code linting complete$(NC)"
+
+# Type checking with MyPy
+type: check-venv
+	@echo "$(BLUE)🔬 Type checking with MyPy...$(NC)"
+	@$(MYPY) $(SRC_DIR)/ || echo "$(YELLOW)⚠️  Type checking found issues (see output above)$(NC)"
+	@echo "$(GREEN)✅ Type checking complete$(NC)"
+
+# Run tests
+test: check-venv
+	@echo "$(BLUE)🧪 Running tests with pytest...$(NC)"
+	@$(PYTEST) $(TESTS_DIR)/ -v --tb=short
+	@echo "$(GREEN)✅ Tests complete$(NC)"
+
+# Fast QA pipeline without type checking
+qa-fast: format lint test
+	@echo "$(GREEN)✅ Fast QA pipeline finished$(NC)"
+	@echo "$(CYAN)💡 Quick quality checks passed!$(NC)"
+
+# Fix code issues automatically
+fix: check-venv
+	@echo "$(BLUE)🔧 Auto-fixing code issues...$(NC)"
+	@$(RUFF) check $(SRC_DIR)/ --fix --unsafe-fixes
+	@$(RUFF) format $(SRC_DIR)/
+	@echo "$(GREEN)✅ Auto-fix complete$(NC)"

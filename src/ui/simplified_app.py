@@ -23,7 +23,6 @@ if str(src_path) not in sys.path:
 
 # Import adapters with compatibility fallback
 try:
-    from core.audio import AudioAdapter
     from core.nlp import TextAdapter
     from core.vision import VisionAdapter
 except ImportError:
@@ -31,12 +30,7 @@ except ImportError:
     from adapters_compat import TextAdapter, VisionAdapter
 
 # Configure page with sidebar disabled
-st.set_page_config(
-    page_title="PlantGuard AI", 
-    page_icon="🌿", 
-    layout="wide", 
-    initial_sidebar_state="collapsed"
-)
+st.set_page_config(page_title="PlantGuard AI", page_icon="🌿", layout="wide", initial_sidebar_state="collapsed")
 
 # Initialize session state
 if "analysis_history" not in st.session_state:
@@ -44,11 +38,7 @@ if "analysis_history" not in st.session_state:
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
 if "current_models" not in st.session_state:
-    st.session_state.current_models = {
-        "vision": "resnet50_plantvillage_v1", 
-        "audio": "whisper_tiny_local", 
-        "text": "distilbert_plant_qa_v1"
-    }
+    st.session_state.current_models = {"vision": "resnet50_plantvillage_v1", "audio": "whisper_tiny_local", "text": "distilbert_plant_qa_v1"}
 if "settings_expanded" not in st.session_state:
     st.session_state.settings_expanded = False
 if "comparison_history" not in st.session_state:
@@ -84,7 +74,7 @@ class SimplifiedPlantGuardApp:
     def render_header(self):
         """Render the main application header with integrated controls."""
         col1, col2, col3 = st.columns([3, 1, 1])
-        
+
         with col1:
             st.markdown(
                 """
@@ -95,13 +85,13 @@ class SimplifiedPlantGuardApp:
                 """,
                 unsafe_allow_html=True,
             )
-        
+
         with col2:
             # Quick stats
             if st.session_state.analysis_history:
                 total_analyses = len(st.session_state.analysis_history)
                 st.metric("Total Analyses", total_analyses)
-        
+
         with col3:
             # Settings toggle button
             if st.button("⚙️ Settings", key="settings_toggle", help="Show/hide settings panel"):
@@ -113,7 +103,7 @@ class SimplifiedPlantGuardApp:
         if st.session_state.settings_expanded:
             with st.expander("⚙️ Quick Settings", expanded=True):
                 col1, col2, col3 = st.columns(3)
-                
+
                 # Model selection for each type
                 for i, model_type in enumerate(["vision", "audio", "text"]):
                     with [col1, col2, col3][i]:
@@ -132,7 +122,7 @@ class SimplifiedPlantGuardApp:
                             options=model_options,
                             index=current_idx,
                             key=f"{model_type}_model_select",
-                            label_visibility="collapsed"
+                            label_visibility="collapsed",
                         )
 
                         # Update model if changed
@@ -144,7 +134,7 @@ class SimplifiedPlantGuardApp:
                 # Quick actions row
                 st.markdown("---")
                 col_a, col_b, col_c, col_d = st.columns(4)
-                
+
                 with col_a:
                     if st.button("🧹 Clear History", use_container_width=True):
                         st.session_state.analysis_history = []
@@ -152,15 +142,15 @@ class SimplifiedPlantGuardApp:
                         st.session_state.comparison_history = []
                         st.success("History cleared!")
                         st.rerun()
-                
+
                 with col_b:
                     if st.button("💾 Export Data", use_container_width=True):
                         self.export_session_data()
-                
+
                 with col_c:
                     if st.button("📊 View Stats", use_container_width=True):
                         self.show_quick_stats()
-                
+
                 with col_d:
                     if st.button("❓ Help", use_container_width=True):
                         self.show_help_info()
@@ -168,13 +158,9 @@ class SimplifiedPlantGuardApp:
     def render_main_interface(self):
         """Render the main tabbed interface."""
         # Create main tabs
-        tab1, tab2, tab3, tab4, tab5 = st.tabs([
-            "🖼️ Image Analysis", 
-            "🎤 Voice Assistant", 
-            "💬 Chat Assistant", 
-            "📈 History & Settings", 
-            "🔄 Compare Images"
-        ])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(
+            ["🖼️ Image Analysis", "🎤 Voice Assistant", "💬 Chat Assistant", "📈 History & Settings", "🔄 Compare Images"]
+        )
 
         with tab1:
             self.render_image_analysis_tab()
@@ -194,15 +180,13 @@ class SimplifiedPlantGuardApp:
     def render_image_analysis_tab(self):
         """Render image analysis interface."""
         st.markdown("### 📷 Plant Image Analysis")
-        
+
         col1, col2 = st.columns([2, 1])
 
         with col1:
             # File upload
             uploaded_file = st.file_uploader(
-                "Choose a plant image", 
-                type=["jpg", "jpeg", "png"], 
-                help="Upload a clear image of the plant leaf or affected area"
+                "Choose a plant image", type=["jpg", "jpeg", "png"], help="Upload a clear image of the plant leaf or affected area"
             )
 
             if uploaded_file is not None:
@@ -212,7 +196,7 @@ class SimplifiedPlantGuardApp:
 
                 # Analysis controls
                 col_a, col_b = st.columns(2)
-                
+
                 with col_a:
                     if st.button("🔍 Analyze Plant", type="primary", use_container_width=True):
                         with st.spinner("Analyzing image with AI..."):
@@ -224,7 +208,7 @@ class SimplifiedPlantGuardApp:
                                 result["type"] = "image"
                                 result["filename"] = uploaded_file.name
                                 st.session_state.analysis_history.append(result)
-                
+
                 with col_b:
                     if st.button("📊 View Details", use_container_width=True):
                         if st.session_state.analysis_history:
@@ -252,7 +236,7 @@ class SimplifiedPlantGuardApp:
                 """,
                 unsafe_allow_html=True,
             )
-            
+
             # Recent analysis
             st.markdown("### 📊 Recent Analysis")
             recent_analyses = st.session_state.analysis_history[-3:]  # Last 3
@@ -262,7 +246,7 @@ class SimplifiedPlantGuardApp:
                     with st.expander(f"{analysis.get('disease', 'Unknown')} ({analysis.get('confidence', 0):.0%})", expanded=False):
                         st.write(f"**Time:** {analysis.get('timestamp', 'Unknown')}")
                         st.write(f"**Confidence:** {analysis.get('confidence', 0):.1%}")
-                        if analysis.get('filename'):
+                        if analysis.get("filename"):
                             st.write(f"**File:** {analysis['filename']}")
 
                         if st.button("🔄 View Details", key=f"recent_{i}"):
@@ -276,11 +260,7 @@ class SimplifiedPlantGuardApp:
         st.markdown("Ask questions about plant care using your voice.")
 
         # Audio upload
-        audio_file = st.file_uploader(
-            "Upload audio file", 
-            type=["wav", "mp3", "m4a"], 
-            help="Upload an audio file with your plant care question"
-        )
+        audio_file = st.file_uploader("Upload audio file", type=["wav", "mp3", "m4a"], help="Upload an audio file with your plant care question")
 
         if audio_file is not None:
             st.audio(audio_file, format="audio/wav")
@@ -351,8 +331,7 @@ class SimplifiedPlantGuardApp:
             if st.session_state.analysis_history:
                 for i, analysis in enumerate(reversed(st.session_state.analysis_history)):
                     with st.expander(
-                        f"{analysis.get('disease', 'Unknown Disease')} - {analysis.get('confidence', 0):.0%} confidence", 
-                        expanded=False
+                        f"{analysis.get('disease', 'Unknown Disease')} - {analysis.get('confidence', 0):.0%} confidence", expanded=False
                     ):
                         col_a, col_b = st.columns(2)
                         with col_a:
@@ -362,7 +341,7 @@ class SimplifiedPlantGuardApp:
                         with col_b:
                             st.write(f"**Date:** {analysis.get('timestamp', 'Unknown')[:10]}")
                             st.write(f"**Time:** {analysis.get('timestamp', 'Unknown')[11:16]}")
-                            if analysis.get('filename'):
+                            if analysis.get("filename"):
                                 st.write(f"**File:** {analysis['filename']}")
                             if st.button("View Full Report", key=f"report_{i}"):
                                 st.json(analysis)
@@ -371,7 +350,7 @@ class SimplifiedPlantGuardApp:
 
         with col2:
             st.markdown("### ⚙️ Advanced Settings")
-            
+
             # Model management
             st.markdown("**🔧 Model Configuration**")
             for model_type in ["vision", "audio", "text"]:
@@ -390,7 +369,7 @@ class SimplifiedPlantGuardApp:
                         f"Select {model_type} model:",
                         options=model_options,
                         index=current_idx,
-                        format_func=lambda x: self.models[model_type][x]["name"],
+                        format_func=lambda x, mt=model_type: self.models[mt][x]["name"],
                         key=f"detailed_{model_type}_model",
                     )
 
@@ -398,11 +377,11 @@ class SimplifiedPlantGuardApp:
                         st.session_state.current_models[model_type] = new_model
                         st.success(f"✅ Updated {model_type} model")
                         st.rerun()
-            
+
             # Data management
             st.markdown("---")
             st.markdown("**🗂️ Data Management**")
-            
+
             col_a, col_b = st.columns(2)
             with col_a:
                 if st.button("🧹 Clear All Data", use_container_width=True):
@@ -426,36 +405,30 @@ class SimplifiedPlantGuardApp:
         with col1:
             st.markdown("#### 📷 First Image")
             image1 = st.file_uploader(
-                "Upload first plant image", 
-                type=["jpg", "jpeg", "png"], 
-                key="image1_uploader", 
-                help="Upload the first image for comparison"
+                "Upload first plant image", type=["jpg", "jpeg", "png"], key="image1_uploader", help="Upload the first image for comparison"
             )
 
         with col2:
             st.markdown("#### 📷 Second Image")
             image2 = st.file_uploader(
-                "Upload second plant image", 
-                type=["jpg", "jpeg", "png"], 
-                key="image2_uploader", 
-                help="Upload the second image for comparison"
+                "Upload second plant image", type=["jpg", "jpeg", "png"], key="image2_uploader", help="Upload the second image for comparison"
             )
 
         if image1 is not None and image2 is not None:
             # Display comparison
             self.render_side_by_side_comparison(image1, image2)
-            
+
             # Comparison controls
             col_comp1, col_comp2, col_comp3 = st.columns(3)
-            
+
             with col_comp1:
                 if st.button("🔍 Compare Both", type="primary", use_container_width=True):
                     self.analyze_comparison(image1, image2)
-            
+
             with col_comp2:
                 if st.button("💾 Save Comparison", use_container_width=True):
                     self.save_comparison(image1, image2)
-            
+
             with col_comp3:
                 if st.button("📊 View Insights", use_container_width=True):
                     self.show_comparison_insights(image1, image2)
@@ -465,7 +438,7 @@ class SimplifiedPlantGuardApp:
         # Comparison history
         st.markdown("---")
         st.markdown("### 📚 Comparison History")
-        
+
         history = st.session_state.comparison_history
 
         if history:
@@ -487,7 +460,7 @@ class SimplifiedPlantGuardApp:
             st.info("No comparison history yet. Start by comparing two images!")
 
     # Helper methods for analysis and data processing
-    
+
     def analyze_image(self, image: Image.Image) -> dict[str, Any] | None:
         """Analyze uploaded image using vision model."""
         try:
@@ -560,11 +533,11 @@ class SimplifiedPlantGuardApp:
 
         st.markdown(
             f"""
-        <div style='background: white; padding: 1.5rem; border-radius: 15px; border-left: 5px solid {risk_color}; 
+        <div style='background: white; padding: 1.5rem; border-radius: 15px; border-left: 5px solid {risk_color};
                     box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin: 1rem 0;'>
             <h3 style='margin: 0 0 1rem 0; color: #333;'>🦠 {result.get("disease", "Unknown Disease")}</h3>
             <p style='margin: 0.5rem 0; font-size: 1.1rem;'><strong>🎯 Confidence:</strong> {result.get("confidence", 0):.1%}</p>
-            <p style='margin: 0.5rem 0;'><strong>⚠️ Risk Level:</strong> 
+            <p style='margin: 0.5rem 0;'><strong>⚠️ Risk Level:</strong>
                <span style='color: {risk_color}; font-weight: bold; text-transform: uppercase;'>{result.get("risk_level", "Medium")}</span></p>
             <p style='margin: 0.5rem 0;'><strong>📝 Description:</strong> {result.get("description", "No description available")}</p>
             <p style='margin: 0.5rem 0;'><strong>💊 Treatment:</strong> {result.get("treatment", "Consult with plant care specialist")}</p>
@@ -605,9 +578,9 @@ class SimplifiedPlantGuardApp:
         """Analyze both images for comparison."""
         img1 = Image.open(image1)
         img2 = Image.open(image2)
-        
+
         col1, col2 = st.columns(2)
-        
+
         with col1:
             st.markdown("**First Image Analysis:**")
             with st.spinner("Analyzing first image..."):
@@ -615,7 +588,7 @@ class SimplifiedPlantGuardApp:
                 if result1:
                     st.success(f"Disease: {result1.get('disease', 'Unknown')}")
                     st.info(f"Confidence: {result1.get('confidence', 0):.1%}")
-        
+
         with col2:
             st.markdown("**Second Image Analysis:**")
             with st.spinner("Analyzing second image..."):
@@ -623,22 +596,22 @@ class SimplifiedPlantGuardApp:
                 if result2:
                     st.success(f"Disease: {result2.get('disease', 'Unknown')}")
                     st.info(f"Confidence: {result2.get('confidence', 0):.1%}")
-        
+
         # Comparison insights
         if result1 and result2:
             st.markdown("### 🔍 Comparison Insights")
-            
-            disease1 = result1.get('disease', 'Unknown')
-            disease2 = result2.get('disease', 'Unknown')
-            
+
+            disease1 = result1.get("disease", "Unknown")
+            disease2 = result2.get("disease", "Unknown")
+
             if disease1 == disease2:
                 st.success(f"✅ Both images show the same condition: {disease1}")
             else:
                 st.warning(f"⚠️ Different conditions detected: {disease1} vs {disease2}")
-            
-            conf1 = result1.get('confidence', 0)
-            conf2 = result2.get('confidence', 0)
-            
+
+            conf1 = result1.get("confidence", 0)
+            conf2 = result2.get("confidence", 0)
+
             if abs(conf1 - conf2) < 0.1:
                 st.info("Similar confidence levels in both analyses")
             elif conf1 > conf2:
@@ -668,14 +641,14 @@ class SimplifiedPlantGuardApp:
     def show_comparison_insights(self, image1, image2):
         """Show detailed comparison insights."""
         st.info("📊 Generating detailed comparison insights...")
-        
+
         insights = [
             "Both images appear to be from similar plant species",
             "Lighting conditions differ between the two images",
             "Image quality is suitable for analysis",
-            "Consider taking images from similar angles for better comparison"
+            "Consider taking images from similar angles for better comparison",
         ]
-        
+
         st.markdown("**Insights:**")
         for insight in insights:
             st.write(f"• {insight}")
@@ -701,15 +674,15 @@ class SimplifiedPlantGuardApp:
     def show_quick_stats(self):
         """Show quick statistics."""
         col1, col2, col3 = st.columns(3)
-        
+
         with col1:
             total_analyses = len(st.session_state.analysis_history)
             st.metric("Total Analyses", total_analyses)
-        
+
         with col2:
             total_chats = len(st.session_state.chat_messages)
             st.metric("Chat Messages", total_chats)
-        
+
         with col3:
             total_comparisons = len(st.session_state.comparison_history)
             st.metric("Comparisons", total_comparisons)
@@ -718,7 +691,7 @@ class SimplifiedPlantGuardApp:
         """Show help information."""
         st.info("""
         **PlantGuard Help:**
-        
+
         📷 **Image Analysis:** Upload plant images for AI-powered disease detection
         🎤 **Voice Assistant:** Ask questions using voice (development in progress)
         💬 **Chat Assistant:** Get answers about plant care and diseases
@@ -728,7 +701,7 @@ class SimplifiedPlantGuardApp:
         """)
 
     # Utility methods
-    
+
     def get_disease_description(self, disease_class: str) -> str:
         """Get description for a disease class."""
         descriptions = {
