@@ -171,26 +171,7 @@ st.markdown(
 """,
     unsafe_allow_html=True,
 )
-# Inject JS to force static sidebar across entrypoints
-st.markdown(
-    """
-    <script>
-    (function(){
-        function ensureStatic(){
-            try{
-                const toggle = document.querySelector('button[title="Toggle sidebar"]');
-                if(toggle) toggle.style.display='none';
-                const sidebar = document.querySelector('div[data-testid="stSidebar"]') || document.querySelector('.css-1d391kg');
-                if(sidebar){ sidebar.style.transform='none'; sidebar.style.left='0'; sidebar.style.width='320px'; sidebar.style.visibility='visible'; }
-            }catch(e){}
-        }
-        window.addEventListener('load', ensureStatic);
-        setTimeout(ensureStatic, 800);
-    })();
-    </script>
-    """,
-    unsafe_allow_html=True,
-)
+
 
 # Header
 st.markdown(

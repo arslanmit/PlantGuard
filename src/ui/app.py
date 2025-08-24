@@ -159,70 +159,12 @@ def render_system_status() -> None:
 
 
 def main() -> None:
-    """Main Streamlit application."""
-    st.set_page_config(page_title="🌱 PlantGuard", page_icon="🌱", layout="wide", initial_sidebar_state="expanded")
-
-    # Header
-    st.title("🌱 PlantGuard Assistant")
-    st.markdown("""
-    **Multimodal Plant Disease Detection System**
-
-    Choose your preferred input method below to get AI-powered plant disease diagnosis
-    and treatment recommendations.
-    """)
-
-    # Initialize switchers
-    mode_switcher = ModeSwitcher()
-    model_switcher = ModelSwitcher()
-
-    # Model switcher - render into left column to make sidebar static
-    left_col, right_col = st.columns([1, 4])
-
-    with left_col:
-        st.markdown("### ⚙️ Settings")
-        st.markdown("---")
-        available_models = {
-            "vision": ["resnet50_plantvillage_v1", "efficientnet_b0_plants", "vit_base_plants"],
-            "audio": ["whisper_tiny_local", "wav2vec2_plant_sounds"],
-            "text": ["distilbert_plant_qa_v1", "roberta_plant_care", "t5_small_plant_qa"],
-        }
-        model_switcher.render(available_models)
-
-    # Render main UI in the right column
-    with right_col:
-        # Mode switcher
-        selected_mode = mode_switcher.render()
-
-    st.markdown("---")
-
-    # Render the appropriate interface based on selected mode
-    if selected_mode == "vision":
-        render_vision_mode()
-    elif selected_mode == "audio":
-        render_audio_mode()
-    elif selected_mode == "text":
-        render_text_mode()
-
-    # System status
-    st.markdown("---")
-    render_system_status()
-
-    # Development progress
-    st.markdown("---")
-    st.markdown("**🚀 Development Progress:**")
-    progress_col1, progress_col2 = st.columns(2)
-
-    with progress_col1:
-        st.markdown("✅ Environment Setup")
-        st.markdown("✅ Mode Switcher UI")
-        st.markdown("⏳ Vision Model Integration")
-        st.markdown("⏳ Audio Processing")
-
-    with progress_col2:
-        st.markdown("⏳ Text Processing")
-        st.markdown("⏳ Model Fusion")
-        st.markdown("⏳ Knowledge Base")
-        st.markdown("⏳ Real-time Processing")
+    """Main Streamlit application - now using simplified interface."""
+    # Import and run the simplified app
+    from .simplified_app import SimplifiedPlantGuardApp
+    
+    app = SimplifiedPlantGuardApp()
+    app.run()
 
 
 def create_app():

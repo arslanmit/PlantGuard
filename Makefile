@@ -94,7 +94,7 @@ help:
 	@echo ""
 	@echo "$(GREEN)🚀 Quick Start$(NC)"
 	@echo "  $(BLUE)start$(NC)              - Complete setup + launch (new users start here!)"
-	@echo "  $(BLUE)run$(NC)                - Launch PlantGuard app (port 8501)"
+	@echo "  $(BLUE)run$(NC)                - Launch PlantGuard SPA (single page application)"
 	@echo "  $(BLUE)dev$(NC)                - Quick development workflow (format + lint + test)"
 	@echo "  $(BLUE)notebook$(NC)           - Open Jupyter for interactive development"
 	@echo ""
@@ -180,6 +180,12 @@ help:
 	@echo "  $(CYAN)Training:$(NC)          make dataset-status → make train → make monitor"
 	@echo "  $(CYAN)Deployment:$(NC)        make qa → make deploy-check → make deploy-local"
 	@echo ""
+	@echo "$(YELLOW)🌟 Single Page Application Features:$(NC)"
+	@echo "  • All functionality in one interface"
+	@echo "  • AI agent friendly design"
+	@echo "  • No navigation complexity"
+	@echo "  • Complete technical capability preservation"
+	@echo ""
 	@echo "$(YELLOW)🍎 macOS Features:$(NC)"
 	@echo "  • Apple Silicon MPS acceleration ($(TORCH_DEVICE))"
 	@echo "  • Optimized for $(WORKERS) CPU cores"
@@ -188,15 +194,22 @@ help:
 
 # ========== Quick Start & Environment Setup ==========
 
+# Check virtual environment is active
+check-venv:
+	@if [ ! -x $(PY) ]; then \
+		echo "$(YELLOW)⚠️  Virtual environment not found. Creating...$(NC)"; \
+		make setup-environment; \
+	fi
+
 # Complete first-time setup and launch
 start: setup-environment health-check
 	@echo "$(BLUE)🚀 Starting PlantGuard...$(NC)"
-	@echo "$(CYAN)🎯 Launching main application at http://localhost:8501$(NC)"
+	@echo "$(CYAN)🎯 Launching SPA application at http://localhost:8501$(NC)"
 	@make run
 
-# Quick shortcuts
+# Quick shortcuts - SPA focused
 s: start
-r: run
+r: run               # Launch SPA
 d: dev
 t: test
 f: format
@@ -337,26 +350,44 @@ health-check:
 
 # ========== Application & Development ==========
 
-# Launch PlantGuard application
-run:
-	@echo "$(BLUE)🚀 Starting PlantGuard Application...$(NC)"
+# ========== Single Page Application Launch ==========
+
+# Primary command - Launch PlantGuard SPA
+run: check-venv validate-spa
+	@echo "$(GREEN)🌿 Launching PlantGuard Single Page Application$(NC)"
 	@if [ ! -x $(PY) ]; then \
 		echo "$(YELLOW)⚠️  Environment not ready. Running setup...$(NC)"; \
 		make setup-environment; \
 	fi
-	@echo "$(GREEN)🌿 PlantGuard starting at http://localhost:8501$(NC)"
-	@echo "$(CYAN)✨ Features: Multimodal Detection, Model Management, Real-time Analysis$(NC)"
+	@echo "$(CYAN)🔗 Application will be available at: http://localhost:8501$(NC)"
+	@echo "$(YELLOW)✨ Single interface with all functionality - AI agent friendly!$(NC)"
+	@echo "$(CYAN)💱 Features: Image Analysis, Voice Assistant, Chat, History, Comparison - All in one view$(NC)"
 	@if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
 		echo "$(CYAN)🚀 Apple Silicon MPS acceleration enabled$(NC)"; \
 		export PYTORCH_ENABLE_MPS_FALLBACK=1; \
 	fi
 	@echo "$(CYAN)📱 For microphone: Use HTTPS tunnel (make tunnel)$(NC)"
-	@$(STREAMLIT) run src/ui/app_streamlit.py \
+	@$(STREAMLIT) run spa_app.py \
 		--server.port 8501 \
 		--server.headless true \
 		--server.enableCORS false \
 		--server.enableXsrfProtection false \
 		--server.maxUploadSize 200
+
+# Validate SPA setup
+validate-spa: check-venv
+	@echo "$(YELLOW)✅ Validating SPA setup...$(NC)"
+	@$(PY) -c "import spa_app; print('✅ SPA imports successful')" || { echo "$(RED)❌ SPA validation failed$(NC)"; exit 1; }
+	@echo "$(GREEN)✅ PlantGuard SPA ready!$(NC)"
+
+# Legacy support for development/testing
+run-legacy: check-venv
+	@echo "$(YELLOW)⚠️  Starting legacy multi-page interface...$(NC)"
+	@echo "$(CYAN)Note: SPA (make run) is the recommended interface$(NC)"
+	@$(STREAMLIT) run app.py --server.port=8502
+
+run-unified: run
+	@echo "$(GREEN)💡 Tip: 'run-unified' is now the default SPA interface$(NC)"
 
 # Create HTTPS tunnel for microphone access
 tunnel:

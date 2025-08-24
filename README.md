@@ -1,8 +1,10 @@
-# 🌿 PlantGuard — Multimodal Plant Disease Detection System
+# 🌿 PlantGuard — Single Page Application for Plant Disease Detection
 
-**Advanced AI-powered plant disease detection with multiple model support**
+**AI-powered plant disease detection with unified SPA interface - AI agent optimized**
 
-PlantGuard is a production-ready multimodal AI system for plant disease detection. It features a sophisticated model management system supporting multiple pre-trained models (Vision Transformer with 100% accuracy, MobileNet with 95% accuracy, and trainable ResNet50), hot-swappable model switching, complete offline processing capabilities, and dual Streamlit interfaces for seamless user interaction and model management.
+PlantGuard has been **completely transformed** into a Single Page Application (SPA) that consolidates ALL functionality into one seamless, intuitive interface. Perfect for AI coding assistants and streamlined workflows.
+
+> **🌟 NEW SPA INTERFACE!** No more navigation complexity - everything accessible from one unified view. Launch with `make run` to experience all features in a single, AI-friendly interface.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/arslanmit/PlantGuard/blob/main/notebooks/PlantGuard.ipynb)
 
@@ -123,9 +125,9 @@ PlantGuard is a production-ready multimodal AI system for plant disease detectio
 - **Training**: PyTorch + TensorBoard with comprehensive metrics logging
 - **Code Quality**: Ruff + MyPy + Bandit with 100-character line limits
 
-## 🚀 **QUICK START**
+## 🚀 **QUICK START - SPA INTERFACE**
 
-### **Method 1: Local Development (Recommended)**
+### **Primary Method: Single Page Application (Recommended)**
 
 ```bash
 # Clone repository
@@ -135,24 +137,39 @@ cd PlantGuard
 # Complete setup (creates venv, installs deps, configures tools)
 make setup
 
-# Launch PlantGuard main app
+# Launch PlantGuard SPA - ALL functionality in one interface!
 make run
-# Opens at http://localhost:8501
+# Opens at http://localhost:8501 with unified interface!
+```
 
-# Launch Model Switcher (separate interface)
-make switcher
-# Opens at http://localhost:8502
+**🌟 SPA Interface Features:**
+- 🎯 **No Navigation Required** - All features in one view
+- 🤖 **AI Agent Optimized** - Perfect for AI coding workflows
+- 📱 **Mobile Responsive** - Works seamlessly on all devices
+- ⚡ **Instant Access** - Image analysis, voice, chat, history - instantly available
+- 🔄 **Contextual UI** - Interface adapts to your current task
+- 🎮 **Batch Processing** - Analyze multiple images at once
+- 📊 **Real-time Results** - Immediate AI analysis with confidence scoring
 
-# Launch both applications simultaneously
-make run-all
+### **Method 2: Legacy Dual Interface** (If Needed)
+
+```bash
+# Clone repository  
+git clone https://github.com/arslanmit/PlantGuard.git
+cd PlantGuard
+
+# Complete setup (creates venv, installs deps, configures tools)
+make setup
+
+# Launch legacy dual-port interface
+make run-legacy
 # Main app: http://localhost:8501
+# Model switcher: http://localhost:8502
+
+# Or launch both applications simultaneously
+make run-all
+# Main app: http://localhost:8501  
 # Switcher: http://localhost:8502
-
-# Validate configuration before running
-make validate
-
-# Stop all running applications
-make stop
 ```
 
 ### **Method 2: Google Colab (Cloud Development)**
