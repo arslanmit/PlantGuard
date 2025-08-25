@@ -321,19 +321,24 @@ class ErrorHandler:
 
         _error_info = self.handle_error(error, error_type="system_error", context=context, show_details=False)
 
-        # Provide page-specific recovery
-        st.markdown("### 🏠 Navigation Options:")
+        # Provide content focus options instead of page navigation
+        st.markdown("### 🏠 Content Focus Options:")
 
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("🏠 Go to Home"):
-                st.session_state.current_page = "Home"
-                st.rerun()
+            if st.button("🏠 Focus on Image Analysis", key="error_focus_home"):
+                st.session_state.focused_content = "image_analysis"
+                st.success("Focused on Image Analysis - no page refresh!")
 
         with col2:
-            if st.button("🔄 Refresh Page"):
-                st.rerun()
+            if st.button("🔄 Refresh Content", key="error_refresh_content"):
+                st.success("Content refreshed - staying on same page!")
+
+        with col3:
+            if st.button("📊 Focus on History", key="error_focus_history"):
+                st.session_state.focused_content = "history_settings"
+                st.success("Focused on History - no page refresh!")
 
         with col3:
             if st.button("📚 View History"):

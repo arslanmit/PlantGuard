@@ -78,7 +78,7 @@ endif
 
 .DEFAULT_GOAL := help
 
-.PHONY: help start setup run dev test clean
+.PHONY: help start setup run mobile dev test clean
 .PHONY: format lint check fix train monitor notebook benchmark evaluate
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
@@ -95,6 +95,7 @@ help:
 	@echo "$(GREEN)🚀 Quick Start$(NC)"
 	@echo "  $(BLUE)start$(NC)              - Complete setup + launch (new users start here!)"
 	@echo "  $(BLUE)run$(NC)                - Launch PlantGuard SPA (single page application)"
+	@echo "  $(BLUE)mobile$(NC)             - Launch Mobile PlantGuard (optimized for Chrome/Safari mobile)"
 	@echo "  $(BLUE)dev$(NC)                - Quick development workflow (format + lint + test)"
 	@echo "  $(BLUE)notebook$(NC)           - Open Jupyter for interactive development"
 	@echo ""
@@ -176,6 +177,7 @@ help:
 	@echo "$(GREEN)⚡ Quick Shortcuts$(NC)"
 	@echo "  $(BLUE)s$(NC)                  - start (complete setup + launch)"
 	@echo "  $(BLUE)r$(NC)                  - run (launch app)"
+	@echo "  $(BLUE)m$(NC)                  - mobile (launch mobile app)"
 	@echo "  $(BLUE)d$(NC)                  - dev (development workflow)"
 	@echo "  $(BLUE)t$(NC)                  - test (run tests)"
 	@echo "  $(BLUE)f$(NC)                  - format (format code)"
@@ -217,6 +219,7 @@ start: setup-environment health-check
 # Quick shortcuts - SPA focused
 s: start
 r: run               # Launch SPA
+m: mobile            # Launch Mobile SPA
 d: dev
 t: test
 f: format
@@ -479,6 +482,31 @@ run: check-venv validate-spa
 		--server.enableXsrfProtection false \
 		--server.maxUploadSize 200
 
+# Mobile PlantGuard command - Launch Mobile-Optimized SPA
+mobile: check-venv validate-mobile
+	@echo "$(GREEN)📱 Launching Mobile PlantGuard Application$(NC)"
+	@if [ ! -x $(PY) ]; then \
+		echo "$(YELLOW)⚠️  Environment not ready. Running setup...$(NC)"; \
+		make setup-environment; \
+	fi
+	@echo "$(CYAN)🔗 Mobile Application will be available at: http://localhost:8502$(NC)"
+	@echo "$(YELLOW)📱 Mobile-first design optimized for Chrome & Safari Mobile$(NC)"
+	@echo "$(CYAN)✨ Features: Touch-friendly UI, Fixed 428px layout, AI agent testing$(NC)"
+	@echo "$(CYAN)🎯 Fixed Design: Always 428px width (mobile-first on all screens)$(NC)"
+	@echo "$(GREEN)💻 Desktop View: Shows mobile interface in 428px column$(NC)"
+	@if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+		echo "$(CYAN)🚀 Apple Silicon MPS acceleration enabled$(NC)"; \
+		export PYTORCH_ENABLE_MPS_FALLBACK=1; \
+	fi
+	@echo "$(CYAN)🤖 Built-in AI Agent autonomous testing and self-healing$(NC)"
+	@$(STREAMLIT) run mobile_spa_app.py \
+		--server.port 8502 \
+		--server.headless true \
+		--server.enableCORS false \
+		--server.enableXsrfProtection false \
+		--server.maxUploadSize 200 \
+		--theme.base light
+
 # SPA Development mode with hot reload
 spa-dev: check-venv validate-spa
 	@echo "$(BLUE)🛠️ Starting PlantGuard SPA in development mode$(NC)"
@@ -521,6 +549,30 @@ validate-spa: check-venv
 	@$(PY) -c "import torch; print(f'✅ PyTorch available: {torch.__version__}')" || { echo "$(RED)❌ PyTorch not found$(NC)"; exit 1; }
 	@$(PY) -c "import PIL; print('✅ PIL available')" || { echo "$(RED)❌ PIL not found$(NC)"; exit 1; }
 	@echo "$(GREEN)✅ PlantGuard SPA ready!$(NC)"
+
+# Validate Mobile SPA setup and dependencies
+validate-mobile: check-venv
+	@echo "$(YELLOW)📱 Validating Mobile SPA setup...$(NC)"
+	@if [ ! -f mobile_spa_app.py ]; then \
+		echo "$(RED)❌ Mobile SPA entry point missing$(NC)"; \
+		echo "$(CYAN)💡 Mobile app not found at mobile_spa_app.py$(NC)"; \
+		exit 1; \
+	fi
+	@$(PY) -c "import mobile_spa_app; print('✅ Mobile SPA imports successful')" || { \
+		echo "$(RED)❌ Mobile SPA validation failed$(NC)"; \
+		echo "$(CYAN)💡 Check mobile component dependencies$(NC)"; \
+		exit 1; \
+	}
+	@$(PY) -c "import streamlit; print('✅ Streamlit available')" || { echo "$(RED)❌ Streamlit not found$(NC)"; exit 1; }
+	@$(PY) -c "import torch; print(f'✅ PyTorch available: {torch.__version__}')" || { echo "$(RED)❌ PyTorch not found$(NC)"; exit 1; }
+	@$(PY) -c "import PIL; print('✅ PIL available')" || { echo "$(RED)❌ PIL not found$(NC)"; exit 1; }
+	@$(PY) -c "from ui.components.mobile_component_registry import mobile_component_registry; print('✅ Mobile components available')" || { \
+		echo "$(YELLOW)⚠️  Mobile components not fully available$(NC)"; \
+	}
+	@$(PY) -c "from ui.components.ai_agent_testing import get_ai_testing_framework; print('✅ AI testing framework available')" || { \
+		echo "$(YELLOW)⚠️  AI testing framework not available$(NC)"; \
+	}
+	@echo "$(GREEN)✅ Mobile PlantGuard ready!$(NC)"
 
 # SPA Configuration Management
 spa-config: check-venv

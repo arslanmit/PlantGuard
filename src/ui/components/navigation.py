@@ -100,10 +100,9 @@ class NavigationHeader:
 
                 selected_page = self._render_navigation_tabs(current_page)
         else:
-            # Mobile view
+            # Mobile view - always-visible navigation (no hamburger menu)
             self._render_header()
-            self._render_mobile_hamburger_menu()
-            selected_page = self.render_collapsible_navigation()
+            selected_page = self._render_always_visible_mobile_navigation(current_page)
 
         # Update session state if page changed
         if selected_page != current_page:
@@ -216,98 +215,53 @@ class NavigationHeader:
         # Check if mobile view was detected (this would be set by JavaScript in real implementation)
         return st.session_state.get("mobile_view", False)
 
-    def _render_mobile_hamburger_menu(self):
-        """Render mobile hamburger menu with collapsible navigation."""
-        # Initialize hamburger menu state
-        if "hamburger_menu_open" not in st.session_state:
-            st.session_state.hamburger_menu_open = False
-
-        # Hamburger menu button with enhanced styling
-        hamburger_button_html = """
-        <div style='
-            width: 44px;
-            height: 44px;
-            border: 2px solid #22C55E;
-            border-radius: 8px;
-            background: #22C55E15;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-bottom: 8px;
-        '>
-            <span style='
-                font-size: 18px;
-                color: #22C55E;
-                font-weight: bold;
-            '>☰</span>
-        </div>
-        """
-
-        st.markdown(hamburger_button_html, unsafe_allow_html=True)
-
-        if st.button("☰ Menu", key="hamburger_menu_btn", help="Open navigation menu", use_container_width=True):
-            st.session_state.hamburger_menu_open = not st.session_state.hamburger_menu_open
-
-        # Render collapsible menu if open
-        if st.session_state.hamburger_menu_open:
-            self._render_collapsible_mobile_menu()
-
-    def _render_collapsible_mobile_menu(self):
-        """Render the collapsible mobile navigation menu."""
-        current_page = st.session_state.get("current_page", "Home")
-
-        # Mobile menu container with enhanced styling
-        menu_html = """
-        <div style='
-            position: absolute;
-            top: 60px;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 2px solid #E5E7EB;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            z-index: 1000;
-            padding: 16px;
-            margin: 8px;
-        '>
-            <div style='
-                text-align: center;
-                font-weight: bold;
-                color: #22C55E;
-                margin-bottom: 16px;
-                font-size: 18px;
-            '>Navigation Menu</div>
-        </div>
-        """
-
-        st.markdown(menu_html, unsafe_allow_html=True)
-
-        # Create navigation buttons in mobile menu
-        st.markdown("**📱 Mobile Navigation**")
-
-        for page_name, page_info in self.pages.items():
-            button_type = "primary" if page_name == current_page else "secondary"
-
-            # Mobile-friendly navigation button
-            if st.button(
-                f"{page_info['icon']} {page_name}",
-                key=f"mobile_nav_{page_name}",
-                help=page_info["description"],
-                type=button_type,  # type: ignore[arg-type]
-                use_container_width=True,
-            ):
-                # Defer navigation to avoid component unregistration races
-                st.session_state["__nav_pending"] = page_name
-                st.session_state.hamburger_menu_open = False  # Close menu after selection
-                # track later when applying pending navigation
-
-        # Close menu button
-        st.markdown("---")
-        if st.button("✕ Close Menu", key="close_mobile_menu", use_container_width=True):
-            st.session_state.hamburger_menu_open = False
+    def _render_always_visible_mobile_navigation(self, current_page: str) -> str:
+        """Render always-visible mobile navigation - no hamburger menu."""
+        
+        # Always-visible navigation header
+        st.markdown("### 🧭 Navigation")
+        st.markdown("All features directly accessible:")
+        
+        # Always show all navigation options in a grid
+        pages_list = list(self.pages.items())
+        
+        # For 2-4 pages, use 2-column grid
+        if len(pages_list) <= 4:
+            cols = st.columns(2)
+        else:
+            # For more pages, use 3-column grid
+            cols = st.columns(3)
+        
+        selected_page = current_page
+        
+        for i, (page_name, page_info) in enumerate(pages_list):
+            col_index = i % len(cols)
+            
+            with cols[col_index]:
+                button_type = "primary" if page_name == current_page else "secondary"
+                
+                # Always-visible button with icon + text + status
+                button_label = f"{page_info['icon']} {page_name}"
+                if page_name == current_page:
+                    button_label += " ✅"
+                
+                if st.button(
+                    button_label,
+                    key=f"mobile_nav_always_visible_{page_name}",
+                    help=page_info["description"],
+                    type=button_type,
+                    use_container_width=True,
+                    disabled=(page_name == current_page)  # Disable current page
+                ):
+                    selected_page = page_name
+                
+                # Show status below button
+                if page_name == current_page:
+                    st.success("Current")
+                else:
+                    st.info("Available")
+        
+        return selected_page
 
     def render_collapsible_navigation(self) -> str:
         """Render collapsible navigation for mobile devices."""
