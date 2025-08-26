@@ -1,0 +1,492 @@
+{
+    "dashboard": {
+        "id": null,
+        "title": "Mobile PlantGuard Dashboard",
+        "tags": [
+            "mobile",
+            "plantguard",
+            "monitoring"
+        ],
+        "style": "dark",
+        "timezone": "browser",
+        "refresh": "30s",
+        "time": {
+            "from": "now-1h",
+            "to": "now"
+        },
+        "panels": [
+            {
+                "id": 1,
+                "title": "Application Status",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "up{job=\"plantguard-mobile\"}",
+                        "legendFormat": "App Status"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": 0
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 1
+                                }
+                            ]
+                        },
+                        "mappings": [
+                            {
+                                "options": {
+                                    "0": {
+                                        "text": "DOWN"
+                                    }
+                                },
+                                "type": "value"
+                            },
+                            {
+                                "options": {
+                                    "1": {
+                                        "text": "UP"
+                                    }
+                                },
+                                "type": "value"
+                            }
+                        ]
+                    }
+                },
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 0,
+                    "y": 0
+                }
+            },
+            {
+                "id": 2,
+                "title": "Request Rate",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "rate(mobile_requests_total[5m])",
+                        "legendFormat": "Requests/sec"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "reqps",
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 6,
+                    "y": 0
+                }
+            },
+            {
+                "id": 3,
+                "title": "Error Rate",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "rate(mobile_errors_total[5m])",
+                        "legendFormat": "Errors/sec"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "short",
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": 0
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 0.01
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 0.1
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 12,
+                    "y": 0
+                }
+            },
+            {
+                "id": 4,
+                "title": "Response Time (95th percentile)",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.95, rate(mobile_request_duration_seconds_bucket[5m]))",
+                        "legendFormat": "95th percentile"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "s",
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": 0
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 2
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 5
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 18,
+                    "y": 0
+                }
+            },
+            {
+                "id": 5,
+                "title": "Request Rate Over Time",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "rate(mobile_requests_total[5m])",
+                        "legendFormat": "Total Requests"
+                    },
+                    {
+                        "expr": "rate(mobile_requests_total{endpoint=\"/camera\"}[5m])",
+                        "legendFormat": "Camera Requests"
+                    },
+                    {
+                        "expr": "rate(mobile_requests_total{endpoint=\"/upload\"}[5m])",
+                        "legendFormat": "Upload Requests"
+                    },
+                    {
+                        "expr": "rate(mobile_requests_total{endpoint=\"/voice\"}[5m])",
+                        "legendFormat": "Voice Requests"
+                    }
+                ],
+                "yAxes": [
+                    {
+                        "label": "Requests per second",
+                        "min": 0
+                    }
+                ],
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 4
+                }
+            },
+            {
+                "id": 6,
+                "title": "Response Time Distribution",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.50, rate(mobile_request_duration_seconds_bucket[5m]))",
+                        "legendFormat": "50th percentile"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.95, rate(mobile_request_duration_seconds_bucket[5m]))",
+                        "legendFormat": "95th percentile"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.99, rate(mobile_request_duration_seconds_bucket[5m]))",
+                        "legendFormat": "99th percentile"
+                    }
+                ],
+                "yAxes": [
+                    {
+                        "label": "Response time (seconds)",
+                        "min": 0
+                    }
+                ],
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 4
+                }
+            },
+            {
+                "id": 7,
+                "title": "Component Performance",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "rate(mobile_component_duration_seconds_sum{component=\"camera\"}[5m]) / rate(mobile_component_duration_seconds_count{component=\"camera\"}[5m])",
+                        "legendFormat": "Camera Component"
+                    },
+                    {
+                        "expr": "rate(mobile_component_duration_seconds_sum{component=\"upload\"}[5m]) / rate(mobile_component_duration_seconds_count{component=\"upload\"}[5m])",
+                        "legendFormat": "Upload Component"
+                    },
+                    {
+                        "expr": "rate(mobile_component_duration_seconds_sum{component=\"voice\"}[5m]) / rate(mobile_component_duration_seconds_count{component=\"voice\"}[5m])",
+                        "legendFormat": "Voice Component"
+                    },
+                    {
+                        "expr": "rate(mobile_component_duration_seconds_sum{component=\"analysis\"}[5m]) / rate(mobile_component_duration_seconds_count{component=\"analysis\"}[5m])",
+                        "legendFormat": "Analysis Component"
+                    }
+                ],
+                "yAxes": [
+                    {
+                        "label": "Average duration (seconds)",
+                        "min": 0
+                    }
+                ],
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 12
+                }
+            },
+            {
+                "id": 8,
+                "title": "Error Rate by Component",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "rate(mobile_component_errors_total{component=\"camera\"}[5m])",
+                        "legendFormat": "Camera Errors"
+                    },
+                    {
+                        "expr": "rate(mobile_component_errors_total{component=\"upload\"}[5m])",
+                        "legendFormat": "Upload Errors"
+                    },
+                    {
+                        "expr": "rate(mobile_component_errors_total{component=\"voice\"}[5m])",
+                        "legendFormat": "Voice Errors"
+                    },
+                    {
+                        "expr": "rate(mobile_component_errors_total{component=\"analysis\"}[5m])",
+                        "legendFormat": "Analysis Errors"
+                    }
+                ],
+                "yAxes": [
+                    {
+                        "label": "Errors per second",
+                        "min": 0
+                    }
+                ],
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 12
+                }
+            },
+            {
+                "id": 9,
+                "title": "Memory Usage",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "container_memory_usage_bytes{container_label_com_docker_compose_service=\"plantguard-mobile\"} / 1024 / 1024",
+                        "legendFormat": "Memory Usage (MB)"
+                    },
+                    {
+                        "expr": "container_spec_memory_limit_bytes{container_label_com_docker_compose_service=\"plantguard-mobile\"} / 1024 / 1024",
+                        "legendFormat": "Memory Limit (MB)"
+                    }
+                ],
+                "yAxes": [
+                    {
+                        "label": "Memory (MB)",
+                        "min": 0
+                    }
+                ],
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 20
+                }
+            },
+            {
+                "id": 10,
+                "title": "CPU Usage",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service=\"plantguard-mobile\"}[5m]) * 100",
+                        "legendFormat": "CPU Usage (%)"
+                    }
+                ],
+                "yAxes": [
+                    {
+                        "label": "CPU Usage (%)",
+                        "min": 0,
+                        "max": 100
+                    }
+                ],
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 20
+                }
+            },
+            {
+                "id": 11,
+                "title": "Feature Usage",
+                "type": "piechart",
+                "targets": [
+                    {
+                        "expr": "increase(mobile_feature_usage_total[1h])",
+                        "legendFormat": "{{feature}}"
+                    }
+                ],
+                "options": {
+                    "pieType": "pie",
+                    "tooltip": {
+                        "mode": "single"
+                    },
+                    "legend": {
+                        "displayMode": "table",
+                        "placement": "right"
+                    }
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 28
+                }
+            },
+            {
+                "id": 12,
+                "title": "User Success Rate",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "(rate(mobile_interactions_success_total[10m]) / rate(mobile_interactions_total[10m])) * 100",
+                        "legendFormat": "Success Rate"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "percent",
+                        "color": {
+                            "mode": "thresholds"
+                        },
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "red",
+                                    "value": 0
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 80
+                                },
+                                {
+                                    "color": "green",
+                                    "value": 95
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 12,
+                    "y": 28
+                }
+            },
+            {
+                "id": 13,
+                "title": "Active Sessions",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "mobile_active_sessions",
+                        "legendFormat": "Active Sessions"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "short",
+                        "color": {
+                            "mode": "palette-classic"
+                        }
+                    }
+                },
+                "gridPos": {
+                    "h": 4,
+                    "w": 6,
+                    "x": 18,
+                    "y": 28
+                }
+            },
+            {
+                "id": 14,
+                "title": "Model Inference Time",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.95, rate(mobile_model_inference_duration_seconds_bucket{model=\"vision\"}[5m]))",
+                        "legendFormat": "Vision Model (95th percentile)"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.95, rate(mobile_model_inference_duration_seconds_bucket{model=\"audio\"}[5m]))",
+                        "legendFormat": "Audio Model (95th percentile)"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.95, rate(mobile_model_inference_duration_seconds_bucket{model=\"text\"}[5m]))",
+                        "legendFormat": "Text Model (95th percentile)"
+                    }
+                ],
+                "yAxes": [
+                    {
+                        "label": "Inference time (seconds)",
+                        "min": 0
+                    }
+                ],
+                "gridPos": {
+                    "h": 8,
+                    "w": 24,
+                    "x": 0,
+                    "y": 36
+                }
+            }
+        ]
+    }
+}

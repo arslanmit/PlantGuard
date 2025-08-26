@@ -1,304 +1,660 @@
 """
-Mobile Layout Manager for PlantGuard
+Mobile Layout Manager for PlantGuard UI.
 
-Manages the main mobile layout with fixed-width scrollable container,
-optimized for Chrome and Safari mobile browsers.
-
-AI Agent Friendly Features:
-- Clear component structure
-- Predictable layout behavior
-- Built-in testing capabilities
-- Responsive design patterns
+This module provides the core layout management system for mobile interfaces,
+implementing responsive design patterns and touch-optimized layouts with
+performance optimizations for mobile devices.
 """
 
+import logging
+from datetime import datetime
+from typing import Any
+
 import streamlit as st
-from typing import Any, Dict, List, Optional
-from .mobile_component_registry import MobileComponent, ComponentMetadata, register_mobile_component
+
+from .mobile_component_registry import MobileComponentRegistry
+from .mobile_state_manager import MobileStateManager
+
+logger = logging.getLogger(__name__)
 
 
-@register_mobile_component
-class MobileLayoutManager(MobileComponent):
-    """Main layout manager for mobile PlantGuard application.
-    
-    Features:
-    - Fixed-width container (428px max for mobile)
-    - Safe area support for notched devices
-    - Smooth scrolling optimization
-    - CSS framework integration
-    - AI agent testable structure
-    """
-    
-    def __init__(self, component_id: str = "mobile_layout_manager", **kwargs):
-        super().__init__(component_id, **kwargs)
-        self.mobile_css_loaded = False
-        self.safe_areas_configured = False
-        
-    def _get_component_metadata(self) -> ComponentMetadata:
-        """Return component metadata for AI agent understanding."""
-        return ComponentMetadata(
-            component_id=self.component_id,
-            component_type="layout_manager",
-            display_name="Mobile Layout Manager",
-            description="Main container managing mobile layout and styling",
-            ai_agent_friendly_description=(
-                "This component creates the main mobile container with fixed width, "
-                "handles CSS loading, manages safe areas, and provides scrollable content area"
-            ),
-            interactive_elements=[
-                {
-                    'id': 'mobile_app_container',
-                    'type': 'container',
-                    'description': 'Main app container',
-                    'testable': True
-                }
-            ],
-            state_dependencies=[
-                'mobile_css_loaded',
-                'mobile_layout_initialized'
-            ],
-            css_classes=[
-                'mobile-app-container',
-                'mobile-content-wrapper'
-            ],
-            test_scenarios=[
-                {
-                    'name': 'css_loading',
-                    'description': 'Test CSS framework loading',
-                    'expected_outcome': 'Mobile CSS classes available'
-                },
-                {
-                    'name': 'container_width',
-                    'description': 'Test fixed-width container',
-                    'expected_outcome': 'Container max-width set to 428px'
-                },
-                {
-                    'name': 'safe_areas',
-                    'description': 'Test safe area handling',
-                    'expected_outcome': 'Safe area insets applied'
-                }
-            ],
-            ai_agent_instructions={
-                'testing': 'Verify CSS loading, container dimensions, and safe area support',
-                'fixing': 'Auto-load CSS if missing, initialize layout state variables',
-                'monitoring': 'Check for layout shifts, scrolling performance'
-            },
-            version="1.0.0",
-            ai_agent_testable=True,
-            auto_fix_enabled=True
-        )
-    
-    def load_mobile_css(self) -> bool:
-        """Load mobile CSS framework."""
+class MobileLayoutManager:
+    """Main layout manager for mobile interface."""
+
+    def __init__(self, component_id: str = "mobile_layout", **kwargs):
+        """Initialize mobile layout manager with configuration."""
+        self.component_id = component_id
+        self.config = {
+            "layout_type": "single_column",
+            "touch_target_size": 48,
+            "spacing_unit": 16,
+            "max_width": "100%",
+            "breakpoints": {"mobile": 480, "tablet": 768, "desktop": 1024},
+            "performance_optimizations": True,
+            "lazy_loading": True,
+            "resource_bundling": True,
+            "offline_support": True,
+        }
+
+        # Update config with any provided kwargs
+        self.config.update(kwargs)
+
+        self.component_registry = MobileComponentRegistry()
+        self.state_manager = MobileStateManager()
+        self._css_injected = False
+
+        # Initialize performance optimizations
+        self._initialize_performance_optimizations()
+
+    def render(self) -> None:
+        """Render the complete mobile layout with performance optimizations."""
         try:
-            css_path = "assets/mobile_styles.css"
-            
-            # Read CSS file
-            try:
-                with open(css_path, 'r', encoding='utf-8') as f:
-                    mobile_css = f.read()
-            except FileNotFoundError:
-                # Fallback CSS if file not found
-                mobile_css = self._get_fallback_css()
-            
-            # Inject CSS into Streamlit
-            st.markdown(f"<style>{mobile_css}</style>", unsafe_allow_html=True)
-            
-            # Update session state
-            st.session_state.mobile_css_loaded = True
-            self.mobile_css_loaded = True
-            
-            return True
-            
+            # Check if performance optimizations are enabled
+            if self.config.get("performance_optimizations", True):
+                self._check_memory_pressure()
+                self._preload_critical_resources()
+
+            with st.container():
+                self._apply_mobile_styles()
+                self._render_header()
+                self._render_main_content()
+                self._render_status_bar()
+
+                # Render performance indicators if enabled
+                if self.config.get("show_performance_stats", False):
+                    self._render_performance_stats()
+
         except Exception as e:
-            st.error(f"Failed to load mobile CSS: {e}")
-            return False
-    
-    def _get_fallback_css(self) -> str:
-        """Provide fallback CSS if main file unavailable - Fixed 428px mobile design."""
+            logger.error(f"Mobile layout rendering failed: {e}")
+            self._render_error_fallback()
+
+    def _apply_mobile_styles(self) -> None:
+        """Apply mobile-specific CSS styles."""
+        if not self._css_injected:
+            st.markdown(self._get_mobile_css(), unsafe_allow_html=True)
+            self._css_injected = True
+
+    def _get_mobile_css(self) -> str:
+        """Generate mobile-optimized CSS with design system variables."""
         return """
-        /* Fallback Mobile CSS - Fixed 428px Design for All Screens */
+        <style>
         :root {
-            --mobile-max-width: 428px;
-            --mobile-space-md: 16px;
-            --mobile-primary: #16A34A;
-            --mobile-bg-primary: #FFFFFF;
-            --mobile-touch-target: 44px;
-            --mobile-border-radius: 12px;
+            /* Color System */
+            --primary-color: #16A34A;
+            --primary-hover: #15803D;
+            --accent-color: #22C55E;
+            --background-color: #F8FAFC;
+            --surface-color: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --error-color: #EF4444;
+            --warning-color: #F59E0B;
+            --success-color: #10B981;
+            
+            /* Layout System */
+            --touch-target-size: 48px;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --spacing-unit: 16px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            
+            /* Typography */
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 20px;
+            --font-size-2xl: 24px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            
+            /* Animation */
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.2s ease;
+            --transition-slow: 0.3s ease;
         }
         
-        .mobile-app-container {
-            width: 100%;
-            max-width: var(--mobile-max-width); /* Always 428px */
-            margin: 0 auto;
-            min-height: 100vh;
-            padding: var(--mobile-space-md);
-            background-color: var(--mobile-bg-primary);
-        }
-        
-        .mobile-content-wrapper {
-            width: 100%;
+        /* Mobile Layout Foundation */
+        .mobile-main-layout {
             display: flex;
             flex-direction: column;
-            gap: var(--mobile-space-md);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            background-color: var(--background-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        """
-    
-    def configure_safe_areas(self) -> None:
-        """Configure safe areas for notched devices."""
-        safe_area_css = """
-        <style>
-        .mobile-app-container {
-            padding-top: max(env(safe-area-inset-top, 0px), 16px);
-            padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
-            padding-left: max(env(safe-area-inset-left, 0px), 16px);
-            padding-right: max(env(safe-area-inset-right, 0px), 16px);
+        
+        .mobile-container {
+            width: 100%;
+            max-width: 100vw;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+            box-sizing: border-box;
+        }
+        
+        .mobile-section {
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Touch-Optimized Components */
+        .mobile-button {
+            min-height: var(--touch-target-size);
+            min-width: var(--touch-target-size);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            touch-action: manipulation;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            text-decoration: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .mobile-button:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .mobile-button:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .mobile-button-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .mobile-button-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .mobile-button-secondary {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Input Grid System */
+        .mobile-input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .mobile-input-item {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            min-height: var(--touch-target-size);
+        }
+        
+        .mobile-input-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .mobile-input-item:active {
+            transform: scale(0.98);
+        }
+        
+        /* Card System */
+        .mobile-card {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid var(--border-color);
+        }
+        
+        .mobile-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .mobile-card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        /* Loading States */
+        .mobile-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl);
+            color: var(--text-secondary);
+        }
+        
+        .mobile-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: var(--spacing-sm);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Error States */
+        .mobile-error {
+            background-color: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: var(--error-color);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .mobile-error-title {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        /* Responsive Breakpoints */
+        @media (max-width: 480px) {
+            .mobile-container {
+                padding: 0 var(--spacing-sm);
+            }
+            
+            .mobile-section {
+                padding: var(--spacing-sm);
+                margin-bottom: var(--spacing-md);
+            }
+            
+            .mobile-input-grid {
+                gap: var(--spacing-xs);
+                padding: var(--spacing-sm);
+            }
+            
+            .mobile-card {
+                padding: var(--spacing-sm);
+            }
+        }
+        
+        @media (max-width: 360px) {
+            :root {
+                --spacing-unit: 12px;
+                --spacing-md: 12px;
+                --spacing-lg: 18px;
+            }
+            
+            .mobile-button {
+                font-size: var(--font-size-sm);
+                padding: var(--spacing-xs) var(--spacing-sm);
+            }
+        }
+        
+        /* Accessibility Enhancements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #0F172A;
+                --surface-color: #1E293B;
+                --text-primary: #F1F5F9;
+                --text-secondary: #94A3B8;
+                --border-color: #334155;
+            }
+        }
+        
+        /* Focus States for Accessibility */
+        .mobile-button:focus,
+        .mobile-input-item:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+        
+        /* High Contrast Mode Support */
+        @media (prefers-contrast: high) {
+            :root {
+                --border-color: #000000;
+                --text-secondary: var(--text-primary);
+            }
         }
         </style>
         """
-        st.markdown(safe_area_css, unsafe_allow_html=True)
-        self.safe_areas_configured = True
-    
-    def initialize_mobile_layout(self) -> None:
-        """Initialize mobile layout state and configuration."""
-        # Initialize session state variables
-        if 'mobile_layout_initialized' not in st.session_state:
-            st.session_state.mobile_layout_initialized = False
-        
-        if 'mobile_css_loaded' not in st.session_state:
-            st.session_state.mobile_css_loaded = False
-        
-        if 'mobile_viewport_configured' not in st.session_state:
-            st.session_state.mobile_viewport_configured = False
-        
-        # Configure viewport for mobile
-        if not st.session_state.mobile_viewport_configured:
-            self._configure_mobile_viewport()
-            st.session_state.mobile_viewport_configured = True
-        
-        # Load CSS if not already loaded
-        if not st.session_state.mobile_css_loaded:
-            self.load_mobile_css()
-        
-        # Configure safe areas
-        if not self.safe_areas_configured:
-            self.configure_safe_areas()
-        
-        st.session_state.mobile_layout_initialized = True
-    
-    def _configure_mobile_viewport(self) -> None:
-        """Configure mobile viewport settings."""
-        viewport_meta = """
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="default">
-        <meta name="theme-color" content="#16A34A">
-        """
-        # Note: In a real Streamlit app, viewport would be set in page config
-        # This is for documentation/testing purposes
-    
-    def render(self, content: Any = None, **kwargs) -> None:
-        """Render the mobile layout container.
-        
-        Args:
-            content: Content to render inside the container
-            **kwargs: Additional rendering options
-        """
-        # Initialize layout if not done
-        if not st.session_state.get('mobile_layout_initialized', False):
-            self.initialize_mobile_layout()
-        
-        # Create main mobile container with streamlit container
-        with st.container():
-            # Render provided content directly
-            if content:
-                if callable(content):
-                    content()
-                else:
-                    st.write(content)
-            elif 'children' in kwargs:
-                # Render child components
-                for child in kwargs['children']:
-                    if hasattr(child, 'render'):
-                        child.render()
-                    else:
-                        st.write(child)
-    
-    def render_with_header_footer(self, header: Any = None, content: Any = None, footer: Any = None) -> None:
-        """Render layout with header, content, and footer sections."""
-        self.initialize_mobile_layout()
-        
-        with st.container():
-            # Header section
-            if header:
-                if callable(header):
-                    header()
-                else:
-                    st.write(header)
-            
-            # Main content section
-            if content:
-                if callable(content):
-                    content()
-                else:
-                    st.write(content)
-            
-            # Footer section
-            if footer:
-                if callable(footer):
-                    footer()
-                else:
-                    st.write(footer)
-    
-    def get_layout_status(self) -> Dict[str, Any]:
-        """Get current layout status for AI agent monitoring."""
-        return {
-            'component_id': self.component_id,
-            'css_loaded': st.session_state.get('mobile_css_loaded', False),
-            'layout_initialized': st.session_state.get('mobile_layout_initialized', False),
-            'viewport_configured': st.session_state.get('mobile_viewport_configured', False),
-            'safe_areas_configured': self.safe_areas_configured,
-            'container_classes': self.metadata.css_classes,
-            'status': 'ready' if all([
-                st.session_state.get('mobile_css_loaded', False),
-                st.session_state.get('mobile_layout_initialized', False)
-            ]) else 'initializing'
-        }
-    
-    def debug_layout_info(self) -> Dict[str, Any]:
-        """Get debug information for AI agent analysis."""
-        return {
-            'layout_manager_id': self.component_id,
-            'session_state_vars': {
-                key: value for key, value in st.session_state.items() 
-                if key.startswith('mobile_')
-            },
-            'component_metadata': {
-                'type': self.metadata.component_type,
-                'css_classes': self.metadata.css_classes,
-                'state_dependencies': self.metadata.state_dependencies
-            },
-            'layout_status': self.get_layout_status(),
-            'ai_agent_context': self.get_ai_agent_context()
-        }
 
+    def _render_header(self) -> None:
+        """Render mobile header section."""
+        try:
+            st.markdown(
+                """
+            <div class="mobile-section">
+                <div class="mobile-card-header">
+                    <h1 class="mobile-card-title">🌿 PlantGuard Mobile</h1>
+                    <div class="mobile-status-indicator" id="mobile-status">
+                        <span style="color: var(--success-color);">●</span> Ready
+                    </div>
+                </div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+        except Exception as e:
+            logger.warning(f"Header rendering failed: {e}")
 
-# Utility functions for easy usage
-def create_mobile_layout(component_id: str = "main_layout") -> MobileLayoutManager:
-    """Create and return a MobileLayoutManager instance."""
-    return MobileLayoutManager(component_id)
+    def _render_main_content(self) -> None:
+        """Render main content area."""
+        try:
+            st.markdown('<div class="mobile-main-content">', unsafe_allow_html=True)
 
+            # Main content will be populated by specific components
+            # This is the container where mobile components will be rendered
+            placeholder = st.empty()
 
-def render_mobile_app(content_function: callable, header: Any = None, footer: Any = None):
-    """Convenience function to render mobile app with layout manager."""
-    layout_manager = create_mobile_layout()
-    
-    if header or footer:
-        layout_manager.render_with_header_footer(
-            header=header,
-            content=content_function,
-            footer=footer
+            # Store placeholder in state for component access
+            self.state_manager.set_global_state("main_content_placeholder", placeholder)
+
+            st.markdown("</div>", unsafe_allow_html=True)
+        except Exception as e:
+            logger.warning(f"Main content rendering failed: {e}")
+
+    def _render_status_bar(self) -> None:
+        """Render mobile status bar."""
+        try:
+            st.markdown(
+                """
+            <div class="mobile-status-bar" style="
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: var(--surface-color);
+                border-top: 1px solid var(--border-color);
+                padding: var(--spacing-xs) var(--spacing-md);
+                font-size: var(--font-size-xs);
+                color: var(--text-secondary);
+                text-align: center;
+                z-index: 1000;
+            ">
+                <span id="mobile-connection-status">Connected</span> • 
+                <span id="mobile-last-update">Updated: {}</span>
+            </div>
+            """.format(datetime.now().strftime("%H:%M")),
+                unsafe_allow_html=True,
+            )
+        except Exception as e:
+            logger.warning(f"Status bar rendering failed: {e}")
+
+    def _render_error_fallback(self) -> None:
+        """Render error fallback interface."""
+        st.markdown(
+            """
+        <div class="mobile-error">
+            <div class="mobile-error-title">⚠️ Interface Error</div>
+            <p>The mobile interface encountered an error. Please refresh the page.</p>
+            <button onclick="window.location.reload()" class="mobile-button mobile-button-primary">
+                🔄 Refresh Page
+            </button>
+        </div>
+        """,
+            unsafe_allow_html=True,
         )
-    else:
-        layout_manager.render(content=content_function)
-    
-    return layout_manager
+
+    def get_config(self) -> dict[str, Any]:
+        """Get current layout configuration."""
+        return self.config.copy()
+
+    def update_config(self, updates: dict[str, Any]) -> None:
+        """Update layout configuration."""
+        self.config.update(updates)
+        logger.info(f"Mobile layout config updated: {updates}")
+
+    def register_component(self, component_type: str, component_class) -> None:
+        """Register a new mobile component type."""
+        self.component_registry.register_component(component_type, component_class)
+
+    def create_component(self, component_type: str, component_id: str, title: str):
+        """Create a mobile component instance."""
+        return self.component_registry.create_component(component_type, component_id, title)
+
+    def _initialize_performance_optimizations(self) -> None:
+        """Initialize performance optimization systems."""
+        try:
+            # Try to import optional performance modules
+            try:
+                from .mobile_performance_optimizer import mobile_performance_optimizer
+
+                mobile_performance_optimizer.set_optimization_level("auto")
+            except ImportError:
+                logger.debug("Mobile performance optimizer not available, using basic optimizations")
+
+            # Try to enable offline mode if configured
+            if self.config.get("offline_support", True):
+                try:
+                    from .mobile_offline_manager import mobile_offline_manager
+
+                    mobile_offline_manager.enable_offline_mode()
+                except ImportError:
+                    logger.debug("Mobile offline manager not available")
+
+            # Try to create CSS bundle for mobile styles
+            if self.config.get("resource_bundling", True):
+                try:
+                    from .mobile_bundle_optimizer import mobile_bundle_optimizer
+
+                    css_content = self._get_mobile_css()
+                    mobile_bundle_optimizer.create_css_bundle({"mobile_layout": css_content}, "mobile_layout_styles")
+                except ImportError:
+                    logger.debug("Mobile bundle optimizer not available, using inline CSS")
+
+            logger.debug("Performance optimizations initialized")
+
+        except Exception as e:
+            logger.warning(f"Failed to initialize performance optimizations: {e}")
+
+    def _check_memory_pressure(self) -> None:
+        """Check and handle memory pressure."""
+        try:
+            memory_pressure = mobile_performance_optimizer.memory_manager.check_memory_pressure()
+
+            if memory_pressure == "critical":
+                # Force memory cleanup
+                mobile_performance_optimizer.memory_manager.cleanup_memory(force=True)
+                logger.warning("Critical memory pressure detected - performed cleanup")
+
+                # Show user notification
+                st.warning("⚠️ Low memory detected. Some features may be limited.")
+
+            elif memory_pressure == "warning":
+                # Gentle cleanup
+                mobile_performance_optimizer.memory_manager.cleanup_memory()
+                logger.info("Memory pressure warning - performed gentle cleanup")
+
+        except Exception as e:
+            logger.warning(f"Memory pressure check failed: {e}")
+
+    def _preload_critical_resources(self) -> None:
+        """Preload critical resources for better performance."""
+        try:
+            # Preload critical mobile components
+            critical_components = ["mobile_header", "mobile_input_ribbon", "mobile_image_analysis"]
+
+            mobile_performance_optimizer.preload_critical_components(critical_components)
+
+            # Load critical bundles
+            mobile_bundle_optimizer.preload_critical_bundles()
+
+        except Exception as e:
+            logger.warning(f"Failed to preload critical resources: {e}")
+
+    def _render_performance_stats(self) -> None:
+        """Render performance statistics for debugging."""
+        try:
+            with st.expander("📊 Performance Stats", expanded=False):
+                # Get performance report
+                perf_report = mobile_performance_optimizer.get_performance_report()
+
+                col1, col2, col3 = st.columns(3)
+
+                with col1:
+                    st.metric("Avg Render Time", f"{perf_report['session_info']['avg_render_time']:.3f}s")
+                    st.metric("Cache Hit Rate", f"{perf_report['cache_stats']['hit_rate']:.1f}%")
+
+                with col2:
+                    st.metric("Memory Usage", f"{perf_report['memory_stats']['rss_mb']:.1f}MB")
+                    st.metric("Memory Pressure", perf_report["memory_pressure"].title())
+
+                with col3:
+                    st.metric("Loaded Components", len(perf_report["loaded_components"]))
+                    st.metric("Cache Size", f"{perf_report['cache_stats']['size_mb']:.1f}MB")
+
+                # Offline stats
+                offline_stats = mobile_offline_manager.get_offline_stats()
+                if offline_stats["enabled"]:
+                    st.markdown("**Offline Status:**")
+                    st.json(
+                        {
+                            "connection": offline_stats["connection_status"],
+                            "cached_resources": offline_stats["cached_resources"],
+                            "queued_operations": offline_stats["queued_operations"],
+                        }
+                    )
+
+        except Exception as e:
+            logger.warning(f"Failed to render performance stats: {e}")
+
+    def get_layout_status(self) -> dict[str, Any]:
+        """Get comprehensive layout status including performance metrics."""
+        try:
+            base_status = {
+                "status": "ready",
+                "config": self.config.copy(),
+                "css_injected": self._css_injected,
+                "components_registered": len(self.component_registry.get_all_components()),
+            }
+
+            # Add performance metrics if optimizations are enabled
+            if self.config.get("performance_optimizations", True):
+                perf_report = mobile_performance_optimizer.get_performance_report()
+                offline_stats = mobile_offline_manager.get_offline_stats()
+                bundle_stats = mobile_bundle_optimizer.get_bundle_stats()
+
+                base_status.update(
+                    {
+                        "performance": {
+                            "avg_render_time": perf_report["session_info"]["avg_render_time"],
+                            "memory_usage_mb": perf_report["memory_stats"]["rss_mb"],
+                            "memory_pressure": perf_report["memory_pressure"],
+                            "cache_hit_rate": perf_report["cache_stats"]["hit_rate"],
+                        },
+                        "offline": {
+                            "enabled": offline_stats["enabled"],
+                            "connection_status": offline_stats["connection_status"],
+                            "cached_resources": offline_stats["cached_resources"],
+                            "cache_size_mb": offline_stats["cache_size_mb"],
+                        },
+                        "bundles": {
+                            "total_bundles": bundle_stats["total_bundles"],
+                            "loaded_bundles": bundle_stats["loaded_bundles"],
+                            "load_success_rate": bundle_stats["load_success_rate"],
+                        },
+                    }
+                )
+
+            return base_status
+
+        except Exception as e:
+            logger.error(f"Failed to get layout status: {e}")
+            return {"status": "error", "error": str(e)}
+
+    def enable_performance_monitoring(self) -> None:
+        """Enable performance monitoring and stats display."""
+        self.config["show_performance_stats"] = True
+        logger.info("Performance monitoring enabled")
+
+    def disable_performance_monitoring(self) -> None:
+        """Disable performance monitoring and stats display."""
+        self.config["show_performance_stats"] = False
+        logger.info("Performance monitoring disabled")
+
+    def optimize_for_low_memory(self) -> None:
+        """Optimize layout for low memory devices."""
+        # Set aggressive optimization level
+        mobile_performance_optimizer.set_optimization_level("aggressive")
+
+        # Reduce cache sizes
+        mobile_performance_optimizer.cache.max_size_bytes = 25 * 1024 * 1024  # 25MB
+
+        # Enable aggressive memory management
+        self.config["aggressive_memory_management"] = True
+
+        logger.info("Layout optimized for low memory devices")
+
+    def load_mobile_css(self) -> None:
+        """Load mobile CSS with performance optimizations."""
+        if not self._css_injected:
+            try:
+                # Try to check if bundled CSS is available
+                try:
+                    from .mobile_bundle_optimizer import mobile_bundle_optimizer
+
+                    if mobile_bundle_optimizer.load_bundle("mobile_layout_styles"):
+                        logger.debug("Loaded CSS from bundle")
+                    else:
+                        # Fallback to inline CSS
+                        self._apply_mobile_styles()
+                except ImportError:
+                    # Bundle optimizer not available, use inline CSS
+                    self._apply_mobile_styles()
+
+                self._css_injected = True
+
+            except Exception as e:
+                logger.warning(f"Failed to load optimized CSS: {e}")
+                # Fallback to basic CSS injection
+                self._apply_mobile_styles()

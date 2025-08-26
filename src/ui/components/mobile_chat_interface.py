@@ -1,583 +1,619 @@
 """
-Mobile Chat Interface for PlantGuard
+Mobile Chat Interface Component for PlantGuard UI.
 
-Integrates TextAdapter with mobile-optimized chat UI.
-Provides conversational plant care assistance with chat history.
+This module provides a mobile-optimized chat interface component with
+message bubbles, scrollable history, typing indicators, and touch optimization.
 """
 
-import streamlit as st
-from typing import Any, Dict, List, Optional, Tuple
-import time
-import json
+import logging
 from datetime import datetime
+from typing import Any
 
-# Import existing adapters
-try:
-    from core.nlp import TextAdapter
-except ImportError:
-    # Fallback for development/testing
-    from src.adapters_compat import TextAdapter
+import streamlit as st
 
-from .mobile_component_registry import MobileComponent, ComponentMetadata, register_mobile_component
+from .mobile_base_component import MobileBaseComponent
+from .mobile_error_handler import ErrorCategory, ErrorSeverity
+
+logger = logging.getLogger(__name__)
 
 
-@register_mobile_component
-class MobileChatInterface(MobileComponent):
-    """Mobile-optimized chat interface for plant care assistance.
-    
-    Features:
-    - Touch-friendly chat input
-    - Conversational message display
-    - Chat history management
-    - Quick question suggestions
-    - Mobile-optimized scrolling
-    - AI agent testable
-    """
-    
-    def __init__(self, component_id: str = "mobile_chat_interface", **kwargs):
-        super().__init__(component_id, **kwargs)
-        self.text_adapter = None
-        self.max_chat_history = kwargs.get('max_chat_history', 50)
-        self.show_suggestions = kwargs.get('show_suggestions', True)
-        self.auto_scroll = kwargs.get('auto_scroll', True)
-        
-    def _get_component_metadata(self) -> ComponentMetadata:
-        """Return component metadata for AI agent understanding."""
-        return ComponentMetadata(
-            component_id=self.component_id,
-            component_type="chat_interface",
-            display_name="Mobile Chat Interface",
-            description="Mobile chat interface for plant care Q&A conversations",
-            ai_agent_friendly_description=(
-                "Chat interface component that provides mobile-optimized conversational "
-                "interface for plant care questions with TextAdapter integration"
-            ),
-            interactive_elements=[
-                {
-                    'id': 'chat_input',
-                    'type': 'text_input',
-                    'key': f'{self.component_id}_chat_input',
-                    'description': 'Chat message input field',
-                    'testable': True
-                },
-                {
-                    'id': 'send_button',
-                    'type': 'button',
-                    'key': f'{self.component_id}_send',
-                    'description': 'Send message button',
-                    'testable': True
-                },
-                {
-                    'id': 'clear_chat_button',
-                    'type': 'button',
-                    'key': f'{self.component_id}_clear_chat',
-                    'description': 'Clear chat history button',
-                    'testable': True
-                },
-                {
-                    'id': 'suggestion_buttons',
-                    'type': 'button_group',
-                    'description': 'Quick question suggestion buttons',
-                    'testable': True
-                }
-            ],
-            state_dependencies=[
-                'chat_messages',
-                'chat_input_text',
-                'processing_message',
-                'text_adapter_loaded'
-            ],
-            css_classes=[
-                'mobile-chat-interface',
-                'mobile-chat-messages',
-                'mobile-chat-input',
-                'mobile-message-bubble'
-            ],
-            test_scenarios=[
-                {
-                    'name': 'message_sending',
-                    'description': 'Test sending chat messages',
-                    'expected_outcome': 'Messages send and display correctly'
-                },
-                {
-                    'name': 'response_generation',
-                    'description': 'Test AI response generation',
-                    'expected_outcome': 'AI generates appropriate responses'
-                },
-                {
-                    'name': 'chat_history',
-                    'description': 'Test chat history management',
-                    'expected_outcome': 'Chat history persists and scrolls properly'
-                },
-                {
-                    'name': 'suggestions',
-                    'description': 'Test quick question suggestions',
-                    'expected_outcome': 'Suggestion buttons work and populate input'
-                }
-            ],
-            ai_agent_instructions={
-                'testing': 'Test message sending, response generation, history management, suggestions',
-                'fixing': 'Initialize TextAdapter, handle message errors, fix scrolling issues',
-                'monitoring': 'Monitor response quality, chat performance, user engagement'
-            },
-            version="1.0.0",
-            ai_agent_testable=True,
-            auto_fix_enabled=True
-        )
-    
-    def initialize_chat_components(self) -> None:
-        """Initialize chat interface components."""
-        # Initialize session state
-        if 'chat_messages' not in st.session_state:
-            st.session_state.chat_messages = []
-        
-        if 'chat_input_text' not in st.session_state:
-            st.session_state.chat_input_text = ""
-        
-        if 'processing_message' not in st.session_state:
-            st.session_state.processing_message = False
-        
-        if 'text_adapter_loaded' not in st.session_state:
-            st.session_state.text_adapter_loaded = False
-        
-        # Initialize TextAdapter if not already done
-        if not self.text_adapter:
-            try:
-                self.text_adapter = TextAdapter()
-                st.session_state.text_adapter_loaded = True
-            except Exception as e:
-                st.error(f"Failed to initialize TextAdapter: {e}")
-                st.session_state.text_adapter_loaded = False
-        
-        # Add welcome message if chat is empty
-        if not st.session_state.chat_messages:
-            welcome_message = {
-                'role': 'assistant',
-                'content': '🌱 Hello! I\'m your PlantGuard AI assistant. Ask me anything about plant care, diseases, or gardening tips!',
-                'timestamp': time.time()
-            }
-            st.session_state.chat_messages.append(welcome_message)
-    
-    def get_quick_suggestions(self) -> List[str]:
-        """Get quick question suggestions for users."""
-        return [
-            "Why are my plant leaves turning yellow?",
-            "How often should I water my plants?",
-            "What are these brown spots on leaves?",
-            "My plant looks wilted, what should I do?",
-            "How much sunlight does my plant need?",
-            "What's the best fertilizer for houseplants?"
-        ]
-    
-    def render_chat_messages(self) -> None:
-        """Render chat message history."""
-        messages = st.session_state.get('chat_messages', [])
-        
-        if not messages:
-            st.info("💬 Start a conversation by asking a plant care question!")
-            return
-        
-        # Create scrollable container for messages
-        st.markdown('<div class="mobile-chat-messages" style="max-height: 400px; overflow-y: auto; padding: 1rem; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 1rem;">', 
-                   unsafe_allow_html=True)
-        
-        for i, message in enumerate(messages):
-            role = message.get('role', 'user')
-            content = message.get('content', '')
-            timestamp = message.get('timestamp', time.time())
-            
-            # Format timestamp
-            time_str = datetime.fromtimestamp(timestamp).strftime('%H:%M')
-            
-            if role == 'user':
-                # User message (right-aligned)
-                st.markdown(f"""
-                <div class="mobile-message-bubble user-message" style="
-                    background-color: #16A34A;
-                    color: white;
-                    padding: 0.75rem;
-                    border-radius: 12px 12px 4px 12px;
-                    margin: 0.5rem 0 0.5rem 2rem;
-                    text-align: left;
-                ">
-                    <div>{content}</div>
-                    <div style="font-size: 0.75rem; opacity: 0.8; margin-top: 0.25rem;">{time_str}</div>
-                </div>
-                """, unsafe_allow_html=True)
-            else:
-                # Assistant message (left-aligned)
-                st.markdown(f"""
-                <div class="mobile-message-bubble assistant-message" style="
-                    background-color: #F0F9F0;
-                    color: #1F2937;
-                    padding: 0.75rem;
-                    border-radius: 12px 12px 12px 4px;
-                    margin: 0.5rem 2rem 0.5rem 0;
-                    text-align: left;
-                    border-left: 3px solid #16A34A;
-                ">
-                    <div>🤖 {content}</div>
-                    <div style="font-size: 0.75rem; opacity: 0.6; margin-top: 0.25rem;">{time_str}</div>
-                </div>
-                """, unsafe_allow_html=True)
-        
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    def render_quick_suggestions(self) -> Optional[str]:
-        """Render quick question suggestions.
-        
-        Returns:
-            str: Selected suggestion text or None
+class MobileChatInterface(MobileBaseComponent):
+    """Mobile-optimized chat interface component with conversational interaction."""
+
+    def __init__(self, component_id: str, title: str = "Plant Care Assistant", **kwargs):
         """
-        if not self.show_suggestions:
-            return None
-        
-        suggestions = self.get_quick_suggestions()
-        selected_suggestion = None
-        
-        st.markdown("**💡 Quick Questions:**")
-        
-        # Display suggestions in a compact grid
-        cols = st.columns(2)
-        
-        for i, suggestion in enumerate(suggestions[:4]):  # Show first 4 suggestions
-            col_index = i % 2
-            
-            with cols[col_index]:
-                if st.button(
-                    suggestion,
-                    key=f"{self.component_id}_suggestion_{i}",
-                    help="Click to use this question",
-                    use_container_width=True
-                ):
-                    selected_suggestion = suggestion
-                    st.session_state.chat_input_text = suggestion
-        
-        return selected_suggestion
-    
-    def render_chat_input(self) -> Tuple[str, bool]:
-        """Render chat input interface.
-        
-        Returns:
-            Tuple of (input_text, send_clicked)
-        """
-        # Chat input form
-        with st.form(key=f"{self.component_id}_form", clear_on_submit=True):
-            col1, col2 = st.columns([4, 1])
-            
-            with col1:
-                user_input = st.text_input(
-                    "Ask about plant care...",
-                    value=st.session_state.get('chat_input_text', ''),
-                    placeholder="e.g., Why are my tomato leaves curling?",
-                    label_visibility="collapsed",
-                    key=f"{self.component_id}_chat_input"
-                )
-            
-            with col2:
-                send_clicked = st.form_submit_button(
-                    "📤",
-                    help="Send message",
-                    use_container_width=True,
-                    disabled=st.session_state.get('processing_message', False)
-                )
-        
-        # Clear input text after form submission
-        if send_clicked:
-            st.session_state.chat_input_text = ""
-        
-        return user_input, send_clicked
-    
-    def render_chat_controls(self) -> bool:
-        """Render chat control buttons.
-        
-        Returns:
-            bool: True if clear was clicked
-        """
-        col1, col2, col3 = st.columns([2, 2, 1])
-        
-        with col1:
-            if st.button(
-                "🗑️ Clear Chat",
-                key=f"{self.component_id}_clear_chat",
-                use_container_width=True
-            ):
-                return True
-        
-        with col2:
-            # Chat statistics
-            message_count = len(st.session_state.get('chat_messages', []))
-            st.metric("Messages", message_count)
-        
-        with col3:
-            # Processing indicator
-            if st.session_state.get('processing_message', False):
-                st.markdown("🔄")
-        
-        return False
-    
-    def process_user_message(self, user_input: str) -> str:
-        """Process user message and generate AI response.
-        
+        Initialize mobile chat interface component.
+
         Args:
-            user_input: User's message text
-            
-        Returns:
-            str: AI-generated response
+            component_id: Unique identifier for this component
+            title: Display title for the component
+            **kwargs: Additional component arguments
         """
-        if not user_input.strip():
-            return ""
-        
+        super().__init__(component_id, title, **kwargs)
+
+        # Chat configuration
+        self.chat_config = {
+            "max_message_length": 1000,
+            "max_history_length": 50,
+            "show_typing_indicator": True,
+            "enable_voice_input": True,
+            "enable_image_context": True,
+            "auto_scroll": True,
+            "message_timestamp": True,
+            "user_avatar": "🧑‍🌾",
+            "bot_avatar": "🌿",
+        }
+
+        # Initialize chat state
+        self._initialize_chat_state()
+
+        logger.debug("MobileChatInterface initialized: %s", component_id)
+
+    def _initialize_chat_state(self) -> None:
+        """Initialize chat-specific state."""
+        chat_state = {
+            "messages": [],
+            "current_input": "",
+            "is_typing": False,
+            "typing_start_time": None,
+            "last_message_time": None,
+            "chat_session_id": f"chat_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "context": {"current_plant": None, "current_disease": None, "analysis_results": []},
+        }
+
+        current_state = self.get_state()
+        if "chat_data" not in current_state["data"]:
+            current_state["data"]["chat_data"] = chat_state
+            self.set_state(current_state)
+
+            # Add welcome message
+            self._add_welcome_message()
+
+    def render(self) -> None:
+        """Render the mobile chat interface."""
         try:
-            st.session_state.processing_message = True
-            
-            # Add user message to chat
-            user_message = {
-                'role': 'user',
-                'content': user_input.strip(),
-                'timestamp': time.time()
-            }
-            st.session_state.chat_messages.append(user_message)
-            
-            # Generate AI response
-            with st.spinner("🤖 Thinking..."):
-                if self.text_adapter:
-                    response = self.text_adapter.generate_response(
-                        disease_class="general",
-                        user_query=user_input,
-                        confidence=0.0
-                    )
-                else:
-                    response = self._generate_fallback_response(user_input)
-            
-            # Add AI response to chat
-            ai_message = {
-                'role': 'assistant',
-                'content': response,
-                'timestamp': time.time()
-            }
-            st.session_state.chat_messages.append(ai_message)
-            
-            # Limit chat history size
-            if len(st.session_state.chat_messages) > self.max_chat_history:
-                st.session_state.chat_messages = st.session_state.chat_messages[-self.max_chat_history:]
-            
-            return response
-            
+            # Get current state
+            state = self.get_state()
+            chat_data = state["data"].get("chat_data", {})
+
+            # Render chat interface container
+            st.markdown(
+                f"""
+                <div class="mobile-chat-interface mobile-component" 
+                     data-component-id="{self.component_id}"
+                     data-testid="chat-interface-{self.component_id}">
+                """,
+                unsafe_allow_html=True,
+            )
+
+            # Update context with current analysis
+            self._update_chat_context()
+
+            # Render chat header
+            self._render_chat_header()
+
+            # Render chat messages
+            self._render_chat_messages(chat_data.get("messages", []))
+
+            # Render typing indicator
+            if chat_data.get("is_typing", False):
+                self._render_typing_indicator()
+
+            # Render chat input
+            self._render_chat_input()
+
+            # Render chat controls
+            self._render_chat_controls()
+
+            st.markdown("</div>", unsafe_allow_html=True)
+
         except Exception as e:
-            error_response = f"I apologize, but I encountered an error: {e}"
-            
-            error_message = {
-                'role': 'assistant',
-                'content': error_response,
-                'timestamp': time.time()
-            }
-            st.session_state.chat_messages.append(error_message)
-            
-            return error_response
-        finally:
-            st.session_state.processing_message = False
-    
-    def _generate_fallback_response(self, user_input: str) -> str:
-        """Generate fallback response when TextAdapter is not available."""
-        # Simple keyword-based responses
-        user_lower = user_input.lower()
-        
-        if any(word in user_lower for word in ['yellow', 'yellowing']):
-            return """Yellow leaves can indicate several issues:
-            
-🌱 **Common causes:**
-• Overwatering or underwatering
-• Nutrient deficiency (especially nitrogen)
-• Natural aging of older leaves
-• Insufficient light
+            logger.error("Chat interface rendering failed: %s", e)
+            self.handle_error(e, ErrorCategory.COMPONENT, ErrorSeverity.HIGH)
 
-💡 **Solutions:**
-• Check soil moisture before watering
-• Ensure proper drainage
-• Consider fertilizing if needed
-• Evaluate light conditions
-
-If only older, lower leaves are yellowing, this is often normal!"""
-        
-        elif any(word in user_lower for word in ['water', 'watering']):
-            return """Watering tips for healthy plants:
-            
-💧 **General guidelines:**
-• Check soil moisture first - stick finger 1-2 inches deep
-• Water when top inch of soil feels dry
-• Water thoroughly until it drains from bottom
-• Empty saucers after 30 minutes
-
-🌿 **Factors affecting watering:**
-• Plant type (succulents need less, ferns need more)
-• Season (less in winter, more in growing season)
-• Humidity and temperature
-• Pot size and drainage
-
-Most houseplants prefer "soak and dry" method!"""
-        
-        elif any(word in user_lower for word in ['brown', 'spots', 'disease']):
-            return """Brown spots could indicate:
-            
-🍂 **Possible causes:**
-• Fungal infections
-• Bacterial spots
-• Sunburn or heat damage
-• Overwatering issues
-• Nutrient problems
-
-🔍 **What to do:**
-• Remove affected leaves
-• Improve air circulation
-• Avoid getting leaves wet when watering
-• Check for pests
-• Consider fungicide if spreading
-
-For accurate diagnosis, try uploading a photo for visual analysis!"""
-        
-        else:
-            return f"""Thank you for your question about: "{user_input}"
-            
-🌱 I'd be happy to help with plant care advice! Here are some general tips:
-            
-• **Light**: Most houseplants prefer bright, indirect light
-• **Water**: Check soil moisture before watering
-• **Air**: Good circulation prevents many issues
-• **Soil**: Use well-draining potting mix
-• **Observation**: Monitor your plants regularly
-            
-For specific plant care advice, try asking about:
-• Watering schedules
-• Light requirements
-• Common problems (yellowing, brown spots, etc.)
-• Fertilizing tips
-            
-Or upload a photo for visual plant analysis!"""
-    
-    def clear_chat_history(self) -> None:
-        """Clear all chat messages."""
-        st.session_state.chat_messages = []
-        st.session_state.processing_message = False
-        
-        # Add welcome message back
+    def _add_welcome_message(self) -> None:
+        """Add welcome message to chat."""
         welcome_message = {
-            'role': 'assistant',
-            'content': '🌱 Chat cleared! Feel free to ask me anything about plant care.',
-            'timestamp': time.time()
+            "id": f"msg_{datetime.now().strftime('%Y%m%d_%H%M%S')}_welcome",
+            "type": "bot",
+            "content": "🌿 Hello! I'm your PlantGuard assistant. I can help you with plant care questions, disease identification, and treatment advice. How can I help you today?",
+            "timestamp": datetime.now().isoformat(),
+            "context": None,
         }
-        st.session_state.chat_messages.append(welcome_message)
-    
-    def render(self, **kwargs) -> Dict[str, Any]:
-        """Render the complete mobile chat interface.
-        
-        Returns:
-            Dict containing chat session information
-        """
-        # Initialize components
-        self.initialize_chat_components()
-        
-        # Main container
-        st.markdown('<div class="mobile-chat-interface" data-component="mobile-chat-interface" data-testable="true">', 
-                   unsafe_allow_html=True)
-        
-        # Check if TextAdapter is available
-        if not st.session_state.get('text_adapter_loaded', False):
-            st.warning("⚠️ Text processing not available. Using basic responses.")
-        
-        # Chat messages display
-        self.render_chat_messages()
-        
-        # Quick suggestions
-        if self.show_suggestions and len(st.session_state.get('chat_messages', [])) <= 1:
-            selected_suggestion = self.render_quick_suggestions()
-        
-        # Chat input
-        user_input, send_clicked = self.render_chat_input()
-        
-        # Process message if sent
-        if send_clicked and user_input.strip():
-            response = self.process_user_message(user_input)
-            if response:
-                st.rerun()  # Refresh to show new messages
-        
-        # Chat controls
-        clear_clicked = self.render_chat_controls()
-        
-        if clear_clicked:
-            self.clear_chat_history()
-            st.rerun()
-        
-        # Usage tips
-        with st.expander("💡 Chat Tips"):
+
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+        chat_data["messages"].append(welcome_message)
+        state["data"]["chat_data"] = chat_data
+        self.set_state(state)
+
+    def _update_chat_context(self) -> None:
+        """Update chat context with current analysis results."""
+        # Get current analysis results
+        analysis_results = []
+        if "analysis_results" in st.session_state and st.session_state.analysis_results:
+            analysis_results = st.session_state.analysis_results[-3:]  # Last 3 results
+
+        # Update context
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+        chat_data["context"]["analysis_results"] = analysis_results
+
+        # Set current disease if available
+        if analysis_results:
+            latest_result = analysis_results[0]
+            disease_name, confidence = latest_result.get("prediction", ("Unknown", 0.0))
+            chat_data["context"]["current_disease"] = {"name": disease_name, "confidence": confidence, "timestamp": latest_result.get("timestamp")}
+
+        state["data"]["chat_data"] = chat_data
+        self.set_state(state)
+
+    def _render_chat_header(self) -> None:
+        """Render chat header with title and status."""
+        col1, col2, col3 = st.columns([3, 1, 1])
+
+        with col1:
+            st.markdown(f"### {self.chat_config['bot_avatar']} {self.title}")
+
+        with col2:
+            # Context indicator
+            state = self.get_state()
+            chat_data = state["data"]["chat_data"]
+            current_disease = chat_data["context"].get("current_disease")
+
+            if current_disease:
+                st.markdown(f"<small>🔬 Context: {current_disease['name']}</small>", unsafe_allow_html=True)
+
+        with col3:
+            # Chat controls
+            if st.button("🧹", key=f"{self.component_id}_clear", help="Clear chat"):
+                self._clear_chat()
+
+    def _render_chat_messages(self, messages: list[dict[str, Any]]) -> None:
+        """Render chat messages with mobile-optimized bubbles."""
+        if not messages:
+            st.info("💬 Start a conversation by typing a message below!")
+            return
+
+        # Create scrollable container for messages
+        st.markdown(
+            """
+        <div class="mobile-chat-messages" style="
+            max-height: 400px; 
+            overflow-y: auto; 
+            padding: 10px; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 10px;
+            margin-bottom: 10px;
+        ">
+        """,
+            unsafe_allow_html=True,
+        )
+
+        # Render messages
+        for message in messages[-20:]:  # Show last 20 messages
+            self._render_message_bubble(message)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    def _render_message_bubble(self, message: dict[str, Any]) -> None:
+        """Render individual message bubble."""
+        message_type = message.get("type", "user")
+        content = message.get("content", "")
+        timestamp = message.get("timestamp", "")
+
+        # Format timestamp
+        formatted_time = self._format_message_timestamp(timestamp)
+
+        if message_type == "user":
+            # User message (right-aligned)
+            st.markdown(
+                f"""
+            <div class="mobile-message mobile-message-user">
+                <div class="message-content user-message">
+                    <div class="message-avatar">{self.chat_config["user_avatar"]}</div>
+                    <div class="message-bubble user-bubble">
+                        <p>{content}</p>
+                        <small class="message-time">{formatted_time}</small>
+                    </div>
+                </div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+        else:
+            # Bot message (left-aligned)
+            st.markdown(
+                f"""
+            <div class="mobile-message mobile-message-bot">
+                <div class="message-content bot-message">
+                    <div class="message-avatar">{self.chat_config["bot_avatar"]}</div>
+                    <div class="message-bubble bot-bubble">
+                        <p>{content}</p>
+                        <small class="message-time">{formatted_time}</small>
+                    </div>
+                </div>
+            </div>
+            """,
+                unsafe_allow_html=True,
+            )
+
+    def _render_typing_indicator(self) -> None:
+        """Render typing indicator when bot is responding."""
+        st.markdown(
+            """
+        <div class="mobile-typing-indicator">
+            <div class="message-content bot-message">
+                <div class="message-avatar">🌿</div>
+                <div class="message-bubble bot-bubble typing">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <small>PlantGuard is typing...</small>
+                </div>
+            </div>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
+
+    def _render_chat_input(self) -> None:
+        """Render chat input with send button."""
+        st.markdown("### 💬 Ask a Question")
+
+        # Input area
+        col1, col2 = st.columns([4, 1])
+
+        with col1:
+            user_input = st.text_area(
+                "Type your plant care question...",
+                key=f"{self.component_id}_input",
+                height=80,
+                max_chars=self.chat_config["max_message_length"],
+                placeholder="Ask about plant diseases, care tips, treatments, or anything plant-related!",
+                label_visibility="collapsed",
+            )
+
+        with col2:
+            st.markdown("<br>", unsafe_allow_html=True)  # Spacing
+
+            send_button = st.button(
+                "📤\nSend", key=f"{self.component_id}_send", use_container_width=True, type="primary", disabled=not user_input.strip()
+            )
+
+            # Voice input button (if enabled)
+            if self.chat_config["enable_voice_input"]:
+                voice_button = st.button("🎤\nVoice", key=f"{self.component_id}_voice", use_container_width=True, help="Use voice input")
+
+                if voice_button:
+                    self._handle_voice_input()
+
+        # Handle send button
+        if send_button and user_input.strip():
+            self._handle_user_message(user_input.strip())
+
+        # Quick action buttons
+        self._render_quick_actions()
+
+    def _render_quick_actions(self) -> None:
+        """Render quick action buttons for common questions."""
+        st.markdown("**Quick Questions:**")
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            if st.button("🌱 Plant Care", key=f"{self.component_id}_quick_care", use_container_width=True):
+                self._handle_user_message("How do I take care of my plant?")
+
+        with col2:
+            if st.button("🔍 Symptoms", key=f"{self.component_id}_quick_symptoms", use_container_width=True):
+                self._handle_user_message("What do these symptoms mean?")
+
+        with col3:
+            if st.button("💊 Treatment", key=f"{self.component_id}_quick_treatment", use_container_width=True):
+                self._handle_user_message("How should I treat this disease?")
+
+    def _render_chat_controls(self) -> None:
+        """Render chat control buttons."""
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            if st.button("📋 History", key=f"{self.component_id}_history", use_container_width=True):
+                self._show_chat_history()
+
+        with col2:
+            if st.button("📤 Export", key=f"{self.component_id}_export", use_container_width=True):
+                self._export_chat()
+
+        with col3:
+            if st.button("⚙️ Settings", key=f"{self.component_id}_settings", use_container_width=True):
+                self._show_chat_settings()
+
+        with col4:
+            if st.button("❓ Help", key=f"{self.component_id}_help", use_container_width=True):
+                self._show_chat_help()
+
+    def _handle_user_message(self, message: str) -> None:
+        """Handle user message and generate bot response."""
+        try:
+            # Add user message
+            user_msg = {
+                "id": f"msg_{datetime.now().strftime('%Y%m%d_%H%M%S')}_user",
+                "type": "user",
+                "content": message,
+                "timestamp": datetime.now().isoformat(),
+                "context": self._get_current_context(),
+            }
+
+            self._add_message(user_msg)
+
+            # Show typing indicator
+            self._set_typing(True)
+
+            # Generate bot response
+            bot_response = self._generate_bot_response(message)
+
+            # Add bot message
+            bot_msg = {
+                "id": f"msg_{datetime.now().strftime('%Y%m%d_%H%M%S')}_bot",
+                "type": "bot",
+                "content": bot_response,
+                "timestamp": datetime.now().isoformat(),
+                "context": self._get_current_context(),
+            }
+
+            self._add_message(bot_msg)
+
+            # Hide typing indicator
+            self._set_typing(False)
+
+            # Clear input
+            st.session_state[f"{self.component_id}_input"] = ""
+
+        except Exception as e:
+            logger.error("Failed to handle user message: %s", e)
+            self._set_typing(False)
+            self._add_error_message("Sorry, I encountered an error. Please try again.")
+
+    def _generate_bot_response(self, user_message: str) -> str:
+        """Generate bot response using text adapter and context."""
+        try:
+            # Get current context
+            context = self._get_current_context()
+
+            # Import text adapter
+            from src.core.nlp import ChatModel, TextAdapter
+
+            # Get or create adapters
+            if "text_adapter" not in st.session_state:
+                st.session_state.text_adapter = TextAdapter()
+
+            if "chat_model" not in st.session_state:
+                st.session_state.chat_model = ChatModel()
+
+            text_adapter = st.session_state.text_adapter
+            chat_model = st.session_state.chat_model
+
+            # Prepare context-aware input
+            context_prompt = self._build_context_prompt(user_message, context)
+
+            # Generate response
+            response = chat_model.predict(context_prompt)
+
+            return response
+
+        except Exception as e:
+            logger.error("Bot response generation failed: %s", e)
+            return self._get_fallback_response(user_message)
+
+    def _build_context_prompt(self, user_message: str, context: dict[str, Any]) -> str:
+        """Build context-aware prompt for the chat model."""
+        prompt_parts = []
+
+        # Add system context
+        prompt_parts.append("You are PlantGuard, an AI plant care assistant.")
+
+        # Add current disease context if available
+        current_disease = context.get("current_disease")
+        if current_disease:
+            prompt_parts.append(f"Current diagnosis: {current_disease['name']} (confidence: {current_disease['confidence']:.1%})")
+
+        # Add recent analysis results
+        analysis_results = context.get("analysis_results", [])
+        if analysis_results:
+            prompt_parts.append("Recent analysis results:")
+            for result in analysis_results[-2:]:  # Last 2 results
+                disease_name, confidence = result.get("prediction", ("Unknown", 0.0))
+                prompt_parts.append(f"- {disease_name} ({confidence:.1%})")
+
+        # Add user message
+        prompt_parts.append(f"User question: {user_message}")
+
+        # Add response guidelines
+        prompt_parts.append("Provide helpful, accurate plant care advice. Keep responses concise and mobile-friendly.")
+
+        return "\n".join(prompt_parts)
+
+    def _get_fallback_response(self, user_message: str) -> str:
+        """Get fallback response when AI generation fails."""
+        # Simple keyword-based responses
+        message_lower = user_message.lower()
+
+        if any(word in message_lower for word in ["water", "watering"]):
+            return "🚰 For watering, check the soil moisture first. Most plants prefer soil that's slightly moist but not waterlogged. Water when the top inch of soil feels dry."
+
+        elif any(word in message_lower for word in ["light", "sun", "sunlight"]):
+            return "☀️ Most plants need bright, indirect light. Direct sunlight can burn leaves, while too little light causes weak growth. Adjust placement based on your plant's needs."
+
+        elif any(word in message_lower for word in ["disease", "sick", "problem"]):
+            return "🔍 If your plant looks sick, first check for common issues: overwatering, pests, or inadequate light. Take a clear photo and use PlantGuard's analysis feature for specific diagnosis."
+
+        elif any(word in message_lower for word in ["fertilizer", "feed", "nutrients"]):
+            return "🌱 Feed your plants during growing season (spring/summer) with balanced fertilizer. Follow package instructions and don't over-fertilize, which can harm plants."
+
+        else:
+            return "🌿 I'm here to help with plant care! You can ask about watering, lighting, diseases, fertilizing, or any other plant-related questions. Feel free to be specific about your plant and its symptoms."
+
+    def _get_current_context(self) -> dict[str, Any]:
+        """Get current chat context."""
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+        return chat_data.get("context", {})
+
+    def _add_message(self, message: dict[str, Any]) -> None:
+        """Add message to chat history."""
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+
+        # Add message
+        chat_data["messages"].append(message)
+
+        # Limit history length
+        if len(chat_data["messages"]) > self.chat_config["max_history_length"]:
+            chat_data["messages"] = chat_data["messages"][-self.chat_config["max_history_length"] :]
+
+        # Update last message time
+        chat_data["last_message_time"] = datetime.now().isoformat()
+
+        # Save state
+        state["data"]["chat_data"] = chat_data
+        self.set_state(state)
+
+    def _add_error_message(self, error_text: str) -> None:
+        """Add error message to chat."""
+        error_msg = {
+            "id": f"msg_{datetime.now().strftime('%Y%m%d_%H%M%S')}_error",
+            "type": "bot",
+            "content": f"❌ {error_text}",
+            "timestamp": datetime.now().isoformat(),
+            "context": None,
+        }
+        self._add_message(error_msg)
+
+    def _set_typing(self, is_typing: bool) -> None:
+        """Set typing indicator state."""
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+        chat_data["is_typing"] = is_typing
+
+        if is_typing:
+            chat_data["typing_start_time"] = datetime.now().isoformat()
+        else:
+            chat_data["typing_start_time"] = None
+
+        state["data"]["chat_data"] = chat_data
+        self.set_state(state)
+
+    def _format_message_timestamp(self, timestamp: str) -> str:
+        """Format message timestamp for display."""
+        try:
+            if not timestamp:
+                return ""
+
+            dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+            return dt.strftime("%H:%M")
+
+        except Exception:
+            return ""
+
+    def _handle_voice_input(self) -> None:
+        """Handle voice input (placeholder for future implementation)."""
+        st.info("🎤 Voice input feature coming soon! For now, please type your question.")
+
+    def _clear_chat(self) -> None:
+        """Clear chat history."""
+        self._initialize_chat_state()
+        st.success("🧹 Chat cleared!")
+
+    def _show_chat_history(self) -> None:
+        """Show chat history in expandable section."""
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+        messages = chat_data.get("messages", [])
+
+        with st.expander("📋 Chat History", expanded=True):
+            if not messages:
+                st.info("No chat history available.")
+            else:
+                st.write(f"**Total messages:** {len(messages)}")
+                st.write(f"**Session ID:** {chat_data.get('chat_session_id', 'Unknown')}")
+
+                for i, msg in enumerate(messages[-10:], 1):  # Last 10 messages
+                    msg_type = "You" if msg["type"] == "user" else "PlantGuard"
+                    timestamp = self._format_message_timestamp(msg["timestamp"])
+                    st.write(f"**{i}. {msg_type}** ({timestamp}): {msg['content'][:100]}...")
+
+    def _export_chat(self) -> None:
+        """Export chat history."""
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+        messages = chat_data.get("messages", [])
+
+        if not messages:
+            st.warning("No chat history to export.")
+            return
+
+        # Create export text
+        export_text = f"PlantGuard Chat Export\nSession: {chat_data.get('chat_session_id', 'Unknown')}\nExported: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+
+        for msg in messages:
+            sender = "You" if msg["type"] == "user" else "PlantGuard"
+            timestamp = self._format_message_timestamp(msg["timestamp"])
+            export_text += f"[{timestamp}] {sender}: {msg['content']}\n\n"
+
+        st.text_area("📤 Chat Export", value=export_text, height=200, key=f"{self.component_id}_export_text")
+
+        st.success("✅ Chat history ready to export! Copy the text above.")
+
+    def _show_chat_settings(self) -> None:
+        """Show chat settings."""
+        with st.expander("⚙️ Chat Settings", expanded=True):
+            st.write("**Current Settings:**")
+            st.write(f"• Max message length: {self.chat_config['max_message_length']} characters")
+            st.write(f"• Max history: {self.chat_config['max_history_length']} messages")
+            st.write(f"• Voice input: {'Enabled' if self.chat_config['enable_voice_input'] else 'Disabled'}")
+            st.write(f"• Image context: {'Enabled' if self.chat_config['enable_image_context'] else 'Disabled'}")
+
+    def _show_chat_help(self) -> None:
+        """Show chat help information."""
+        with st.expander("❓ Chat Help", expanded=True):
             st.markdown("""
-            **How to get the best answers:**
+            **How to use PlantGuard Chat:**
             
-            ✅ **Be specific**: "Why are my tomato leaves yellowing?" vs "Plant problem"
+            🌿 **Ask Questions:** Type any plant care question
+            📷 **Use Context:** Chat knows about your recent plant analysis
+            🎤 **Voice Input:** Use the voice button (coming soon)
+            📋 **Quick Actions:** Use preset question buttons
             
-            ✅ **Include details**: Mention plant type, symptoms, care routine
+            **Example Questions:**
+            • "How often should I water my plant?"
+            • "What does this disease mean?"
+            • "How do I treat leaf spots?"
+            • "Is my plant getting enough light?"
             
-            ✅ **Ask follow-ups**: "What fertilizer should I use for this?"
-            
-            **Example good questions:**
-            • "My fiddle leaf fig has brown spots on lower leaves"
-            • "How often should I water my snake plant in winter?"
-            • "What's the white powder on my plant leaves?"
-            
-            **For visual problems**: Try the Image Analysis tab for photo-based diagnosis!
+            **Tips:**
+            • Be specific about your plant type and symptoms
+            • Mention recent analysis results for better context
+            • Ask follow-up questions for more details
             """)
-        
-        # Close container
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        return {
-            'message_count': len(st.session_state.get('chat_messages', [])),
-            'text_adapter_loaded': st.session_state.get('text_adapter_loaded', False),
-            'processing_message': st.session_state.get('processing_message', False),
-            'last_message_time': st.session_state.get('chat_messages', [{}])[-1].get('timestamp') if st.session_state.get('chat_messages') else None
-        }
-    
-    def get_chat_status(self) -> Dict[str, Any]:
-        """Get current chat status for AI agent monitoring."""
-        messages = st.session_state.get('chat_messages', [])
-        
-        return {
-            'component_id': self.component_id,
-            'text_adapter_loaded': st.session_state.get('text_adapter_loaded', False),
-            'message_count': len(messages),
-            'user_message_count': len([m for m in messages if m.get('role') == 'user']),
-            'assistant_message_count': len([m for m in messages if m.get('role') == 'assistant']),
-            'processing_message': st.session_state.get('processing_message', False),
-            'last_activity': messages[-1].get('timestamp') if messages else None,
-            'max_chat_history': self.max_chat_history,
-            'show_suggestions': self.show_suggestions,
-            'auto_scroll': self.auto_scroll
-        }
-    
-    def export_chat_history(self) -> Dict[str, Any]:
-        """Export chat history for analysis or backup."""
-        return {
-            'messages': st.session_state.get('chat_messages', []),
-            'export_timestamp': time.time(),
-            'component_id': self.component_id,
-            'session_info': self.get_chat_status()
-        }
 
+    def get_message_count(self) -> int:
+        """Get number of messages in chat."""
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+        return len(chat_data.get("messages", []))
 
-# Utility functions
-def create_mobile_chat_interface(max_chat_history: int = 50,
-                                show_suggestions: bool = True,
-                                auto_scroll: bool = True) -> MobileChatInterface:
-    """Create and return a MobileChatInterface instance."""
-    return MobileChatInterface(
-        component_id="mobile_chat_interface",
-        max_chat_history=max_chat_history,
-        show_suggestions=show_suggestions,
-        auto_scroll=auto_scroll
-    )
+    def get_last_message(self) -> dict[str, Any] | None:
+        """Get the last message in chat."""
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+        messages = chat_data.get("messages", [])
+        return messages[-1] if messages else None
 
-
-def render_plant_care_chat() -> Dict[str, Any]:
-    """Convenience function to render plant care chat interface."""
-    chat_interface = create_mobile_chat_interface()
-    return chat_interface.render()
+    def is_typing(self) -> bool:
+        """Check if bot is currently typing."""
+        state = self.get_state()
+        chat_data = state["data"]["chat_data"]
+        return chat_data.get("is_typing", False)

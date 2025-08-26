@@ -4,7 +4,7 @@
   "description": "When files are deleted, scan the entire codebase to identify and remove related dependencies that are no longer needed",
   "version": "1",
   "when": {
-    "type": "fileDeleted",
+    "type": "userTriggered",
     "patterns": [
       "**/*.py",
       "**/*.js",

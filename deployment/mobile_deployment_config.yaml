@@ -1,0 +1,357 @@
+# Mobile PlantGuard Deployment Configuration
+
+# Application Configuration
+app:
+  name: "PlantGuard Mobile"
+  version: "1.0.0"
+  description: "AI-powered plant disease detection for mobile devices"
+
+# Mobile Optimization Settings
+mobile:
+  # Responsive Design
+  viewport:
+    width: "device-width"
+    initial_scale: 1.0
+    maximum_scale: 5.0
+    user_scalable: true
+    viewport_fit: "cover"
+
+  # Touch Optimization
+  touch:
+    target_size: 48 # Minimum touch target size in pixels
+    spacing: 16 # Minimum spacing between touch targets
+    feedback: true # Enable touch feedback animations
+
+  # Performance Optimization
+  performance:
+    lazy_loading: true
+    image_compression: true
+    cache_strategy: "aggressive"
+    preload_critical: true
+    bundle_splitting: true
+
+  # PWA Configuration
+  pwa:
+    enabled: true
+    offline_support: true
+    install_prompt: true
+    background_sync: false # Disabled for privacy
+    push_notifications: false # Disabled for privacy
+
+# Streamlit Configuration
+streamlit:
+  server:
+    port: 8501
+    address: "0.0.0.0"
+    headless: true
+    enableCORS: false
+    enableXsrfProtection: true
+    maxUploadSize: 200 # MB
+    maxMessageSize: 200 # MB
+
+  browser:
+    gatherUsageStats: false
+    serverAddress: "localhost"
+    serverPort: 8501
+
+  theme:
+    primaryColor: "#16A34A"
+    backgroundColor: "#FFFFFF"
+    secondaryBackgroundColor: "#F3F4F6"
+    textColor: "#1F2937"
+    font: "sans serif"
+
+  # Mobile-specific Streamlit settings
+  mobile:
+    hideMainMenu: true
+    hideFooter: true
+    hideSidebar: true
+    disableWidgetStateDuplicationWarning: true
+
+# Security Configuration
+security:
+  # HTTPS Configuration
+  https:
+    enabled: true
+    force_redirect: true
+    hsts_max_age: 31536000
+    include_subdomains: true
+
+  # Content Security Policy
+  csp:
+    default_src: "'self'"
+    script_src: "'self' 'unsafe-inline' 'unsafe-eval'"
+    style_src: "'self' 'unsafe-inline'"
+    img_src: "'self' data: blob:"
+    media_src: "'self' blob:"
+    connect_src: "'self'"
+    font_src: "'self'"
+    object_src: "'none'"
+    base_uri: "'self'"
+    form_action: "'self'"
+
+  # Privacy Settings
+  privacy:
+    disable_telemetry: true
+    no_external_requests: true
+    local_processing_only: true
+    session_only_storage: true
+
+# Resource Optimization
+resources:
+  # Memory Management
+  memory:
+    max_heap_size: "2g"
+    gc_strategy: "G1GC"
+    cache_size: "512m"
+
+  # CPU Optimization
+  cpu:
+    max_threads: 4
+    thread_pool_size: 8
+    async_processing: true
+
+  # Storage Optimization
+  storage:
+    temp_cleanup: true
+    cache_expiry: 3600 # 1 hour
+    max_cache_size: "1g"
+    compression: true
+
+# Model Configuration
+models:
+  # Vision Model
+  vision:
+    model_path: "data/models/vision_resnet50.pt"
+    device: "auto" # auto-detect MPS/CUDA/CPU
+    batch_size: 1
+    max_image_size: [1024, 1024]
+    preprocessing:
+      normalize: true
+      resize: true
+      center_crop: true
+
+  # Audio Model
+  audio:
+    whisper_model: "tiny"
+    device: "auto"
+    language: "en"
+    max_duration: 60 # seconds
+    sample_rate: 16000
+
+  # Text Model
+  text:
+    model_path: "data/models/text_distilbert"
+    device: "auto"
+    max_length: 512
+    batch_size: 1
+
+# Caching Configuration
+cache:
+  # Model Caching
+  models:
+    enabled: true
+    ttl: 86400 # 24 hours
+    max_size: "2g"
+
+  # Static Asset Caching
+  static:
+    enabled: true
+    ttl: 3600 # 1 hour
+    compression: true
+    etag: true
+
+  # API Response Caching
+  api:
+    enabled: true
+    ttl: 300 # 5 minutes
+    max_entries: 1000
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+  # File Logging
+  file:
+    enabled: true
+    path: "logs/mobile_app.log"
+    max_size: "10MB"
+    backup_count: 5
+    rotation: "daily"
+
+  # Console Logging
+  console:
+    enabled: true
+    level: "INFO"
+
+  # Error Tracking
+  errors:
+    enabled: true
+    level: "ERROR"
+    include_traceback: true
+    max_entries: 1000
+
+# Monitoring Configuration
+monitoring:
+  # Health Checks
+  health:
+    enabled: true
+    endpoint: "/health"
+    interval: 30 # seconds
+
+  # Metrics Collection
+  metrics:
+    enabled: true
+    endpoint: "/metrics"
+    include_system: true
+    include_app: true
+
+  # Performance Monitoring
+  performance:
+    enabled: true
+    sample_rate: 0.1
+    track_requests: true
+    track_errors: true
+
+# Environment-Specific Configurations
+environments:
+  development:
+    debug: true
+    hot_reload: true
+    detailed_errors: true
+    cache_disabled: true
+
+  staging:
+    debug: false
+    hot_reload: false
+    detailed_errors: true
+    cache_enabled: true
+
+  production:
+    debug: false
+    hot_reload: false
+    detailed_errors: false
+    cache_enabled: true
+    compression: true
+    minification: true
+
+# Docker Configuration
+docker:
+  base_image: "python:3.11-slim"
+  working_dir: "/app"
+
+  # Build Configuration
+  build:
+    context: "."
+    dockerfile: "Dockerfile.mobile"
+    target: "production"
+
+  # Runtime Configuration
+  runtime:
+    memory_limit: "2g"
+    cpu_limit: "2"
+    restart_policy: "unless-stopped"
+
+  # Environment Variables
+  environment:
+    PYTHONPATH: "/app/src"
+    STREAMLIT_SERVER_HEADLESS: "true"
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS: "false"
+    STREAMLIT_SERVER_ENABLE_CORS: "false"
+
+# Kubernetes Configuration
+kubernetes:
+  # Deployment
+  deployment:
+    replicas: 2
+    strategy: "RollingUpdate"
+    max_unavailable: 1
+    max_surge: 1
+
+  # Service
+  service:
+    type: "ClusterIP"
+    port: 80
+    target_port: 8501
+
+  # Ingress
+  ingress:
+    enabled: true
+    class: "nginx"
+    tls: true
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "200m"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+
+  # Resources
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+
+  # Health Checks
+  health_checks:
+    liveness_probe:
+      path: "/health"
+      initial_delay: 30
+      period: 10
+    readiness_probe:
+      path: "/health"
+      initial_delay: 5
+      period: 5
+
+# CDN Configuration
+cdn:
+  enabled: true
+  provider: "cloudflare"
+
+  # Static Assets
+  static_assets:
+    cache_ttl: 86400 # 24 hours
+    compression: true
+    minification: true
+
+  # Image Optimization
+  images:
+    auto_webp: true
+    quality: 85
+    progressive: true
+    lazy_loading: true
+
+# Analytics Configuration (Privacy-Focused)
+analytics:
+  # Disable external analytics
+  google_analytics: false
+  facebook_pixel: false
+
+  # Local analytics only
+  local_analytics:
+    enabled: true
+    privacy_compliant: true
+    no_personal_data: true
+    session_only: true
+
+# Backup Configuration
+backup:
+  # Model Backups
+  models:
+    enabled: true
+    schedule: "daily"
+    retention: 7 # days
+
+  # Configuration Backups
+  config:
+    enabled: true
+    schedule: "daily"
+    retention: 30 # days
+
+  # Log Backups
+  logs:
+    enabled: true
+    schedule: "weekly"
+    retention: 4 # weeks

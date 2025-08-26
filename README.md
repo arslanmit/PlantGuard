@@ -1371,3 +1371,27 @@ make switcher      # http://localhost:8502
 # or
 streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502
 ```
+
+---
+
+## 📚 Documentation
+
+### Complete Mobile Guide
+For comprehensive mobile implementation details, see:
+- **[Mobile PlantGuard Complete Guide](docs/MOBILE_PLANTGUARD_COMPLETE_GUIDE.md)** - Complete implementation guide with all components, testing, accessibility, error recovery, and deployment information
+
+### Additional Resources
+- Technical architecture preserved from original system
+- Complete model management documentation
+- Training pipeline documentation maintained
+- Data pipeline documentation in `src/data/README.md`
+- Deployment guide in `deployment/README.md`
+
+### Support
+- GitHub Issues: Technical problems and bug reports
+- Development: Follow standard contribution guidelines
+- Testing: Use `make test` and `make qa` before commits
+
+---
+
+**🌿 PlantGuard provides comprehensive plant disease detection with unified documentation in the Mobile PlantGuard Complete Guide!**
