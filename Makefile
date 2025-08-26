@@ -78,7 +78,7 @@ endif
 
 .DEFAULT_GOAL := help
 
-.PHONY: help start setup run mobile dev test clean
+.PHONY: help start setup mobile dev test clean
 .PHONY: format lint check fix train monitor notebook benchmark evaluate
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
@@ -245,7 +245,7 @@ r:
 # Complete environment setup with macOS optimizations
 setup: setup-environment setup-models setup-knowledge-base
 	@echo "$(GREEN)✅ PlantGuard setup complete!$(NC)"
-	@echo "$(CYAN)💡 Run 'make run' to launch the application$(NC)"
+	@echo "$(CYAN)💡 Run 'make mobile' to launch the application$(NC)"
 	@echo "$(CYAN)💡 Run 'make dev' for development workflow$(NC)"
 
 # Core environment setup
@@ -646,31 +646,31 @@ run:
 	@echo "$(RED)❌ Desktop command 'run' has been removed$(NC)"
 	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
 	@echo "$(CYAN)💡 Use: make mobile$(NC)"
-	@make mobile
+	@echo "$(YELLOW)⚠️  Please run 'make mobile' manually to start the application$(NC)"
 
 spa-dev:
 	@echo "$(RED)❌ Desktop command 'spa-dev' has been removed$(NC)"
 	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
 	@echo "$(CYAN)💡 Use: make mobile-dev$(NC)"
-	@make mobile-dev
+	@echo "$(YELLOW)⚠️  Please run 'make mobile-dev' manually to start development mode$(NC)"
 
 spa-prod:
 	@echo "$(RED)❌ Desktop command 'spa-prod' has been removed$(NC)"
 	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
 	@echo "$(CYAN)💡 Use: make mobile-prod$(NC)"
-	@make mobile-prod
+	@echo "$(YELLOW)⚠️  Please run 'make mobile-prod' manually to start production mode$(NC)"
 
 spa-test:
 	@echo "$(RED)❌ Desktop command 'spa-test' has been removed$(NC)"
 	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
 	@echo "$(CYAN)💡 Use: make mobile-test$(NC)"
-	@make mobile-test
+	@echo "$(YELLOW)⚠️  Please run 'make mobile-test' manually to run tests$(NC)"
 
 spa-performance:
 	@echo "$(RED)❌ Desktop command 'spa-performance' has been removed$(NC)"
 	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
 	@echo "$(CYAN)💡 Use: make mobile-performance$(NC)"
-	@make mobile-performance
+	@echo "$(YELLOW)⚠️  Please run 'make mobile-performance' manually to run performance tests$(NC)"
 
 # ========== Quality Assurance & Development Tools ==========
 

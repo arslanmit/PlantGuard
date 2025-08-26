@@ -108,14 +108,14 @@
   - Remove desktop references from backup files and migration scripts
   - _Requirements: 4.1, 4.3, 6.2, 6.3_
 
-- [ ] 16. Complete Makefile desktop target removal
+- [x] 16. Complete Makefile desktop target removal
   - Remove the actual desktop target definitions (run:, spa-dev:, spa-prod:, spa-test:, spa-performance:) from Makefile
   - Keep only the redirect handlers that provide helpful migration messages
   - Update Makefile help documentation to remove any remaining desktop references
   - Test that all redirected commands work correctly and provide clear guidance
   - _Requirements: 3.1, 3.2, 3.3, 9.4_
 
-- [ ] 17. Final system validation and cleanup
+- [x] 17. Final system validation and cleanup
   - Run comprehensive validation to ensure no broken imports remain
   - Verify all desktop files and references have been properly removed
   - Test mobile application startup and core functionality
