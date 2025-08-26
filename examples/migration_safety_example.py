@@ -41,9 +41,9 @@ def main():
     print("\n3. Simulating migration changes...")
 
     # Track file removals
-    desktop_files_to_remove = ["spa_app.py", "app.py", "test_spa_navigation.py", "test_unified_ui.py"]
+    removed_files = ["spa_app.py", "app.py", "test_spa_navigation.py", "test_unified_ui.py"]
 
-    for file_path in desktop_files_to_remove:
+    for file_path in removed_files:
         framework.tracker.track_file_removal(file_path)
         print(f"   Tracked removal: {file_path}")
 

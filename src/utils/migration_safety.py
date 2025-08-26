@@ -328,7 +328,7 @@ class MigrationValidator:
             "src/core/nlp.py",
         ]
 
-        desktop_import_patterns = [
+        legacy_import_patterns = [
             "from spa_app import",
             "import spa_app",
             "from app import",
@@ -344,14 +344,14 @@ class MigrationValidator:
                     with open(path) as f:
                         content = f.read()
 
-                    # Check for desktop imports
-                    found_desktop_imports = []
-                    for pattern in desktop_import_patterns:
+                    # Check for legacy imports
+                    found_legacy_imports = []
+                    for pattern in legacy_import_patterns:
                         if pattern in content:
-                            found_desktop_imports.append(pattern)
+                            found_legacy_imports.append(pattern)
 
-                    if found_desktop_imports:
-                        results["failed"].append({"file": filepath, "desktop_imports": found_desktop_imports})
+                    if found_legacy_imports:
+                        results["failed"].append({"file": filepath, "legacy_imports": found_legacy_imports})
                     else:
                         results["passed"].append(filepath)
 
@@ -370,20 +370,20 @@ class MigrationValidator:
             if "mobile:" not in makefile_content:
                 return {"test": "makefile_targets", "status": "failed", "details": "Mobile target not found in Makefile"}
 
-            # Check desktop targets are handled
-            desktop_targets = ["run:", "spa-dev:", "spa-prod:"]
-            found_desktop_targets = []
+            # Check legacy targets are handled
+            legacy_targets = ["run:", "spa-dev:", "spa-prod:"]
+            found_legacy_targets = []
 
-            for target in desktop_targets:
+            for target in legacy_targets:
                 if target in makefile_content:
-                    found_desktop_targets.append(target)
+                    found_legacy_targets.append(target)
 
             status = "passed"
             details = "Makefile properly configured for mobile-only"
 
-            if found_desktop_targets:
+            if found_legacy_targets:
                 status = "warning"
-                details = f"Desktop targets still present: {found_desktop_targets}"
+                details = f"Legacy targets still present: {found_legacy_targets}"
 
             return {"test": "makefile_targets", "status": status, "details": details}
 

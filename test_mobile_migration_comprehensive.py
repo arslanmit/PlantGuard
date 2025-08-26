@@ -33,7 +33,7 @@ class MobileMigrationTester:
 
         # Test categories as per task requirements
         tests = [
-            ("Desktop File Removal", self.test_desktop_file_removal),
+            ("Removed File Cleanup", self.test_desktop_file_removal),
             ("Make Mobile Command", self.test_make_mobile_command),
             ("Mobile Functionality", self.test_mobile_functionality),
             ("Import Validation", self.test_import_validation),
@@ -74,7 +74,7 @@ class MobileMigrationTester:
 
     def test_desktop_file_removal(self) -> dict[str, Any]:
         """Test that desktop-specific files have been removed."""
-        desktop_files_to_check = [
+        removed_files_to_check = [
             "spa_app.py",
             "app.py",
             "test_spa_navigation.py",
@@ -84,7 +84,7 @@ class MobileMigrationTester:
         still_present = []
         properly_removed = []
 
-        for filepath in desktop_files_to_check:
+        for filepath in removed_files_to_check:
             full_path = self.workspace_root / filepath
             if full_path.exists():
                 still_present.append(filepath)
@@ -94,12 +94,12 @@ class MobileMigrationTester:
         if still_present:
             return {
                 "status": "failed",
-                "details": f"Desktop files still present: {still_present}",
+                "details": f"Removed files still present: {still_present}",
                 "properly_removed": properly_removed,
                 "still_present": still_present,
             }
 
-        return {"status": "passed", "details": f"All desktop files properly removed: {properly_removed}", "properly_removed": properly_removed}
+        return {"status": "passed", "details": f"All removed files properly cleaned up: {properly_removed}", "properly_removed": properly_removed}
 
     def test_make_mobile_command(self) -> dict[str, Any]:
         """Test that 'make mobile' command works correctly."""
@@ -191,10 +191,10 @@ class MobileMigrationTester:
         ]
 
         broken_imports = []
-        desktop_references = []
+        legacy_references = []
 
-        # Patterns that indicate desktop references
-        desktop_patterns = [
+        # Patterns that indicate legacy references that should be cleaned up
+        legacy_patterns = [
             "from spa_app import",
             "import spa_app",
             "from app import",
@@ -208,10 +208,10 @@ class MobileMigrationTester:
                 with open(py_file, encoding="utf-8") as f:
                     content = f.read()
 
-                # Check for desktop references
-                for pattern in desktop_patterns:
+                # Check for legacy references
+                for pattern in legacy_patterns:
                     if pattern in content:
-                        desktop_references.append({"file": str(py_file.relative_to(self.workspace_root)), "pattern": pattern})
+                        legacy_references.append({"file": str(py_file.relative_to(self.workspace_root)), "pattern": pattern})
 
                 # Try to compile the file (basic syntax check)
                 try:
@@ -228,15 +228,15 @@ class MobileMigrationTester:
         if broken_imports:
             status = "failed"
             details = f"Found {len(broken_imports)} files with broken imports"
-        elif desktop_references:
+        elif legacy_references:
             status = "warning"
-            details = f"Found {len(desktop_references)} desktop references that may need cleanup"
+            details = f"Found {len(legacy_references)} legacy references that may need cleanup"
 
         return {
             "status": status,
             "details": details,
             "broken_imports": broken_imports,
-            "desktop_references": desktop_references,
+            "legacy_references": legacy_references,
             "files_checked": len(python_files),
         }
 
@@ -306,13 +306,13 @@ class MobileMigrationTester:
             with open(makefile_path) as f:
                 makefile_content = f.read()
 
-            # Check for removed desktop targets
-            desktop_targets = ["run:", "spa-dev:", "spa-prod:", "spa-test:", "spa-performance:"]
-            found_desktop_targets = []
+            # Check for removed legacy targets
+            removed_targets = ["run:", "spa-dev:", "spa-prod:", "spa-test:", "spa-performance:"]
+            found_removed_targets = []
 
-            for target in desktop_targets:
+            for target in removed_targets:
                 if target in makefile_content:
-                    found_desktop_targets.append(target)
+                    found_removed_targets.append(target)
 
             # Check for required mobile targets
             required_mobile_targets = ["mobile:"]
@@ -326,9 +326,9 @@ class MobileMigrationTester:
             if missing_mobile_targets:
                 status = "failed"
                 details = f"Missing required mobile targets: {missing_mobile_targets}"
-            elif found_desktop_targets:
+            elif found_removed_targets:
                 status = "warning"
-                details = f"Desktop targets still present: {found_desktop_targets}"
+                details = f"Removed targets still present: {found_removed_targets}"
             else:
                 status = "passed"
                 details = "Makefile properly updated for mobile-only"
@@ -336,7 +336,7 @@ class MobileMigrationTester:
             return {
                 "status": status,
                 "details": details,
-                "found_desktop_targets": found_desktop_targets,
+                "found_removed_targets": found_removed_targets,
                 "missing_mobile_targets": missing_mobile_targets,
             }
 

@@ -6,6 +6,7 @@ This script tests the enhanced mobile functionality including:
 - Core adapter integration
 - Performance optimization
 - Enhanced UI features
+- Mobile-only system validation
 """
 
 import sys

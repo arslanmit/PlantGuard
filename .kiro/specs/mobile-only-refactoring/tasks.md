@@ -101,16 +101,24 @@
   - Create maintenance guide for future mobile-only development
   - _Requirements: 6.1, 6.4, 8.1, 9.3_
 
-- [x] 15. Final cleanup of remaining desktop references
-  - Clean up remaining desktop import references found in validation (35 references)
-  - Remove any remaining desktop-specific patterns in configuration files
-  - Update any hardcoded references to removed desktop files in documentation
-  - Ensure all test files and scripts use only mobile references
+- [x] 15. Clean up remaining desktop references in test and utility files
+  - Remove desktop import patterns from test files (test_mobile_migration_comprehensive.py, test_mobile_optimization.py)
+  - Clean up desktop references in utility files (src/utils/migration_safety.py, examples/migration_safety_example.py)
+  - Update test files to remove hardcoded desktop patterns used for validation
+  - Remove desktop references from backup files and migration scripts
   - _Requirements: 4.1, 4.3, 6.2, 6.3_
 
-- [x] 16. Complete Makefile desktop target removal
-  - Fully remove desktop targets that still exist (run:, spa-dev:, spa-prod:, spa-test:, spa-performance:)
-  - Ensure all desktop targets redirect to mobile equivalents with clear messaging
-  - Update Makefile help documentation to remove any desktop references
-  - Test that all redirected commands work correctly
+- [ ] 16. Complete Makefile desktop target removal
+  - Remove the actual desktop target definitions (run:, spa-dev:, spa-prod:, spa-test:, spa-performance:) from Makefile
+  - Keep only the redirect handlers that provide helpful migration messages
+  - Update Makefile help documentation to remove any remaining desktop references
+  - Test that all redirected commands work correctly and provide clear guidance
   - _Requirements: 3.1, 3.2, 3.3, 9.4_
+
+- [ ] 17. Final system validation and cleanup
+  - Run comprehensive validation to ensure no broken imports remain
+  - Verify all desktop files and references have been properly removed
+  - Test mobile application startup and core functionality
+  - Validate that all make targets work as expected
+  - Generate final migration report documenting completed changes
+  - _Requirements: 7.1, 7.2, 7.4, 10.5_

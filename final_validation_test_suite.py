@@ -106,22 +106,22 @@ class FinalValidationTestSuite:
             results["tests"]["configuration"] = {"status": "failed", "details": f"Configuration loading failed: {e}"}
             results["status"] = "failed"
 
-        # Test 5: Desktop components removal validation
-        desktop_files = ["spa_app.py", "app.py", "test_spa_navigation.py", "test_unified_ui.py"]
+        # Test 5: Removed components validation
+        removed_file_list = ["spa_app.py", "app.py", "test_spa_navigation.py", "test_unified_ui.py"]
         removed_files = []
         remaining_files = []
 
-        for file_path in desktop_files:
+        for file_path in removed_file_list:
             if not Path(file_path).exists():
                 removed_files.append(file_path)
             else:
                 remaining_files.append(file_path)
 
         if remaining_files:
-            results["tests"]["desktop_removal"] = {"status": "failed", "details": f"Desktop files still present: {remaining_files}"}
+            results["tests"]["file_cleanup"] = {"status": "failed", "details": f"Removed files still present: {remaining_files}"}
             results["status"] = "failed"
         else:
-            results["tests"]["desktop_removal"] = {"status": "passed", "details": f"All desktop files removed: {removed_files}"}
+            results["tests"]["file_cleanup"] = {"status": "passed", "details": f"All removed files cleaned up: {removed_files}"}
 
         return results
 
@@ -232,18 +232,18 @@ class FinalValidationTestSuite:
             results["tests"]["mobile_target"] = {"status": "failed", "details": "Mobile target not found in Makefile"}
             results["status"] = "failed"
 
-        # Test 3: Desktop targets removed
-        desktop_targets = ["run:", "spa-dev:", "spa-prod:", "spa-test:"]
-        found_desktop_targets = []
+        # Test 3: Legacy targets removed
+        legacy_targets = ["run:", "spa-dev:", "spa-prod:", "spa-test:"]
+        found_legacy_targets = []
 
-        for target in desktop_targets:
+        for target in legacy_targets:
             if target in makefile_content:
-                found_desktop_targets.append(target)
+                found_legacy_targets.append(target)
 
-        if found_desktop_targets:
-            results["tests"]["desktop_targets_removed"] = {"status": "warning", "details": f"Desktop targets still present: {found_desktop_targets}"}
+        if found_legacy_targets:
+            results["tests"]["legacy_targets_removed"] = {"status": "warning", "details": f"Legacy targets still present: {found_legacy_targets}"}
         else:
-            results["tests"]["desktop_targets_removed"] = {"status": "passed", "details": "All desktop targets successfully removed"}
+            results["tests"]["legacy_targets_removed"] = {"status": "passed", "details": "All legacy targets successfully removed"}
 
         # Test 4: Test make mobile command (dry run)
         try:
@@ -308,11 +308,11 @@ class FinalValidationTestSuite:
 
         # Test 2: File path error handling
         try:
-            # Test accessing removed desktop files
-            desktop_files = ["spa_app.py", "app.py"]
+            # Test accessing removed files
+            removed_file_list = ["spa_app.py", "app.py"]
             file_access_errors = []
 
-            for file_path in desktop_files:
+            for file_path in removed_file_list:
                 try:
                     with open(file_path):
                         file_access_errors.append(f"{file_path} still accessible (should be removed)")

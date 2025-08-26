@@ -1,7 +1,7 @@
 {
-  "Desktop File Removal": {
+  "Removed File Cleanup": {
     "status": "passed",
-    "details": "All desktop files properly removed: ['spa_app.py', 'app.py', 'test_spa_navigation.py', 'test_unified_ui.py']",
+    "details": "All removed files properly cleaned up: ['spa_app.py', 'app.py', 'test_spa_navigation.py', 'test_unified_ui.py']",
     "properly_removed": [
       "spa_app.py",
       "app.py",
@@ -25,11 +25,43 @@
   },
   "Import Validation": {
     "status": "warning",
-    "details": "Found 35 desktop references that may need cleanup",
+    "details": "Found 32 legacy references that may need cleanup",
     "broken_imports": [],
-    "desktop_references": [
+    "legacy_references": [
+      {
+        "file": "validate_file_structure_optimization.py",
+        "pattern": "spa_app."
+      },
       {
         "file": "test_mobile_optimization.py",
+        "pattern": "spa_app."
+      },
+      {
+        "file": "mobile_performance_optimizer.py",
+        "pattern": "from spa_app import"
+      },
+      {
+        "file": "mobile_performance_optimizer.py",
+        "pattern": "import spa_app"
+      },
+      {
+        "file": "mobile_performance_optimizer.py",
+        "pattern": "from app import"
+      },
+      {
+        "file": "mobile_performance_optimizer.py",
+        "pattern": "import app"
+      },
+      {
+        "file": "mobile_performance_optimizer.py",
+        "pattern": "spa_app."
+      },
+      {
+        "file": "final_validation_test_suite.py",
+        "pattern": "spa_app."
+      },
+      {
+        "file": "optimize_file_structure.py",
         "pattern": "spa_app."
       },
       {
@@ -69,62 +101,6 @@
         "pattern": "spa_app."
       },
       {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/mobile_spa_app.py",
-        "pattern": "spa_app."
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/app.py",
-        "pattern": "spa_app."
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/tests/test_spa_focused.py",
-        "pattern": "from spa_app import"
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/tests/test_spa_focused.py",
-        "pattern": "import spa_app"
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/tests/test_spa_focused.py",
-        "pattern": "spa_app."
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/tests/test_spa_comprehensive.py",
-        "pattern": "from spa_app import"
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/tests/test_migration_safety.py",
-        "pattern": "from spa_app import"
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/tests/test_migration_safety.py",
-        "pattern": "spa_app."
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/src/ui/mobile_accessibility_demo.py",
-        "pattern": "import app"
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/src/utils/migration_safety.py",
-        "pattern": "from spa_app import"
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/src/utils/migration_safety.py",
-        "pattern": "import spa_app"
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/src/utils/migration_safety.py",
-        "pattern": "from app import"
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/src/utils/migration_safety.py",
-        "pattern": "import app"
-      },
-      {
-        "file": ".migration_backups/backup_mobile_only_refactoring_20250826_132100_20250826_132100/src/utils/migration_safety.py",
-        "pattern": "spa_app."
-      },
-      {
         "file": "tests/test_migration_safety.py",
         "pattern": "from spa_app import"
       },
@@ -142,6 +118,10 @@
       },
       {
         "file": "examples/migration_safety_example.py",
+        "pattern": "spa_app."
+      },
+      {
+        "file": "scripts/migration_helper.py",
         "pattern": "spa_app."
       },
       {
@@ -166,10 +146,18 @@
       },
       {
         "file": "src/utils/migration_safety.py",
+        "pattern": "from app import"
+      },
+      {
+        "file": "src/utils/migration_safety.py",
+        "pattern": "import app"
+      },
+      {
+        "file": "src/utils/migration_safety.py",
         "pattern": "spa_app."
       }
     ],
-    "files_checked": 445
+    "files_checked": 242
   },
   "Core Adapter Integration": {
     "status": "passed",
@@ -188,8 +176,8 @@
   },
   "Makefile Targets": {
     "status": "warning",
-    "details": "Desktop targets still present: ['run:', 'spa-dev:', 'spa-prod:', 'spa-test:', 'spa-performance:']",
-    "found_desktop_targets": [
+    "details": "Removed targets still present: ['run:', 'spa-dev:', 'spa-prod:', 'spa-test:', 'spa-performance:']",
+    "found_removed_targets": [
       "run:",
       "spa-dev:",
       "spa-prod:",

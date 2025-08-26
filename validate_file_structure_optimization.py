@@ -131,8 +131,8 @@ def validate_file_references_updated(workspace_root: Path) -> dict[str, Any]:
     checked_files = []
     issues_found = []
 
-    # Check for desktop references in config files
-    desktop_patterns = ["spa_app.py", "app.py", "desktop_"]
+    # Check for legacy references in config files
+    legacy_patterns = ["spa_app.py", "app.py", "desktop_"]
 
     for config_file in config_files:
         config_path = workspace_root / config_file
@@ -142,7 +142,7 @@ def validate_file_references_updated(workspace_root: Path) -> dict[str, Any]:
                     content = f.read()
 
                 found_patterns = []
-                for pattern in desktop_patterns:
+                for pattern in legacy_patterns:
                     if pattern in content and "mobile_spa_app.py" not in content:
                         found_patterns.append(pattern)
 

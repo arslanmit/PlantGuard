@@ -167,10 +167,10 @@ class ComprehensiveMobileTestRunner:
                     )
 
                 # Extract specific findings
-                if "Desktop File Removal" in json_data:
-                    desktop_removal = json_data["Desktop File Removal"]
-                    if desktop_removal.get("status") == "passed":
-                        summary["key_findings"].append("✅ All desktop files successfully removed")
+                if "Removed File Cleanup" in json_data:
+                    file_cleanup = json_data["Removed File Cleanup"]
+                    if file_cleanup.get("status") == "passed":
+                        summary["key_findings"].append("✅ All removed files successfully cleaned up")
                     else:
                         summary["key_findings"].append("❌ Desktop file removal incomplete")
 
@@ -191,8 +191,8 @@ class ComprehensiveMobileTestRunner:
                 if "Import Validation" in json_data:
                     imports = json_data["Import Validation"]
                     if imports.get("status") == "warning":
-                        desktop_refs = len(imports.get("desktop_references", []))
-                        summary["key_findings"].append(f"⚠️ Found {desktop_refs} desktop references needing cleanup")
+                        legacy_refs = len(imports.get("legacy_references", []))
+                        summary["key_findings"].append(f"⚠️ Found {legacy_refs} legacy references needing cleanup")
                     elif imports.get("status") == "passed":
                         summary["key_findings"].append("✅ All imports validated successfully")
 

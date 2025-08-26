@@ -475,8 +475,8 @@ class MobilePerformanceOptimizer:
             "src/ui/components/mobile_layout_manager.py",
         ]
 
-        # Desktop imports to remove
-        desktop_imports = ["from spa_app import", "import spa_app", "from app import", "import app", "from desktop_", "import desktop_"]
+        # Legacy imports to remove
+        legacy_imports = ["from spa_app import", "import spa_app", "from app import", "import app", "from desktop_", "import desktop_"]
 
         for file_path in mobile_files:
             full_path = self.project_root / file_path
@@ -495,10 +495,10 @@ class MobilePerformanceOptimizer:
                 for line in lines:
                     line_stripped = line.strip()
 
-                    # Check for desktop imports to remove
+                    # Check for legacy imports to remove
                     should_remove = False
-                    for desktop_import in desktop_imports:
-                        if desktop_import in line:
+                    for legacy_import in legacy_imports:
+                        if legacy_import in line:
                             should_remove = True
                             removed_imports.append(line_stripped)
                             break

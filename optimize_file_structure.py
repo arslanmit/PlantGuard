@@ -93,8 +93,8 @@ class FileStructureOptimizer:
         # Mobile assets to keep
         mobile_assets = ["mobile_styles.css", "mobile_optimized_styles.css"]
 
-        # Desktop assets to remove (if any exist)
-        desktop_patterns = [
+        # Legacy assets to remove (if any exist)
+        legacy_patterns = [
             "desktop_",
             "spa_",
             "legacy_",
@@ -113,15 +113,15 @@ class FileStructureOptimizer:
                     kept_assets.append(filename)
                     self.log_action("keep_mobile_asset", filename)
 
-                # Remove desktop assets
-                elif any(pattern in filename for pattern in desktop_patterns):
+                # Remove legacy assets
+                elif any(pattern in filename for pattern in legacy_patterns):
                     if filename != "mobile_styles.css" and filename != "mobile_optimized_styles.css":
                         try:
                             asset_file.unlink()
                             removed_assets.append(filename)
-                            self.log_action("remove_desktop_asset", filename)
+                            self.log_action("remove_legacy_asset", filename)
                         except Exception as e:
-                            self.log_action("remove_desktop_asset", filename, f"failed: {e}")
+                            self.log_action("remove_legacy_asset", filename, f"failed: {e}")
                 else:
                     # Keep other assets (images, icons, etc.)
                     kept_assets.append(filename)
@@ -176,11 +176,11 @@ class FileStructureOptimizer:
                     with open(config_path) as f:
                         content = f.read()
 
-                    # Check if it contains any desktop references that need updating
-                    desktop_refs = ["spa_app", "app.py", "desktop_"]
-                    has_desktop_refs = any(ref in content for ref in desktop_refs)
+                    # Check if it contains any legacy references that need updating
+                    legacy_refs = ["spa_app", "app.py", "desktop_"]
+                    has_legacy_refs = any(ref in content for ref in legacy_refs)
 
-                    if has_desktop_refs:
+                    if has_legacy_refs:
                         # For now, just log that manual review may be needed
                         self.log_action("check_file_references", config_file, "needs_manual_review")
                     else:
@@ -204,13 +204,13 @@ class FileStructureOptimizer:
             cache_path = self.workspace_root / cache_dir
             if cache_path.exists():
                 try:
-                    # For __pycache__, remove desktop-specific compiled files
+                    # For __pycache__, remove legacy-specific compiled files
                     if cache_dir == "__pycache__":
-                        desktop_pyc_files = list(cache_path.glob("*spa_app*.pyc")) + list(cache_path.glob("*app*.pyc"))
-                        for pyc_file in desktop_pyc_files:
+                        legacy_pyc_files = list(cache_path.glob("*spa_app*.pyc")) + list(cache_path.glob("*app*.pyc"))
+                        for pyc_file in legacy_pyc_files:
                             if "mobile" not in pyc_file.name:
                                 pyc_file.unlink()
-                                self.log_action("remove_desktop_cache", str(pyc_file.name))
+                                self.log_action("remove_legacy_cache", str(pyc_file.name))
 
                     cleaned_caches.append(cache_dir)
 
@@ -222,7 +222,7 @@ class FileStructureOptimizer:
     def validate_mobile_structure(self) -> dict[str, Any]:
         """Validate that the mobile-only structure is correct."""
 
-        validation_results = {"mobile_app_present": False, "mobile_assets_present": False, "desktop_files_absent": True, "structure_valid": False}
+        validation_results = {"mobile_app_present": False, "mobile_assets_present": False, "removed_files_absent": True, "structure_valid": False}
 
         # Check mobile app exists
         mobile_app_path = self.workspace_root / "mobile_spa_app.py"
@@ -233,16 +233,16 @@ class FileStructureOptimizer:
         mobile_optimized = self.workspace_root / "assets" / "mobile_optimized_styles.css"
         validation_results["mobile_assets_present"] = mobile_styles.exists() and mobile_optimized.exists()
 
-        # Check desktop files are absent
-        desktop_files = ["spa_app.py", "app.py"]
-        for desktop_file in desktop_files:
-            if (self.workspace_root / desktop_file).exists():
-                validation_results["desktop_files_absent"] = False
+        # Check removed files are absent
+        removed_files = ["spa_app.py", "app.py"]
+        for removed_file in removed_files:
+            if (self.workspace_root / removed_file).exists():
+                validation_results["removed_files_absent"] = False
                 break
 
         # Overall structure validation
         validation_results["structure_valid"] = (
-            validation_results["mobile_app_present"] and validation_results["mobile_assets_present"] and validation_results["desktop_files_absent"]
+            validation_results["mobile_app_present"] and validation_results["mobile_assets_present"] and validation_results["removed_files_absent"]
         )
 
         return validation_results
@@ -293,7 +293,7 @@ def main():
     validation = results["validation"]
     print(f"   Mobile App Present: {'✅' if validation['mobile_app_present'] else '❌'}")
     print(f"   Mobile Assets Present: {'✅' if validation['mobile_assets_present'] else '❌'}")
-    print(f"   Desktop Files Absent: {'✅' if validation['desktop_files_absent'] else '❌'}")
+    print(f"   Removed Files Absent: {'✅' if validation['removed_files_absent'] else '❌'}")
     print(f"   Overall Structure Valid: {'✅' if validation['structure_valid'] else '❌'}")
 
     if validation["structure_valid"]:
