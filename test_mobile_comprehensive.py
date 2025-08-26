@@ -78,7 +78,6 @@ def test_mobile_component_imports():
 def test_mobile_app_integration():
     """Test mobile app integration."""
     try:
-        import mobile_plantguard_app
         import mobile_spa_app
 
         st.success("✅ Mobile apps can be imported")

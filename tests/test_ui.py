@@ -1,7 +1,7 @@
-"""UI unit test file for PlantGuard unified interface.
+"""UI unit test file for PlantGuard mobile interface.
 
-Tests the unified interface that replaced the legacy multi-page system.
-All UI components are now part of the unified interface in src/ui/unified_app.py.
+Tests the mobile interface components for the mobile-only system.
+All UI components are now part of the mobile interface in mobile_spa_app.py.
 """
 
 import sys
@@ -12,9 +12,9 @@ src_path = Path(__file__).parent.parent / "src"
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
-# Test the unified interface components
+# Test the mobile interface components
 try:
-    from ui.unified_app import UnifiedPlantGuardApp
+    import mobile_spa_app
 except ImportError:
     # Create a minimal stub for testing if import fails
     class UnifiedPlantGuardApp:
@@ -40,9 +40,9 @@ except ImportError:
             return "Image Comparison"
 
 
-def test_unified_app_initialization():
-    """Test that the unified app can be initialized."""
-    app = UnifiedPlantGuardApp()
+def test_mobile_app_initialization():
+    """Test that the mobile app can be initialized."""
+    # Test that mobile_spa_app can be imported
     assert app is not None
     assert hasattr(app, "models")
     assert "vision" in app.models
@@ -50,9 +50,9 @@ def test_unified_app_initialization():
     assert "text" in app.models
 
 
-def test_unified_app_components():
-    """Test that all main components exist in unified app."""
-    app = UnifiedPlantGuardApp()
+def test_mobile_app_components():
+    """Test that all main components exist in mobile app."""
+    # Test that mobile_spa_app has required functions
 
     # Test main interface methods exist
     assert hasattr(app, "render_header")

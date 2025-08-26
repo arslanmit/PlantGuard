@@ -25,7 +25,7 @@
   },
   "Import Validation": {
     "status": "warning",
-    "details": "Found 32 legacy references that may need cleanup",
+    "details": "Found 33 legacy references that may need cleanup",
     "broken_imports": [],
     "legacy_references": [
       {
@@ -101,6 +101,10 @@
         "pattern": "spa_app."
       },
       {
+        "file": "tests/test_ui.py",
+        "pattern": "spa_app."
+      },
+      {
         "file": "tests/test_migration_safety.py",
         "pattern": "from spa_app import"
       },
@@ -157,7 +161,7 @@
         "pattern": "spa_app."
       }
     ],
-    "files_checked": 242
+    "files_checked": 233
   },
   "Core Adapter Integration": {
     "status": "passed",

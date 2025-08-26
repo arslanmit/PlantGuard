@@ -134,7 +134,7 @@ class FileStructureOptimizer:
 
         # Define mobile-focused organization
         mobile_structure = {
-            "mobile_apps": ["mobile_spa_app.py", "mobile_plantguard_app.py"],
+            "mobile_apps": ["mobile_spa_app.py"],
             "mobile_tests": ["test_mobile_*.py", "*mobile_test*.py"],
             "mobile_docs": ["docs/MOBILE_*.md", "*mobile*.md"],
         }

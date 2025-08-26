@@ -34,7 +34,7 @@ def validate_mobile_focused_structure(workspace_root: Path) -> dict[str, Any]:
     """Requirement 8.1: Maintain clear mobile-focused directory structure."""
 
     expected_structure = {
-        "mobile_apps": ["mobile_spa_app.py", "mobile_plantguard_app.py"],
+        "mobile_apps": ["mobile_spa_app.py"],
         "mobile_assets": ["assets/mobile_styles.css", "assets/mobile_optimized_styles.css"],
         "mobile_components": ["src/ui/mobile_*.py"],
         "mobile_tests": ["test_mobile_*.py"],
@@ -171,7 +171,7 @@ def validate_mobile_components_organized(workspace_root: Path) -> dict[str, Any]
     # Check mobile component organization
     mobile_ui_components = list((workspace_root / "src" / "ui").glob("mobile_*.py"))
     mobile_tests = list(workspace_root.glob("test_mobile_*.py"))
-    mobile_apps = [workspace_root / "mobile_spa_app.py", workspace_root / "mobile_plantguard_app.py"]
+    mobile_apps = [workspace_root / "mobile_spa_app.py"]
 
     organized_components = {
         "mobile_ui_components": len(mobile_ui_components),
