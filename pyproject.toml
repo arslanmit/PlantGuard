@@ -964,9 +964,6 @@ check-typed-exception = true # Check exception handling
   "E402", # Allow module-level imports after sys.path manipulation in page modules
 ]
 
-"app.py" = [
-  "E402", # Allow module-level imports after sys.path manipulation in app.py
-]
 
 # 🎨 Code Formatting - How code looks
 [tool.ruff.format]

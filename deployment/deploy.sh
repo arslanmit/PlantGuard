@@ -69,7 +69,7 @@ validate_config() {
         "$SCRIPT_DIR/$DOCKER_COMPOSE_FILE"
         "$SCRIPT_DIR/Dockerfile.mobile"
         "$SCRIPT_DIR/mobile_deployment_config.yaml"
-        "$PROJECT_ROOT/mobile_plantguard_app.py"
+        "$PROJECT_ROOT/mobile_spa_app.py"
         "$PROJECT_ROOT/requirements.txt"
     )
     

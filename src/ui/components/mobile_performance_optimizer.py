@@ -25,6 +25,46 @@ import streamlit as st
 logger = logging.getLogger(__name__)
 
 
+class ComponentRenderOptimizer:
+    """Context manager for optimized component rendering."""
+
+    def __init__(self, performance_optimizer, component_id: str):
+        """Initialize the context manager."""
+        self.performance_optimizer = performance_optimizer
+        self.component_id = component_id
+        self.start_time = None
+
+    def __enter__(self):
+        """Enter the context manager."""
+        self.start_time = time.time()
+
+        # Check if optimization is enabled
+        if not self.performance_optimizer._optimization_enabled:
+            return self
+
+        # Check memory pressure
+        try:
+            memory_pressure = self.performance_optimizer.memory_manager.check_memory_pressure()
+            if memory_pressure == "critical":
+                self.performance_optimizer.memory_manager.cleanup_memory(force=True)
+        except Exception as e:
+            logger.warning(f"Memory pressure check failed: {e}")
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Exit the context manager."""
+        if self.start_time:
+            render_time = time.time() - self.start_time
+            logger.debug(f"Component {self.component_id} rendered in {render_time:.3f}s")
+
+        # Handle any exceptions gracefully
+        if exc_type:
+            logger.warning(f"Component {self.component_id} rendering failed: {exc_val}")
+
+        return False  # Don't suppress exceptions
+
+
 @dataclass
 class PerformanceMetrics:
     """Performance metrics tracking."""
@@ -384,7 +424,19 @@ class MobilePerformanceOptimizer:
                 "optimization_level": "auto",
             }
 
-    def optimize_component_render(self, component_id: str) -> Callable:
+    def optimize_component_render(self, component_id: str):
+        """
+        Context manager to optimize component rendering.
+
+        Args:
+            component_id: Component identifier
+
+        Returns:
+            Context manager for optimized rendering
+        """
+        return ComponentRenderOptimizer(self, component_id)
+
+    def optimize_component_render_decorator(self, component_id: str) -> Callable:
         """
         Decorator to optimize component rendering.
 

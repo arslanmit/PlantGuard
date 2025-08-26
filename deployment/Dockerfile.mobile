@@ -76,7 +76,7 @@ COPY --from=builder --chown=plantguard:plantguard /usr/local/bin /usr/local/bin
 COPY --from=builder --chown=plantguard:plantguard /app /app
 
 # Copy mobile-specific files
-COPY --chown=plantguard:plantguard mobile_plantguard_app.py .
+COPY --chown=plantguard:plantguard mobile_spa_app.py .
 COPY --chown=plantguard:plantguard deployment/mobile_deployment_config.yaml ./config/
 COPY --chown=plantguard:plantguard .streamlit/ ./.streamlit/
 
@@ -95,7 +95,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 EXPOSE 8501
 
 # Set default command
-CMD ["streamlit", "run", "mobile_plantguard_app.py", \
+CMD ["streamlit", "run", "mobile_spa_app.py", \
      "--server.port=8501", \
      "--server.address=0.0.0.0", \
      "--server.headless=true", \
@@ -129,7 +129,7 @@ RUN pip install --no-cache-dir \
 USER plantguard
 
 # Override command for development
-CMD ["streamlit", "run", "mobile_plantguard_app.py", \
+CMD ["streamlit", "run", "mobile_spa_app.py", \
      "--server.port=8501", \
      "--server.address=0.0.0.0", \
      "--server.headless=true", \

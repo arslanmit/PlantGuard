@@ -296,9 +296,9 @@ class MobileLayoutManager:
 
         st.markdown("</div></div>", unsafe_allow_html=True)
 
-    def get_responsive_columns(self, mobile_cols: int = 1, tablet_cols: int = 2, desktop_cols: int = 3):
-        """Create responsive column layout based on screen size."""
-        # For mobile-first approach, default to single column
+    def get_responsive_columns(self, mobile_cols: int = 1):
+        """Create mobile column layout."""
+        # Mobile-only system - use mobile column count
         return st.columns(mobile_cols)
 
     def apply_touch_optimization(self) -> None:

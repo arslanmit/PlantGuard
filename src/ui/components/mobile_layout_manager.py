@@ -467,30 +467,36 @@ class MobileLayoutManager:
         try:
             # Try to import optional performance modules
             try:
-                from .mobile_performance_optimizer import mobile_performance_optimizer
+                from .mobile_performance_optimizer import MobilePerformanceOptimizer
 
-                mobile_performance_optimizer.set_optimization_level("auto")
+                self.performance_optimizer = MobilePerformanceOptimizer()
+                self.performance_optimizer.set_optimization_level("auto")
             except ImportError:
                 logger.debug("Mobile performance optimizer not available, using basic optimizations")
+                self.performance_optimizer = None
 
             # Try to enable offline mode if configured
             if self.config.get("offline_support", True):
                 try:
-                    from .mobile_offline_manager import mobile_offline_manager
+                    from .mobile_offline_manager import MobileOfflineManager
 
-                    mobile_offline_manager.enable_offline_mode()
+                    self.offline_manager = MobileOfflineManager()
+                    self.offline_manager.enable_offline_mode()
                 except ImportError:
                     logger.debug("Mobile offline manager not available")
+                    self.offline_manager = None
 
             # Try to create CSS bundle for mobile styles
             if self.config.get("resource_bundling", True):
                 try:
-                    from .mobile_bundle_optimizer import mobile_bundle_optimizer
+                    from .mobile_bundle_optimizer import MobileBundleOptimizer
 
+                    self.bundle_optimizer = MobileBundleOptimizer()
                     css_content = self._get_mobile_css()
-                    mobile_bundle_optimizer.create_css_bundle({"mobile_layout": css_content}, "mobile_layout_styles")
+                    self.bundle_optimizer.create_css_bundle({"mobile_layout": css_content}, "mobile_layout_styles")
                 except ImportError:
                     logger.debug("Mobile bundle optimizer not available, using inline CSS")
+                    self.bundle_optimizer = None
 
             logger.debug("Performance optimizations initialized")
 
@@ -500,11 +506,14 @@ class MobileLayoutManager:
     def _check_memory_pressure(self) -> None:
         """Check and handle memory pressure."""
         try:
-            memory_pressure = mobile_performance_optimizer.memory_manager.check_memory_pressure()
+            if not self.performance_optimizer:
+                return {"status": "unavailable", "action": "none"}
+
+            memory_pressure = self.performance_optimizer.memory_manager.check_memory_pressure()
 
             if memory_pressure == "critical":
                 # Force memory cleanup
-                mobile_performance_optimizer.memory_manager.cleanup_memory(force=True)
+                self.performance_optimizer.memory_manager.cleanup_memory(force=True)
                 logger.warning("Critical memory pressure detected - performed cleanup")
 
                 # Show user notification
@@ -512,7 +521,7 @@ class MobileLayoutManager:
 
             elif memory_pressure == "warning":
                 # Gentle cleanup
-                mobile_performance_optimizer.memory_manager.cleanup_memory()
+                self.performance_optimizer.memory_manager.cleanup_memory()
                 logger.info("Memory pressure warning - performed gentle cleanup")
 
         except Exception as e:
@@ -524,10 +533,14 @@ class MobileLayoutManager:
             # Preload critical mobile components
             critical_components = ["mobile_header", "mobile_input_ribbon", "mobile_image_analysis"]
 
-            mobile_performance_optimizer.preload_critical_components(critical_components)
+            if not self.performance_optimizer:
+                return
+
+            self.performance_optimizer.preload_critical_components(critical_components)
 
             # Load critical bundles
-            mobile_bundle_optimizer.preload_critical_bundles()
+            if self.bundle_optimizer:
+                self.bundle_optimizer.preload_critical_bundles()
 
         except Exception as e:
             logger.warning(f"Failed to preload critical resources: {e}")
@@ -537,7 +550,7 @@ class MobileLayoutManager:
         try:
             with st.expander("📊 Performance Stats", expanded=False):
                 # Get performance report
-                perf_report = mobile_performance_optimizer.get_performance_report()
+                perf_report = self.performance_optimizer.get_performance_report() if self.performance_optimizer else {}
 
                 col1, col2, col3 = st.columns(3)
 
@@ -554,7 +567,7 @@ class MobileLayoutManager:
                     st.metric("Cache Size", f"{perf_report['cache_stats']['size_mb']:.1f}MB")
 
                 # Offline stats
-                offline_stats = mobile_offline_manager.get_offline_stats()
+                offline_stats = self.offline_manager.get_offline_stats() if self.offline_manager else {"enabled": False}
                 if offline_stats["enabled"]:
                     st.markdown("**Offline Status:**")
                     st.json(
@@ -580,9 +593,15 @@ class MobileLayoutManager:
 
             # Add performance metrics if optimizations are enabled
             if self.config.get("performance_optimizations", True):
-                perf_report = mobile_performance_optimizer.get_performance_report()
-                offline_stats = mobile_offline_manager.get_offline_stats()
-                bundle_stats = mobile_bundle_optimizer.get_bundle_stats()
+                perf_report = self.performance_optimizer.get_performance_report() if self.performance_optimizer else {}
+                offline_stats = (
+                    self.offline_manager.get_offline_stats()
+                    if self.offline_manager
+                    else {"enabled": False, "connection_status": "unknown", "cached_resources": 0, "cache_size_mb": 0}
+                )
+                bundle_stats = (
+                    self.bundle_optimizer.get_bundle_stats() if hasattr(self, "bundle_optimizer") and self.bundle_optimizer else {"total_bundles": 0}
+                )
 
                 base_status.update(
                     {
@@ -625,10 +644,11 @@ class MobileLayoutManager:
     def optimize_for_low_memory(self) -> None:
         """Optimize layout for low memory devices."""
         # Set aggressive optimization level
-        mobile_performance_optimizer.set_optimization_level("aggressive")
+        if self.performance_optimizer:
+            self.performance_optimizer.set_optimization_level("aggressive")
 
-        # Reduce cache sizes
-        mobile_performance_optimizer.cache.max_size_bytes = 25 * 1024 * 1024  # 25MB
+            # Reduce cache sizes
+            self.performance_optimizer.cache.max_size_bytes = 25 * 1024 * 1024  # 25MB
 
         # Enable aggressive memory management
         self.config["aggressive_memory_management"] = True
@@ -641,9 +661,7 @@ class MobileLayoutManager:
             try:
                 # Try to check if bundled CSS is available
                 try:
-                    from .mobile_bundle_optimizer import mobile_bundle_optimizer
-
-                    if mobile_bundle_optimizer.load_bundle("mobile_layout_styles"):
+                    if self.bundle_optimizer and self.bundle_optimizer.load_bundle("mobile_layout_styles"):
                         logger.debug("Loaded CSS from bundle")
                     else:
                         # Fallback to inline CSS

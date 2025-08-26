@@ -52,17 +52,6 @@
                 "PYTHONPATH": "${workspaceFolder}/src"
             }
         },
-        {
-            "name": "Debug PlantGuard App",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/app.py",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/src"
-            }
-        }
     ],
     "inputs": [
         {

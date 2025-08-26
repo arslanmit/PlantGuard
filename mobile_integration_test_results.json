@@ -1,0 +1,59 @@
+{
+  "Mobile App Imports": {
+    "status": "passed",
+    "details": "Mobile app imports successfully",
+    "missing_components": []
+  },
+  "Core Adapters Functionality": {
+    "status": "passed",
+    "details": "All core adapters imported and initialized successfully",
+    "adapters": [
+      "VisionAdapter",
+      "AudioAdapter",
+      "TextAdapter"
+    ]
+  },
+  "Mobile Components Registry": {
+    "status": "warning",
+    "details": "Mobile registry loaded with 0 components",
+    "available_components": [],
+    "missing_components": [
+      "mobile_header",
+      "mobile_input_ribbon",
+      "mobile_content_tabs",
+      "mobile_image_analysis",
+      "mobile_voice_interface",
+      "mobile_chat_interface"
+    ]
+  },
+  "Streamlit Configuration": {
+    "status": "passed",
+    "details": "Streamlit 1.48.1 is available and configured",
+    "streamlit_version": "1.48.1"
+  },
+  "Mobile Assets": {
+    "status": "passed",
+    "details": "Found 2 mobile assets",
+    "present_assets": [
+      "assets/mobile_styles.css",
+      "assets/mobile_optimized_styles.css"
+    ],
+    "missing_assets": []
+  },
+  "PyTorch MPS Availability": {
+    "status": "passed",
+    "details": "PyTorch MPS (Apple Silicon) acceleration available",
+    "device_info": {
+      "mps_available": true,
+      "pytorch_version": "2.8.0",
+      "cuda_available": false
+    }
+  },
+  "summary": {
+    "overall_status": "warning",
+    "total_tests": 6,
+    "passed": 5,
+    "failed": 0,
+    "warnings": 1
+  }
+}

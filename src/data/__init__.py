@@ -7,13 +7,7 @@ import importlib
 from typing import Any
 
 # Import new dataset and validation utilities at module import time
-from .dataset import (
-    DataTransforms,
-    PlantVillageDataset,
-    create_data_loaders,
-    create_stratified_split,
-    get_dataset_statistics,
-)
+from .dataset import DataTransforms, PlantVillageDataset, create_data_loaders, create_stratified_split, get_dataset_statistics
 from .validation import DataIntegrityChecker, DatasetAnalyzer, ImageValidator, generate_data_report
 
 # Import existing modules (if they exist) dynamically
@@ -27,12 +21,8 @@ except (ImportError, AttributeError):
     AudioPreprocessor = None
     ImagePreprocessor = None
 
-# Legacy compatibility
-get_dataloaders = create_data_loaders
-DataValidator = ImageValidator
-
 __all__: list[str] = [
-    # Legacy exports (if available)
+    # Core exports
     "AudioPreprocessor",
     "DataIntegrityChecker",
     "DataTransforms",
@@ -46,6 +36,5 @@ __all__: list[str] = [
     "create_data_loaders",
     "create_stratified_split",
     "generate_data_report",
-    "get_dataloaders",
     "get_dataset_statistics",
 ]

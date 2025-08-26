@@ -366,7 +366,7 @@ class MobilePlantGuardApp:
         if st.session_state.mobile_device_detected:
             st.success("📱 Mobile device detected - Optimized interface loaded")
         else:
-            st.info("💻 Desktop detected - Mobile interface for testing")
+            st.info("💻 Non-mobile device detected - Mobile interface optimized for all screens")
 
     def render_adapter_status(self) -> None:
         """Render adapter connection status."""

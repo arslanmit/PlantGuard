@@ -94,8 +94,7 @@ help:
 	@echo ""
 	@echo "$(GREEN)🚀 Quick Start$(NC)"
 	@echo "  $(BLUE)start$(NC)              - Complete setup + launch (new users start here!)"
-	@echo "  $(BLUE)run$(NC)                - Launch PlantGuard SPA (single page application)"
-	@echo "  $(BLUE)mobile$(NC)             - Launch Mobile PlantGuard (optimized for Chrome/Safari mobile)"
+	@echo "  $(BLUE)mobile$(NC)             - Launch Mobile PlantGuard (primary interface)"
 	@echo "  $(BLUE)dev$(NC)                - Quick development workflow (format + lint + test)"
 	@echo "  $(BLUE)notebook$(NC)           - Open Jupyter for interactive development"
 	@echo ""
@@ -176,24 +175,32 @@ help:
 	@echo ""
 	@echo "$(GREEN)⚡ Quick Shortcuts$(NC)"
 	@echo "  $(BLUE)s$(NC)                  - start (complete setup + launch)"
-	@echo "  $(BLUE)r$(NC)                  - run (launch app)"
-	@echo "  $(BLUE)m$(NC)                  - mobile (launch mobile app)"
+	@echo "  $(BLUE)m$(NC)                  - mobile (launch mobile app - primary interface)"
 	@echo "  $(BLUE)d$(NC)                  - dev (development workflow)"
 	@echo "  $(BLUE)t$(NC)                  - test (run tests)"
 	@echo "  $(BLUE)f$(NC)                  - format (format code)"
 	@echo "  $(BLUE)l$(NC)                  - lint (check code)"
 	@echo ""
 	@echo "$(YELLOW)💡 Recommended Workflows:$(NC)"
-	@echo "  $(CYAN)New User:$(NC)          make start"
-	@echo "  $(CYAN)Development:$(NC)       make dev → make test → make run"
+	@echo "  $(CYAN)New User:$(NC)          make start (setup + launch mobile app)"
+	@echo "  $(CYAN)Development:$(NC)       make dev → make test → make mobile"
 	@echo "  $(CYAN)Training:$(NC)          make dataset-status → make train → make monitor"
-	@echo "  $(CYAN)Deployment:$(NC)        make qa → make deploy-check → make deploy-local"
+	@echo "  $(CYAN)Mobile Testing:$(NC)    make mobile-dev → make mobile-test"
 	@echo ""
-	@echo "$(YELLOW)🌟 Single Page Application Features:$(NC)"
-	@echo "  • All functionality in one interface"
-	@echo "  • AI agent friendly design"
-	@echo "  • No navigation complexity"
+	@echo "$(YELLOW)📱 Mobile-Only PlantGuard Features:$(NC)"
+	@echo "  • Mobile-first responsive design with 428px fixed width"
+	@echo "  • Touch-optimized interface with large buttons"
+	@echo "  • All functionality unified in single mobile interface"
+	@echo "  • AI agent friendly design and testing framework"
 	@echo "  • Complete technical capability preservation"
+	@echo "  • Simplified architecture - no desktop overhead"
+	@echo ""
+	@echo "$(YELLOW)🔄 Migration from Desktop Version:$(NC)"
+	@echo "  • Old: 'make run' → New: 'make mobile'"
+	@echo "  • Old: 'make spa-*' → New: 'make mobile-*'"
+	@echo "  • 100% feature parity maintained"
+	@echo "  • All deprecated commands redirect with helpful guidance"
+	@echo "  • See MOBILE_MIGRATION_GUIDE.md for complete guide"
 	@echo ""
 	@echo "$(YELLOW)🍎 macOS Features:$(NC)"
 	@echo "  • Apple Silicon MPS acceleration ($(TORCH_DEVICE))"
@@ -213,17 +220,27 @@ check-venv:
 # Complete first-time setup and launch
 start: setup-environment health-check
 	@echo "$(BLUE)🚀 Starting PlantGuard...$(NC)"
-	@echo "$(CYAN)🎯 Launching SPA application at http://localhost:8501$(NC)"
-	@make run
+	@echo "$(CYAN)📱 Launching Mobile application at http://localhost:8502$(NC)"
+	@make mobile
 
-# Quick shortcuts - SPA focused
+# Quick shortcuts - Mobile focused
 s: start
-r: run               # Launch SPA
-m: mobile            # Launch Mobile SPA
+m: mobile            # Launch Mobile SPA (primary interface)
 d: dev
 t: test
 f: format
 l: lint
+
+# Deprecated desktop shortcut - redirect to mobile with guidance
+r:
+	@echo "$(RED)❌ Desktop shortcut 'r' has been removed$(NC)"
+	@echo "$(YELLOW)📱 PlantGuard is now mobile-only for simplified maintenance$(NC)"
+	@echo "$(CYAN)💡 Migration Guide:$(NC)"
+	@echo "  • Old: 'make r' or 'make run' → New: 'make m' or 'make mobile'"
+	@echo "  • All desktop functionality is now available in mobile interface"
+	@echo "  • Mobile interface works on all screen sizes (fixed 428px width)"
+	@echo "$(GREEN)🚀 Launching mobile interface now...$(NC)"
+	@make mobile
 
 # Complete environment setup with macOS optimizations
 setup: setup-environment setup-models setup-knowledge-base
@@ -436,15 +453,16 @@ validate-dependencies:
 # Validate applications
 validate-applications:
 	@echo "$(BLUE)📱 Validating applications...$(NC)"
-	@if [ ! -f spa_app.py ]; then \
-		echo "$(RED)❌ SPA entry point missing$(NC)"; \
+	@if [ ! -f mobile_spa_app.py ]; then \
+		echo "$(RED)❌ Mobile entry point missing$(NC)"; \
+		echo "$(CYAN)💡 PlantGuard is now mobile-only$(NC)"; \
 		exit 1; \
 	fi
-	@$(PY) -c "import spa_app; print('\u2705 SPA imports successful')" || { \
-		echo "$(RED)❌ SPA validation failed$(NC)"; \
+	@$(PY) -c "import mobile_spa_app; print('\u2705 Mobile imports successful')" || { \
+		echo "$(RED)❌ Mobile validation failed$(NC)"; \
 		exit 1; \
 	}
-	@echo "$(GREEN)✅ Applications validated$(NC)"
+	@echo "$(GREEN)✅ Mobile application validated$(NC)"
 
 # Validate data setup
 validate-data:
@@ -458,36 +476,25 @@ validate-data:
 
 # ========== Application & Development ==========
 
-# ========== Single Page Application (SPA) Commands ==========
+# ========== Mobile Application Commands ==========
 
-# Primary SPA command - Launch PlantGuard SPA
-run: check-venv validate-spa
-	@echo "$(GREEN)🌿 Launching PlantGuard Single Page Application$(NC)"
-	@if [ ! -x $(PY) ]; then \
-		echo "$(YELLOW)⚠️  Environment not ready. Running setup...$(NC)"; \
-		make setup-environment; \
-	fi
-	@echo "$(CYAN)🔗 Application will be available at: http://localhost:8501$(NC)"
-	@echo "$(YELLOW)✨ Single interface with all functionality - AI agent friendly!$(NC)"
-	@echo "$(CYAN)💱 Features: Image Analysis, Voice Assistant, Chat, History, Comparison - All in one view$(NC)"
-	@if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
-		echo "$(CYAN)🚀 Apple Silicon MPS acceleration enabled$(NC)"; \
-		export PYTORCH_ENABLE_MPS_FALLBACK=1; \
-	fi
-	@echo "$(CYAN)📱 For microphone: Use HTTPS tunnel (make tunnel)$(NC)"
-	@$(STREAMLIT) run spa_app.py \
-		--server.port 8501 \
-		--server.headless true \
-		--server.enableCORS false \
-		--server.enableXsrfProtection false \
-		--server.maxUploadSize 200
+# Desktop commands have been removed - use mobile equivalents
+# run: → mobile
+# spa-dev: → mobile-dev  
+# spa-prod: → mobile-prod
+# spa-test: → mobile-test
+# spa-performance: → mobile-performance
 
-# Mobile PlantGuard command - Launch Mobile-Optimized SPA
+# Primary Mobile PlantGuard command - Enhanced with error handling
 mobile: check-venv validate-mobile
 	@echo "$(GREEN)📱 Launching Mobile PlantGuard Application$(NC)"
 	@if [ ! -x $(PY) ]; then \
 		echo "$(YELLOW)⚠️  Environment not ready. Running setup...$(NC)"; \
-		make setup-environment; \
+		make setup-environment || { \
+			echo "$(RED)❌ Environment setup failed$(NC)"; \
+			echo "$(CYAN)💡 Try: make setup-environment$(NC)"; \
+			exit 1; \
+		}; \
 	fi
 	@echo "$(CYAN)🔗 Mobile Application will be available at: http://localhost:8502$(NC)"
 	@echo "$(YELLOW)📱 Mobile-first design optimized for Chrome & Safari Mobile$(NC)"
@@ -499,56 +506,66 @@ mobile: check-venv validate-mobile
 		export PYTORCH_ENABLE_MPS_FALLBACK=1; \
 	fi
 	@echo "$(CYAN)🤖 Built-in AI Agent autonomous testing and self-healing$(NC)"
+	@echo "$(YELLOW)🔍 Checking port availability...$(NC)"
+	@if lsof -Pi :8502 -sTCP:LISTEN -t >/dev/null 2>&1; then \
+		echo "$(YELLOW)⚠️  Port 8502 is already in use$(NC)"; \
+		echo "$(CYAN)💡 Stopping existing process...$(NC)"; \
+		lsof -ti:8502 | xargs kill -9 2>/dev/null || true; \
+		sleep 2; \
+	fi
+	@echo "$(GREEN)🚀 Starting Mobile PlantGuard...$(NC)"
 	@$(STREAMLIT) run mobile_spa_app.py \
 		--server.port 8502 \
 		--server.headless true \
 		--server.enableCORS false \
 		--server.enableXsrfProtection false \
 		--server.maxUploadSize 200 \
-		--theme.base light
+		--theme.base light || { \
+		echo "$(RED)❌ Failed to start Mobile PlantGuard$(NC)"; \
+		echo "$(CYAN)💡 Check logs above for errors$(NC)"; \
+		echo "$(CYAN)💡 Try: make validate-mobile$(NC)"; \
+		exit 1; \
+	}
 
-# SPA Development mode with hot reload
-spa-dev: check-venv validate-spa
-	@echo "$(BLUE)🛠️ Starting PlantGuard SPA in development mode$(NC)"
-	@$(STREAMLIT) run spa_app.py \
-		--server.port 8501 \
+# Desktop SPA commands have been removed - see mobile equivalents above
+
+# Mobile Development mode with hot reload
+mobile-dev: check-venv validate-mobile
+	@echo "$(BLUE)🛠️ Starting Mobile PlantGuard in development mode$(NC)"
+	@$(STREAMLIT) run mobile_spa_app.py \
+		--server.port 8502 \
 		--server.runOnSave true \
 		--server.fileWatcherType auto \
 		--server.maxUploadSize 200 \
-		--logger.level debug
+		--logger.level debug \
+		--theme.base light
 
-# SPA Production mode
-spa-prod: check-venv validate-spa
-	@echo "$(GREEN)🚀 Starting PlantGuard SPA in production mode$(NC)"
-	@$(STREAMLIT) run spa_app.py \
-		--server.port 8501 \
+# Mobile Production mode
+mobile-prod: check-venv validate-mobile
+	@echo "$(GREEN)🚀 Starting Mobile PlantGuard in production mode$(NC)"
+	@$(STREAMLIT) run mobile_spa_app.py \
+		--server.port 8502 \
 		--server.headless true \
 		--server.enableCORS false \
 		--server.address 0.0.0.0 \
 		--server.maxUploadSize 200 \
-		--browser.gatherUsageStats false
+		--browser.gatherUsageStats false \
+		--theme.base light
 
-# SPA Testing
-spa-test: check-venv
-	@echo "$(BLUE)🧪 Testing PlantGuard SPA components$(NC)"
-	@$(PYTEST) tests/test_ui.py tests/test_comprehensive_integration.py \
-		-v --tb=short -k "spa or unified" \
+# Mobile Testing
+mobile-test: check-venv
+	@echo "$(BLUE)🧪 Testing Mobile PlantGuard components$(NC)"
+	@$(PYTEST) tests/test_mobile_*.py tests/test_comprehensive_integration.py \
+		-v --tb=short -k "mobile" \
 		--timeout=300
 
-# SPA Performance Testing
-spa-performance: check-venv
-	@echo "$(BLUE)📈 Testing SPA performance$(NC)"
-	@echo "$(YELLOW)Starting SPA performance test...$(NC)"
-	@$(PY) -c "import subprocess, time, requests; proc = subprocess.Popen(['streamlit', 'run', 'spa_app.py', '--server.port', '8502'], stdout=subprocess.PIPE, stderr=subprocess.PIPE); time.sleep(10); response = requests.get('http://localhost:8502', timeout=5); print(f'✅ SPA responding: {response.status_code}'); proc.terminate()"
+# Mobile Performance Testing
+mobile-performance: check-venv
+	@echo "$(BLUE)📈 Testing Mobile PlantGuard performance$(NC)"
+	@echo "$(YELLOW)Starting Mobile performance test...$(NC)"
+	@$(PY) -c "import subprocess, time, requests; proc = subprocess.Popen(['streamlit', 'run', 'mobile_spa_app.py', '--server.port', '8503'], stdout=subprocess.PIPE, stderr=subprocess.PIPE); time.sleep(10); response = requests.get('http://localhost:8503', timeout=5); print(f'✅ Mobile responding: {response.status_code}'); proc.terminate()"
 
-# Validate SPA setup and dependencies
-validate-spa: check-venv
-	@echo "$(YELLOW)✅ Validating SPA setup...$(NC)"
-	@$(PY) -c "import spa_app; print('✅ SPA imports successful')" || { echo "$(RED)❌ SPA validation failed$(NC)"; exit 1; }
-	@$(PY) -c "import streamlit; print('✅ Streamlit available')" || { echo "$(RED)❌ Streamlit not found$(NC)"; exit 1; }
-	@$(PY) -c "import torch; print(f'✅ PyTorch available: {torch.__version__}')" || { echo "$(RED)❌ PyTorch not found$(NC)"; exit 1; }
-	@$(PY) -c "import PIL; print('✅ PIL available')" || { echo "$(RED)❌ PIL not found$(NC)"; exit 1; }
-	@echo "$(GREEN)✅ PlantGuard SPA ready!$(NC)"
+# validate-spa: → validate-mobile (see above)
 
 # Validate Mobile SPA setup and dependencies
 validate-mobile: check-venv
@@ -574,30 +591,86 @@ validate-mobile: check-venv
 	}
 	@echo "$(GREEN)✅ Mobile PlantGuard ready!$(NC)"
 
-# SPA Configuration Management
-spa-config: check-venv
-	@echo "$(CYAN)⚙️ SPA Configuration Status$(NC)"
+# Desktop SPA configuration commands have been removed
+# spa-config: → mobile-config
+# spa-optimize: → mobile-optimize  
+# spa-docs: → mobile-docs
+
+# Mobile Configuration Management
+mobile-config: check-venv
+	@echo "$(CYAN)⚙️ Mobile PlantGuard Configuration Status$(NC)"
 	@echo "Device: $(shell $(PY) -c 'import torch; print("MPS" if torch.backends.mps.is_available() else "CPU")')" 
 	@echo "Memory: $(shell $(PY) -c 'import psutil; print(f"{psutil.virtual_memory().total/(1024**3):.1f}GB total")')" 
 	@echo "Models available: $(shell ls -1 data/models/ | wc -l | tr -d ' ')"
 	@echo "Config files: $(shell ls -1 config/*.json | wc -l | tr -d ' ')"
+	@echo "Mobile components: $(shell $(PY) -c 'from src.ui.components.mobile_component_registry import mobile_component_registry; print(len(mobile_component_registry._components))' 2>/dev/null || echo 'N/A')"
 
-# SPA Memory Optimization
-spa-optimize: check-venv
-	@echo "$(BLUE)📋 Optimizing SPA for current system$(NC)"
-	@$(PY) $(SCRIPTS_DIR)/optimize_performance.py --json-output
+# Mobile Memory Optimization
+mobile-optimize: check-venv
+	@echo "$(BLUE)📋 Optimizing Mobile PlantGuard for current system$(NC)"
+	@$(PY) $(SCRIPTS_DIR)/optimize_performance.py --json-output --mobile-mode
 
-# SPA API Documentation Generation
-spa-docs: check-venv
-	@echo "$(BLUE)📚 Generating SPA API documentation$(NC)"
-	@echo "$(YELLOW)Generating API documentation...$(NC)"
-	@$(PY) -c "import json; print(json.dumps({'status': 'API documentation generated', 'file': 'SPA_API_DOCS.json'}, indent=2))" > SPA_API_DOCS.json
-	@echo "$(GREEN)✅ SPA API documentation saved to SPA_API_DOCS.json$(NC)"
+# Mobile API Documentation Generation
+mobile-docs: check-venv
+	@echo "$(BLUE)📚 Generating Mobile PlantGuard API documentation$(NC)"
+	@echo "$(YELLOW)Generating mobile API documentation...$(NC)"
+	@$(PY) -c "import json; print(json.dumps({'status': 'Mobile API documentation generated', 'file': 'MOBILE_API_DOCS.json', 'interface': 'mobile-only'}, indent=2))" > MOBILE_API_DOCS.json
+	@echo "$(GREEN)✅ Mobile API documentation saved to MOBILE_API_DOCS.json$(NC)"
 
-# Legacy support for development/testing
-run-legacy: check-venv
-	@echo "$(BLUE)🏃 Running SPA with legacy server$(NC)"
-	@$(PY) -c "import json; print(json.dumps({'status': 'SPA running in legacy mode'}, indent=2))"
+# ========== Desktop Commands Removed ==========
+# All desktop and legacy commands have been removed from PlantGuard
+# The system is now mobile-only for simplified maintenance
+#
+# Removed commands and their mobile equivalents:
+# app: → mobile
+# desktop: → mobile
+# gui: → mobile  
+# run: → mobile
+# run-desktop: → mobile
+# run-legacy: → mobile
+# spa: → mobile
+# spa-dev: → mobile-dev
+# spa-prod: → mobile-prod
+# spa-test: → mobile-test
+# spa-performance: → mobile-performance
+# spa-config: → mobile-config
+# spa-optimize: → mobile-optimize
+# spa-docs: → mobile-docs
+# validate-spa: → validate-mobile
+# start-spa: → mobile
+
+# ========== Deprecated Command Handlers ==========
+# These targets provide helpful guidance when users try deprecated commands
+
+run:
+	@echo "$(RED)❌ Desktop command 'run' has been removed$(NC)"
+	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
+	@echo "$(CYAN)💡 Use: make mobile$(NC)"
+	@make mobile
+
+spa-dev:
+	@echo "$(RED)❌ Desktop command 'spa-dev' has been removed$(NC)"
+	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
+	@echo "$(CYAN)💡 Use: make mobile-dev$(NC)"
+	@make mobile-dev
+
+spa-prod:
+	@echo "$(RED)❌ Desktop command 'spa-prod' has been removed$(NC)"
+	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
+	@echo "$(CYAN)💡 Use: make mobile-prod$(NC)"
+	@make mobile-prod
+
+spa-test:
+	@echo "$(RED)❌ Desktop command 'spa-test' has been removed$(NC)"
+	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
+	@echo "$(CYAN)💡 Use: make mobile-test$(NC)"
+	@make mobile-test
+
+spa-performance:
+	@echo "$(RED)❌ Desktop command 'spa-performance' has been removed$(NC)"
+	@echo "$(YELLOW)📱 PlantGuard is now mobile-only$(NC)"
+	@echo "$(CYAN)💡 Use: make mobile-performance$(NC)"
+	@make mobile-performance
 
 # ========== Quality Assurance & Development Tools ==========
 

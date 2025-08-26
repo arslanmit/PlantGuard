@@ -28,6 +28,8 @@ src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
 # Import mobile components
+
+# Import core adapters for enhanced functionality
 from ui.components.mobile_chat_interface import MobileChatInterface
 from ui.components.mobile_component_registry import mobile_component_registry
 from ui.components.mobile_content_tabs import MobileContentTabs
@@ -37,9 +39,99 @@ from ui.components.mobile_input_ribbon import MobileInputRibbon
 from ui.components.mobile_layout_manager import MobileLayoutManager
 from ui.components.mobile_voice_interface import MobileVoiceInterface
 
+# Import testing framework and performance optimizer with fallbacks
+try:
+    from ui.components.mobile_testing_framework import MobileTestingFramework
+except ImportError:
+    # Fallback if testing framework is not available
+    class MobileTestingFramework:
+        def test_all_components(self):
+            return {"components_tested": 0, "status": "testing_framework_unavailable"}
+
+
+try:
+    from ui.components.mobile_performance_optimizer import mobile_performance_optimizer
+except ImportError:
+    # Fallback if performance optimizer is not available
+    class MockPerformanceOptimizer:
+        def set_optimization_level(self, level):
+            pass
+
+        def enable_offline_mode(self):
+            pass
+
+        def preload_critical_components(self, components):
+            pass
+
+        def optimize_images(self, data):
+            return data
+
+        def get_performance_report(self):
+            return {}
+
+        def optimize_component_render(self, component_id):
+            def decorator(func):
+                return func
+
+            return decorator
+
+        @property
+        def cache(self):
+            class MockCache:
+                def clear(self):
+                    pass
+
+                def get_stats(self):
+                    return {}
+
+            return MockCache()
+
+        @property
+        def memory_manager(self):
+            class MockMemoryManager:
+                def cleanup_memory(self, force=False):
+                    return {"freed_mb": 0}
+
+            return MockMemoryManager()
+
+    mobile_performance_optimizer = MockPerformanceOptimizer()
+
+# Import core adapters for enhanced functionality
+from core.audio import AudioAdapter
+from core.nlp import TextAdapter
+from core.vision import VisionAdapter
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Global testing framework instance
+_mobile_testing_framework = None
+
+
+def get_ai_testing_framework() -> MobileTestingFramework:
+    """Get or create the global AI testing framework instance."""
+    global _mobile_testing_framework
+    if _mobile_testing_framework is None:
+        _mobile_testing_framework = MobileTestingFramework()
+    return _mobile_testing_framework
+
+
+# Global adapter instances for enhanced functionality
+@st.cache_resource
+def load_core_adapters():
+    """Load and cache core PlantGuard adapters for mobile use."""
+    try:
+        vision_adapter = VisionAdapter(lazy_load=True)
+        audio_adapter = AudioAdapter()
+        text_adapter = TextAdapter()
+
+        logger.info("Core adapters loaded successfully for mobile app")
+        return vision_adapter, audio_adapter, text_adapter
+    except Exception as e:
+        logger.error(f"Failed to load core adapters: {e}")
+        return None, None, None
+
 
 # Page configuration for mobile with fixed 428px design - NO SIDEBAR
 st.set_page_config(
@@ -91,8 +183,19 @@ class MobilePlantGuardApp:
         self.voice_interface = None
         self.chat_interface = None
 
+        # Core adapters for full PlantGuard functionality
+        self.vision_adapter = None
+        self.audio_adapter = None
+        self.text_adapter = None
+
+        # Performance optimization
+        self.performance_optimizer = mobile_performance_optimizer
+
         # Initialize session state
         self.initialize_app_state()
+
+        # Load core adapters
+        self._load_core_adapters()
 
     def initialize_app_state(self) -> None:
         """Initialize essential application-wide session state only."""
@@ -119,6 +222,9 @@ class MobilePlantGuardApp:
 
         # Initialize component-specific state
         self._initialize_component_states()
+
+        # Initialize performance optimization
+        self._initialize_performance_optimization()
 
     def initialize_components(self) -> None:
         """Initialize all mobile components."""
@@ -225,6 +331,28 @@ class MobilePlantGuardApp:
 
         if "current_chat_input" not in st.session_state:
             st.session_state.current_chat_input = ""
+
+        # Enhanced mobile functionality state
+        if "mobile_analysis_history" not in st.session_state:
+            st.session_state.mobile_analysis_history = []
+
+        if "mobile_performance_mode" not in st.session_state:
+            st.session_state.mobile_performance_mode = "balanced"
+
+        if "mobile_offline_mode" not in st.session_state:
+            st.session_state.mobile_offline_mode = False
+
+        # Initialize performance optimization state
+        if "mobile_performance" not in st.session_state:
+            st.session_state.mobile_performance = {"optimization_level": "balanced", "memory_usage": 0, "cache_stats": {"hit_rate": 0, "size_mb": 0}}
+
+        # Initialize offline manager state
+        if "mobile_offline" not in st.session_state:
+            st.session_state.mobile_offline = {"enabled": False, "connection_status": "online", "cached_resources": 0, "cache_size_mb": 0}
+
+        # Initialize bundle optimizer state
+        if "mobile_bundles" not in st.session_state:
+            st.session_state.mobile_bundles = {"loaded_bundles": [], "total_size_mb": 0, "optimization_enabled": True}
 
     def _setup_state_persistence(self) -> None:
         """Setup state persistence for mobile session continuity."""
@@ -344,37 +472,552 @@ class MobilePlantGuardApp:
         # Register comparison tab
         self.content_tabs.register_tab_content("comparison", self.render_comparison_tab)
 
+    def _load_core_adapters(self) -> None:
+        """Load core PlantGuard adapters for enhanced mobile functionality."""
+        try:
+            self.vision_adapter, self.audio_adapter, self.text_adapter = load_core_adapters()
+
+            if self.vision_adapter and self.audio_adapter and self.text_adapter:
+                logger.info("Core adapters loaded successfully for mobile app")
+                st.session_state.mobile_adapters_loaded = True
+            else:
+                logger.warning("Some core adapters failed to load")
+                st.session_state.mobile_adapters_loaded = False
+
+        except Exception as e:
+            logger.error(f"Failed to load core adapters: {e}")
+            st.session_state.mobile_adapters_loaded = False
+
+    def _initialize_performance_optimization(self) -> None:
+        """Initialize performance optimization for mobile app."""
+        try:
+            # Set optimization level based on device capabilities
+            self.performance_optimizer.set_optimization_level("auto")
+
+            # Enable offline mode optimizations if needed
+            if st.session_state.get("mobile_offline_mode", False):
+                self.performance_optimizer.enable_offline_mode()
+
+            # Preload critical components
+            critical_components = ["mobile_header", "mobile_input_ribbon", "mobile_image_analysis", "mobile_chat_interface"]
+            self.performance_optimizer.preload_critical_components(critical_components)
+
+            logger.info("Performance optimization initialized for mobile app")
+
+        except Exception as e:
+            logger.error(f"Failed to initialize performance optimization: {e}")
+
+    def analyze_image_with_adapters(self, image) -> dict[str, Any]:
+        """Analyze image using core vision adapter with mobile optimizations."""
+        try:
+            if not self.vision_adapter:
+                return {
+                    "error": "Vision adapter not available",
+                    "disease": "Unknown",
+                    "confidence": 0.0,
+                    "recommendations": ["Vision analysis not available. Please check system status."],
+                }
+
+            # Optimize image for mobile processing
+            if hasattr(image, "read"):
+                image_data = image.read()
+                optimized_image_data = self.performance_optimizer.optimize_images(image_data)
+
+                # Convert back to PIL Image
+                import io
+
+                from PIL import Image as PILImage
+
+                image = PILImage.open(io.BytesIO(optimized_image_data))
+
+            # Perform prediction
+            disease_class, confidence = self.vision_adapter.predict(image)
+
+            # Get detailed information using text adapter
+            disease_info = {}
+            recommendations = []
+
+            if self.text_adapter:
+                disease_info = self.text_adapter.get_disease_info(disease_class)
+                response = self.text_adapter.generate_response(disease_class, "What should I do about this disease?", confidence)
+                recommendations = response.split("\n") if response else []
+
+            # Save to analysis history
+            analysis_result = {
+                "timestamp": st.session_state.get("app_start_time", 0),
+                "disease": disease_class,
+                "confidence": confidence,
+                "disease_info": disease_info,
+                "recommendations": recommendations,
+            }
+
+            st.session_state.mobile_analysis_history.append(analysis_result)
+
+            # Limit history size
+            if len(st.session_state.mobile_analysis_history) > 50:
+                st.session_state.mobile_analysis_history = st.session_state.mobile_analysis_history[-50:]
+
+            return analysis_result
+
+        except Exception as e:
+            logger.error(f"Image analysis failed: {e}")
+            return {
+                "error": str(e),
+                "disease": "Analysis Failed",
+                "confidence": 0.0,
+                "recommendations": ["Analysis failed. Please try again or check system status."],
+            }
+
+    def process_voice_input(self, audio_data) -> str:
+        """Process voice input using audio adapter."""
+        try:
+            if not self.audio_adapter:
+                return "Voice processing not available"
+
+            # Transcribe audio
+            transcription = self.audio_adapter.transcribe(audio_data)
+
+            if transcription and self.text_adapter:
+                # Generate response using text adapter
+                response = self.text_adapter.generate_response("general", transcription, 1.0)
+                return response
+
+            return transcription or "No speech detected"
+
+        except Exception as e:
+            logger.error(f"Voice processing failed: {e}")
+            return f"Voice processing error: {e}"
+
+    def process_text_query(self, query: str, context: dict = None) -> str:
+        """Process text query using NLP adapter."""
+        try:
+            if not self.text_adapter:
+                return "Text processing not available"
+
+            # Use context from recent analysis if available
+            disease_class = "general"
+            confidence = 1.0
+
+            if context:
+                disease_class = context.get("disease", "general")
+                confidence = context.get("confidence", 1.0)
+            elif st.session_state.mobile_analysis_history:
+                # Use most recent analysis as context
+                recent_analysis = st.session_state.mobile_analysis_history[-1]
+                disease_class = recent_analysis.get("disease", "general")
+                confidence = recent_analysis.get("confidence", 1.0)
+
+            # Generate response
+            response = self.text_adapter.generate_response(disease_class, query, confidence)
+            return response
+
+        except Exception as e:
+            logger.error(f"Text processing failed: {e}")
+            return f"Text processing error: {e}"
+
+    def render_performance_status(self) -> None:
+        """Render performance status indicator."""
+        try:
+            # Only show if performance optimization is enabled
+            if st.session_state.get("mobile_performance_mode") != "minimal":
+                with st.expander("⚡ Performance Status", expanded=False):
+                    try:
+                        perf_report = self.performance_optimizer.get_performance_report()
+
+                        col1, col2, col3 = st.columns(3)
+
+                        with col1:
+                            memory_pressure = perf_report.get("memory_pressure", "unknown")
+                            if memory_pressure == "normal":
+                                st.success("🟢 Memory: Normal")
+                            elif memory_pressure == "warning":
+                                st.warning("🟡 Memory: Warning")
+                            else:
+                                st.error("🔴 Memory: Critical")
+
+                        with col2:
+                            cache_stats = perf_report.get("cache_stats", {})
+                            hit_rate = cache_stats.get("hit_rate", 0)
+                            st.metric("Cache Hit Rate", f"{hit_rate:.1f}%")
+
+                        with col3:
+                            adapters_status = st.session_state.get("mobile_adapters_loaded", False)
+                            if adapters_status:
+                                st.success("🟢 Adapters: Ready")
+                            else:
+                                st.error("🔴 Adapters: Not Ready")
+
+                        # Performance actions
+                        col1, col2 = st.columns(2)
+
+                        with col1:
+                            if st.button("🧹 Clean Memory", use_container_width=True, key="perf_clean_memory"):
+                                with st.spinner("Cleaning memory..."):
+                                    cleanup_stats = self.performance_optimizer.memory_manager.cleanup_memory(force=True)
+                                    freed_mb = cleanup_stats.get("freed_mb", 0)
+                                    st.success(f"Freed {freed_mb:.1f}MB")
+
+                        with col2:
+                            if st.button("🔄 Clear Cache", use_container_width=True, key="perf_clear_cache"):
+                                self.performance_optimizer.cache.clear()
+                                st.success("Cache cleared")
+                                st.rerun()
+
+                    except Exception as e:
+                        st.warning(f"Performance monitoring unavailable: {e}")
+
+        except Exception as e:
+            logger.error(f"Performance status rendering failed: {e}")
+
     def render_image_analysis_tab(self) -> None:
-        """Render image analysis tab content."""
-        self.image_analysis.render()
+        """Render enhanced image analysis tab content with core adapter integration."""
+        try:
+            # Use performance optimization
+            with self.performance_optimizer.optimize_component_render("image_analysis_tab"):
+                # Check if adapters are loaded
+                adapters_status = st.session_state.get("mobile_adapters_loaded", False)
+
+                if not adapters_status:
+                    st.warning("⚠️ Core adapters not fully loaded. Some features may be limited.")
+
+                # Render the mobile image analysis component
+                self.image_analysis.render()
+
+                # Add enhanced functionality if adapters are available
+                if adapters_status and self.vision_adapter:
+                    st.markdown("### 🔬 Enhanced Analysis")
+
+                    # Show recent analysis results
+                    if st.session_state.mobile_analysis_history:
+                        recent_analysis = st.session_state.mobile_analysis_history[-1]
+
+                        with st.expander("📊 Latest Analysis Results", expanded=False):
+                            col1, col2 = st.columns(2)
+
+                            with col1:
+                                st.metric("Disease Detected", recent_analysis.get("disease", "Unknown"))
+                                st.metric("Confidence", f"{recent_analysis.get('confidence', 0):.1%}")
+
+                            with col2:
+                                if recent_analysis.get("disease_info"):
+                                    disease_info = recent_analysis["disease_info"]
+                                    st.write(f"**Plant Type:** {disease_info.get('plant_type', 'Unknown')}")
+                                    st.write(f"**Severity:** {disease_info.get('severity', 'Unknown')}")
+
+                    # Quick analysis button for uploaded images
+                    if st.session_state.get("uploaded_image"):
+                        if st.button("🚀 Quick Analysis with AI", use_container_width=True, type="primary"):
+                            with st.spinner("Analyzing with AI..."):
+                                result = self.analyze_image_with_adapters(st.session_state.uploaded_image)
+
+                                if "error" not in result:
+                                    st.success(f"✅ Analysis complete: {result['disease']} ({result['confidence']:.1%} confidence)")
+
+                                    # Show recommendations
+                                    if result.get("recommendations"):
+                                        st.markdown("**Recommendations:**")
+                                        for rec in result["recommendations"][:3]:
+                                            if rec.strip():
+                                                st.write(f"• {rec.strip()}")
+                                else:
+                                    st.error(f"❌ Analysis failed: {result['error']}")
+
+        except Exception as e:
+            logger.error(f"Enhanced image analysis tab rendering failed: {e}")
+            # Fallback to basic rendering
+            self.image_analysis.render()
 
     def render_voice_assistant_tab(self) -> None:
-        """Render voice assistant tab content."""
-        self.voice_interface.render()
+        """Render enhanced voice assistant tab content with core adapter integration."""
+        try:
+            # Use performance optimization
+            with self.performance_optimizer.optimize_component_render("voice_assistant_tab"):
+                # Check if adapters are loaded
+                adapters_status = st.session_state.get("mobile_adapters_loaded", False)
+
+                if not adapters_status:
+                    st.warning("⚠️ Audio processing not fully loaded. Voice features may be limited.")
+
+                # Render the mobile voice interface component
+                self.voice_interface.render()
+
+                # Add enhanced functionality if adapters are available
+                if adapters_status and self.audio_adapter:
+                    st.markdown("### 🎤 Enhanced Voice Processing")
+
+                    # Voice input processing
+                    if st.session_state.get("recorded_audio"):
+                        if st.button("🔊 Process Voice with AI", use_container_width=True, type="primary"):
+                            with st.spinner("Processing voice..."):
+                                response = self.process_voice_input(st.session_state.recorded_audio)
+
+                                if response and "error" not in response.lower():
+                                    st.success("✅ Voice processed successfully")
+                                    st.markdown("**AI Response:**")
+                                    st.write(response)
+
+                                    # Save to chat history
+                                    st.session_state.chat_history.append(
+                                        {
+                                            "type": "voice",
+                                            "input": "Voice input processed",
+                                            "response": response,
+                                            "timestamp": st.session_state.get("app_start_time", 0),
+                                        }
+                                    )
+                                else:
+                                    st.error(f"❌ Voice processing failed: {response}")
+
+                    # Quick voice commands
+                    st.markdown("**Quick Voice Commands:**")
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        if st.button("🌿 'What's wrong with my plant?'", use_container_width=True):
+                            response = self.process_text_query("What's wrong with my plant?")
+                            st.write(response)
+
+                    with col2:
+                        if st.button("💊 'How do I treat this disease?'", use_container_width=True):
+                            response = self.process_text_query("How do I treat this disease?")
+                            st.write(response)
+
+        except Exception as e:
+            logger.error(f"Enhanced voice assistant tab rendering failed: {e}")
+            # Fallback to basic rendering
+            self.voice_interface.render()
 
     def render_chat_interface_tab(self) -> None:
-        """Render chat interface tab content."""
-        self.chat_interface.render()
+        """Render enhanced chat interface tab content with core adapter integration."""
+        try:
+            # Use performance optimization
+            with self.performance_optimizer.optimize_component_render("chat_interface_tab"):
+                # Check if adapters are loaded
+                adapters_status = st.session_state.get("mobile_adapters_loaded", False)
+
+                if not adapters_status:
+                    st.warning("⚠️ Text processing not fully loaded. Chat features may be limited.")
+
+                # Render the mobile chat interface component
+                self.chat_interface.render()
+
+                # Add enhanced functionality if adapters are available
+                if adapters_status and self.text_adapter:
+                    st.markdown("### 💬 Enhanced AI Chat")
+
+                    # Smart chat input with context awareness
+                    user_input = st.text_input(
+                        "Ask about your plant:",
+                        placeholder="e.g., 'How do I prevent this disease?', 'Is this plant healthy?'",
+                        key="enhanced_chat_input",
+                    )
+
+                    col1, col2 = st.columns([3, 1])
+
+                    with col1:
+                        if st.button("💬 Send Message", use_container_width=True, type="primary"):
+                            if user_input.strip():
+                                with st.spinner("Generating AI response..."):
+                                    # Get context from recent analysis
+                                    context = None
+                                    if st.session_state.mobile_analysis_history:
+                                        context = st.session_state.mobile_analysis_history[-1]
+
+                                    response = self.process_text_query(user_input, context)
+
+                                    # Add to chat history
+                                    chat_entry = {
+                                        "type": "text",
+                                        "input": user_input,
+                                        "response": response,
+                                        "timestamp": st.session_state.get("app_start_time", 0),
+                                        "context": context.get("disease", "general") if context else "general",
+                                    }
+
+                                    st.session_state.chat_history.append(chat_entry)
+
+                                    # Clear input
+                                    st.session_state.enhanced_chat_input = ""
+                                    st.rerun()
+
+                    with col2:
+                        if st.button("🗑️ Clear", use_container_width=True):
+                            st.session_state.chat_history.clear()
+                            st.rerun()
+
+                    # Display enhanced chat history
+                    if st.session_state.chat_history:
+                        st.markdown("### 📝 Chat History")
+
+                        for i, chat in enumerate(reversed(st.session_state.chat_history[-10:])):
+                            with st.expander(f"💬 {chat['input'][:50]}...", expanded=i == 0):
+                                st.markdown(f"**You:** {chat['input']}")
+                                st.markdown(f"**AI:** {chat['response']}")
+
+                                if chat.get("context") and chat["context"] != "general":
+                                    st.caption(f"Context: {chat['context']}")
+
+                    # Quick question buttons
+                    st.markdown("### ❓ Quick Questions")
+
+                    quick_questions = [
+                        "What disease does my plant have?",
+                        "How do I treat this condition?",
+                        "How can I prevent this in the future?",
+                        "Is this plant healthy?",
+                        "What are the symptoms to look for?",
+                    ]
+
+                    cols = st.columns(2)
+                    for i, question in enumerate(quick_questions):
+                        with cols[i % 2]:
+                            if st.button(f"❓ {question}", use_container_width=True, key=f"quick_q_{i}"):
+                                # Get context from recent analysis
+                                context = None
+                                if st.session_state.mobile_analysis_history:
+                                    context = st.session_state.mobile_analysis_history[-1]
+
+                                with st.spinner("Generating response..."):
+                                    response = self.process_text_query(question, context)
+
+                                    # Add to chat history
+                                    chat_entry = {
+                                        "type": "quick_question",
+                                        "input": question,
+                                        "response": response,
+                                        "timestamp": st.session_state.get("app_start_time", 0),
+                                        "context": context.get("disease", "general") if context else "general",
+                                    }
+
+                                    st.session_state.chat_history.append(chat_entry)
+                                    st.rerun()
+
+        except Exception as e:
+            logger.error(f"Enhanced chat interface tab rendering failed: {e}")
+            # Fallback to basic rendering
+            self.chat_interface.render()
 
     def render_history_settings_tab(self) -> None:
         """Render history and settings tab content."""
         st.markdown("### 📊 Analysis History")
 
-        # Analysis history
-        history = st.session_state.get("analysis_history", [])
-        if history:
-            for i, analysis in enumerate(history[-5:]):
-                with st.expander(f"Analysis {len(history) - i}", expanded=False):
-                    st.json(analysis)
+        # Enhanced analysis history with mobile-specific data
+        mobile_history = st.session_state.get("mobile_analysis_history", [])
+        regular_history = st.session_state.get("analysis_history", [])
+
+        # Combine and show both histories
+        all_history = mobile_history + regular_history
+
+        if all_history:
+            st.markdown(f"**Total Analyses:** {len(all_history)}")
+
+            # Show recent analyses with enhanced display
+            for i, analysis in enumerate(all_history[-5:]):
+                analysis_num = len(all_history) - i
+
+                # Determine analysis type and create appropriate title
+                if "disease" in analysis:
+                    title = f"🔬 Analysis {analysis_num}: {analysis.get('disease', 'Unknown')}"
+                    confidence = analysis.get("confidence", 0)
+                    if confidence > 0:
+                        title += f" ({confidence:.1%})"
+                else:
+                    title = f"📊 Analysis {analysis_num}"
+
+                with st.expander(title, expanded=False):
+                    if "disease" in analysis:
+                        # Enhanced mobile analysis display
+                        col1, col2 = st.columns(2)
+
+                        with col1:
+                            st.metric("Disease", analysis.get("disease", "Unknown"))
+                            st.metric("Confidence", f"{analysis.get('confidence', 0):.1%}")
+
+                        with col2:
+                            disease_info = analysis.get("disease_info", {})
+                            if disease_info:
+                                st.write(f"**Plant Type:** {disease_info.get('plant_type', 'Unknown')}")
+                                st.write(f"**Severity:** {disease_info.get('severity', 'Unknown')}")
+
+                        # Show recommendations if available
+                        recommendations = analysis.get("recommendations", [])
+                        if recommendations:
+                            st.markdown("**Key Recommendations:**")
+                            for rec in recommendations[:3]:
+                                if rec.strip():
+                                    st.write(f"• {rec.strip()}")
+                    else:
+                        # Regular analysis display
+                        st.json(analysis)
         else:
             st.info("No analysis history yet. Analyze some plants to see results here!")
 
+        # Performance metrics
+        if st.session_state.get("mobile_adapters_loaded", False):
+            st.markdown("### 📈 Performance Metrics")
+
+            try:
+                perf_report = self.performance_optimizer.get_performance_report()
+
+                col1, col2, col3 = st.columns(3)
+
+                with col1:
+                    session_info = perf_report.get("session_info", {})
+                    st.metric("Total Renders", session_info.get("total_renders", 0))
+
+                with col2:
+                    avg_render_time = session_info.get("avg_render_time", 0)
+                    st.metric("Avg Render Time", f"{avg_render_time:.3f}s")
+
+                with col3:
+                    memory_stats = perf_report.get("memory_stats", {})
+                    memory_mb = memory_stats.get("rss_mb", 0)
+                    st.metric("Memory Usage", f"{memory_mb:.1f}MB")
+
+                # Cache statistics
+                cache_stats = perf_report.get("cache_stats", {})
+                if cache_stats:
+                    st.markdown("**Cache Performance:**")
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        st.metric("Cache Hit Rate", f"{cache_stats.get('hit_rate', 0):.1f}%")
+
+                    with col2:
+                        st.metric("Cache Size", f"{cache_stats.get('size_mb', 0):.1f}MB")
+
+            except Exception as e:
+                st.warning(f"Performance metrics unavailable: {e}")
+
         st.markdown("### ⚙️ Settings")
 
-        # App settings
+        # Enhanced app settings
         col1, col2 = st.columns(2)
 
         with col1:
+            # Core Adapters Status
+            st.markdown("**🧠 Core Adapters**")
+
+            adapters_loaded = st.session_state.get("mobile_adapters_loaded", False)
+
+            if adapters_loaded:
+                st.success("✅ All adapters loaded")
+
+                # Adapter details
+                if self.vision_adapter:
+                    st.write("🔬 Vision: Ready")
+                if self.audio_adapter:
+                    st.write("🎤 Audio: Ready")
+                if self.text_adapter:
+                    st.write("💬 Text: Ready")
+            else:
+                st.error("❌ Adapters not loaded")
+
+                if st.button("🔄 Reload Adapters", use_container_width=True):
+                    with st.spinner("Reloading adapters..."):
+                        self._load_core_adapters()
+                        st.rerun()
+
             # AI Agent controls
             st.markdown("**🤖 AI Agent**")
 
@@ -383,27 +1026,52 @@ class MobilePlantGuardApp:
                     test_results = get_ai_testing_framework().test_all_components()
                     if test_results:
                         st.success(f"Tests completed: {test_results.get('components_tested', 0)} components tested")
-                        st.json(test_results)
 
-            # Health monitoring
-            if st.button("Check Component Health", use_container_width=True):
-                health_report = ai_testing_framework.get_component_health_report()
-                st.json(health_report)
+                        # Show summary instead of full JSON
+                        summary = test_results.get("overall_summary", {})
+                        if summary:
+                            col_a, col_b = st.columns(2)
+                            with col_a:
+                                st.metric("Status", summary.get("overall_status", "unknown"))
+                            with col_b:
+                                st.metric("Success Rate", f"{summary.get('success_rate', 0):.1%}")
 
         with col2:
-            # App preferences
+            # Enhanced app preferences
             st.markdown("**📱 Preferences**")
 
-            # Theme selection (placeholder)
-            theme = st.selectbox("Theme", ["Auto", "Light", "Dark"], key="mobile_theme_select")
+            # Performance mode selection
+            perf_mode = st.selectbox(
+                "Performance Mode",
+                ["Auto", "Minimal", "Balanced", "Aggressive"],
+                index=1,  # Default to Balanced
+                key="mobile_perf_mode_select",
+            )
 
-            # Notification settings
-            notifications = st.checkbox("Enable notifications", key="mobile_notifications")
+            if perf_mode.lower() != st.session_state.get("mobile_performance_mode", "balanced"):
+                st.session_state.mobile_performance_mode = perf_mode.lower()
+                self.performance_optimizer.set_optimization_level(perf_mode.lower())
+                st.success(f"Performance mode set to {perf_mode}")
+
+            # Offline mode toggle
+            offline_mode = st.checkbox("Offline Mode", value=st.session_state.get("mobile_offline_mode", False), key="mobile_offline_toggle")
+
+            if offline_mode != st.session_state.get("mobile_offline_mode", False):
+                st.session_state.mobile_offline_mode = offline_mode
+                if offline_mode:
+                    self.performance_optimizer.enable_offline_mode()
+                    st.success("Offline mode enabled")
+
+            # Theme selection
+            theme = st.selectbox("Theme", ["Auto", "Light", "Dark"], key="mobile_theme_select")
 
             # Auto-clear chat
             auto_clear = st.checkbox("Auto-clear chat after analysis", key="mobile_auto_clear_chat")
 
-        # App information
+            # Image optimization
+            optimize_images = st.checkbox("Optimize images for mobile", value=True, key="mobile_optimize_images")
+
+        # Enhanced app information
         st.markdown("### ℹ️ App Information")
 
         col1, col2, col3 = st.columns(3)
@@ -418,6 +1086,63 @@ class MobilePlantGuardApp:
         with col3:
             active_tab = st.session_state.get("current_tab", "unknown")
             st.metric("Active Tab", active_tab.replace("_", " ").title())
+
+        # Additional metrics
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            analyses_count = len(st.session_state.get("mobile_analysis_history", []))
+            st.metric("AI Analyses", analyses_count)
+
+        with col2:
+            chat_count = len(st.session_state.get("chat_history", []))
+            st.metric("Chat Messages", chat_count)
+
+        with col3:
+            perf_mode = st.session_state.get("mobile_performance_mode", "balanced")
+            st.metric("Performance", perf_mode.title())
+
+        # System status
+        st.markdown("**🔧 System Status:**")
+
+        status_items = []
+
+        # Adapter status
+        if st.session_state.get("mobile_adapters_loaded", False):
+            status_items.append("✅ Core Adapters: Ready")
+        else:
+            status_items.append("❌ Core Adapters: Not Loaded")
+
+        # Performance optimization status
+        try:
+            perf_report = self.performance_optimizer.get_performance_report()
+            memory_pressure = perf_report.get("memory_pressure", "unknown")
+
+            if memory_pressure == "normal":
+                status_items.append("✅ Memory: Normal")
+            elif memory_pressure == "warning":
+                status_items.append("⚠️ Memory: Warning")
+            else:
+                status_items.append("❌ Memory: Critical")
+        except:
+            status_items.append("❓ Memory: Unknown")
+
+        # Cache status
+        try:
+            cache_stats = self.performance_optimizer.cache.get_stats()
+            hit_rate = cache_stats.get("hit_rate", 0)
+
+            if hit_rate > 80:
+                status_items.append("✅ Cache: Excellent")
+            elif hit_rate > 60:
+                status_items.append("✅ Cache: Good")
+            else:
+                status_items.append("⚠️ Cache: Poor")
+        except:
+            status_items.append("❓ Cache: Unknown")
+
+        for status in status_items:
+            st.write(status)
 
     def render_comparison_tab(self) -> None:
         """Render comparison tab content."""
@@ -501,32 +1226,90 @@ class MobilePlantGuardApp:
                     st.success("AI Agent activated - no page refresh needed!")
 
     def run(self) -> None:
-        """Run the mobile PlantGuard application."""
+        """Run the enhanced mobile PlantGuard application with performance optimizations."""
+        # Apply performance optimizations at startup
+        try:
+            # Load optimized CSS
+            st.markdown(self.performance_optimizer.get_optimized_css(), unsafe_allow_html=True)
+        except:
+            pass  # Continue without CSS optimizations if they fail
+
         # Initialize components if not done
         if not st.session_state.get("mobile_app_initialized", False):
-            self.initialize_components()
+            with st.spinner("🚀 Initializing PlantGuard Mobile..."):
+                self.initialize_components()
 
         # Check initialization status with detailed feedback
         if not st.session_state.get("mobile_app_initialized", False):
             st.error("❌ Application failed to initialize properly")
 
-            # Show fallback content
+            # Show enhanced troubleshooting
             st.markdown("### 🌿 PlantGuard Mobile - Initialization Error")
-            st.markdown("The mobile app components failed to initialize. Please try refreshing the page.")
+            st.markdown("The mobile app components failed to initialize. Please try the options below.")
 
-            # Basic troubleshooting
-            if st.button("🔄 Try to Reinitialize", use_container_width=True, key="spa_reinitialize"):
-                st.session_state.mobile_app_initialized = False
-                st.success("Reinitializing - page will refresh once for full restart")
-                st.rerun()
+            col1, col2 = st.columns(2)
+
+            with col1:
+                if st.button("🔄 Reinitialize App", use_container_width=True, key="spa_reinitialize"):
+                    st.session_state.mobile_app_initialized = False
+                    st.success("Reinitializing - page will refresh")
+                    st.rerun()
+
+            with col2:
+                if st.button("🧹 Clear Cache & Restart", use_container_width=True, key="spa_clear_restart"):
+                    # Clear performance cache
+                    try:
+                        self.performance_optimizer.cache.clear()
+                    except:
+                        pass
+
+                    # Clear session state
+                    keys_to_clear = [k for k in st.session_state.keys() if k.startswith("mobile_")]
+                    for key in keys_to_clear:
+                        del st.session_state[key]
+
+                    st.success("Cache cleared - refreshing")
+                    st.rerun()
+
+            # Show system status for debugging
+            with st.expander("🔍 System Status", expanded=False):
+                st.write("**Adapter Status:**")
+                adapters_loaded = st.session_state.get("mobile_adapters_loaded", False)
+                st.write(f"- Core Adapters: {'✅ Loaded' if adapters_loaded else '❌ Not Loaded'}")
+
+                st.write("**Component Status:**")
+                st.write(f"- Layout Manager: {'✅' if self.layout_manager else '❌'}")
+                st.write(f"- Header: {'✅' if self.header else '❌'}")
+                st.write(f"- Input Ribbon: {'✅' if self.input_ribbon else '❌'}")
+                st.write(f"- Content Tabs: {'✅' if self.content_tabs else '❌'}")
 
             # Show minimal functionality
-            st.markdown("#### 🔧 Basic Functionality")
-            st.info("For full functionality, please refresh the page or check console logs.")
+            st.markdown("#### 🔧 Emergency Mode")
+            st.info("Basic plant analysis is available below while the full app loads.")
+
+            # Basic image upload for emergency use
+            uploaded_file = st.file_uploader("Upload plant image", type=["jpg", "jpeg", "png"])
+            if uploaded_file:
+                st.image(uploaded_file, caption="Uploaded Image", use_container_width=True)
+
+                if st.button("🔬 Basic Analysis", use_container_width=True):
+                    if st.session_state.get("mobile_adapters_loaded", False) and self.vision_adapter:
+                        with st.spinner("Analyzing..."):
+                            try:
+                                result = self.analyze_image_with_adapters(uploaded_file)
+                                if "error" not in result:
+                                    st.success(f"Disease: {result['disease']} ({result['confidence']:.1%})")
+                                else:
+                                    st.error(result["error"])
+                            except Exception as e:
+                                st.error(f"Analysis failed: {e}")
+                    else:
+                        st.warning("Core adapters not available for analysis")
             return
 
-        # Render AI agent status in main content instead of sidebar
+        # Render AI agent status and performance info in main content
         self.render_ai_agent_status()
+        self.render_performance_status()
 
         # Load mobile CSS first
         if self.layout_manager and not st.session_state.get("mobile_css_loaded", False):
@@ -587,7 +1370,7 @@ class MobilePlantGuardApp:
         with st.expander("📱 PlantGuard Mobile Info", expanded=False):
             st.markdown("**Version:** 1.0.0-mobile")
             st.markdown("📱 **Mobile:** Chrome & Safari Optimized")
-            st.markdown("💻 **Desktop:** Fixed 428px Mobile View")
+            st.markdown("💻 **All Devices:** Fixed 428px Mobile View")
             st.markdown("🎯 **Design:** Always 428px width (mobile-first)")
 
             # Fixed mobile design indicator

@@ -8,16 +8,16 @@ This script validates that the user's original issue has been completely resolve
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add src to path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
+
 def validate_user_issue_resolution():
     """Validate that the user's original navigation issue has been resolved."""
-    
+
     print("🌿 PlantGuard Mobile SPA - User Issue Resolution Validation")
     print("=" * 70)
     print()
@@ -29,56 +29,58 @@ def validate_user_issue_resolution():
     print("   Single Page Application (SPA) navigation system")
     print("   Content focus switching without page redirects")
     print()
-    
+
     validation_results = []
-    
+
     # Test 1: Verify SPA Manager eliminates page redirects
     print("🧪 Test 1: SPA Manager - No Page Redirects")
     print("-" * 50)
     try:
         from ui.components.mobile_spa_manager import MobileSPAManager
+
         spa_manager = MobileSPAManager("validation_spa")
-        
+
         # Check that prevent_page_redirects is enabled
         spa_manager.initialize_spa_state()
         status = spa_manager.get_spa_status()
-        
-        if status.get('prevent_page_redirects', False):
+
+        if status.get("prevent_page_redirects", False):
             print("✅ Page redirect prevention is ACTIVE")
             print("✅ Buttons will NOT cause page navigation")
             validation_results.append(True)
         else:
             print("❌ Page redirect prevention is NOT active")
             validation_results.append(False)
-            
+
     except Exception as e:
         print(f"❌ SPA Manager test failed: {e}")
         validation_results.append(False)
-    
+
     print()
-    
+
     # Test 2: Verify Content Tabs use SPA system
     print("🧪 Test 2: Content Tabs - SPA Integration")
     print("-" * 50)
     try:
         from ui.components.mobile_content_tabs import MobileContentTabs
+
         content_tabs = MobileContentTabs("validation_tabs")
-        
+
         # Check that SPA manager is integrated
-        if hasattr(content_tabs, 'spa_manager'):
+        if hasattr(content_tabs, "spa_manager"):
             print("✅ Content Tabs integrated with SPA Manager")
             print("✅ Tab switching will NOT cause page redirects")
             validation_results.append(True)
         else:
             print("❌ Content Tabs NOT integrated with SPA Manager")
             validation_results.append(False)
-            
+
     except Exception as e:
         print(f"❌ Content Tabs test failed: {e}")
         validation_results.append(False)
-    
+
     print()
-    
+
     # Test 3: Verify Error Handler uses content focus
     print("🧪 Test 3: Error Handler - Content Focus (No Page Navigation)")
     print("-" * 50)
@@ -86,11 +88,11 @@ def validate_user_issue_resolution():
         # Check that error handler file has been updated
         error_handler_path = Path("src/ui/components/error_handler.py")
         if error_handler_path.exists():
-            with open(error_handler_path, 'r') as f:
+            with open(error_handler_path) as f:
                 content = f.read()
-                
+
             # Check for SPA-friendly content focus instead of page navigation
-            if 'focused_content' in content and 'Focus on' in content:
+            if "focused_content" in content and "Focus on" in content:
                 print("✅ Error Handler uses content focus instead of page navigation")
                 print("✅ Error recovery will NOT cause page redirects")
                 validation_results.append(True)
@@ -100,27 +102,27 @@ def validate_user_issue_resolution():
         else:
             print("❌ Error Handler file not found")
             validation_results.append(False)
-            
+
     except Exception as e:
         print(f"❌ Error Handler test failed: {e}")
         validation_results.append(False)
-    
+
     print()
-    
+
     # Test 4: Verify mobile_spa_app.py eliminates st.rerun() calls
-    print("🧪 Test 4: Main App - Eliminated st.rerun() Calls")  
+    print("🧪 Test 4: Main App - Eliminated st.rerun() Calls")
     print("-" * 50)
     try:
         app_path = Path("mobile_spa_app.py")
         if app_path.exists():
-            with open(app_path, 'r') as f:
+            with open(app_path) as f:
                 content = f.read()
-                
+
             # Count remaining st.rerun() calls (should only be for critical app resets)
-            rerun_count = content.count('st.rerun()')
-            
+            rerun_count = content.count("st.rerun()")
+
             # Check for SPA-friendly content focus updates
-            if 'focused_content' in content and rerun_count <= 3:  # Only critical rerun calls remain
+            if "focused_content" in content and rerun_count <= 3:  # Only critical rerun calls remain
                 print(f"✅ Main app uses content focus switching (only {rerun_count} critical st.rerun() calls)")
                 print("✅ Button interactions will NOT cause page redirects")
                 validation_results.append(True)
@@ -130,24 +132,24 @@ def validate_user_issue_resolution():
         else:
             print("❌ Main app file not found")
             validation_results.append(False)
-            
+
     except Exception as e:
         print(f"❌ Main App test failed: {e}")
         validation_results.append(False)
-    
+
     print()
-    
+
     # Test 5: Verify CSS supports SPA styling
     print("🧪 Test 5: CSS - SPA Visual Support")
     print("-" * 50)
     try:
         css_path = Path("assets/mobile_styles.css")
         if css_path.exists():
-            with open(css_path, 'r') as f:
+            with open(css_path) as f:
                 content = f.read()
-                
+
             # Check for SPA-specific CSS classes
-            if 'mobile-spa-container' in content and 'mobile-content-section' in content:
+            if "mobile-spa-container" in content and "mobile-content-section" in content:
                 print("✅ CSS includes SPA-specific styling")
                 print("✅ Content focus highlighting will work correctly")
                 validation_results.append(True)
@@ -157,14 +159,14 @@ def validate_user_issue_resolution():
         else:
             print("❌ CSS file not found")
             validation_results.append(False)
-            
+
     except Exception as e:
         print(f"❌ CSS test failed: {e}")
         validation_results.append(False)
-    
+
     print()
     print("=" * 70)
-    
+
     # Final validation results
     if all(validation_results):
         print("🎉 USER ISSUE COMPLETELY RESOLVED!")
@@ -192,10 +194,12 @@ def validate_user_issue_resolution():
         print()
         return False
 
+
 def main():
     """Run the complete validation."""
     success = validate_user_issue_resolution()
     return success
+
 
 if __name__ == "__main__":
     success = main()

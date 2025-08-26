@@ -7,6 +7,7 @@ with comprehensive reporting and AI agent support.
 """
 
 import logging
+import time
 from datetime import datetime
 from typing import Any
 
@@ -48,6 +49,61 @@ class MobileTestingFramework:
         self.test_execution_history: list[dict[str, Any]] = []
 
         logger.info("MobileTestingFramework initialized with all testing modules")
+
+    def test_all_components(self) -> dict[str, Any]:
+        """
+        Test all registered mobile components.
+
+        Returns:
+            Dictionary with test results for all components
+        """
+        try:
+            # Get all registered components from the mobile component registry
+            from .mobile_component_registry import mobile_component_registry
+
+            components = mobile_component_registry.get_all_components()
+
+            if not components:
+                return {
+                    "components_tested": 0,
+                    "status": "no_components_registered",
+                    "message": "No components found in registry",
+                    "test_results": {},
+                }
+
+            test_results = {}
+            total_tested = 0
+            total_passed = 0
+
+            for component_id, component_class in components.items():
+                try:
+                    # Run validation for each component
+                    validation_result = self.run_full_component_validation(component_id)
+                    test_results[component_id] = validation_result
+
+                    total_tested += 1
+
+                    # Check if component passed
+                    overall_summary = validation_result.get("overall_summary", {})
+                    if overall_summary.get("overall_status") == "passed":
+                        total_passed += 1
+
+                except Exception as e:
+                    test_results[component_id] = {"error": str(e), "status": "test_failed"}
+                    total_tested += 1
+
+            return {
+                "components_tested": total_tested,
+                "components_passed": total_passed,
+                "success_rate": (total_passed / total_tested * 100) if total_tested > 0 else 0,
+                "status": "completed",
+                "test_results": test_results,
+                "timestamp": time.time(),
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to test all components: {e}")
+            return {"components_tested": 0, "status": "framework_error", "error": str(e), "test_results": {}}
 
     def run_full_component_validation(self, component_id: str) -> dict[str, Any]:
         """

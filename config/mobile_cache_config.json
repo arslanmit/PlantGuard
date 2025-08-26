@@ -1,0 +1,23 @@
+{
+  "streamlit_cache": {
+    "max_entries": 50,
+    "ttl": 3600,
+    "allow_output_mutation": true
+  },
+  "model_cache": {
+    "vision_model_cache_size": 1,
+    "audio_model_cache_size": 1,
+    "text_model_cache_size": 1,
+    "lazy_loading": true
+  },
+  "image_cache": {
+    "max_image_size_mb": 10,
+    "compression_quality": 85,
+    "max_cached_images": 20
+  },
+  "memory_management": {
+    "auto_cleanup_interval": 300,
+    "memory_threshold_mb": 500,
+    "aggressive_gc": true
+  }
+}

@@ -158,14 +158,11 @@ class MobileInterfaceSwitcher:
             }
 
     def apply_interface_config(self) -> None:
-        """Apply interface configuration to Streamlit."""
+        """Apply mobile interface configuration to Streamlit."""
         config = self.get_interface_config()
 
-        # Apply CSS based on interface type
-        if config["interface_type"] == "mobile":
-            self._apply_mobile_css()
-        else:
-            self._apply_desktop_css()
+        # Apply mobile CSS (mobile-only system)
+        self._apply_mobile_css()
 
     def _apply_mobile_css(self) -> None:
         """Apply mobile-specific CSS."""
@@ -254,41 +251,6 @@ class MobileInterfaceSwitcher:
         """
 
         st.markdown(mobile_css, unsafe_allow_html=True)
-
-    def _apply_desktop_css(self) -> None:
-        """Apply desktop-specific CSS."""
-        desktop_css = """
-        <style>
-        /* Desktop interface styles */
-        .main .block-container {
-            max-width: 1200px;
-            padding: 1rem 2rem;
-        }
-        
-        /* Desktop button styles */
-        .stButton > button {
-            min-height: 40px;
-        }
-        
-        /* Desktop layout */
-        .desktop-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-        
-        /* Desktop cards */
-        .desktop-card {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        </style>
-        """
-
-        st.markdown(desktop_css, unsafe_allow_html=True)
 
     def render_interface_info(self) -> None:
         """Render information about current interface."""

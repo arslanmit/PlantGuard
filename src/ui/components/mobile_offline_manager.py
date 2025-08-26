@@ -549,6 +549,14 @@ class MobileOfflineManager:
                 with open(cache_file, encoding="utf-8") as f:
                     resource_data = json.load(f)
 
+                # Convert strategy string back to enum
+                if "strategy" in resource_data and isinstance(resource_data["strategy"], str):
+                    try:
+                        resource_data["strategy"] = CacheStrategy(resource_data["strategy"])
+                    except ValueError:
+                        # Default to CACHE_FIRST if invalid strategy
+                        resource_data["strategy"] = CacheStrategy.CACHE_FIRST
+
                 # Reconstruct resource
                 resource = OfflineResource(**resource_data)
                 self._offline_cache[resource_id] = resource
@@ -563,8 +571,14 @@ class MobileOfflineManager:
         try:
             resource_file = self.cache_dir / f"{resource.id}.cache"
 
+            # Convert resource to dict with enum serialization
+            resource_dict = asdict(resource)
+            # Convert enum to string for JSON serialization
+            if isinstance(resource_dict.get("strategy"), CacheStrategy) or hasattr(resource_dict.get("strategy"), "value"):
+                resource_dict["strategy"] = resource_dict["strategy"].value
+
             with open(resource_file, "w", encoding="utf-8") as f:
-                json.dump(asdict(resource), f, indent=2)
+                json.dump(resource_dict, f, indent=2)
 
         except Exception as e:
             logger.warning(f"Failed to persist resource {resource.id}: {e}")
