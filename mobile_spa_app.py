@@ -16,30 +16,40 @@ Features:
 - Self-healing capabilities
 """
 
+# Standard library imports
+import builtins
+import contextlib
+import io
 import logging
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
-import streamlit as st
-
-# Add src to Python path
+# Add src to Python path (must be before first-party imports)
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
-# Import mobile components
+# Third-party imports
+import streamlit as st  # noqa: E402
+from PIL import Image as PILImage  # noqa: E402
 
-# Import core adapters for enhanced functionality
-from ui.components.mobile_chat_interface import MobileChatInterface
-from ui.components.mobile_component_registry import mobile_component_registry
-from ui.components.mobile_content_tabs import MobileContentTabs
-from ui.components.mobile_header import MobileHeader
-from ui.components.mobile_image_analysis import MobileImageAnalysis
-from ui.components.mobile_input_ribbon import MobileInputRibbon
-from ui.components.mobile_layout_manager import MobileLayoutManager
-from ui.components.mobile_voice_interface import MobileVoiceInterface
+# First-party imports - Core adapters
+from core.audio import AudioAdapter  # noqa: E402
+from core.nlp import TextAdapter  # noqa: E402
+from core.vision import VisionAdapter  # noqa: E402
 
-# Import testing framework and performance optimizer with fallbacks
+# First-party imports - Mobile components
+from ui.components.mobile_chat_interface import MobileChatInterface  # noqa: E402
+from ui.components.mobile_component_registry import mobile_component_registry  # noqa: E402
+from ui.components.mobile_content_tabs import MobileContentTabs  # noqa: E402
+from ui.components.mobile_header import MobileHeader  # noqa: E402
+from ui.components.mobile_image_analysis import MobileImageAnalysis  # noqa: E402
+from ui.components.mobile_input_ribbon import MobileInputRibbon  # noqa: E402
+from ui.components.mobile_layout_manager import MobileLayoutManager  # noqa: E402
+from ui.components.mobile_voice_interface import MobileVoiceInterface  # noqa: E402
+
+# Conditional imports with fallbacks
 try:
     from ui.components.mobile_testing_framework import MobileTestingFramework
 except ImportError:
@@ -95,14 +105,6 @@ except ImportError:
             return MockMemoryManager()
 
     mobile_performance_optimizer = MockPerformanceOptimizer()
-
-# Import core adapters for enhanced functionality
-import builtins
-import contextlib
-
-from core.audio import AudioAdapter
-from core.nlp import TextAdapter
-from core.vision import VisionAdapter
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -212,8 +214,6 @@ class MobilePlantGuardApp:
 
         # App start time
         if "app_start_time" not in st.session_state:
-            import time
-
             st.session_state.app_start_time = time.time()
 
         # Mobile-specific essentials
@@ -402,7 +402,6 @@ class MobilePlantGuardApp:
 
     def track_tab_navigation(self, new_tab: str) -> None:
         """Track tab navigation for user analytics."""
-        import time
 
         if st.session_state.current_tab != new_tab:
             # Update previous tab
@@ -423,7 +422,6 @@ class MobilePlantGuardApp:
 
     def save_analysis_result(self, result: dict[str, Any], analysis_type: str = "unknown") -> None:
         """Save analysis result to history with metadata."""
-        import time
 
         analysis_record = {
             "timestamp": time.time(),
@@ -441,7 +439,6 @@ class MobilePlantGuardApp:
 
     def get_session_analytics(self) -> dict[str, Any]:
         """Get comprehensive session analytics."""
-        import time
 
         current_time = time.time()
         session_duration = current_time - st.session_state.app_start_time
@@ -527,10 +524,6 @@ class MobilePlantGuardApp:
                 optimized_image_data = self.performance_optimizer.optimize_images(image_data)
 
                 # Convert back to PIL Image
-                import io
-
-                from PIL import Image as PILImage
-
                 image = PILImage.open(io.BytesIO(optimized_image_data))
 
             # Perform prediction
@@ -1174,7 +1167,6 @@ class MobilePlantGuardApp:
 
     def get_session_duration(self) -> str:
         """Get formatted session duration."""
-        import time
 
         start_time = st.session_state.get("app_start_time", time.time())
         duration = time.time() - start_time
@@ -1203,8 +1195,6 @@ class MobilePlantGuardApp:
                 self.track_tab_navigation(target_tab)
 
                 # Update input mode timestamp
-                import time
-
                 st.session_state.current_input_mode = selected_input
                 st.session_state.last_input_timestamp = time.time()
 

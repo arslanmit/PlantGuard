@@ -183,8 +183,6 @@ class MakeMobileTester:
     def test_port_availability(self) -> dict[str, Any]:
         """Test that the mobile app port (8502) is available."""
         try:
-            import socket
-
             # Test if port 8502 is available
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(1)

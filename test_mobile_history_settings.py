@@ -13,12 +13,12 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
-from datetime import datetime
+from datetime import datetime  # noqa: E402
 
-import streamlit as st
+import streamlit as st  # noqa: E402
 
-from ui.components.mobile_history_view import MobileHistoryView
-from ui.components.mobile_settings_card import MobileSettingsCard
+from ui.components.mobile_history_view import MobileHistoryView  # noqa: E402
+from ui.components.mobile_settings_card import MobileSettingsCard  # noqa: E402
 
 # Page configuration
 st.set_page_config(page_title="Mobile History & Settings Test", page_icon="🧪", layout="wide", initial_sidebar_state="collapsed")

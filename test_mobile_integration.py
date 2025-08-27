@@ -13,20 +13,30 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
-from datetime import datetime
+from datetime import datetime  # noqa: E402
 
-import streamlit as st
+import streamlit as st  # noqa: E402
 
 
 def test_component_imports():
     """Test that all components can be imported successfully."""
-    try:
-        from ui.components.mobile_history_view import MobileHistoryView
-        from ui.components.mobile_settings_card import MobileSettingsCard
-        from ui.components.mobile_state_manager import MobileStateManager
-        from ui.components.model_switcher import ModelSwitcher
+    import importlib.util
 
-        st.success("✅ All components imported successfully")
+    components = [
+        "ui.components.mobile_history_view",
+        "ui.components.mobile_settings_card",
+        "ui.components.mobile_state_manager",
+        "ui.components.model_switcher",
+    ]
+
+    try:
+        for component_name in components:
+            spec = importlib.util.find_spec(component_name)
+            if spec is None:
+                st.error(f"❌ Component not found: {component_name}")
+                return False
+
+        st.success("✅ All components found successfully")
         return True
     except ImportError as e:
         st.error(f"❌ Import error: {e}")

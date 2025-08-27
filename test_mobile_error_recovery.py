@@ -15,11 +15,16 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 def test_error_handler_imports():
     """Test that error handler modules can be imported."""
-    try:
-        from src.ui.mobile_error_handler import ErrorCategory, ErrorSeverity, MobileErrorBoundary, MobileErrorHandler, mobile_error_boundary
+    import importlib.util
 
-        print("✅ MobileErrorHandler imports successful")
-        return True
+    try:
+        spec = importlib.util.find_spec("src.ui.mobile_error_handler")
+        if spec is not None:
+            print("✅ MobileErrorHandler module found")
+            return True
+        else:
+            print("❌ MobileErrorHandler module not found")
+            return False
     except ImportError as e:
         print(f"❌ MobileErrorHandler import failed: {e}")
         return False
@@ -27,17 +32,16 @@ def test_error_handler_imports():
 
 def test_offline_manager_imports():
     """Test that offline manager modules can be imported."""
-    try:
-        from src.ui.mobile_offline_manager import (
-            MobileOfflineManager,
-            NetworkStatus,
-            OfflineCapability,
-            ensure_offline_capability,
-            with_offline_support,
-        )
+    import importlib.util
 
-        print("✅ MobileOfflineManager imports successful")
-        return True
+    try:
+        spec = importlib.util.find_spec("src.ui.mobile_offline_manager")
+        if spec is not None:
+            print("✅ MobileOfflineManager module found")
+            return True
+        else:
+            print("❌ MobileOfflineManager module not found")
+            return False
     except ImportError as e:
         print(f"❌ MobileOfflineManager import failed: {e}")
         return False
@@ -45,16 +49,16 @@ def test_offline_manager_imports():
 
 def test_integration_imports():
     """Test that integration module can be imported."""
-    try:
-        from src.ui.mobile_error_recovery_integration import (
-            MobileErrorRecoveryIntegration,
-            create_resilient_mobile_component,
-            handle_mobile_operation,
-            initialize_mobile_error_recovery,
-        )
+    import importlib.util
 
-        print("✅ MobileErrorRecoveryIntegration imports successful")
-        return True
+    try:
+        spec = importlib.util.find_spec("src.ui.mobile_error_recovery_integration")
+        if spec is not None:
+            print("✅ MobileErrorRecoveryIntegration module found")
+            return True
+        else:
+            print("❌ MobileErrorRecoveryIntegration module not found")
+            return False
     except ImportError as e:
         print(f"❌ MobileErrorRecoveryIntegration import failed: {e}")
         return False

@@ -21,7 +21,6 @@ Usage:
 
 import argparse
 import gc
-import importlib
 import json
 import logging
 import os
@@ -62,10 +61,17 @@ class MobilePerformanceOptimizer:
         # Measure mobile app import time
         start_time = time.time()
         try:
-            import mobile_spa_app
+            import importlib.util
 
-            startup_times["mobile_app_import"] = time.time() - start_time
-            logger.info(f"✅ Mobile app import: {startup_times['mobile_app_import']:.3f}s")
+            spec = importlib.util.find_spec("mobile_spa_app")
+            if spec is not None:
+                mobile_spa_app = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mobile_spa_app)
+                startup_times["mobile_app_import"] = time.time() - start_time
+                logger.info(f"✅ Mobile app import: {startup_times['mobile_app_import']:.3f}s")
+            else:
+                logger.error("❌ Mobile app module not found")
+                startup_times["mobile_app_import"] = -1
         except ImportError as e:
             logger.error(f"❌ Failed to import mobile app: {e}")
             startup_times["mobile_app_import"] = -1

@@ -100,10 +100,6 @@ Mobile ARIA Accessibility Helper
 Provides comprehensive ARIA support for mobile components.
 """
 
-import logging
-from typing import Dict, Any, Optional
-import streamlit as st
-
 logger = logging.getLogger(__name__)
 
 class MobileAriaHelper:
@@ -363,7 +359,7 @@ class MobileAriaHelper:
 mobile_aria_helper = MobileAriaHelper()
 '''
 
-    def validate_and_improve_semantic_html(self) -> Dict[str, Any]:
+    def validate_and_improve_semantic_html(self) -> dict[str, Any]:
         """Validate and improve semantic HTML structure."""
         logger.info("Validating and improving semantic HTML")
 
@@ -406,10 +402,6 @@ Mobile Semantic HTML Helper
 
 Provides semantic HTML structure for better accessibility.
 """
-
-import logging
-from typing import List, Dict, Any, Optional
-import streamlit as st
 
 logger = logging.getLogger(__name__)
 
@@ -673,7 +665,7 @@ class MobileSemanticHelper:
 mobile_semantic_helper = MobileSemanticHelper()
 '''
 
-    def validate_and_improve_keyboard_navigation(self) -> Dict[str, Any]:
+    def validate_and_improve_keyboard_navigation(self) -> dict[str, Any]:
         """Validate and improve keyboard navigation."""
         logger.info("Validating and improving keyboard navigation")
 
@@ -716,10 +708,6 @@ Mobile Keyboard Navigation Helper
 
 Provides keyboard navigation support for mobile accessibility.
 """
-
-import logging
-from typing import List, Dict, Any, Optional
-import streamlit as st
 
 logger = logging.getLogger(__name__)
 

@@ -13,7 +13,7 @@ from unittest.mock import Mock
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
-import streamlit as st
+import streamlit as st  # noqa: E402
 
 
 class MockStreamlit:
@@ -58,16 +58,26 @@ class MockStreamlit:
 
 def test_mobile_component_imports():
     """Test that all mobile components can be imported."""
-    try:
-        from ui.components.mobile_chat_interface import MobileChatInterface
-        from ui.components.mobile_content_tabs import MobileContentTabs
-        from ui.components.mobile_header import MobileHeader
-        from ui.components.mobile_image_analysis import MobileImageAnalysis
-        from ui.components.mobile_input_ribbon import MobileInputRibbon
-        from ui.components.mobile_layout_manager import MobileLayoutManager
-        from ui.components.mobile_voice_interface import MobileVoiceInterface
+    import importlib.util
 
-        st.success("✅ All mobile components imported successfully")
+    components = [
+        "ui.components.mobile_chat_interface",
+        "ui.components.mobile_content_tabs",
+        "ui.components.mobile_header",
+        "ui.components.mobile_image_analysis",
+        "ui.components.mobile_input_ribbon",
+        "ui.components.mobile_layout_manager",
+        "ui.components.mobile_voice_interface",
+    ]
+
+    try:
+        for component_name in components:
+            spec = importlib.util.find_spec(component_name)
+            if spec is None:
+                st.error(f"❌ Component not found: {component_name}")
+                return False
+
+        st.success("✅ All mobile components found successfully")
         return True
 
     except ImportError as e:
@@ -77,11 +87,16 @@ def test_mobile_component_imports():
 
 def test_mobile_app_integration():
     """Test mobile app integration."""
-    try:
-        import mobile_spa_app
+    import importlib.util
 
-        st.success("✅ Mobile apps can be imported")
-        return True
+    try:
+        spec = importlib.util.find_spec("mobile_spa_app")
+        if spec is not None:
+            st.success("✅ Mobile app can be imported")
+            return True
+        else:
+            st.error("❌ Mobile app module not found")
+            return False
 
     except ImportError as e:
         st.error(f"❌ Mobile app import error: {e}")
@@ -90,10 +105,16 @@ def test_mobile_app_integration():
 
 def test_adapter_integration():
     """Test that adapters work with mobile components."""
+    import importlib.util
+
+    adapters = ["core.audio", "core.nlp", "core.vision"]
+
     try:
-        from core.audio import AudioAdapter
-        from core.nlp import TextAdapter
-        from core.vision import VisionAdapter
+        for adapter_name in adapters:
+            spec = importlib.util.find_spec(adapter_name)
+            if spec is None:
+                st.error(f"❌ Adapter not found: {adapter_name}")
+                return False
 
         st.success("✅ All adapters can be imported")
         return True

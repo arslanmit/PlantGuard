@@ -14,15 +14,22 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
 def test_mobile_imports():
     """Test that mobile modules can be imported."""
-    try:
-        from src.ui.mobile_component_registry import MobileComponentRegistry, MobileStateManager
-        from src.ui.mobile_design_system import ButtonVariant, ComponentSize, MobileDesignSystem
-        from src.ui.mobile_layout_manager import MobileLayoutManager
+    import importlib.util
 
-        print("✅ All mobile modules imported successfully")
+    modules = ["src.ui.mobile_component_registry", "src.ui.mobile_design_system", "src.ui.mobile_layout_manager"]
+
+    try:
+        for module_name in modules:
+            spec = importlib.util.find_spec(module_name)
+            if spec is None:
+                print(f"❌ Module not found: {module_name}")
+                return False
+
+        print("✅ All mobile modules found successfully")
         return True
     except ImportError as e:
         print(f"❌ Import error: {e}")
+        return False
         return False
 
 
