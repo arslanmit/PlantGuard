@@ -120,7 +120,7 @@ class MobileTestingFramework:
         start_time = datetime.now()
         execution_id = f"validation_{component_id}_{int(start_time.timestamp())}"
 
-        validation_results = {
+        validation_results: dict[str, Any] = {
             "execution_id": execution_id,
             "component_id": component_id,
             "start_time": start_time.isoformat(),
@@ -304,18 +304,26 @@ class MobileTestingFramework:
                 summary["ai_agent_compatibility"] = "poor"
 
             # Calculate overall success rate
-            if summary["total_tests"] > 0:
-                summary["success_rate"] = summary["passed_tests"] / summary["total_tests"]
+            total_tests = summary["total_tests"]
+            passed_tests = summary["passed_tests"]
+            if isinstance(total_tests, int) and total_tests > 0 and isinstance(passed_tests, int):
+                summary["success_rate"] = passed_tests / total_tests
+            else:
+                summary["success_rate"] = 0.0
 
             # Determine overall status
-            if summary["success_rate"] >= 0.9:
-                summary["overall_status"] = "excellent"
-            elif summary["success_rate"] >= 0.8:
-                summary["overall_status"] = "good"
-            elif summary["success_rate"] >= 0.6:
-                summary["overall_status"] = "fair"
+            success_rate = summary["success_rate"]
+            if isinstance(success_rate, int | float):
+                if success_rate >= 0.9:
+                    summary["overall_status"] = "excellent"
+                elif success_rate >= 0.8:
+                    summary["overall_status"] = "good"
+                elif success_rate >= 0.6:
+                    summary["overall_status"] = "fair"
+                else:
+                    summary["overall_status"] = "poor"
             else:
-                summary["overall_status"] = "poor"
+                summary["overall_status"] = "unknown"
 
             # Determine performance grade
             performance_tests = validation_results.get("mobile_specific_tests", {}).get("performance_tests", [])
@@ -406,7 +414,7 @@ class MobileTestingFramework:
 
     def _apply_auto_healing(self, component_id: str, validation_results: dict[str, Any]) -> dict[str, Any]:
         """Apply auto-healing based on validation results."""
-        healing_results = {"healing_attempted": False, "healing_successful": False, "actions_taken": [], "remaining_issues": []}
+        healing_results: dict[str, Any] = {"healing_attempted": False, "healing_successful": False, "actions_taken": [], "remaining_issues": []}
 
         try:
             # Check if healing is needed
@@ -422,9 +430,11 @@ class MobileTestingFramework:
 
                 if healing_result.status == "healed":
                     healing_results["healing_successful"] = True
-                    healing_results["actions_taken"].extend(healing_result.actions_taken)
+                    if hasattr(healing_result, "actions_taken") and isinstance(healing_result.actions_taken, list):
+                        healing_results["actions_taken"].extend(healing_result.actions_taken)
                 else:
-                    healing_results["remaining_issues"].extend(healing_result.findings)
+                    if hasattr(healing_result, "findings") and isinstance(healing_result.findings, list):
+                        healing_results["remaining_issues"].extend(healing_result.findings)
 
                 logger.info("Auto-healing completed for %s: %s", component_id, "successful" if healing_results["healing_successful"] else "failed")
 
@@ -443,7 +453,7 @@ class MobileTestingFramework:
         """
         logger.info("Starting continuous monitoring cycle")
 
-        monitoring_results = {
+        monitoring_results: dict[str, Any] = {
             "timestamp": datetime.now().isoformat(),
             "component_discovery": {},
             "health_checks": {},
@@ -501,10 +511,25 @@ class MobileTestingFramework:
                     )
 
             # Generate monitoring summary
+            health_checks = monitoring_results["health_checks"]
+            alerts = monitoring_results["alerts"]
+
+            healthy_count = 0
+            if isinstance(health_checks, dict):
+                for health_result in health_checks.values():
+                    if isinstance(health_result, dict) and health_result.get("confidence", 0) > 0.7:
+                        healthy_count += 1
+
+            critical_alerts_count = 0
+            if isinstance(alerts, list):
+                for alert in alerts:
+                    if isinstance(alert, dict) and "critical" in alert.get("type", ""):
+                        critical_alerts_count += 1
+
             monitoring_results["summary"] = {
                 "components_monitored": len(all_states),
-                "healthy_components": len([h for h in monitoring_results["health_checks"].values() if h.get("confidence", 0) > 0.7]),
-                "critical_alerts": len([a for a in monitoring_results["alerts"] if "critical" in a.get("type", "")]),
+                "healthy_components": healthy_count,
+                "critical_alerts": critical_alerts_count,
                 "monitoring_status": "completed",
             }
 
