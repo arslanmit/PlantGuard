@@ -4,8 +4,7 @@
     "status": "passed",
     "found_structure": {
       "mobile_apps": [
-        "mobile_spa_app.py",
-        "mobile_plantguard_app.py"
+        "mobile_spa_app.py"
       ],
       "mobile_assets": [
         "assets/mobile_styles.css",
@@ -17,7 +16,6 @@
         "src/ui/mobile_navigation.py",
         "src/ui/mobile_input_demo.py",
         "src/ui/mobile_design_system.py",
-        "src/ui/mobile_demo_app.py",
         "src/ui/mobile_display_demo.py",
         "src/ui/mobile_accessibility.py",
         "src/ui/mobile_error_handler.py",
@@ -48,7 +46,7 @@
       ]
     },
     "missing_items": [],
-    "details": "Mobile structure organized with 2 apps, 2 assets, 16 components, 10 tests"
+    "details": "Mobile structure organized with 1 apps, 2 assets, 15 components, 10 tests"
   },
   "requirement_8_2": {
     "requirement": "8.2 - Empty directories cleaned",
@@ -72,22 +70,23 @@
     "requirement": "8.4 - Mobile components organized logically",
     "status": "passed",
     "organized_components": {
-      "mobile_ui_components": 16,
+      "mobile_ui_components": 15,
       "mobile_tests": 10,
-      "mobile_apps": 2
+      "mobile_apps": 1
     },
-    "details": "Found 16 UI components, 10 tests, 2 apps"
+    "details": "Found 15 UI components, 10 tests, 1 apps"
   },
   "requirement_8_5": {
     "requirement": "8.5 - Mobile-relevant assets only",
     "status": "passed",
     "mobile_assets": [
       "mobile_optimized_styles.css",
-      "mobile_styles.css"
+      "mobile_styles.css",
+      "mobile_performance_optimized.css"
     ],
     "problematic_assets": [],
-    "total_assets": 2,
-    "details": "Found 2 mobile assets, 0 problematic assets"
+    "total_assets": 3,
+    "details": "Found 3 mobile assets, 0 problematic assets"
   },
   "overall_status": "passed"
 }
