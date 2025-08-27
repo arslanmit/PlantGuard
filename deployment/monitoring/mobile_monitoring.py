@@ -259,7 +259,7 @@ class MobileMonitoringSystem:
 
         recent_performance = (
             [m for m in self.performance_metrics if datetime.fromisoformat(m.timestamp) > datetime.now() - timedelta(minutes=5)]
-            if hasattr(list(self.performance_metrics)[0] if self.performance_metrics else None, "timestamp")
+            if hasattr(next(iter(self.performance_metrics)) if self.performance_metrics else None, "timestamp")
             else []
         )
 

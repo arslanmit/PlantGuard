@@ -131,7 +131,7 @@ class MobileMemoryManager:
             return
 
         # Clean up temporary state entries
-        temp_keys = [key for key in st.session_state.keys() if key.startswith("temp_")]
+        temp_keys = [key for key in st.session_state if key.startswith("temp_")]
         for key in temp_keys:
             if key in st.session_state:
                 del st.session_state[key]

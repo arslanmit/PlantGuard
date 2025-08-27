@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class FileStructureOptimizer:
     """Optimize file structure for mobile-only PlantGuard system."""
 
-    def __init__(self, workspace_root: Path = None):
+    def __init__(self, workspace_root: Path | None = None):
         self.workspace_root = workspace_root or Path.cwd()
         self.optimization_log = []
 

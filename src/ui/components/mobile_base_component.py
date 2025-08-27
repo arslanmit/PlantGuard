@@ -323,7 +323,7 @@ class MobileBaseComponent(ABC):
 
     def _render_loading_state(self) -> None:
         """Render loading state."""
-        css_classes = " ".join(self.get_css_classes() + ["loading"])
+        css_classes = " ".join([*self.get_css_classes(), "loading"])
 
         st.markdown(
             f"""
@@ -340,7 +340,7 @@ class MobileBaseComponent(ABC):
     def _render_error_state(self) -> None:
         """Render error state."""
         error_message = self.get_error()
-        css_classes = " ".join(self.get_css_classes() + ["error"])
+        css_classes = " ".join([*self.get_css_classes(), "error"])
 
         st.markdown(
             f"""
@@ -359,7 +359,7 @@ class MobileBaseComponent(ABC):
 
     def _render_fallback(self) -> None:
         """Render fallback UI when main rendering fails."""
-        css_classes = " ".join(self.get_css_classes() + ["fallback"])
+        css_classes = " ".join([*self.get_css_classes(), "fallback"])
 
         st.markdown(
             f"""

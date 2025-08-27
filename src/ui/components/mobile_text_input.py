@@ -298,10 +298,7 @@ class MobileTextInput(MobileBaseComponent):
         if len(text) < self.text_config["min_length"]:
             return False
 
-        if len(text) > self.text_config["max_length"]:
-            return False
-
-        return True
+        return not len(text) > self.text_config["max_length"]
 
     def _validate_text_input(self, text: str) -> dict[str, Any]:
         """Validate text input and return validation results."""

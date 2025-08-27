@@ -188,7 +188,7 @@ class MobileOfflineManager:
                 st.info(f"📋 {len(offline_queue)} operations queued for when connection returns")
 
     @staticmethod
-    def cache_resource(key: str, data: Any, expiry_hours: int = None, metadata: dict = None) -> bool:
+    def cache_resource(key: str, data: Any, expiry_hours: int | None = None, metadata: dict | None = None) -> bool:
         """
         Cache a resource for offline use.
 
@@ -270,7 +270,7 @@ class MobileOfflineManager:
 
     @staticmethod
     def queue_offline_operation(
-        operation_id: str, operation_type: str, operation_data: dict, retry_callback: Callable = None, priority: int = 1
+        operation_id: str, operation_type: str, operation_data: dict, retry_callback: Callable | None = None, priority: int = 1
     ) -> bool:
         """
         Queue an operation for execution when network becomes available.
@@ -372,7 +372,9 @@ class MobileOfflineManager:
         }
 
     @staticmethod
-    def retry_with_backoff(operation_id: str, operation_func: Callable, max_attempts: int = None, backoff_base: float = None) -> dict[str, Any]:
+    def retry_with_backoff(
+        operation_id: str, operation_func: Callable, max_attempts: int | None = None, backoff_base: float | None = None
+    ) -> dict[str, Any]:
         """
         Retry an operation with exponential backoff.
 
@@ -442,7 +444,7 @@ class MobileOfflineManager:
 
     @staticmethod
     def register_offline_capability(
-        component_id: str, capability_level: OfflineCapability, cached_resources: list[str] = None, fallback_data: dict = None
+        component_id: str, capability_level: OfflineCapability, cached_resources: list[str] | None = None, fallback_data: dict | None = None
     ) -> None:
         """
         Register offline capability for a component.
@@ -763,7 +765,7 @@ class MobileOfflineManager:
 # Utility functions for easy integration
 
 
-def with_offline_support(operation_id: str, operation_func: Callable, fallback_func: Callable = None, cache_result: bool = True):
+def with_offline_support(operation_id: str, operation_func: Callable, fallback_func: Callable | None = None, cache_result: bool = True):
     """
     Decorator to add offline support to operations.
 
@@ -821,7 +823,7 @@ def with_offline_support(operation_id: str, operation_func: Callable, fallback_f
     return decorator
 
 
-def ensure_offline_capability(component_id: str, required_resources: list[str] = None):
+def ensure_offline_capability(component_id: str, required_resources: list[str] | None = None):
     """
     Ensure a component has the necessary offline capabilities.
 

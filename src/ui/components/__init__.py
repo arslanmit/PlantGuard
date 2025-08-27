@@ -5,6 +5,8 @@ This package provides mobile-optimized components with AI agent support
 and comprehensive error handling for the PlantGuard plant disease detection system.
 """
 
+import logging
+
 # Core infrastructure components
 # Base component class
 from .mobile_base_component import MobileBaseComponent
@@ -50,27 +52,27 @@ AI_AGENT_INFO = {
 
 # Export all public components and utilities
 __all__ = [
-    # Core infrastructure
-    "MobileLayoutManager",
-    "MobileComponentRegistry",
-    "MobileStateManager",
-    "MobileErrorHandler",
-    # Base classes
-    "MobileBaseComponent",
-    # Test components
-    "MobileTestComponent",
-    # Enums and data classes
-    "StateType",
-    "StateEntry",
-    "ErrorSeverity",
-    "ErrorCategory",
-    "ErrorInfo",
+    "AI_AGENT_INFO",
     # Registry and discovery
     "MOBILE_COMPONENT_TYPES",
-    "AI_AGENT_INFO",
+    "ErrorCategory",
+    "ErrorInfo",
+    "ErrorSeverity",
+    # Base classes
+    "MobileBaseComponent",
+    "MobileComponentRegistry",
+    "MobileErrorHandler",
+    # Core infrastructure
+    "MobileLayoutManager",
+    "MobileStateManager",
+    # Test components
+    "MobileTestComponent",
+    "StateEntry",
+    # Enums and data classes
+    "StateType",
+    "__author__",
     # Version info
     "__version__",
-    "__author__",
 ]
 
 
@@ -144,8 +146,6 @@ def validate_mobile_infrastructure() -> dict:
 
 
 # Initialize logging for the mobile components package
-import logging
-
 logger = logging.getLogger(__name__)
 logger.info(f"Mobile Components Package v{__version__} initialized")
 logger.debug(f"Available component types: {list(MOBILE_COMPONENT_TYPES.keys())}")

@@ -336,7 +336,7 @@ class MobileErrorHandler:
             ErrorSeverity.CRITICAL: "#FCA5A5",
         }
 
-        severity_icons = {ErrorSeverity.LOW: "ℹ️", ErrorSeverity.MEDIUM: "⚠️", ErrorSeverity.HIGH: "❌", ErrorSeverity.CRITICAL: "🚨"}
+        severity_icons = {ErrorSeverity.LOW: "i", ErrorSeverity.MEDIUM: "⚠️", ErrorSeverity.HIGH: "❌", ErrorSeverity.CRITICAL: "🚨"}
 
         color = severity_colors.get(error_info.severity, "#FEF3C7")
         icon = severity_icons.get(error_info.severity, "⚠️")

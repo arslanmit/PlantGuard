@@ -110,7 +110,7 @@ def test_mobile_component_registry():
 
         # Test state manager
         test_state = MobileStateManager.get_component_state("test_component")
-        assert test_state["initialized"] == True
+        assert test_state["initialized"]
         assert "data" in test_state
 
         print("✅ MobileComponentRegistry tests passed")

@@ -252,7 +252,7 @@ class MobileSpecificTester:
         # Add some variation for realism
         import random
 
-        variation = random.uniform(0.9, 1.1)
+        variation = random.uniform(0.9, 1.1)  # noqa: S311
         final_size = simulated_size * variation
 
         # Check if meets minimum requirements

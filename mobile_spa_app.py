@@ -97,6 +97,9 @@ except ImportError:
     mobile_performance_optimizer = MockPerformanceOptimizer()
 
 # Import core adapters for enhanced functionality
+import builtins
+import contextlib
+
 from core.audio import AudioAdapter
 from core.nlp import TextAdapter
 from core.vision import VisionAdapter
@@ -588,7 +591,7 @@ class MobilePlantGuardApp:
             logger.error(f"Voice processing failed: {e}")
             return f"Voice processing error: {e}"
 
-    def process_text_query(self, query: str, context: dict = None) -> str:
+    def process_text_query(self, query: str, context: dict | None = None) -> str:
         """Process text query using NLP adapter."""
         try:
             if not self.text_adapter:
@@ -1258,13 +1261,11 @@ class MobilePlantGuardApp:
             with col2:
                 if st.button("🧹 Clear Cache & Restart", use_container_width=True, key="spa_clear_restart"):
                     # Clear performance cache
-                    try:
+                    with contextlib.suppress(builtins.BaseException):
                         self.performance_optimizer.cache.clear()
-                    except:
-                        pass
 
                     # Clear session state
-                    keys_to_clear = [k for k in st.session_state.keys() if k.startswith("mobile_")]
+                    keys_to_clear = [k for k in st.session_state if k.startswith("mobile_")]
                     for key in keys_to_clear:
                         del st.session_state[key]
 
@@ -1355,7 +1356,7 @@ class MobilePlantGuardApp:
 
             if st.button("🔄 Try Full Restart", use_container_width=True, key="spa_full_restart"):
                 # Clear all mobile app state
-                keys_to_clear = [k for k in st.session_state.keys() if k.startswith("mobile_")]
+                keys_to_clear = [k for k in st.session_state if k.startswith("mobile_")]
                 for key in keys_to_clear:
                     del st.session_state[key]
                 st.success("Full restart initiated - page will refresh once")

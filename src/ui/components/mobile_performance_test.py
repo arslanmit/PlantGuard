@@ -467,7 +467,7 @@ class MobilePerformanceTest:
                     if metrics:
                         st.markdown("**Metrics:**")
                         for metric_name, metric_value in metrics.items():
-                            if isinstance(metric_value, (int, float)):
+                            if isinstance(metric_value, int | float):
                                 st.metric(metric_name.replace("_", " ").title(), f"{metric_value:.3f}")
                             else:
                                 st.text(f"{metric_name.replace('_', ' ').title()}: {metric_value}")

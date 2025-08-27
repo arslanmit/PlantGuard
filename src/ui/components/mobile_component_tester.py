@@ -520,7 +520,7 @@ class MobileComponentTester:
                 timestamp=datetime.now().isoformat(),
             )
 
-    def run_component_test_suite(self, component_type: str, component_id: str = None) -> list[TestResult]:
+    def run_component_test_suite(self, component_type: str, component_id: str | None = None) -> list[TestResult]:
         """
         Run complete test suite for a component type.
 
@@ -595,14 +595,14 @@ class MobileComponentTester:
 
         all_results = {}
 
-        for component_type in self.test_suites.keys():
+        for component_type in self.test_suites:
             logger.info("Testing component type: %s", component_type)
             results = self.run_component_test_suite(component_type)
             all_results[component_type] = results
 
         return all_results
 
-    def generate_test_report(self, results: dict[str, list[TestResult]] = None) -> dict[str, Any]:
+    def generate_test_report(self, results: dict[str, list[TestResult]] | None = None) -> dict[str, Any]:
         """
         Generate comprehensive test report.
 
@@ -615,7 +615,7 @@ class MobileComponentTester:
         if results is None:
             # Use all stored results
             results = {}
-            for component_type in self.test_suites.keys():
+            for component_type in self.test_suites:
                 component_results = [r for r in self.test_results if component_type in r.test_name]
                 if component_results:
                     results[component_type] = component_results

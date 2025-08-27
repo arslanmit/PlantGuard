@@ -832,7 +832,7 @@ class AIAgentTestingFramework:
             if test_coverage < 80:
                 recommendations.append(f"📊 Test coverage is {test_coverage:.1f}% - consider improving test reliability")
 
-        return recommendations or ["ℹ️ No specific recommendations at this time"]
+        return recommendations or ["i No specific recommendations at this time"]
 
     def get_component_health_report(self) -> dict[str, Any]:
         """Get comprehensive component health report."""
@@ -880,7 +880,9 @@ class AIAgentTestingFramework:
 class InteractionTestResult:
     """Result from autonomous interaction testing."""
 
-    def __init__(self, element_id: str, test_type: str, success: bool, response_time: float = 0.0, error: str = None, data: dict[str, Any] = None):
+    def __init__(
+        self, element_id: str, test_type: str, success: bool, response_time: float = 0.0, error: str | None = None, data: dict[str, Any] | None = None
+    ):
         self.element_id = element_id
         self.test_type = test_type
         self.success = success

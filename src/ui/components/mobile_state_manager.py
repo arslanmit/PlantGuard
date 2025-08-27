@@ -274,7 +274,7 @@ class MobileStateManager:
         """
         component_states = {}
 
-        for key in st.session_state.keys():
+        for key in st.session_state:
             if key.startswith(self._state_prefix) and not key.endswith("_tracking"):
                 component_id = key.replace(f"{self._state_prefix}_", "")
                 component_states[component_id] = st.session_state[key]
@@ -290,7 +290,7 @@ class MobileStateManager:
         """
         error_states = {}
 
-        for key in st.session_state.keys():
+        for key in st.session_state:
             if key.startswith(self._error_prefix):
                 component_id = key.replace(f"{self._error_prefix}_", "")
                 error_states[component_id] = st.session_state[key]
@@ -359,7 +359,7 @@ class MobileStateManager:
         }
 
         # Get global states
-        for key in st.session_state.keys():
+        for key in st.session_state:
             if key.startswith(self._global_prefix):
                 global_key = key.replace(f"{self._global_prefix}_", "")
                 snapshot["global_states"][global_key] = st.session_state[key]
@@ -450,7 +450,7 @@ class MobileStateManager:
         return {
             "total_components": len(component_states),
             "components_with_errors": len(error_states),
-            "total_session_keys": len([k for k in st.session_state.keys() if k.startswith("mobile_")]),
+            "total_session_keys": len([k for k in st.session_state if k.startswith("mobile_")]),
             "memory_usage_estimate": len(str(st.session_state)),
             "last_activity": datetime.now().isoformat(),
         }

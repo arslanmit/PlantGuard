@@ -338,7 +338,7 @@ class MobileErrorHandler:
             st.warning(f"⚠️ {base_message}")
             st.info("Please try again.")
         else:
-            st.info(f"ℹ️ {base_message}")
+            st.info(f"i {base_message}")
 
     @staticmethod
     def _should_attempt_recovery(component_id: str) -> bool:

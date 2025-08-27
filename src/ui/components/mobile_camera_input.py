@@ -418,7 +418,7 @@ class MobileCameraInput(MobileBaseComponent):
                 # Show disease information if available
                 disease_info = analysis_result.get("disease_info", {})
                 if disease_info and disease_info.get("description"):
-                    with st.expander("ℹ️ Disease Information", expanded=False):
+                    with st.expander("i Disease Information", expanded=False):
                         st.write(f"**Description:** {disease_info['description']}")
 
                         # Show immediate treatment steps

@@ -350,7 +350,7 @@ class PerformanceOptimizer:
 
             # Memory benchmark
             start_time = time.time()
-            large_list = [i for i in range(1000000)]
+            large_list = list(range(1000000))
             memory_time = time.time() - start_time
             del large_list
 

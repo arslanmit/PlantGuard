@@ -222,7 +222,7 @@ class MobileOfflineManager:
             expires_at = now + timedelta(hours=ttl_hours) if ttl_hours > 0 else None
 
             # Calculate size
-            content_str = json.dumps(content) if not isinstance(content, (str, bytes)) else str(content)
+            content_str = json.dumps(content) if not isinstance(content, str | bytes) else str(content)
             size_bytes = len(content_str.encode("utf-8"))
 
             # Create offline resource

@@ -652,7 +652,7 @@ class MobileComponentRegistry:
 
         try:
             # Test component creation for each type
-            for component_type in self._components.keys():
+            for component_type in self._components:
                 test_id = f"ai_test_{component_type}"
                 component = self.create_component(component_type, test_id, f"AI Test {component_type}")
 

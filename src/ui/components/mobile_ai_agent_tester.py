@@ -741,7 +741,7 @@ class MobileAIAgentTester:
         # Get all component states for monitoring
         all_states = self.state_manager.get_all_component_states()
 
-        for component_id in all_states.keys():
+        for component_id in all_states:
             try:
                 # Validate component health
                 validation_result = self.validate_component_health(component_id)

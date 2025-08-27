@@ -83,7 +83,7 @@ class MobileCacheManager:
     def generate_key(self, *args, **kwargs) -> str:
         """Generate cache key from arguments."""
         key_data = pickle.dumps((args, sorted(kwargs.items())))
-        return hashlib.md5(key_data).hexdigest()
+        return hashlib.sha256(key_data).hexdigest()
 
 
 # Global cache manager

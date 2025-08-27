@@ -1,0 +1,13 @@
+{
+  "migration_id": "test_migration",
+  "start_time": "2025-08-27T13:15:39.671674",
+  "files_removed": [],
+  "files_modified": [],
+  "files_backed_up": [],
+  "imports_cleaned": [],
+  "targets_removed": [],
+  "migration_complete": false,
+  "validation_passed": false,
+  "backup_created": false,
+  "rollback_available": false
+}

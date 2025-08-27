@@ -201,7 +201,9 @@ def defer_execution(operation_id: str, delay: float = 0.1):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            operation = lambda: func(*args, **kwargs)
+            def operation():
+                return func(*args, **kwargs)
+
             return mobile_lazy_loader.defer_operation(operation_id, operation, delay)
 
         return wrapper

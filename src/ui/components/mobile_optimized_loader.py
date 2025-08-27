@@ -6,7 +6,6 @@ Implements lazy loading and caching for better performance.
 
 import logging
 import time
-from functools import lru_cache
 from typing import Any
 
 import streamlit as st
@@ -22,7 +21,6 @@ class MobileOptimizedLoader:
         self._load_times: dict[str, float] = {}
         self._performance_metrics = {"total_loads": 0, "cache_hits": 0, "average_load_time": 0.0}
 
-    @lru_cache(maxsize=32)
     def load_component(self, component_type: str, component_id: str, **kwargs) -> Any:
         """Load component with caching and performance monitoring."""
         start_time = time.time()

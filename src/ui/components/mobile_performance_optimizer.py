@@ -376,7 +376,7 @@ class MemoryManager:
         cutoff_time = datetime.now() - timedelta(hours=1)
         keys_to_remove = []
 
-        for key in st.session_state.keys():
+        for key in st.session_state:
             if isinstance(key, str) and key.startswith("mobile_"):
                 # Check if this is a timestamped entry
                 state_data = st.session_state.get(key)
@@ -646,10 +646,7 @@ class MobilePerformanceOptimizer:
 
         # Don't cache dynamic content
         dynamic_components = ["mobile_chat_interface", "mobile_voice_interface"]
-        if component_id in dynamic_components:
-            return False
-
-        return True
+        return component_id not in dynamic_components
 
     def _record_performance_metrics(self, component_id: str, render_time: float) -> None:
         """Record performance metrics."""

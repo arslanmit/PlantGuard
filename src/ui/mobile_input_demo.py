@@ -284,7 +284,7 @@ def render_demo_footer():
     """Render demo footer with additional information."""
     st.markdown("---")
 
-    with st.expander("ℹ️ About This Demo", expanded=False):
+    with st.expander("i About This Demo", expanded=False):
         st.markdown("""
         **PlantGuard Mobile Input Demo** showcases the mobile-optimized input components:
         

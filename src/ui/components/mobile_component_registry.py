@@ -333,7 +333,7 @@ class MobileComponentRegistry:
         import fnmatch
 
         matching_components = []
-        for component_type in self._components.keys():
+        for component_type in self._components:
             if fnmatch.fnmatch(component_type, pattern):
                 matching_components.append(component_type)
 

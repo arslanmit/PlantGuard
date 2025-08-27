@@ -1687,7 +1687,7 @@ class MobileComprehensiveTestingSuite:
                 "state_persistence": all(
                     state_manager.get_component_state(comp_id)["data"] == state["data"] for comp_id, state in test_states.items()
                 ),
-                "state_isolation": len(set(state_manager.get_component_state(comp_id)["data"] for comp_id in test_states)) == len(test_states),
+                "state_isolation": len({state_manager.get_component_state(comp_id)["data"] for comp_id in test_states}) == len(test_states),
                 "state_updates": True,  # Assume working based on implementation
                 "state_cleanup": True,  # Assume working based on implementation
             }

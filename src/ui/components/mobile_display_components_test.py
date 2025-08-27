@@ -213,8 +213,8 @@ class TestMobileRecommendations:
     def test_section_expansion_state(self):
         """Test section expansion state management."""
         # Test default expansion states
-        assert self.component._is_section_expanded("immediate") == True
-        assert self.component._is_section_expanded("preventive") == False
+        assert self.component._is_section_expanded("immediate")
+        assert not self.component._is_section_expanded("preventive")
 
     def test_recommendations_with_analysis_context(self):
         """Test recommendations with analysis context."""
@@ -272,11 +272,11 @@ class TestMobileChatInterface:
         """Test typing indicator functionality."""
         # Set typing
         self.component._set_typing(True)
-        assert self.component.is_typing() == True
+        assert self.component.is_typing()
 
         # Clear typing
         self.component._set_typing(False)
-        assert self.component.is_typing() == False
+        assert not self.component.is_typing()
 
     def test_context_building(self):
         """Test chat context building."""
@@ -351,15 +351,11 @@ class TestMobileChatInterface:
         assert len(messages) <= self.component.chat_config["max_history_length"]
 
     @patch("src.core.nlp.TextAdapter")
-    @patch("src.core.nlp.ChatModel")
-    def test_bot_response_generation(self, mock_chat_model, mock_text_adapter):
+    def test_bot_response_generation(self, mock_text_adapter):
         """Test bot response generation with mocked adapters."""
-        # Mock the adapters
-        mock_chat_instance = Mock()
-        mock_chat_instance.predict.return_value = "This is a test response from the bot."
-        mock_chat_model.return_value = mock_chat_instance
-
+        # Mock the text adapter
         mock_text_instance = Mock()
+        mock_text_instance.generate_response.return_value = "This is a test response from the bot."
         mock_text_adapter.return_value = mock_text_instance
 
         # Test response generation
@@ -373,7 +369,7 @@ class TestMobileChatInterface:
 
         prompt = self.component._build_context_prompt("How do I treat this?", context)
         assert "Apple Scab" in prompt
-        assert "0.85" in prompt or "85%" in prompt
+        assert "0.85" in prompt or "85%" in prompt or "85.0%" in prompt
         assert "How do I treat this?" in prompt
 
 
@@ -401,8 +397,8 @@ class TestMobileDisplayComponentsIntegration:
         st.session_state.analysis_results = [analysis_result]
 
         # Test that all components can access the shared analysis results
-        assert analysis_display.has_results() == True
-        assert recommendations.has_recommendations() == True
+        assert analysis_display.has_results()
+        assert recommendations.has_recommendations()
 
         # Test chat context includes analysis results
         chat_interface._update_chat_context()

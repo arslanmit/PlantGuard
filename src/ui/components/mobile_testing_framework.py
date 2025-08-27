@@ -461,7 +461,7 @@ class MobileTestingFramework:
             all_states = self.state_manager.get_all_component_states()
 
             # Monitor each component
-            for component_id in all_states.keys():
+            for component_id in all_states:
                 try:
                     # Health check
                     health_result = self.ai_agent_tester.validate_component_health(component_id)

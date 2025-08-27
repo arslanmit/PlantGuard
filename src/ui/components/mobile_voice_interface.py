@@ -335,10 +335,10 @@ class MobileVoiceInterface(MobileComponent):
             st.session_state.transcription_in_progress = False
             # Clean up temporary file
             try:
-                import os
+                from pathlib import Path
 
                 if "temp_file_path" in locals():
-                    os.unlink(temp_file_path)
+                    Path(temp_file_path).unlink()
             except:
                 pass
 

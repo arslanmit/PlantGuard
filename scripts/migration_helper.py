@@ -163,8 +163,8 @@ class MigrationHelper:
         report = {
             "timestamp": str(Path().cwd()),
             "migration_summary": self.generate_migration_summary(),
-            "command_migrations": {cmd: self.get_command_migration(cmd) for cmd in self.command_mappings.keys()},
-            "feature_migrations": {feature: self.get_feature_migration(feature) for feature in self.feature_mappings.keys()},
+            "command_migrations": {cmd: self.get_command_migration(cmd) for cmd in self.command_mappings},
+            "feature_migrations": {feature: self.get_feature_migration(feature) for feature in self.feature_mappings},
         }
 
         with open(output_file, "w") as f:

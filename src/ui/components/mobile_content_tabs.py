@@ -285,7 +285,9 @@ class MobileContentTabs(MobileComponent):
                 self.spa_manager.register_content_area(tab_id, tab["title"], tab["icon"], callback)
             else:
                 # Register with default content
-                default_callback = lambda tab_info=tab: self._render_default_tab_content(tab_info["id"], tab_info)
+                def default_callback(tab_info=tab):
+                    return self._render_default_tab_content(tab_info["id"], tab_info)
+
                 self.spa_manager.register_content_area(tab_id, tab["title"], tab["icon"], default_callback)
         """Render tab navigation buttons.
         

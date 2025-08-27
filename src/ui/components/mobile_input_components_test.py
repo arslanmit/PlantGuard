@@ -15,10 +15,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import streamlit as st
 
 # Import mobile components
-from mobile_camera_input import MobileCameraInput
-from mobile_text_input import MobileTextInput
-from mobile_upload_input import MobileUploadInput
-from mobile_voice_input import MobileVoiceInput
+from .mobile_camera_input import MobileCameraInput
+from .mobile_text_input import MobileTextInput
+from .mobile_upload_input import MobileUploadInput
+from .mobile_voice_input import MobileVoiceInput
 
 logger = logging.getLogger(__name__)
 

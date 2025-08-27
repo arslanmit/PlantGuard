@@ -524,7 +524,23 @@ class MobileChatInterface(MobileBaseComponent):
 
     def _clear_chat(self) -> None:
         """Clear chat history."""
-        self._initialize_chat_state()
+        # Force reinitialize chat state
+        chat_state = {
+            "messages": [],
+            "current_input": "",
+            "is_typing": False,
+            "typing_start_time": None,
+            "last_message_time": None,
+            "chat_session_id": f"chat_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "context": {"current_plant": None, "current_disease": None, "analysis_results": []},
+        }
+
+        current_state = self.get_state()
+        current_state["data"]["chat_data"] = chat_state
+        self.set_state(current_state)
+
+        # Add welcome message
+        self._add_welcome_message()
         st.success("🧹 Chat cleared!")
 
     def _show_chat_history(self) -> None:

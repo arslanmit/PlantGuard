@@ -115,7 +115,7 @@ class CacheManager:
         self.memory_cache: dict[str, Any] = {}
         self.cache_metadata: dict[str, dict[str, Any]] = {}
 
-    def _generate_cache_key(self, key: str, params: dict[str, Any] = None) -> str:
+    def _generate_cache_key(self, key: str, params: dict[str, Any] | None = None) -> str:
         """Generate a unique cache key."""
         if params:
             params_str = json.dumps(params, sort_keys=True)
@@ -123,9 +123,9 @@ class CacheManager:
         else:
             key_with_params = key
 
-        return hashlib.md5(key_with_params.encode()).hexdigest()
+        return hashlib.sha256(key_with_params.encode()).hexdigest()
 
-    def get_from_cache(self, key: str, params: dict[str, Any] = None) -> Any | None:
+    def get_from_cache(self, key: str, params: dict[str, Any] | None = None) -> Any | None:
         """Get item from cache."""
         cache_key = self._generate_cache_key(key, params)
 
@@ -151,7 +151,7 @@ class CacheManager:
 
         return None
 
-    def set_cache(self, key: str, value: Any, params: dict[str, Any] = None, ttl: int = 3600) -> None:
+    def set_cache(self, key: str, value: Any, params: dict[str, Any] | None = None, ttl: int = 3600) -> None:
         """Set item in cache."""
         cache_key = self._generate_cache_key(key, params)
 
@@ -183,7 +183,7 @@ class CacheManager:
         """Clear cache entries."""
         if key_pattern:
             # Clear specific pattern
-            keys_to_remove = [k for k in self.memory_cache.keys() if key_pattern in k]
+            keys_to_remove = [k for k in self.memory_cache if key_pattern in k]
             for key in keys_to_remove:
                 del self.memory_cache[key]
                 if key in self.cache_metadata:

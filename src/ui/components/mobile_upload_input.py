@@ -319,7 +319,7 @@ class MobileUploadInput(MobileBaseComponent):
             st.write(f"**Size:** {self._format_file_size(file_info['size'])}")
 
         with col2:
-            st.write(f"**Dimensions:** {file_info['image'].size[0]}×{file_info['image'].size[1]}")
+            st.write(f"**Dimensions:** {file_info['image'].size[0]}x{file_info['image'].size[1]}")
             st.write(f"**Format:** {file_info['image'].format}")
 
         # Action buttons
@@ -429,7 +429,7 @@ class MobileUploadInput(MobileBaseComponent):
                 # Show disease information if available
                 disease_info = analysis_result.get("disease_info", {})
                 if disease_info and disease_info.get("description"):
-                    with st.expander("ℹ️ Disease Information", expanded=False):
+                    with st.expander("i Disease Information", expanded=False):
                         st.write(f"**Description:** {disease_info['description']}")
 
                         # Show treatment if available

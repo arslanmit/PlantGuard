@@ -429,7 +429,7 @@ class MobileSettingsCard:
                 st.session_state.user_preferences[key] = new_value
                 self._mark_settings_changed()
 
-    def render_select_setting(self, key: str, title: str, description: str, options: list[str], labels: list[str] = None) -> None:
+    def render_select_setting(self, key: str, title: str, description: str, options: list[str], labels: list[str] | None = None) -> None:
         """Render a select setting."""
         current_value = st.session_state.user_preferences.get(key, options[0] if options else "")
         display_labels = labels or options
@@ -857,33 +857,31 @@ class MobileSettingsCard:
                     if st.button("🔄 Reset", key=f"{self.component_id}_reset", use_container_width=True):
                         self._reset_settings()
 
-                with col3:
-                    # Export/Import in expander
-                    with st.expander("📤 Export/Import"):
-                        # Export
-                        if st.button("📤 Export Settings", key=f"{self.component_id}_export", use_container_width=True):
-                            settings_json = self._export_settings()
-                            st.download_button(
-                                "💾 Download Settings",
-                                data=settings_json,
-                                file_name=f"plantguard_settings_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
-                                mime="application/json",
-                                key=f"{self.component_id}_download",
-                                use_container_width=True,
-                            )
-
-                        # Import
-                        uploaded_file = st.file_uploader(
-                            "📥 Import Settings", type=["json"], key=f"{self.component_id}_import", help="Upload a previously exported settings file"
+                with col3, st.expander("📤 Export/Import"):
+                    # Export
+                    if st.button("📤 Export Settings", key=f"{self.component_id}_export", use_container_width=True):
+                        settings_json = self._export_settings()
+                        st.download_button(
+                            "💾 Download Settings",
+                            data=settings_json,
+                            file_name=f"plantguard_settings_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                            mime="application/json",
+                            key=f"{self.component_id}_download",
+                            use_container_width=True,
                         )
 
-                        if uploaded_file is not None:
-                            try:
-                                settings_content = uploaded_file.read().decode("utf-8")
-                                if st.button("📥 Apply Imported Settings", key=f"{self.component_id}_apply_import", use_container_width=True):
-                                    self._import_settings(settings_content)
-                            except Exception as e:
-                                st.error(f"Error reading settings file: {e}")
+                    # Import
+                    uploaded_file = st.file_uploader(
+                        "📥 Import Settings", type=["json"], key=f"{self.component_id}_import", help="Upload a previously exported settings file"
+                    )
+
+                    if uploaded_file is not None:
+                        try:
+                            settings_content = uploaded_file.read().decode("utf-8")
+                            if st.button("📥 Apply Imported Settings", key=f"{self.component_id}_apply_import", use_container_width=True):
+                                self._import_settings(settings_content)
+                        except Exception as e:
+                            st.error(f"Error reading settings file: {e}")
 
                 st.markdown("</div>", unsafe_allow_html=True)
 
