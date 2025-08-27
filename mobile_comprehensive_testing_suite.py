@@ -872,7 +872,7 @@ class MobileComprehensiveTestingSuite:
             # Check if mobile CSS is cached
             layout_manager = MobileLayoutManager("cache_test")
             return hasattr(layout_manager, "load_mobile_css")
-        except:
+        except Exception:
             return False
 
     def check_offline_model_availability(self) -> bool:
@@ -880,7 +880,7 @@ class MobileComprehensiveTestingSuite:
         try:
             # Check for local model loading capabilities
             return Path("data/models").exists() or Path("src/core").exists()
-        except:
+        except Exception:
             return False
 
     def check_network_error_handling(self) -> bool:
@@ -888,7 +888,7 @@ class MobileComprehensiveTestingSuite:
         try:
             error_handler = MobileErrorHandler()
             return hasattr(error_handler, "handle_network_error")
-        except:
+        except Exception:
             return False
 
     def check_progressive_loading(self) -> bool:
@@ -896,7 +896,7 @@ class MobileComprehensiveTestingSuite:
         try:
             # Check if components support progressive loading
             return True  # Assume implemented based on component architecture
-        except:
+        except Exception:
             return False
 
     def check_streamlit_cache_resource(self) -> bool:
@@ -904,42 +904,42 @@ class MobileComprehensiveTestingSuite:
         try:
             # Check if cache decorators are used
             return True  # Based on mobile app implementation
-        except:
+        except Exception:
             return False
 
     def check_streamlit_cache_data(self) -> bool:
         """Check Streamlit cache_data usage."""
         try:
             return True  # Based on implementation patterns
-        except:
+        except Exception:
             return False
 
     def check_component_level_caching(self) -> bool:
         """Check component-level caching."""
         try:
             return True  # Based on state management implementation
-        except:
+        except Exception:
             return False
 
     def check_component_lazy_init(self) -> bool:
         """Check component lazy initialization."""
         try:
             return True  # Based on component registry pattern
-        except:
+        except Exception:
             return False
 
     def check_image_lazy_loading(self) -> bool:
         """Check image lazy loading."""
         try:
             return True  # Based on mobile optimization patterns
-        except:
+        except Exception:
             return False
 
     def check_content_lazy_rendering(self) -> bool:
         """Check content lazy rendering."""
         try:
             return True  # Based on tab content system
-        except:
+        except Exception:
             return False
 
     def get_performance_grade(self, score: float) -> str:

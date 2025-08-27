@@ -437,6 +437,15 @@ select = [
   "PT", # flake8-pytest-style (pytest best practices)
 ]
 
+extend-ignore = [
+  # ============================================================================
+  # 🎨 Code Style Exceptions - Maintain readability over strictness  
+  # ============================================================================
+  "W291", # Trailing whitespace
+  "W292", # No newline at end of file
+  "W293", # Blank line contains whitespace
+]
+
 ignore = [
   # ============================================================================
   # 🤖 ML/AI Specific Exceptions - Allow common ML patterns

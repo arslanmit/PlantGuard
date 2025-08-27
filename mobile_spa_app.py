@@ -950,7 +950,7 @@ class MobilePlantGuardApp:
 
         # Performance metrics
         if st.session_state.get("mobile_adapters_loaded", False):
-            st.markdown("### 📈 Performance Metrics")
+            st.markdown("### Performance Metrics")
 
             try:
                 perf_report = self.performance_optimizer.get_performance_report()
@@ -985,29 +985,29 @@ class MobilePlantGuardApp:
             except Exception as e:
                 st.warning(f"Performance metrics unavailable: {e}")
 
-        st.markdown("### ⚙️ Settings")
+        st.markdown("### Settings")
 
         # Enhanced app settings
         col1, col2 = st.columns(2)
 
         with col1:
             # Core Adapters Status
-            st.markdown("**🧠 Core Adapters**")
+            st.markdown("**Core Adapters**")
 
             adapters_loaded = st.session_state.get("mobile_adapters_loaded", False)
 
             if adapters_loaded:
-                st.success("✅ All adapters loaded")
+                st.success("[OK] All adapters loaded")
 
                 # Adapter details
                 if self.vision_adapter:
-                    st.write("🔬 Vision: Ready")
+                    st.write("Vision: Ready")
                 if self.audio_adapter:
-                    st.write("🎤 Audio: Ready")
+                    st.write("Audio: Ready")
                 if self.text_adapter:
-                    st.write("💬 Text: Ready")
+                    st.write("Text: Ready")
             else:
-                st.error("❌ Adapters not loaded")
+                st.error("[ERROR] Adapters not loaded")
 
                 if st.button("🔄 Reload Adapters", use_container_width=True):
                     with st.spinner("Reloading adapters..."):
@@ -1120,7 +1120,7 @@ class MobilePlantGuardApp:
                 status_items.append("⚠️ Memory: Warning")
             else:
                 status_items.append("❌ Memory: Critical")
-        except:
+        except Exception:
             status_items.append("❓ Memory: Unknown")
 
         # Cache status
@@ -1134,7 +1134,7 @@ class MobilePlantGuardApp:
                 status_items.append("✅ Cache: Good")
             else:
                 status_items.append("⚠️ Cache: Poor")
-        except:
+        except Exception:
             status_items.append("❓ Cache: Unknown")
 
         for status in status_items:

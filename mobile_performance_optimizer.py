@@ -694,7 +694,8 @@ print("SUCCESS:True")
 
             finally:
                 # Clean up test file
-                Path(test_file).unlink()
+                with contextlib.suppress(FileNotFoundError, OSError):
+                    Path(test_file).unlink()
 
         except Exception as e:
             test_results["errors"].append(f"Performance test failed: {e}")

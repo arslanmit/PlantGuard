@@ -20,13 +20,13 @@ def test_error_handler_imports():
     try:
         spec = importlib.util.find_spec("src.ui.mobile_error_handler")
         if spec is not None:
-            print("✅ MobileErrorHandler module found")
+            print("[OK] MobileErrorHandler module found")
             return True
         else:
-            print("❌ MobileErrorHandler module not found")
+            print("[ERROR] MobileErrorHandler module not found")
             return False
     except ImportError as e:
-        print(f"❌ MobileErrorHandler import failed: {e}")
+        print(f"[ERROR] MobileErrorHandler import failed: {e}")
         return False
 
 
@@ -37,13 +37,13 @@ def test_offline_manager_imports():
     try:
         spec = importlib.util.find_spec("src.ui.mobile_offline_manager")
         if spec is not None:
-            print("✅ MobileOfflineManager module found")
+            print("[OK] MobileOfflineManager module found")
             return True
         else:
-            print("❌ MobileOfflineManager module not found")
+            print("[ERROR] MobileOfflineManager module not found")
             return False
     except ImportError as e:
-        print(f"❌ MobileOfflineManager import failed: {e}")
+        print(f"[ERROR] MobileOfflineManager import failed: {e}")
         return False
 
 
@@ -54,13 +54,13 @@ def test_integration_imports():
     try:
         spec = importlib.util.find_spec("src.ui.mobile_error_recovery_integration")
         if spec is not None:
-            print("✅ MobileErrorRecoveryIntegration module found")
+            print("[OK] MobileErrorRecoveryIntegration module found")
             return True
         else:
-            print("❌ MobileErrorRecoveryIntegration module not found")
+            print("[ERROR] MobileErrorRecoveryIntegration module not found")
             return False
     except ImportError as e:
-        print(f"❌ MobileErrorRecoveryIntegration import failed: {e}")
+        print(f"[ERROR] MobileErrorRecoveryIntegration import failed: {e}")
         return False
 
 
@@ -73,7 +73,7 @@ def test_error_handler_functionality():
         assert ErrorSeverity.LOW.value == "low"
         assert ErrorCategory.COMPONENT_RENDER.value == "component_render"
 
-        print("✅ Error handler enums working correctly")
+        print("[OK] Error handler enums working correctly")
 
         # Test error boundary decorator
         from src.ui.mobile_error_handler import mobile_error_boundary
@@ -86,11 +86,11 @@ def test_error_handler_functionality():
         # For now, just test that the decorator can be applied
         assert callable(test_function)
 
-        print("✅ Error boundary decorator working")
+        print("[OK] Error boundary decorator working")
         return True
 
     except Exception as e:
-        print(f"❌ Error handler functionality test failed: {e}")
+        print(f"[ERROR] Error handler functionality test failed: {e}")
         return False
 
 
@@ -103,7 +103,7 @@ def test_offline_manager_functionality():
         assert NetworkStatus.ONLINE.value == "online"
         assert OfflineCapability.FULL.value == "full"
 
-        print("✅ Offline manager enums working correctly")
+        print("[OK] Offline manager enums working correctly")
 
         # Test decorator
         from src.ui.mobile_offline_manager import with_offline_support
@@ -114,11 +114,11 @@ def test_offline_manager_functionality():
 
         assert callable(test_operation)
 
-        print("✅ Offline support decorator working")
+        print("[OK] Offline support decorator working")
         return True
 
     except Exception as e:
-        print(f"❌ Offline manager functionality test failed: {e}")
+        print(f"[ERROR] Offline manager functionality test failed: {e}")
         return False
 
 
@@ -142,11 +142,11 @@ def test_integration_functionality():
 
         assert callable(test_operation)
 
-        print("✅ Integration decorators working")
+        print("[OK] Integration decorators working")
         return True
 
     except Exception as e:
-        print(f"❌ Integration functionality test failed: {e}")
+        print(f"[ERROR] Integration functionality test failed: {e}")
         return False
 
 
@@ -171,11 +171,11 @@ def test_error_categories_and_severities():
         ]
         assert len(categories) == 7
 
-        print("✅ All error categories and severities defined")
+        print("[OK] All error categories and severities defined")
         return True
 
     except Exception as e:
-        print(f"❌ Error categories/severities test failed: {e}")
+        print(f"[ERROR] Error categories/severities test failed: {e}")
         return False
 
 
@@ -192,11 +192,11 @@ def test_network_status_and_capabilities():
         capabilities = [OfflineCapability.FULL, OfflineCapability.LIMITED, OfflineCapability.NONE, OfflineCapability.CACHED]
         assert len(capabilities) == 4
 
-        print("✅ All network statuses and capabilities defined")
+        print("[OK] All network statuses and capabilities defined")
         return True
 
     except Exception as e:
-        print(f"❌ Network status/capabilities test failed: {e}")
+        print(f"[ERROR] Network status/capabilities test failed: {e}")
         return False
 
 
@@ -214,11 +214,11 @@ def test_class_instantiation():
         assert hasattr(MobileErrorRecoveryIntegration, "initialize_integrated_system")
         assert hasattr(MobileErrorRecoveryIntegration, "handle_network_dependent_operation")
 
-        print("✅ Class instantiation working")
+        print("[OK] Class instantiation working")
         return True
 
     except Exception as e:
-        print(f"❌ Class instantiation test failed: {e}")
+        print(f"[ERROR] Class instantiation test failed: {e}")
         return False
 
 
@@ -232,16 +232,16 @@ def test_file_structure():
             missing_files.append(file_path)
 
     if missing_files:
-        print(f"❌ Missing files: {missing_files}")
+        print(f"[ERROR] Missing files: {missing_files}")
         return False
 
-    print("✅ All required files exist")
+    print("[OK] All required files exist")
     return True
 
 
 def run_all_tests():
     """Run all tests and report results."""
-    print("🧪 Testing Mobile Error Recovery System")
+    print("[TEST] Testing Mobile Error Recovery System")
     print("=" * 50)
 
     tests = [
@@ -261,24 +261,24 @@ def run_all_tests():
     failed = 0
 
     for test_name, test_func in tests:
-        print(f"\n🔍 Testing {test_name}...")
+        print(f"\n[TEST] Testing {test_name}...")
         try:
             if test_func():
                 passed += 1
             else:
                 failed += 1
         except Exception as e:
-            print(f"❌ {test_name} failed with exception: {e}")
+            print(f"[ERROR] {test_name} failed with exception: {e}")
             failed += 1
 
     print("\n" + "=" * 50)
-    print(f"📊 Test Results: {passed} passed, {failed} failed")
+    print(f"[RESULTS] Test Results: {passed} passed, {failed} failed")
 
     if failed == 0:
-        print("🎉 All tests passed! Error recovery system is ready.")
+        print("[SUCCESS] All tests passed! Error recovery system is ready.")
         return True
     else:
-        print("⚠️ Some tests failed. Please check the implementation.")
+        print("[WARNING] Some tests failed. Please check the implementation.")
         return False
 
 
