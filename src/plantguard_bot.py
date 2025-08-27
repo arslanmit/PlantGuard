@@ -51,6 +51,16 @@ class PlantGuardBot:
             self._vision_adapter = VisionAdapter(model_path=self.config.vision_model_path, device=str(self.device))
         return self._vision_adapter
 
+    @vision_adapter.setter
+    def vision_adapter(self, adapter: VisionAdapter | None) -> None:
+        """Set vision adapter instance (for testing)."""
+        self._vision_adapter = adapter
+
+    @vision_adapter.deleter
+    def vision_adapter(self) -> None:
+        """Delete vision adapter instance (for testing)."""
+        self._vision_adapter = None
+
     @property
     def audio_adapter(self) -> AudioAdapter:
         """Lazy loading of audio adapter."""
@@ -58,12 +68,32 @@ class PlantGuardBot:
             self._audio_adapter = AudioAdapter(model_name=self.config.whisper_model_name)
         return self._audio_adapter
 
+    @audio_adapter.setter
+    def audio_adapter(self, adapter: AudioAdapter | None) -> None:
+        """Set audio adapter instance (for testing)."""
+        self._audio_adapter = adapter
+
+    @audio_adapter.deleter
+    def audio_adapter(self) -> None:
+        """Delete audio adapter instance (for testing)."""
+        self._audio_adapter = None
+
     @property
     def text_adapter(self) -> TextAdapter:
         """Lazy loading of text adapter."""
         if self._text_adapter is None:
             self._text_adapter = TextAdapter(knowledge_base_path=self.config.knowledge_base_path)
         return self._text_adapter
+
+    @text_adapter.setter
+    def text_adapter(self, adapter: TextAdapter | None) -> None:
+        """Set text adapter instance (for testing)."""
+        self._text_adapter = adapter
+
+    @text_adapter.deleter
+    def text_adapter(self) -> None:
+        """Delete text adapter instance (for testing)."""
+        self._text_adapter = None
 
     def analyze_plant(self, image: Image.Image, audio_path: str | None = None, text_query: str = "") -> dict[str, Any]:
         """Main analysis method combining all modalities.

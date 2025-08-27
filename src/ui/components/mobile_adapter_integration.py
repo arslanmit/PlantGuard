@@ -21,10 +21,10 @@ class MobileAdapterIntegration:
 
     def __init__(self):
         """Initialize mobile adapter integration."""
-        self._vision_adapter = None
-        self._audio_adapter = None
-        self._text_adapter = None
-        self._chat_model = None
+        self._vision_adapter: Any | None = None
+        self._audio_adapter: Any | None = None
+        self._text_adapter: Any | None = None
+        self._chat_model: Any | None = None
 
         # Mobile-specific preprocessing settings
         self.mobile_config = {
@@ -48,7 +48,7 @@ class MobileAdapterIntegration:
         }
 
     @property
-    def vision_adapter(self):
+    def vision_adapter(self) -> Any | None:
         """Get or create vision adapter instance."""
         if self._vision_adapter is None:
             try:
@@ -67,8 +67,18 @@ class MobileAdapterIntegration:
 
         return self._vision_adapter
 
+    @vision_adapter.setter
+    def vision_adapter(self, adapter: Any | None) -> None:
+        """Set vision adapter instance (for testing)."""
+        self._vision_adapter = adapter
+
+    @vision_adapter.deleter
+    def vision_adapter(self) -> None:
+        """Delete vision adapter instance (for testing)."""
+        self._vision_adapter = None
+
     @property
-    def audio_adapter(self):
+    def audio_adapter(self) -> Any | None:
         """Get or create audio adapter instance."""
         if self._audio_adapter is None:
             try:
@@ -87,8 +97,18 @@ class MobileAdapterIntegration:
 
         return self._audio_adapter
 
+    @audio_adapter.setter
+    def audio_adapter(self, adapter: Any | None) -> None:
+        """Set audio adapter instance (for testing)."""
+        self._audio_adapter = adapter
+
+    @audio_adapter.deleter
+    def audio_adapter(self) -> None:
+        """Delete audio adapter instance (for testing)."""
+        self._audio_adapter = None
+
     @property
-    def text_adapter(self):
+    def text_adapter(self) -> Any | None:
         """Get or create text adapter instance."""
         if self._text_adapter is None:
             try:
@@ -106,6 +126,16 @@ class MobileAdapterIntegration:
                 raise RuntimeError(f"Text adapter initialization failed: {e}") from e
 
         return self._text_adapter
+
+    @text_adapter.setter
+    def text_adapter(self, adapter: Any | None) -> None:
+        """Set text adapter instance (for testing)."""
+        self._text_adapter = adapter
+
+    @text_adapter.deleter
+    def text_adapter(self) -> None:
+        """Delete text adapter instance (for testing)."""
+        self._text_adapter = None
 
     def preprocess_mobile_image(self, image: Image.Image, source: str = "mobile") -> Image.Image:
         """
@@ -434,7 +464,15 @@ class MobileAdapterIntegration:
 
             # Truncate if too long
             if len(text) > config["max_length"]:
-                text = text[: config["max_length"]].rsplit(" ", 1)[0] + "..."
+                # Reserve 3 characters for "..."
+                max_content_length = config["max_length"] - 3
+                # Find the last space before max_content_length to avoid cutting words
+                truncated = text[:max_content_length]
+                last_space = truncated.rfind(" ")
+                if last_space > 0:
+                    text = truncated[:last_space] + "..."
+                else:
+                    text = truncated + "..."
                 logger.warning("Text truncated to %s characters", config["max_length"])
 
             return text.strip()
