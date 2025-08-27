@@ -503,26 +503,20 @@ class MobileAdapterIntegration:
         """Get status of all adapters."""
         status = {"vision_adapter": False, "audio_adapter": False, "text_adapter": False}
 
-        try:
+        with suppress(Exception):
             # Check vision adapter
             vision_adapter = self.vision_adapter
             status["vision_adapter"] = vision_adapter is not None
-        except Exception:
-            pass
 
-        try:
+        with suppress(Exception):
             # Check audio adapter
             audio_adapter = self.audio_adapter
             status["audio_adapter"] = audio_adapter is not None
-        except Exception:
-            pass
 
-        try:
+        with suppress(Exception):
             # Check text adapter
             text_adapter = self.text_adapter
             status["text_adapter"] = text_adapter is not None
-        except Exception:
-            pass
 
         return status
 

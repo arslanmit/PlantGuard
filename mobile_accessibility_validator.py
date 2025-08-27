@@ -280,7 +280,7 @@ class MobileAriaHelper:
             class="error-message"
             style="color: #DC2626; font-size: 0.875rem; margin-top: 0.25rem;"
         >
-            <span aria-hidden="true">⚠️</span>
+            <span aria-hidden="true">[!]</span>
             {error_message}
         </div>
         """
@@ -295,7 +295,7 @@ class MobileAriaHelper:
             class="success-message"
             style="color: #16A34A; font-size: 0.875rem; margin-top: 0.25rem;"
         >
-            <span aria-hidden="true">✅</span>
+            <span aria-hidden="true">[OK]</span>
             {message}
         </div>
         """
@@ -624,7 +624,7 @@ class MobileSemanticHelper:
         }
         
         .breadcrumb-list li:not(:last-child)::after {
-            content: "›";
+            content: ">";
             margin-left: 0.5rem;
             color: #6B7280;
         }

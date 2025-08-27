@@ -25,20 +25,20 @@ def test_mobile_app_imports():
         # Test mobile app import
         import mobile_spa_app
 
-        print("✅ mobile_spa_app imported successfully")
+        print("[PASS] mobile_spa_app imported successfully")
 
         # Test core function
         framework = mobile_spa_app.get_ai_testing_framework()
-        print("✅ AI testing framework created successfully")
+        print("[PASS] AI testing framework created successfully")
 
         # Test adapter loading function
         adapters = mobile_spa_app.load_core_adapters()
-        print("✅ Core adapters loading function works")
+        print("[PASS] Core adapters loading function works")
 
         return True
 
     except Exception as e:
-        print(f"❌ Import test failed: {e}")
+        print(f"[FAIL] Import test failed: {e}")
         return False
 
 
@@ -51,7 +51,7 @@ def test_mobile_app_class():
 
         # Create app instance (without Streamlit context)
         app = mobile_spa_app.MobilePlantGuardApp()
-        print("✅ MobilePlantGuardApp created successfully")
+        print("[PASS] MobilePlantGuardApp created successfully")
 
         # Test method existence
         methods_to_test = [
@@ -65,15 +65,15 @@ def test_mobile_app_class():
 
         for method_name in methods_to_test:
             if hasattr(app, method_name):
-                print(f"✅ Method {method_name} exists")
+                print(f"[PASS] Method {method_name} exists")
             else:
-                print(f"❌ Method {method_name} missing")
+                print(f"[FAIL] Method {method_name} missing")
                 return False
 
         return True
 
     except Exception as e:
-        print(f"❌ Class test failed: {e}")
+        print(f"[FAIL] Class test failed: {e}")
         return False
 
 
@@ -86,11 +86,11 @@ def test_performance_optimizer():
 
         # Test basic functionality
         report = mobile_performance_optimizer.get_performance_report()
-        print("✅ Performance report generated")
+        print("[PASS] Performance report generated")
 
         # Test cache functionality
         cache_stats = mobile_performance_optimizer.cache.get_stats()
-        print("✅ Cache statistics available")
+        print("[PASS] Cache statistics available")
 
         # Test memory manager
         memory_stats = mobile_performance_optimizer.memory_manager.get_memory_usage()

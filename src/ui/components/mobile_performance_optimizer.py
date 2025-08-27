@@ -383,12 +383,10 @@ class MemoryManager:
                 if isinstance(state_data, dict):
                     created_at_str = state_data.get("created_at")
                     if created_at_str:
-                        try:
+                        with suppress(ValueError, TypeError):
                             created_at = datetime.fromisoformat(created_at_str)
                             if created_at < cutoff_time:
                                 keys_to_remove.append(key)
-                        except (ValueError, TypeError):
-                            pass
 
         # Remove old entries
         for key in keys_to_remove:

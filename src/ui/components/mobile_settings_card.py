@@ -896,7 +896,7 @@ class MobileSettingsCard:
                         unsafe_allow_html=True,
                     )
                 elif settings_data["last_saved"]:
-                    try:
+                    with suppress(Exception):
                         last_saved = datetime.fromisoformat(settings_data["last_saved"])
                         time_str = last_saved.strftime("%H:%M")
                         st.markdown(
@@ -907,8 +907,6 @@ class MobileSettingsCard:
                         """,
                             unsafe_allow_html=True,
                         )
-                    except Exception:
-                        pass
 
                 st.markdown("</div>", unsafe_allow_html=True)
 

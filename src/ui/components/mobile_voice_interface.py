@@ -334,13 +334,11 @@ class MobileVoiceInterface(MobileComponent):
         finally:
             st.session_state.transcription_in_progress = False
             # Clean up temporary file
-            try:
+            with suppress(Exception):
                 from pathlib import Path
 
                 if "temp_file_path" in locals():
                     Path(temp_file_path).unlink()
-            except:
-                pass
 
     def render_voice_question_section(self, transcribed_text: str) -> str:
         """Render voice question processing section.

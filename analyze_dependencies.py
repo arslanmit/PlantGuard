@@ -56,7 +56,7 @@ def get_requirements_packages() -> set[str]:
 
 def main():
     """Main analysis function."""
-    print("🔍 Analyzing dependency usage...")
+    print("[INFO] Analyzing dependency usage...")
 
     # Get all Python files in the project
     python_files = []
@@ -126,17 +126,17 @@ def main():
     # Find unused packages
     unused_packages = required_packages - used_packages
 
-    print("\n📊 Analysis Results:")
+    print("\n[RESULTS] Analysis Results:")
     print(f"Total packages in requirements.txt: {len(required_packages)}")
     print(f"Used packages: {len(used_packages)}")
     print(f"Unused packages: {len(unused_packages)}")
 
     if unused_packages:
-        print(f"\n❌ Unused packages ({len(unused_packages)}):")
+        print(f"\n[UNUSED] Unused packages ({len(unused_packages)}):")
         for pkg in sorted(unused_packages):
             print(f"  - {pkg}")
 
-    print(f"\n✅ Used packages ({len(used_packages)}):")
+    print(f"\n[USED] Used packages ({len(used_packages)}):")
     for pkg in sorted(used_packages):
         print(f"  - {pkg}")
 

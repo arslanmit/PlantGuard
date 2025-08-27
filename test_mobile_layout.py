@@ -22,13 +22,13 @@ def test_mobile_imports():
         for module_name in modules:
             spec = importlib.util.find_spec(module_name)
             if spec is None:
-                print(f"❌ Module not found: {module_name}")
+                print(f"[FAIL] Module not found: {module_name}")
                 return False
 
-        print("✅ All mobile modules found successfully")
+        print("[PASS] All mobile modules found successfully")
         return True
     except ImportError as e:
-        print(f"❌ Import error: {e}")
+        print(f"[FAIL] Import error: {e}")
         return False
         return False
 
@@ -51,10 +51,10 @@ def test_mobile_layout_manager():
         assert "mobile-input-grid" in css
         assert "--touch-target-min: 48px" in css
 
-        print("✅ MobileLayoutManager tests passed")
+        print("[PASS] MobileLayoutManager tests passed")
         return True
     except Exception as e:
-        print(f"❌ MobileLayoutManager test failed: {e}")
+        print(f"[FAIL] MobileLayoutManager test failed: {e}")
         return False
 
 
@@ -81,10 +81,10 @@ def test_mobile_design_system():
         assert "mobile-card" in card_html
         assert "mobile-card-elevated" in card_html
 
-        print("✅ MobileDesignSystem tests passed")
+        print("[PASS] MobileDesignSystem tests passed")
         return True
     except Exception as e:
-        print(f"❌ MobileDesignSystem test failed: {e}")
+        print(f"[FAIL] MobileDesignSystem test failed: {e}")
         return False
 
 
@@ -120,10 +120,10 @@ def test_mobile_component_registry():
         assert test_state["initialized"]
         assert "data" in test_state
 
-        print("✅ MobileComponentRegistry tests passed")
+        print("[PASS] MobileComponentRegistry tests passed")
         return True
     except Exception as e:
-        print(f"❌ MobileComponentRegistry test failed: {e}")
+        print(f"[FAIL] MobileComponentRegistry test failed: {e}")
         return False
 
 
@@ -156,10 +156,10 @@ def test_css_classes():
         # Test responsive design
         assert "@media (max-width:" in css
 
-        print("✅ CSS classes test passed")
+        print("[PASS] CSS classes test passed")
         return True
     except Exception as e:
-        print(f"❌ CSS classes test failed: {e}")
+        print(f"[FAIL] CSS classes test failed: {e}")
         return False
 
 
@@ -179,13 +179,13 @@ def main():
         print()
 
     print("=" * 60)
-    print(f"📊 Test Results: {passed}/{total} tests passed")
+    print(f"[INFO] Test Results: {passed}/{total} tests passed")
 
     if passed == total:
-        print("🎉 All tests passed! Mobile layout and design system implementation is working correctly.")
+        print("[SUCCESS] All tests passed! Mobile layout and design system implementation is working correctly.")
         return True
     else:
-        print("⚠️  Some tests failed. Please check the implementation.")
+        print("[WARNING] Some tests failed. Please check the implementation.")
         return False
 
 

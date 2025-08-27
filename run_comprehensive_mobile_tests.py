@@ -171,31 +171,31 @@ class ComprehensiveMobileTestRunner:
                 if "Removed File Cleanup" in json_data:
                     file_cleanup = json_data["Removed File Cleanup"]
                     if file_cleanup.get("status") == "passed":
-                        summary["key_findings"].append("✅ All removed files successfully cleaned up")
+                        summary["key_findings"].append("[OK] All removed files successfully cleaned up")
                     else:
-                        summary["key_findings"].append("❌ Desktop file removal incomplete")
+                        summary["key_findings"].append("[FAIL] Desktop file removal incomplete")
 
                 if "Make Mobile Command" in json_data:
                     make_mobile = json_data["Make Mobile Command"]
                     if make_mobile.get("status") == "passed":
-                        summary["key_findings"].append("✅ Make mobile command works correctly")
+                        summary["key_findings"].append("[OK] Make mobile command works correctly")
                     else:
-                        summary["key_findings"].append("❌ Make mobile command has issues")
+                        summary["key_findings"].append("[FAIL] Make mobile command has issues")
 
                 if "Core Adapter Integration" in json_data:
                     adapters = json_data["Core Adapter Integration"]
                     if adapters.get("status") == "passed":
-                        summary["key_findings"].append("✅ All core adapters (vision, audio, text) working")
+                        summary["key_findings"].append("[OK] All core adapters (vision, audio, text) working")
                     else:
-                        summary["key_findings"].append("❌ Core adapter integration issues")
+                        summary["key_findings"].append("[FAIL] Core adapter integration issues")
 
                 if "Import Validation" in json_data:
                     imports = json_data["Import Validation"]
                     if imports.get("status") == "warning":
                         legacy_refs = len(imports.get("legacy_references", []))
-                        summary["key_findings"].append(f"⚠️ Found {legacy_refs} legacy references needing cleanup")
+                        summary["key_findings"].append(f"[WARN] Found {legacy_refs} legacy references needing cleanup")
                     elif imports.get("status") == "passed":
-                        summary["key_findings"].append("✅ All imports validated successfully")
+                        summary["key_findings"].append("[OK] All imports validated successfully")
 
         # Map to requirements
         summary["requirement_coverage"] = {
@@ -208,16 +208,16 @@ class ComprehensiveMobileTestRunner:
 
         # Generate recommendations based on findings
         if overall_status == "failed":
-            summary["recommendations"].append("❌ Critical issues found - migration not complete")
-            summary["recommendations"].append("🔧 Review failed tests and address issues before proceeding")
+            summary["recommendations"].append("[FAIL] Critical issues found - migration not complete")
+            summary["recommendations"].append("[ACTION] Review failed tests and address issues before proceeding")
         elif overall_status == "warning":
-            summary["recommendations"].append("⚠️ Migration mostly successful with minor issues")
-            summary["recommendations"].append("🧹 Clean up remaining desktop references for full completion")
-            summary["recommendations"].append("✅ Mobile functionality is working correctly")
+            summary["recommendations"].append("[WARN] Migration mostly successful with minor issues")
+            summary["recommendations"].append("[ACTION] Clean up remaining desktop references for full completion")
+            summary["recommendations"].append("[OK] Mobile functionality is working correctly")
         else:
-            summary["recommendations"].append("✅ Mobile-only migration completed successfully")
-            summary["recommendations"].append("🚀 All mobile functionality validated and working")
-            summary["recommendations"].append("📱 System ready for mobile-only operation")
+            summary["recommendations"].append("[OK] Mobile-only migration completed successfully")
+            summary["recommendations"].append("[SUCCESS] All mobile functionality validated and working")
+            summary["recommendations"].append("[READY] System ready for mobile-only operation")
 
         return summary
 
@@ -241,9 +241,9 @@ class ComprehensiveMobileTestRunner:
         overall_status = summary["overall_status"]
 
         # Status indicator
-        status_symbols = {"passed": "✅", "failed": "❌", "warning": "⚠️"}
+        status_symbols = {"passed": "[PASS]", "failed": "[FAIL]", "warning": "[WARN]"}
 
-        print(f"\n🎯 OVERALL STATUS: {status_symbols.get(overall_status, '❓')} {overall_status.upper()}")
+        print(f"\n[STATUS] OVERALL STATUS: {status_symbols.get(overall_status, '[UNKNOWN]')} {overall_status.upper()}")
         print(f"📊 Test Scripts Executed: {summary['total_test_scripts']}")
         print(f"⏰ Test Completed: {results['timestamp']}")
 

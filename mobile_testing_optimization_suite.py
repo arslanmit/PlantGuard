@@ -324,16 +324,13 @@ class MobileTestingOptimizationSuite:
 
             # Simulate loading all mobile components
             component_count = 0
-            try:
+            with suppress(ImportError):
                 from ui.components.mobile_header import MobileHeader
                 from ui.components.mobile_input_ribbon import MobileInputRibbon
                 from ui.components.mobile_layout_manager import MobileLayoutManager
 
                 components = [MobileLayoutManager("perf_layout"), MobileHeader("perf_header", "Test", "Test"), MobileInputRibbon("perf_ribbon")]
                 component_count = len(components)
-
-            except ImportError:
-                pass
 
             loading_time = time.time() - start_time
 
@@ -414,16 +411,13 @@ class MobileTestingOptimizationSuite:
                 start_time = time.time()
 
                 # Simulate multiple renders
-                try:
+                with suppress(ImportError):
                     from ui.components.mobile_layout_manager import MobileLayoutManager
 
                     layout_manager = MobileLayoutManager("render_test")
 
                     for _ in range(5):
                         layout_manager.load_mobile_css()
-
-                except ImportError:
-                    pass
 
                 rendering_time = time.time() - start_time
 
@@ -519,7 +513,7 @@ class MobileTestingOptimizationSuite:
             # Check for lazy loading patterns in components
             lazy_loading_features = []
 
-            try:
+            with suppress(ImportError):
                 from ui.components.mobile_image_analysis import MobileImageAnalysis
 
                 image_analysis = MobileImageAnalysis("lazy_test")
@@ -529,9 +523,6 @@ class MobileTestingOptimizationSuite:
                     lazy_loading_features.append("image_lazy_loading")
                 if hasattr(image_analysis, "defer_heavy_operations"):
                     lazy_loading_features.append("operation_deferring")
-
-            except ImportError:
-                pass
 
             performance_score = len(lazy_loading_features) * 50
 
@@ -699,23 +690,19 @@ class MobileTestingOptimizationSuite:
             total_components = 0
 
             component_classes = []
-            try:
+            with suppress(ImportError):
                 from ui.components.mobile_image_analysis import MobileImageAnalysis
                 from ui.components.mobile_input_ribbon import MobileInputRibbon
 
                 component_classes = [MobileInputRibbon, MobileImageAnalysis]
-            except ImportError:
-                pass
 
             for component_class in component_classes:
                 total_components += 1
-                try:
+                with suppress(Exception):
                     component = component_class(f"touch_test_{total_components}")
                     # Check if component has touch-related methods
                     if hasattr(component, "handle_touch_start") or hasattr(component, "handle_touch_end") or hasattr(component, "on_touch"):
                         touch_compatible_components += 1
-                except:
-                    pass
 
             return {
                 "status": "passed",
@@ -911,17 +898,15 @@ class MobileTestingOptimizationSuite:
 
                 # Test multiple components for semantic HTML
                 component_classes = []
-                try:
+                with suppress(ImportError):
                     from ui.components.mobile_header import MobileHeader
                     from ui.components.mobile_layout_manager import MobileLayoutManager
 
                     component_classes = [(MobileHeader, ("semantic_header", "Test", "Test")), (MobileLayoutManager, ("semantic_layout",))]
-                except ImportError:
-                    pass
 
                 for component_class, args in component_classes:
                     component_count += 1
-                    try:
+                    with suppress(Exception):
                         component = component_class(*args)
                         if hasattr(component, "render"):
                             component.render()
@@ -934,9 +919,6 @@ class MobileTestingOptimizationSuite:
 
                         if any(tag in html_content for tag in ["<header>", "<main>", "<nav>", "<section>"]):
                             semantic_score += 1
-
-                    except:
-                        pass
 
                 return {
                     "status": "passed",
@@ -1051,7 +1033,7 @@ class MobileTestingOptimizationSuite:
                 # Test loading state patterns
                 loading_patterns_found = 0
 
-                try:
+                with suppress(ImportError):
                     from ui.components.mobile_image_analysis import MobileImageAnalysis
 
                     image_analysis = MobileImageAnalysis("loading_test")
@@ -1061,9 +1043,6 @@ class MobileTestingOptimizationSuite:
                         loading_patterns_found += 1
                     if hasattr(image_analysis, "hide_loading_state"):
                         loading_patterns_found += 1
-
-                except ImportError:
-                    pass
 
                 return {
                     "status": "passed",
@@ -1111,7 +1090,7 @@ class MobileTestingOptimizationSuite:
             # Test gesture handling components
             gesture_support_found = 0
 
-            try:
+            with suppress(ImportError):
                 from ui.components.gesture_handler import GestureHandler
 
                 gesture_handler = GestureHandler()
@@ -1122,9 +1101,6 @@ class MobileTestingOptimizationSuite:
                 for method in gesture_methods:
                     if hasattr(gesture_handler, method):
                         gesture_support_found += 1
-
-            except ImportError:
-                pass
 
             return {"status": "passed", "gesture_methods_found": gesture_support_found, "gesture_support_available": gesture_support_found > 0}
 
@@ -1333,7 +1309,7 @@ class MobileTestingOptimizationSuite:
         if summary:
             return f"""
 - **Success Rate**: {summary.get("success_rate", summary.get("compatibility_score", summary.get("accessibility_score", summary.get("usability_score", 0)))):.1f}%
-- **Status**: {"✅ PASS" if summary.get("success_rate", 0) >= 80 else "⚠️ NEEDS IMPROVEMENT"}
+- **Status**: {"[PASS]" if summary.get("success_rate", 0) >= 80 else "[NEEDS IMPROVEMENT]"}
 """
 
         return "Summary not available"
@@ -1363,7 +1339,7 @@ def main():
 
     # Print summary
     summary = results.get("summary", {})
-    print("\n📊 Test Results Summary:")
+    print("\n[INFO] Test Results Summary:")
     print(f"   Total Tests: {summary.get('total_tests', 0)}")
     print(f"   Passed: {summary.get('passed_tests', 0)}")
     print(f"   Failed: {summary.get('failed_tests', 0)}")

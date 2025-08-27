@@ -107,11 +107,9 @@ def validate_empty_directories_cleaned(workspace_root: Path) -> dict[str, Any]:
                 continue
 
             # Check if directory is empty
-            try:
+            with contextlib.suppress(PermissionError):
                 if not any(root_dir.iterdir()):
                     empty_dirs.append(str(root_dir.relative_to(workspace_root)))
-            except PermissionError:
-                continue
 
     status = "passed" if not empty_dirs else "warning"
 

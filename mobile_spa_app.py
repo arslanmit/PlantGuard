@@ -141,7 +141,7 @@ def load_core_adapters():
 # Page configuration for mobile with fixed 428px design - NO SIDEBAR
 st.set_page_config(
     page_title="PlantGuard Mobile",
-    page_icon="🌿",
+    page_icon=":herb:",
     layout="wide",  # Will be constrained to 428px by CSS
     initial_sidebar_state="collapsed",  # Start collapsed
     menu_items={
@@ -273,10 +273,10 @@ class MobilePlantGuardApp:
 
             # Create fallback content function
             def render_fallback_content():
-                st.markdown("### 🌿 PlantGuard Mobile - Loading...")
+                st.markdown("### :herb: PlantGuard Mobile - Loading...")
                 st.info("Some components are still initializing. Please refresh if issues persist.")
 
-                if st.button("🔄 Refresh App", use_container_width=True):
+                if st.button(":arrows_counterclockwise: Refresh App", use_container_width=True):
                     # Clear initialization state to force re-init
                     st.session_state.mobile_app_initialized = False
                     st.rerun()
@@ -616,7 +616,7 @@ class MobilePlantGuardApp:
         try:
             # Only show if performance optimization is enabled
             if st.session_state.get("mobile_performance_mode") != "minimal":
-                with st.expander("⚡ Performance Status", expanded=False):
+                with st.expander(":zap: Performance Status", expanded=False):
                     try:
                         perf_report = self.performance_optimizer.get_performance_report()
 
@@ -625,11 +625,11 @@ class MobilePlantGuardApp:
                         with col1:
                             memory_pressure = perf_report.get("memory_pressure", "unknown")
                             if memory_pressure == "normal":
-                                st.success("🟢 Memory: Normal")
+                                st.success(":green_circle: Memory: Normal")
                             elif memory_pressure == "warning":
-                                st.warning("🟡 Memory: Warning")
+                                st.warning(":yellow_circle: Memory: Warning")
                             else:
-                                st.error("🔴 Memory: Critical")
+                                st.error(":red_circle: Memory: Critical")
 
                         with col2:
                             cache_stats = perf_report.get("cache_stats", {})
@@ -639,22 +639,22 @@ class MobilePlantGuardApp:
                         with col3:
                             adapters_status = st.session_state.get("mobile_adapters_loaded", False)
                             if adapters_status:
-                                st.success("🟢 Adapters: Ready")
+                                st.success(":green_circle: Adapters: Ready")
                             else:
-                                st.error("🔴 Adapters: Not Ready")
+                                st.error(":red_circle: Adapters: Not Ready")
 
                         # Performance actions
                         col1, col2 = st.columns(2)
 
                         with col1:
-                            if st.button("🧹 Clean Memory", use_container_width=True, key="perf_clean_memory"):
+                            if st.button(":broom: Clean Memory", use_container_width=True, key="perf_clean_memory"):
                                 with st.spinner("Cleaning memory..."):
                                     cleanup_stats = self.performance_optimizer.memory_manager.cleanup_memory(force=True)
                                     freed_mb = cleanup_stats.get("freed_mb", 0)
                                     st.success(f"Freed {freed_mb:.1f}MB")
 
                         with col2:
-                            if st.button("🔄 Clear Cache", use_container_width=True, key="perf_clear_cache"):
+                            if st.button(":arrows_counterclockwise: Clear Cache", use_container_width=True, key="perf_clear_cache"):
                                 self.performance_optimizer.cache.clear()
                                 st.success("Cache cleared")
                                 st.rerun()
@@ -674,20 +674,20 @@ class MobilePlantGuardApp:
                 adapters_status = st.session_state.get("mobile_adapters_loaded", False)
 
                 if not adapters_status:
-                    st.warning("⚠️ Core adapters not fully loaded. Some features may be limited.")
+                    st.warning(":warning: Core adapters not fully loaded. Some features may be limited.")
 
                 # Render the mobile image analysis component
                 self.image_analysis.render()
 
                 # Add enhanced functionality if adapters are available
                 if adapters_status and self.vision_adapter:
-                    st.markdown("### 🔬 Enhanced Analysis")
+                    st.markdown("### :microscope: Enhanced Analysis")
 
                     # Show recent analysis results
                     if st.session_state.mobile_analysis_history:
                         recent_analysis = st.session_state.mobile_analysis_history[-1]
 
-                        with st.expander("📊 Latest Analysis Results", expanded=False):
+                        with st.expander(":bar_chart: Latest Analysis Results", expanded=False):
                             col1, col2 = st.columns(2)
 
                             with col1:
@@ -702,12 +702,12 @@ class MobilePlantGuardApp:
 
                     # Quick analysis button for uploaded images
                     if st.session_state.get("uploaded_image"):
-                        if st.button("🚀 Quick Analysis with AI", use_container_width=True, type="primary"):
+                        if st.button(":rocket: Quick Analysis with AI", use_container_width=True, type="primary"):
                             with st.spinner("Analyzing with AI..."):
                                 result = self.analyze_image_with_adapters(st.session_state.uploaded_image)
 
                                 if "error" not in result:
-                                    st.success(f"✅ Analysis complete: {result['disease']} ({result['confidence']:.1%} confidence)")
+                                    st.success(f":white_check_mark: Analysis complete: {result['disease']} ({result['confidence']:.1%} confidence)")
 
                                     # Show recommendations
                                     if result.get("recommendations"):
@@ -716,7 +716,7 @@ class MobilePlantGuardApp:
                                             if rec.strip():
                                                 st.write(f"• {rec.strip()}")
                                 else:
-                                    st.error(f"❌ Analysis failed: {result['error']}")
+                                    st.error(f":x: Analysis failed: {result['error']}")
 
         except Exception as e:
             logger.error(f"Enhanced image analysis tab rendering failed: {e}")
@@ -732,23 +732,23 @@ class MobilePlantGuardApp:
                 adapters_status = st.session_state.get("mobile_adapters_loaded", False)
 
                 if not adapters_status:
-                    st.warning("⚠️ Audio processing not fully loaded. Voice features may be limited.")
+                    st.warning(":warning: Audio processing not fully loaded. Voice features may be limited.")
 
                 # Render the mobile voice interface component
                 self.voice_interface.render()
 
                 # Add enhanced functionality if adapters are available
                 if adapters_status and self.audio_adapter:
-                    st.markdown("### 🎤 Enhanced Voice Processing")
+                    st.markdown("### :microphone: Enhanced Voice Processing")
 
                     # Voice input processing
                     if st.session_state.get("recorded_audio"):
-                        if st.button("🔊 Process Voice with AI", use_container_width=True, type="primary"):
+                        if st.button(":speaker: Process Voice with AI", use_container_width=True, type="primary"):
                             with st.spinner("Processing voice..."):
                                 response = self.process_voice_input(st.session_state.recorded_audio)
 
                                 if response and "error" not in response.lower():
-                                    st.success("✅ Voice processed successfully")
+                                    st.success(":white_check_mark: Voice processed successfully")
                                     st.markdown("**AI Response:**")
                                     st.write(response)
 
@@ -762,19 +762,19 @@ class MobilePlantGuardApp:
                                         }
                                     )
                                 else:
-                                    st.error(f"❌ Voice processing failed: {response}")
+                                    st.error(f":x: Voice processing failed: {response}")
 
                     # Quick voice commands
                     st.markdown("**Quick Voice Commands:**")
                     col1, col2 = st.columns(2)
 
                     with col1:
-                        if st.button("🌿 'What's wrong with my plant?'", use_container_width=True):
+                        if st.button(":herb: 'What's wrong with my plant?'", use_container_width=True):
                             response = self.process_text_query("What's wrong with my plant?")
                             st.write(response)
 
                     with col2:
-                        if st.button("💊 'How do I treat this disease?'", use_container_width=True):
+                        if st.button(":pill: 'How do I treat this disease?'", use_container_width=True):
                             response = self.process_text_query("How do I treat this disease?")
                             st.write(response)
 
@@ -792,14 +792,14 @@ class MobilePlantGuardApp:
                 adapters_status = st.session_state.get("mobile_adapters_loaded", False)
 
                 if not adapters_status:
-                    st.warning("⚠️ Text processing not fully loaded. Chat features may be limited.")
+                    st.warning(":warning: Text processing not fully loaded. Chat features may be limited.")
 
                 # Render the mobile chat interface component
                 self.chat_interface.render()
 
                 # Add enhanced functionality if adapters are available
                 if adapters_status and self.text_adapter:
-                    st.markdown("### 💬 Enhanced AI Chat")
+                    st.markdown("### :speech_balloon: Enhanced AI Chat")
 
                     # Smart chat input with context awareness
                     user_input = st.text_input(
@@ -811,7 +811,7 @@ class MobilePlantGuardApp:
                     col1, col2 = st.columns([3, 1])
 
                     with col1:
-                        if st.button("💬 Send Message", use_container_width=True, type="primary"):
+                        if st.button(":speech_balloon: Send Message", use_container_width=True, type="primary"):
                             if user_input.strip():
                                 with st.spinner("Generating AI response..."):
                                     # Get context from recent analysis
@@ -837,16 +837,16 @@ class MobilePlantGuardApp:
                                     st.rerun()
 
                     with col2:
-                        if st.button("🗑️ Clear", use_container_width=True):
+                        if st.button(":wastebasket: Clear", use_container_width=True):
                             st.session_state.chat_history.clear()
                             st.rerun()
 
                     # Display enhanced chat history
                     if st.session_state.chat_history:
-                        st.markdown("### 📝 Chat History")
+                        st.markdown("### :memo: Chat History")
 
                         for i, chat in enumerate(reversed(st.session_state.chat_history[-10:])):
-                            with st.expander(f"💬 {chat['input'][:50]}...", expanded=i == 0):
+                            with st.expander(f":speech_balloon: {chat['input'][:50]}...", expanded=i == 0):
                                 st.markdown(f"**You:** {chat['input']}")
                                 st.markdown(f"**AI:** {chat['response']}")
 
@@ -854,7 +854,7 @@ class MobilePlantGuardApp:
                                     st.caption(f"Context: {chat['context']}")
 
                     # Quick question buttons
-                    st.markdown("### ❓ Quick Questions")
+                    st.markdown("### :question: Quick Questions")
 
                     quick_questions = [
                         "What disease does my plant have?",
@@ -867,7 +867,7 @@ class MobilePlantGuardApp:
                     cols = st.columns(2)
                     for i, question in enumerate(quick_questions):
                         with cols[i % 2]:
-                            if st.button(f"❓ {question}", use_container_width=True, key=f"quick_q_{i}"):
+                            if st.button(f":question: {question}", use_container_width=True, key=f"quick_q_{i}"):
                                 # Get context from recent analysis
                                 context = None
                                 if st.session_state.mobile_analysis_history:
@@ -895,7 +895,7 @@ class MobilePlantGuardApp:
 
     def render_history_settings_tab(self) -> None:
         """Render history and settings tab content."""
-        st.markdown("### 📊 Analysis History")
+        st.markdown("### :bar_chart: Analysis History")
 
         # Enhanced analysis history with mobile-specific data
         mobile_history = st.session_state.get("mobile_analysis_history", [])
@@ -913,12 +913,12 @@ class MobilePlantGuardApp:
 
                 # Determine analysis type and create appropriate title
                 if "disease" in analysis:
-                    title = f"🔬 Analysis {analysis_num}: {analysis.get('disease', 'Unknown')}"
+                    title = f":microscope: Analysis {analysis_num}: {analysis.get('disease', 'Unknown')}"
                     confidence = analysis.get("confidence", 0)
                     if confidence > 0:
                         title += f" ({confidence:.1%})"
                 else:
-                    title = f"📊 Analysis {analysis_num}"
+                    title = f":bar_chart: Analysis {analysis_num}"
 
                 with st.expander(title, expanded=False):
                     if "disease" in analysis:
@@ -1068,7 +1068,7 @@ class MobilePlantGuardApp:
             optimize_images = st.checkbox("Optimize images for mobile", value=True, key="mobile_optimize_images")
 
         # Enhanced app information
-        st.markdown("### ℹ️ App Information")
+        st.markdown("### 📋 App Information")
 
         col1, col2, col3 = st.columns(3)
 
@@ -1221,11 +1221,9 @@ class MobilePlantGuardApp:
     def run(self) -> None:
         """Run the enhanced mobile PlantGuard application with performance optimizations."""
         # Apply performance optimizations at startup
-        try:
+        with contextlib.suppress(Exception):
             # Load optimized CSS
             st.markdown(self.performance_optimizer.get_optimized_css(), unsafe_allow_html=True)
-        except:
-            pass  # Continue without CSS optimizations if they fail
 
         # Initialize components if not done
         if not st.session_state.get("mobile_app_initialized", False):

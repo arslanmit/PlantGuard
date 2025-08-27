@@ -74,14 +74,14 @@ def test_mobile_component_imports():
         for component_name in components:
             spec = importlib.util.find_spec(component_name)
             if spec is None:
-                st.error(f"❌ Component not found: {component_name}")
+                st.error(f"[FAIL] Component not found: {component_name}")
                 return False
 
-        st.success("✅ All mobile components found successfully")
+        st.success("[PASS] All mobile components found successfully")
         return True
 
     except ImportError as e:
-        st.error(f"❌ Import error: {e}")
+        st.error(f"[FAIL] Import error: {e}")
         return False
 
 
@@ -92,14 +92,14 @@ def test_mobile_app_integration():
     try:
         spec = importlib.util.find_spec("mobile_spa_app")
         if spec is not None:
-            st.success("✅ Mobile app can be imported")
+            st.success("[PASS] Mobile app can be imported")
             return True
         else:
-            st.error("❌ Mobile app module not found")
+            st.error("[FAIL] Mobile app module not found")
             return False
 
     except ImportError as e:
-        st.error(f"❌ Mobile app import error: {e}")
+        st.error(f"[FAIL] Mobile app import error: {e}")
         return False
 
 
@@ -113,14 +113,14 @@ def test_adapter_integration():
         for adapter_name in adapters:
             spec = importlib.util.find_spec(adapter_name)
             if spec is None:
-                st.error(f"❌ Adapter not found: {adapter_name}")
+                st.error(f"[FAIL] Adapter not found: {adapter_name}")
                 return False
 
-        st.success("✅ All adapters can be imported")
+        st.success("[PASS] All adapters can be imported")
         return True
 
     except ImportError as e:
-        st.warning(f"⚠️ Adapter import warning: {e}")
+        st.warning(f"[WARNING] Adapter import warning: {e}")
         return False
 
 
@@ -144,23 +144,23 @@ def run_comprehensive_tests():
             results[test_name] = result
 
             if result:
-                st.success(f"✅ {test_name} passed")
+                st.success(f"[PASS] {test_name} passed")
             else:
-                st.error(f"❌ {test_name} failed")
+                st.error(f"[FAIL] {test_name} failed")
 
         except Exception as e:
-            st.error(f"❌ {test_name} error: {e}")
+            st.error(f"[FAIL] {test_name} error: {e}")
             results[test_name] = False
 
     # Summary
-    st.subheader("📊 Test Summary")
+    st.subheader("[INFO] Test Summary")
     passed = sum(1 for result in results.values() if result)
     total = len(results)
 
     if passed == total:
-        st.success(f"🎉 All tests passed! ({passed}/{total})")
+        st.success(f"[SUCCESS] All tests passed! ({passed}/{total})")
     else:
-        st.warning(f"⚠️ {passed}/{total} tests passed")
+        st.warning(f"[WARNING] {passed}/{total} tests passed")
 
     return results
 

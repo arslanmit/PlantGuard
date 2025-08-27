@@ -18,31 +18,31 @@ def test_basic_functionality():
         from src.ui.mobile_design_system import MobileDesignSystem
         from src.ui.mobile_layout_manager import MobileLayoutManager
 
-        print("✅ Imports successful")
+        print("[OK] Imports successful")
 
         # Test layout manager
         layout = MobileLayoutManager()
         assert layout.config["touch_target_size"] == 48
-        print("✅ Layout manager initialized")
+        print("[OK] Layout manager initialized")
 
         # Test design system
         design = MobileDesignSystem()
         css = design._get_design_system_css()
         assert len(css) > 1000
         assert ".mobile-button" in css
-        print("✅ Design system working")
+        print("[OK] Design system working")
 
         # Test component registry
         registry = MobileComponentRegistry()
         components = registry.get_available_components()
         assert "camera_input" in components
-        print("✅ Component registry working")
+        print("[OK] Component registry working")
 
-        print("\n🎉 All basic tests passed!")
+        print("\n[SUCCESS] All basic tests passed!")
         return True
 
     except Exception as e:
-        print(f"❌ Test failed: {e}")
+        print(f"[FAIL] Test failed: {e}")
         traceback.print_exc()
         return False
 

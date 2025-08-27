@@ -164,16 +164,13 @@ class MakeMobileTester:
                 logger.info("Mobile app started successfully, terminating test process...")
 
                 # Terminate the process group
-                try:
+                with contextlib.suppress(ProcessLookupError):
                     os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
                     time.sleep(2)
 
                     # Force kill if still running
                     if proc.poll() is None:
                         os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
-
-                except ProcessLookupError:
-                    pass  # Process already terminated
 
                 return {
                     "status": "passed",
@@ -194,11 +191,9 @@ class MakeMobileTester:
 
         except Exception as e:
             # Clean up any remaining processes
-            try:
+            with suppress(Exception):
                 if "proc" in locals() and proc.poll() is None:
                     os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
-            except:
-                pass
 
             return {"status": "failed", "details": f"Mobile app startup test failed: {e!s}"}
 
@@ -283,9 +278,9 @@ class MakeMobileTester:
         overall_status = summary.get("overall_status", "unknown")
 
         # Status indicator
-        status_symbols = {"passed": "✅", "failed": "❌", "warning": "⚠️"}
+        status_symbols = {"passed": "[PASS]", "failed": "[FAIL]", "warning": "[WARN]"}
 
-        print(f"\nOverall Status: {status_symbols.get(overall_status, '❓')} {overall_status.upper()}")
+        print(f"\nOverall Status: {status_symbols.get(overall_status, '[UNKNOWN]')} {overall_status.upper()}")
         print(f"Total Tests: {summary.get('total_tests', 0)}")
         print(f"Passed: {summary.get('passed', 0)}")
         print(f"Failed: {summary.get('failed', 0)}")
@@ -300,7 +295,7 @@ class MakeMobileTester:
 
             if isinstance(result, dict):
                 status = result.get("status", "unknown")
-                symbol = status_symbols.get(status, "❓")
+                symbol = status_symbols.get(status, "[UNKNOWN]")
                 details = result.get("details", "No details")
 
                 print(f"{symbol} {test_name}: {status}")

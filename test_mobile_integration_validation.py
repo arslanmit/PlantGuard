@@ -243,9 +243,9 @@ class MobileIntegrationValidator:
         overall_status = summary.get("overall_status", "unknown")
 
         # Status indicator
-        status_symbols = {"passed": "✅", "failed": "❌", "warning": "⚠️"}
+        status_symbols = {"passed": "[PASS]", "failed": "[FAIL]", "warning": "[WARN]"}
 
-        print(f"\nOverall Status: {status_symbols.get(overall_status, '❓')} {overall_status.upper()}")
+        print(f"\nOverall Status: {status_symbols.get(overall_status, '[UNKNOWN]')} {overall_status.upper()}")
         print(f"Total Tests: {summary.get('total_tests', 0)}")
         print(f"Passed: {summary.get('passed', 0)}")
         print(f"Failed: {summary.get('failed', 0)}")
@@ -260,7 +260,7 @@ class MobileIntegrationValidator:
 
             if isinstance(result, dict):
                 status = result.get("status", "unknown")
-                symbol = status_symbols.get(status, "❓")
+                symbol = status_symbols.get(status, "[UNKNOWN]")
                 details = result.get("details", "No details")
 
                 print(f"{symbol} {test_name}: {status}")

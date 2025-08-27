@@ -14,7 +14,7 @@ def analyze_unused_dependencies():
     # Read current requirements
     requirements_file = Path("requirements.txt")
     if not requirements_file.exists():
-        print("❌ requirements.txt not found")
+        print("[ERROR] requirements.txt not found")
         return
 
     with open(requirements_file) as f:
@@ -58,16 +58,16 @@ def analyze_unused_dependencies():
         "psutil",
     ]
 
-    print("🔍 Dependency Analysis:")
-    print(f"  • Total packages in requirements.txt: {len([l for l in lines if l.strip() and not l.startswith('#')])}")
-    print(f"  • Essential mobile packages: {len(essential_mobile)}")
-    print(f"  • Potentially unused packages: {len(potentially_unused)}")
+    print("[INFO] Dependency Analysis:")
+    print(f"  - Total packages in requirements.txt: {len([line for line in lines if line.strip() and not line.startswith('#')])}")
+    print(f"  - Essential mobile packages: {len(essential_mobile)}")
+    print(f"  - Potentially unused packages: {len(potentially_unused)}")
 
     return potentially_unused
 
 
 if __name__ == "__main__":
     unused = analyze_unused_dependencies()
-    print("\n💡 Consider removing these packages for mobile optimization:")
+    print("\n[SUGGESTION] Consider removing these packages for mobile optimization:")
     for pkg in unused:
         print(f"  - {pkg}")
