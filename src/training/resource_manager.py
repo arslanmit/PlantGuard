@@ -193,6 +193,7 @@ class ResourceManager:
                         capture_output=True,
                         text=True,
                         check=True,
+                        timeout=10,  # Add timeout for security
                     )
                     cpu_name = result.stdout.strip()
                 else:

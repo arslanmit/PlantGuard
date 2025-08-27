@@ -23,7 +23,6 @@ import argparse
 import gc
 import json
 import logging
-import os
 import subprocess
 import sys
 import tempfile
@@ -673,7 +672,8 @@ print("SUCCESS:True")
 
             try:
                 # Run the test script
-                result = subprocess.run([sys.executable, test_file], capture_output=True, text=True, timeout=30, cwd=str(self.project_root))
+                python_path = shutil.which("python") or sys.executable
+                result = subprocess.run([python_path, test_file], capture_output=True, text=True, timeout=30, cwd=str(self.project_root))
 
                 if result.returncode == 0:
                     # Parse output
@@ -694,7 +694,7 @@ print("SUCCESS:True")
 
             finally:
                 # Clean up test file
-                os.unlink(test_file)
+                Path(test_file).unlink()
 
         except Exception as e:
             test_results["errors"].append(f"Performance test failed: {e}")

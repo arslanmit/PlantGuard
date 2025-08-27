@@ -5,11 +5,11 @@ This script verifies that the mobile layout manager and design system
 are working correctly and can be imported and initialized.
 """
 
-import os
 import sys
+from pathlib import Path
 
 # Add src to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 
 def test_mobile_imports():

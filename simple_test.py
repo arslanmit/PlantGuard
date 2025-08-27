@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Simple test to verify mobile implementation works."""
 
-import os
 import sys
+import traceback
+from pathlib import Path
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
+sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 
 def test_basic_functionality():

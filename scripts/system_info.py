@@ -4,7 +4,6 @@ Simple system info script for PlantGuard Makefile
 """
 
 import json
-import os
 import platform
 from datetime import datetime
 
@@ -25,7 +24,7 @@ def get_system_info():
             "cpu_count": psutil.cpu_count(),
             "disk_free_gb": round(psutil.disk_usage(".").free / (1024**3), 1),
         },
-        "project": {"name": "PlantGuard", "version": "1.0.0", "directory": os.getcwd()},
+        "project": {"name": "PlantGuard", "version": "1.0.0", "directory": str(Path.cwd())},
     }
     return info
 

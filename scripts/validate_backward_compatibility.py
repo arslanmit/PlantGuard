@@ -97,7 +97,10 @@ class BackwardCompatibilityValidator:
         for cmd in self.mobile_commands:
             try:
                 # Use --dry-run to test without actually executing
-                result = subprocess.run(["make", cmd, "--dry-run"], capture_output=True, text=True, timeout=10)
+                make_path = shutil.which("make")
+                if not make_path:
+                    continue
+                result = subprocess.run([make_path, cmd, "--dry-run"], capture_output=True, text=True, timeout=10)
 
                 command_exists = result.returncode == 0
                 results[f"{cmd}_exists"] = command_exists
@@ -151,7 +154,8 @@ class BackwardCompatibilityValidator:
 
         # Test command migration
         try:
-            result = subprocess.run(["python", "scripts/migration_helper.py", "command", "run"], capture_output=True, text=True, timeout=10)
+            python_path = shutil.which("python") or sys.executable
+            result = subprocess.run([python_path, "scripts/migration_helper.py", "command", "run"], capture_output=True, text=True, timeout=10)
 
             command_help_works = result.returncode == 0
             has_guidance = "Command Removed" in result.stdout
@@ -169,8 +173,9 @@ class BackwardCompatibilityValidator:
 
         # Test feature migration
         try:
+            python_path = shutil.which("python") or sys.executable
             result = subprocess.run(
-                ["python", "scripts/migration_helper.py", "feature", "image_analysis"], capture_output=True, text=True, timeout=10
+                [python_path, "scripts/migration_helper.py", "feature", "image_analysis"], capture_output=True, text=True, timeout=10
             )
 
             feature_help_works = result.returncode == 0
@@ -189,7 +194,8 @@ class BackwardCompatibilityValidator:
 
         # Test summary generation
         try:
-            result = subprocess.run(["python", "scripts/migration_helper.py", "summary"], capture_output=True, text=True, timeout=10)
+            python_path = shutil.which("python") or sys.executable
+            result = subprocess.run([python_path, "scripts/migration_helper.py", "summary"], capture_output=True, text=True, timeout=10)
 
             summary_works = result.returncode == 0
             has_json = '"migration_type"' in result.stdout

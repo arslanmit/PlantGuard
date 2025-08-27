@@ -52,8 +52,9 @@ class ComprehensiveMobileTestRunner:
         logger.info(f"Running {script_name}...")
 
         try:
+            python_path = shutil.which("python") or sys.executable
             result = subprocess.run(
-                [sys.executable, script_path],
+                [python_path, script_path],
                 capture_output=True,
                 text=True,
                 cwd=self.workspace_root,

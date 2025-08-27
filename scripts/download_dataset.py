@@ -128,7 +128,7 @@ class DatasetDownloader:
         try:
             logger.info(f"Downloading from URL: {url}")
 
-            response = requests.get(url, stream=True)
+            response = requests.get(url, stream=True, timeout=30)  # Add timeout for security
             response.raise_for_status()
 
             total_size = int(response.headers.get("content-length", 0))

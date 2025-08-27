@@ -391,7 +391,11 @@ class ProductionPipelineValidator:
             import subprocess
 
             # Test that make help works
-            result = subprocess.run(["make", "help"], check=False, capture_output=True, text=True, timeout=10)
+            make_path = shutil.which("make")
+            if not make_path:
+                self.log_test_result("Makefile.help", False, "Make command not found")
+                return False
+            result = subprocess.run([make_path, "help"], check=False, capture_output=True, text=True, timeout=10)
             if result.returncode != 0:
                 self.log_test_result("Makefile.help", False, "Make help command failed")
                 return False
@@ -409,7 +413,11 @@ class ProductionPipelineValidator:
             for cmd in required_commands:
                 try:
                     # Use make -n to test if target exists without executing it
-                    result = subprocess.run(["make", "-n", cmd], check=False, capture_output=True, text=True, timeout=5)
+                    make_path = shutil.which("make")
+                    if not make_path:
+                        missing_commands.append(cmd)
+                        continue
+                    result = subprocess.run([make_path, "-n", cmd], check=False, capture_output=True, text=True, timeout=5)
                     if result.returncode != 0:
                         missing_commands.append(cmd)
                         logger.debug(f"Command '{cmd}' not found (make -n returned {result.returncode})")

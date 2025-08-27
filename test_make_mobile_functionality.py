@@ -32,7 +32,15 @@ class MakeMobileTester:
     def test_make_mobile_dry_run(self) -> dict[str, Any]:
         """Test make mobile command with dry run to see what it would do."""
         try:
-            result = subprocess.run(["make", "-n", "mobile"], capture_output=True, text=True, cwd=self.workspace_root, timeout=30)
+            make_path = shutil.which("make")
+            if not make_path:
+                return {
+                    "status": "failed",
+                    "details": "Make command not found",
+                    "stdout": "",
+                    "stderr": "Make executable not found in PATH",
+                }
+            result = subprocess.run([make_path, "-n", "mobile"], capture_output=True, text=True, cwd=self.workspace_root, timeout=30)
 
             if result.returncode != 0:
                 return {
@@ -69,18 +77,28 @@ class MakeMobileTester:
         """Test the validation steps in make mobile command."""
         try:
             # Test individual validation commands that make mobile runs
-            validation_commands = [
-                # Check if mobile_spa_app.py exists
-                ["test", "-f", "mobile_spa_app.py"],
-                # Check if python can import mobile_spa_app
-                ["python", "-c", "import mobile_spa_app; print('Mobile SPA imports successful')"],
-                # Check if streamlit is available
-                ["python", "-c", "import streamlit; print('Streamlit available')"],
-                # Check if PyTorch is available
-                ["python", "-c", "import torch; print(f'PyTorch available: {torch.__version__}')"],
-                # Check if PIL is available
-                ["python", "-c", "import PIL; print('PIL available')"],
-            ]
+            # Get secure executable paths
+            test_path = shutil.which("test")
+            python_path = shutil.which("python") or sys.executable
+
+            validation_commands = []
+
+            # Check if mobile_spa_app.py exists
+            if test_path:
+                validation_commands.append([test_path, "-f", "mobile_spa_app.py"])
+
+            # Check if python can import mobile_spa_app
+            validation_commands.extend(
+                [
+                    [python_path, "-c", "import mobile_spa_app; print('Mobile SPA imports successful')"],
+                    # Check if streamlit is available
+                    [python_path, "-c", "import streamlit; print('Streamlit available')"],
+                    # Check if PyTorch is available
+                    [python_path, "-c", "import torch; print(f'PyTorch available: {torch.__version__}')"],
+                    # Check if PIL is available
+                    [python_path, "-c", "import PIL; print('PIL available')"],
+                ]
+            )
 
             validation_results = {}
 
@@ -123,8 +141,12 @@ class MakeMobileTester:
             # Start the mobile app in background
             logger.info("Starting mobile app for quick startup test...")
 
+            make_path = shutil.which("make")
+            if not make_path:
+                return {"status": "failed", "details": "Make command not found"}
+
             proc = subprocess.Popen(
-                ["make", "mobile"],
+                [make_path, "mobile"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 cwd=self.workspace_root,

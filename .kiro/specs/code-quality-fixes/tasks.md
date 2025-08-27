@@ -18,13 +18,13 @@
   - Implement proper conditional import patterns for optional dependencies
   - _Requirements: 2.1, 2.2, 2.4_
 
-- [ ] 4. Fix Security Issues in Subprocess Calls
+- [x] 4. Fix Security Issues in Subprocess Calls
   - Replace partial executable paths with full path resolution using shutil.which()
   - Add timeout parameters to subprocess calls and network requests
   - Implement proper validation for command execution
   - _Requirements: 3.1, 3.3_
 
-- [ ] 5. Convert File Operations to pathlib.Path
+- [x] 5. Convert File Operations to pathlib.Path
   - Replace os.path.join(), os.path.dirname(), os.getcwd() with Path operations
   - Convert os.unlink() calls to Path.unlink()
   - Update all file handling code to use pathlib consistently

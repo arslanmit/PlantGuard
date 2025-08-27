@@ -565,7 +565,7 @@ mobile-test: check-venv
 mobile-performance: check-venv
 	@echo "$(BLUE)📈 Testing Mobile PlantGuard performance$(NC)"
 	@echo "$(YELLOW)Starting Mobile performance test...$(NC)"
-	@$(PY) -c "import subprocess, time, requests; proc = subprocess.Popen(['streamlit', 'run', 'mobile_spa_app.py', '--server.port', '8503'], stdout=subprocess.PIPE, stderr=subprocess.PIPE); time.sleep(10); response = requests.get('http://localhost:8503', timeout=5); print(f'✅ Mobile responding: {response.status_code}'); proc.terminate()"
+	@$(PY) -c "import subprocess, time, requests, shutil, sys; streamlit_path = shutil.which('streamlit') or 'streamlit'; proc = subprocess.Popen([streamlit_path, 'run', 'mobile_spa_app.py', '--server.port', '8503'], stdout=subprocess.PIPE, stderr=subprocess.PIPE); time.sleep(10); response = requests.get('http://localhost:8503', timeout=5); print(f'✅ Mobile responding: {response.status_code}'); proc.terminate()"
 
 # validate-spa: → validate-mobile (see above)
 

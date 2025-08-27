@@ -118,7 +118,10 @@ class MobileMigrationTester:
                 return {"status": "failed", "details": "Mobile target not found in Makefile"}
 
             # Test make mobile command (dry run to avoid actually starting the app)
-            result = subprocess.run(["make", "-n", "mobile"], capture_output=True, text=True, cwd=self.workspace_root, timeout=10)
+            make_path = shutil.which("make")
+            if not make_path:
+                return {"status": "failed", "details": "Make command not found"}
+            result = subprocess.run([make_path, "-n", "mobile"], capture_output=True, text=True, cwd=self.workspace_root, timeout=10)
 
             if result.returncode != 0:
                 return {
@@ -352,8 +355,9 @@ class MobileMigrationTester:
                 return {"status": "failed", "details": "mobile_spa_app.py not found"}
 
             # Run streamlit config check (doesn't start the server)
+            python_path = shutil.which("python") or sys.executable
             result = subprocess.run(
-                ["python", "-m", "streamlit", "config", "show"], capture_output=True, text=True, timeout=30, cwd=self.workspace_root
+                [python_path, "-m", "streamlit", "config", "show"], capture_output=True, text=True, timeout=30, cwd=self.workspace_root
             )
 
             if result.returncode != 0:

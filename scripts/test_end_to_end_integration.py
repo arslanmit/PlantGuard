@@ -50,7 +50,11 @@ class EndToEndIntegrationTest:
 
         try:
             # Test that key commands exist and can be parsed
-            result = subprocess.run(["make", "help"], check=False, capture_output=True, text=True, timeout=10)
+            make_path = shutil.which("make")
+            if not make_path:
+                self.log_test_result("Makefile.help", False, "Make command not found")
+                return False
+            result = subprocess.run([make_path, "help"], check=False, capture_output=True, text=True, timeout=10)
             if result.returncode != 0:
                 self.log_test_result("Makefile.help", False, "Make help failed")
                 return False

@@ -247,7 +247,10 @@ class FinalValidationTestSuite:
 
         # Test 4: Test make mobile command (dry run)
         try:
-            result = subprocess.run(["make", "-n", "mobile"], capture_output=True, text=True, timeout=10)
+            make_path = shutil.which("make")
+            if not make_path:
+                return {"status": "failed", "details": "Make command not found"}
+            result = subprocess.run([make_path, "-n", "mobile"], capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
                 results["tests"]["make_mobile_dry_run"] = {"status": "passed", "details": "Make mobile command validates successfully"}
@@ -264,7 +267,10 @@ class FinalValidationTestSuite:
 
         # Test 5: Help target validation
         try:
-            result = subprocess.run(["make", "help"], capture_output=True, text=True, timeout=10)
+            make_path = shutil.which("make")
+            if not make_path:
+                return {"status": "failed", "details": "Make command not found"}
+            result = subprocess.run([make_path, "help"], capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0 and "mobile" in result.stdout:
                 results["tests"]["make_help"] = {"status": "passed", "details": "Make help shows mobile target"}

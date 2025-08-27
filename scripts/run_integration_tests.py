@@ -45,8 +45,9 @@ class IntegrationTestRunner:
         """Run a specific test suite."""
         logger.info(f"Running {test_name}...")
 
-        # Build pytest command
-        cmd = ["python", "-m", "pytest", test_file, "-v", "--tb=short"]
+        # Build pytest command with secure executable path
+        python_path = shutil.which("python") or sys.executable
+        cmd = [python_path, "-m", "pytest", test_file, "-v", "--tb=short"]
 
         if markers:
             for marker in markers:
@@ -315,7 +316,8 @@ class IntegrationTestRunner:
 
         # Check if pytest is available
         try:
-            subprocess.run(["python", "-m", "pytest", "--version"], check=True, capture_output=True)
+            python_path = shutil.which("python") or sys.executable
+            subprocess.run([python_path, "-m", "pytest", "--version"], check=True, capture_output=True, timeout=10)
         except subprocess.CalledProcessError:
             logger.error("❌ pytest not available. Install with: pip install pytest")
             return False

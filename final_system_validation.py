@@ -231,9 +231,14 @@ class FinalSystemValidator:
 
             # Test mobile target execution (dry run)
             try:
-                result = subprocess.run(["make", "-n", "mobile"], capture_output=True, text=True, timeout=10)
-                make_test_success = result.returncode == 0
-                make_output = result.stdout + result.stderr
+                make_path = shutil.which("make")
+                if not make_path:
+                    make_test_success = False
+                    make_output = "Make command not found"
+                else:
+                    result = subprocess.run([make_path, "-n", "mobile"], capture_output=True, text=True, timeout=10)
+                    make_test_success = result.returncode == 0
+                    make_output = result.stdout + result.stderr
             except subprocess.TimeoutExpired:
                 make_test_success = False
                 make_output = "Make command timed out"
