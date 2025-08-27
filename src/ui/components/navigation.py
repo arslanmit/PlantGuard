@@ -217,50 +217,50 @@ class NavigationHeader:
 
     def _render_always_visible_mobile_navigation(self, current_page: str) -> str:
         """Render always-visible mobile navigation - no hamburger menu."""
-        
+
         # Always-visible navigation header
         st.markdown("### 🧭 Navigation")
         st.markdown("All features directly accessible:")
-        
+
         # Always show all navigation options in a grid
         pages_list = list(self.pages.items())
-        
+
         # For 2-4 pages, use 2-column grid
         if len(pages_list) <= 4:
             cols = st.columns(2)
         else:
             # For more pages, use 3-column grid
             cols = st.columns(3)
-        
+
         selected_page = current_page
-        
+
         for i, (page_name, page_info) in enumerate(pages_list):
             col_index = i % len(cols)
-            
+
             with cols[col_index]:
                 button_type = "primary" if page_name == current_page else "secondary"
-                
+
                 # Always-visible button with icon + text + status
                 button_label = f"{page_info['icon']} {page_name}"
                 if page_name == current_page:
                     button_label += " ✅"
-                
+
                 if st.button(
                     button_label,
                     key=f"mobile_nav_always_visible_{page_name}",
                     help=page_info["description"],
                     type=button_type,
                     use_container_width=True,
-                    disabled=(page_name == current_page)  # Disable current page
+                    disabled=(page_name == current_page),  # Disable current page
                 ):
                     selected_page = page_name
-                
+
                 # Show status below button
                 if page_name == current_page:
                     st.success("Current")
                 else:
                     st.info("Available")
-        
+
         return selected_page
 
     def render_collapsible_navigation(self) -> str:

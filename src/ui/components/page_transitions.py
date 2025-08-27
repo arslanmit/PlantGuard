@@ -317,122 +317,122 @@ class MobileNavigationMenu:
         }
 
         current_page = st.session_state.get("current_page", "Home")
-        
+
         # Always-visible navigation grid (2x3 layout)
         st.markdown("### 🧭 Navigation")
-        
+
         # First row
         col1, col2 = st.columns(2)
         selected_page = None
-        
+
         with col1:
             home_info = pages["Home"]
             button_type = "primary" if current_page == "Home" else "secondary"
             button_label = f"{home_info['icon']} Home"
             if current_page == "Home":
                 button_label += " ✅"
-            
+
             if st.button(
                 button_label,
                 key="mobile_nav_always_visible_home",
                 help=home_info["description"],
                 type=button_type,
                 use_container_width=True,
-                disabled=(current_page == "Home")
+                disabled=(current_page == "Home"),
             ):
                 selected_page = "Home"
-            
+
             if current_page == "Home":
                 st.success("Current")
             else:
                 st.info("Available")
-        
+
         with col2:
             compare_info = pages["Compare"]
             button_type = "primary" if current_page == "Compare" else "secondary"
             button_label = f"{compare_info['icon']} Compare"
             if current_page == "Compare":
                 button_label += " ✅"
-            
+
             if st.button(
                 button_label,
                 key="mobile_nav_always_visible_compare",
                 help=compare_info["description"],
                 type=button_type,
                 use_container_width=True,
-                disabled=(current_page == "Compare")
+                disabled=(current_page == "Compare"),
             ):
                 selected_page = "Compare"
-            
+
             if current_page == "Compare":
                 st.success("Current")
             else:
                 st.info("Available")
-        
+
         # Second row
         col3, col4 = st.columns(2)
-        
+
         with col3:
             history_info = pages["History"]
             button_type = "primary" if current_page == "History" else "secondary"
             button_label = f"{history_info['icon']} History"
             if current_page == "History":
                 button_label += " ✅"
-            
+
             if st.button(
                 button_label,
                 key="mobile_nav_always_visible_history",
                 help=history_info["description"],
                 type=button_type,
                 use_container_width=True,
-                disabled=(current_page == "History")
+                disabled=(current_page == "History"),
             ):
                 selected_page = "History"
-            
+
             if current_page == "History":
                 st.success("Current")
             else:
                 st.info("Available")
-        
+
         with col4:
             guide_info = pages["Guide"]
             button_type = "primary" if current_page == "Guide" else "secondary"
             button_label = f"{guide_info['icon']} Guide"
             if current_page == "Guide":
                 button_label += " ✅"
-            
+
             if st.button(
                 button_label,
                 key="mobile_nav_always_visible_guide",
                 help=guide_info["description"],
                 type=button_type,
                 use_container_width=True,
-                disabled=(current_page == "Guide")
+                disabled=(current_page == "Guide"),
             ):
                 selected_page = "Guide"
-            
+
             if current_page == "Guide":
                 st.success("Current")
             else:
                 st.info("Available")
-        
+
         # Third row - Settings (full width)
         settings_info = pages["Settings"]
         button_type = "primary" if current_page == "Settings" else "secondary"
         button_label = f"{settings_info['icon']} Settings"
         if current_page == "Settings":
             button_label += " ✅"
-        
+
         if st.button(
             button_label,
             key="mobile_nav_always_visible_settings",
             help=settings_info["description"],
             type=button_type,
             use_container_width=True,
-            disabled=(current_page == "Settings")
+            disabled=(current_page == "Settings"),
         ):
             selected_page = "Settings"
-        
+
         if current_page == "Settings":
             st.success("Current")
         else:
