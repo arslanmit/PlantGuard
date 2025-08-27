@@ -85,6 +85,8 @@ endif
 .PHONY: reset fresh stop restart debug profile validate
 .PHONY: templates-list train-production-template train-production-config
 .PHONY: qa health-check tunnel list-models evaluate-model monitor-training setup-dataset
+.PHONY: train-production download-dataset validate-dataset analyze-dataset compare-models
+.PHONY: dataset-status dataset-download dataset-prepare dataset-validate dataset-analyze
 
 # ========== Help & Information ==========
 
@@ -714,3 +716,222 @@ fix: check-venv
 	@$(RUFF) check $(SRC_DIR)/ --fix --unsafe-fixes
 	@$(RUFF) format $(SRC_DIR)/
 	@echo "$(GREEN)✅ Auto-fix complete$(NC)"
+# ========== Production Training Pipeline ==========
+
+# Core training commands (Task 9.1)
+train-production: check-venv
+	@echo "$(BLUE)🚀 Starting production training pipeline...$(NC)"
+	@if [ ! -f scripts/production_training_workflow.py ]; then \
+		echo "$(RED)❌ Production training script not found$(NC)"; \
+		echo "$(CYAN)💡 Expected: scripts/production_training_workflow.py$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(YELLOW)🔍 Validating training prerequisites...$(NC)"
+	@$(PY) scripts/production_training_workflow.py
+	@echo "$(GREEN)✅ Production training complete$(NC)"
+
+# Production training with template
+train-production-template: check-venv
+	@if [ -z "$(TEMPLATE)" ]; then \
+		echo "$(RED)❌ TEMPLATE parameter required$(NC)"; \
+		echo "$(CYAN)💡 Usage: make train-production-template TEMPLATE=<name>$(NC)"; \
+		echo "$(CYAN)💡 Available templates: $(shell ls config/training_templates/*.json 2>/dev/null | xargs -n1 basename | sed 's/.json//' | tr '\n' ' ')$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(BLUE)🚀 Starting production training with template: $(TEMPLATE)$(NC)"
+	@if [ -f "config/training_templates/$(TEMPLATE).json" ]; then \
+		TEMPLATE_PATH="config/training_templates/$(TEMPLATE).json"; \
+	elif [ -f "$(TEMPLATE)" ]; then \
+		TEMPLATE_PATH="$(TEMPLATE)"; \
+	else \
+		echo "$(RED)❌ Template not found: $(TEMPLATE)$(NC)"; \
+		echo "$(CYAN)💡 Available templates:$(NC)"; \
+		ls config/training_templates/*.json 2>/dev/null | xargs -n1 basename | sed 's/.json//' || echo "  No templates found"; \
+		exit 1; \
+	fi; \
+	echo "$(YELLOW)📋 Using template: $$TEMPLATE_PATH$(NC)"; \
+	$(PY) scripts/production_training_workflow.py --config "$$TEMPLATE_PATH"
+	@echo "$(GREEN)✅ Template-based training complete$(NC)"
+
+# Production training with custom config
+train-production-config: check-venv
+	@if [ -z "$(CONFIG)" ]; then \
+		echo "$(RED)❌ CONFIG parameter required$(NC)"; \
+		echo "$(CYAN)💡 Usage: make train-production-config CONFIG=<path>$(NC)"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(CONFIG)" ]; then \
+		echo "$(RED)❌ Config file not found: $(CONFIG)$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(BLUE)🚀 Starting production training with config: $(CONFIG)$(NC)"
+	@$(PY) scripts/production_training_workflow.py --config "$(CONFIG)"
+	@echo "$(GREEN)✅ Custom config training complete$(NC)"
+
+# List available training templates
+templates-list:
+	@echo "$(CYAN)📋 Available Training Templates$(NC)"
+	@echo ""
+	@if [ -d config/training_templates ]; then \
+		for template in config/training_templates/*.json; do \
+			if [ -f "$$template" ]; then \
+				name=$$(basename "$$template" .json); \
+				echo "$(BLUE)  $$name$(NC)"; \
+				if command -v jq >/dev/null 2>&1; then \
+					desc=$$(jq -r '.description // "No description available"' "$$template" 2>/dev/null); \
+					echo "$(YELLOW)    $$desc$(NC)"; \
+				fi; \
+				echo "$(CYAN)    Path: $$template$(NC)"; \
+				echo ""; \
+			fi; \
+		done; \
+	else \
+		echo "$(YELLOW)⚠️  No training templates directory found$(NC)"; \
+	fi
+	@echo "$(CYAN)💡 Usage: make train-production-template TEMPLATE=<name>$(NC)"
+
+# Monitoring and evaluation commands (Task 9.2)
+monitor-training: check-venv
+	@echo "$(BLUE)📊 Launching TensorBoard for training monitoring...$(NC)"
+	@if [ ! -d "$(RUNS_DIR)" ]; then \
+		echo "$(YELLOW)⚠️  No training runs directory found. Creating...$(NC)"; \
+		mkdir -p "$(RUNS_DIR)"; \
+	fi
+	@echo "$(CYAN)🔗 TensorBoard will be available at: http://localhost:6006$(NC)"
+	@echo "$(YELLOW)📂 Monitoring directory: $(RUNS_DIR)$(NC)"
+	@if command -v tensorboard >/dev/null 2>&1; then \
+		tensorboard --logdir="$(RUNS_DIR)" --port=6006 --host=0.0.0.0; \
+	else \
+		$(PY) -m tensorboard.main --logdir="$(RUNS_DIR)" --port=6006 --host=0.0.0.0; \
+	fi
+
+# Evaluate trained models
+evaluate-model: check-venv
+	@echo "$(BLUE)🔍 Evaluating trained models...$(NC)"
+	@if [ ! -f scripts/evaluate_model.py ]; then \
+		echo "$(RED)❌ Model evaluation script not found$(NC)"; \
+		echo "$(CYAN)💡 Expected: scripts/evaluate_model.py$(NC)"; \
+		exit 1; \
+	fi
+	@if [ -n "$(MODEL)" ]; then \
+		echo "$(YELLOW)📊 Evaluating specific model: $(MODEL)$(NC)"; \
+		$(PY) scripts/evaluate_model.py --model "$(MODEL)"; \
+	else \
+		echo "$(YELLOW)📊 Evaluating all available models...$(NC)"; \
+		$(PY) scripts/evaluate_model.py; \
+	fi
+	@echo "$(GREEN)✅ Model evaluation complete$(NC)"
+
+# List available models
+list-models: check-venv
+	@echo "$(BLUE)📋 Listing available models...$(NC)"
+	@if [ ! -f scripts/list_models.py ]; then \
+		echo "$(RED)❌ Model listing script not found$(NC)"; \
+		echo "$(CYAN)💡 Expected: scripts/list_models.py$(NC)"; \
+		exit 1; \
+	fi
+	@$(PY) scripts/list_models.py
+	@echo "$(GREEN)✅ Model listing complete$(NC)"
+
+# Compare multiple models
+compare-models: check-venv
+	@if [ -z "$(MODELS)" ]; then \
+		echo "$(RED)❌ MODELS parameter required$(NC)"; \
+		echo "$(CYAN)💡 Usage: make compare-models MODELS=model1,model2$(NC)"; \
+		echo "$(CYAN)💡 Available models:$(NC)"; \
+		$(PY) scripts/list_models.py --brief 2>/dev/null || echo "  Run 'make list-models' to see available models"; \
+		exit 1; \
+	fi
+	@echo "$(BLUE)📊 Comparing models: $(MODELS)$(NC)"
+	@if [ ! -f scripts/evaluate_model.py ]; then \
+		echo "$(RED)❌ Model evaluation script not found$(NC)"; \
+		exit 1; \
+	fi
+	@$(PY) scripts/evaluate_model.py --compare "$(MODELS)"
+	@echo "$(GREEN)✅ Model comparison complete$(NC)"
+
+# Dataset management commands (Task 9.3)
+setup-dataset: check-venv
+	@echo "$(BLUE)📂 Setting up dataset for training...$(NC)"
+	@if [ ! -f scripts/prepare_dataset.py ]; then \
+		echo "$(RED)❌ Dataset preparation script not found$(NC)"; \
+		echo "$(CYAN)💡 Expected: scripts/prepare_dataset.py$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(YELLOW)🔍 Preparing and validating dataset...$(NC)"
+	@$(PY) scripts/prepare_dataset.py
+	@echo "$(GREEN)✅ Dataset setup complete$(NC)"
+
+# Download PlantVillage dataset
+download-dataset: check-venv
+	@echo "$(BLUE)⬇️  Downloading PlantVillage dataset...$(NC)"
+	@if [ ! -f scripts/download_dataset.py ]; then \
+		echo "$(RED)❌ Dataset download script not found$(NC)"; \
+		echo "$(CYAN)💡 Expected: scripts/download_dataset.py$(NC)"; \
+		exit 1; \
+	fi
+	@echo "$(YELLOW)📥 Starting dataset download...$(NC)"
+	@$(PY) scripts/download_dataset.py
+	@echo "$(GREEN)✅ Dataset download complete$(NC)"
+
+# Validate dataset integrity
+validate-dataset: check-venv
+	@echo "$(BLUE)✅ Validating dataset integrity...$(NC)"
+	@if [ ! -f scripts/validate_dataset.py ]; then \
+		echo "$(RED)❌ Dataset validation script not found$(NC)"; \
+		echo "$(CYAN)💡 Expected: scripts/validate_dataset.py$(NC)"; \
+		exit 1; \
+	fi
+	@$(PY) scripts/validate_dataset.py
+	@echo "$(GREEN)✅ Dataset validation complete$(NC)"
+
+# Analyze dataset statistics
+analyze-dataset: check-venv
+	@echo "$(BLUE)📊 Analyzing dataset statistics...$(NC)"
+	@if [ ! -f scripts/analyze_dataset.py ]; then \
+		echo "$(RED)❌ Dataset analysis script not found$(NC)"; \
+		echo "$(CYAN)💡 Expected: scripts/analyze_dataset.py$(NC)"; \
+		exit 1; \
+	fi
+	@$(PY) scripts/analyze_dataset.py
+	@echo "$(GREEN)✅ Dataset analysis complete$(NC)"
+
+# Legacy training commands for backward compatibility
+train: train-production
+	@echo "$(YELLOW)💡 'make train' now uses production training pipeline$(NC)"
+
+monitor: monitor-training
+	@echo "$(YELLOW)💡 'make monitor' now uses enhanced TensorBoard monitoring$(NC)"
+
+evaluate: evaluate-model
+	@echo "$(YELLOW)💡 'make evaluate' now uses enhanced model evaluation$(NC)"
+
+# Dataset status check
+dataset-status: check-venv
+	@echo "$(BLUE)📊 Checking dataset status...$(NC)"
+	@echo "$(YELLOW)Dataset directory: data/$(NC)"
+	@if [ -d "data/raw" ]; then \
+		echo "$(GREEN)✅ Raw data directory exists$(NC)"; \
+		echo "$(CYAN)  Files: $(shell find data/raw -type f | wc -l | tr -d ' ')$(NC)"; \
+	else \
+		echo "$(RED)❌ Raw data directory missing$(NC)"; \
+	fi
+	@if [ -d "data/processed" ]; then \
+		echo "$(GREEN)✅ Processed data directory exists$(NC)"; \
+		echo "$(CYAN)  Files: $(shell find data/processed -type f | wc -l | tr -d ' ')$(NC)"; \
+	else \
+		echo "$(YELLOW)⚠️  Processed data directory missing$(NC)"; \
+	fi
+	@if [ -f "data/knowledge_base/disease_info.json" ]; then \
+		echo "$(GREEN)✅ Knowledge base available$(NC)"; \
+	else \
+		echo "$(YELLOW)⚠️  Knowledge base missing$(NC)"; \
+	fi
+	@echo "$(CYAN)💡 Run 'make download-dataset' to get PlantVillage data$(NC)"
+	@echo "$(CYAN)💡 Run 'make setup-dataset' to prepare data for training$(NC)"
+
+# Aliases for common dataset commands
+dataset-download: download-dataset
+dataset-prepare: setup-dataset
+dataset-validate: validate-dataset
+dataset-analyze: analyze-dataset

@@ -20,13 +20,6 @@
   - Add support for multiple image formats and quality validation
   - _Requirements: 1.3, 1.4_
 
-- [x] 1.3 Enhance Makefile with advanced dataset commands
-  - Update `make setup-dataset` to use new DatasetManager
-  - Add `make download-dataset` command for automatic dataset acquisition
-  - Implement `make validate-dataset` for dataset integrity checking
-  - Add `make analyze-dataset` for dataset statistics and reporting
-  - _Requirements: 1.1, 1.5_
-
 - [x] 2. Build advanced training configuration system
   - Create TrainingConfig class with comprehensive parameter management
   - Implement automatic resource detection and optimization
@@ -101,13 +94,6 @@
   - Create sample prediction logging with confidence scores
   - _Requirements: 3.2, 3.3_
 
-- [x] 4.3 Add comprehensive training reporting
-  - Implement training report generation with performance summaries
-  - Create model analysis tools with layer-wise statistics
-  - Add training curve visualization and analysis
-  - Write Makefile command `make monitor-training` for TensorBoard launch
-  - _Requirements: 3.4, 3.5_
-
 - [x] 5. Implement model evaluation and validation system
   - Create ModelEvaluator class with comprehensive metrics
   - Implement model comparison and benchmarking tools
@@ -132,7 +118,6 @@
   - Implement automatic model evaluation on validation set after training
   - Create sample image testing with prediction confidence analysis
   - Add model quality assessment with performance thresholds
-  - Write Makefile command `make evaluate-model` for model testing
   - _Requirements: 4.1, 4.4, 4.6_
 
 - [x] 6. Build model management and versioning system
@@ -159,7 +144,6 @@
   - Implement model export in multiple formats (PyTorch, ONNX)
   - Create deployment package generation with dependencies
   - Add model optimization for production deployment
-  - Write Makefile command `make list-models` for model management
   - _Requirements: 5.5, 8.2_
 
 - [x] 7. Implement performance optimization features
@@ -195,8 +179,8 @@
   - Create integration with existing VisionAdapter and UI components
   - _Requirements: 6.1, 6.2, 8.1_
 
-- [x] 8.1 Create production training workflow command
-  - Write `make train-production` command with optimized settings
+- [x] 8.1 Create production training workflow script
+  - Write `scripts/production_training_workflow.py` with optimized settings
   - Implement prerequisite validation (dataset, GPU, disk space)
   - Add automatic configuration selection based on available resources
   - Create production training pipeline with error handling and notifications
@@ -216,25 +200,34 @@
   - Create end-to-end validation with sample datasets
   - _Requirements: 8.4, 8.5_
 
-- [x] 9. Enhance Makefile with production training commands
-  - Add all new training and model management commands
-  - Implement command help and documentation
-  - Create training workflow shortcuts and aliases
-  - _Requirements: 6.1, 3.5, 4.4_
-
-- [x] 9.1 Add comprehensive Makefile commands for training
-  - Implement `make train-production` with full production pipeline
-  - Add `make monitor-training` for TensorBoard launch and monitoring
+- [x] 9. Implement missing Makefile commands for production training
+  - Add `make train-production` command that calls the production training workflow script
+  - Implement `make monitor-training` for TensorBoard launch and monitoring
   - Create `make evaluate-model` for model testing and validation
   - Write `make list-models` for model registry management
-  - _Requirements: 6.1, 3.5, 4.4, 5.3_
+  - Add `make setup-dataset` and related dataset management commands
+  - _Requirements: 6.1, 3.5, 4.4, 1.1_
 
-- [x] 9.2 Update Makefile help and documentation
-  - Update help text with new training commands and descriptions
-  - Add command examples and usage patterns
-  - Create training workflow documentation in Makefile comments
-  - Implement command aliases for common training tasks
-  - _Requirements: 6.1_
+- [x] 9.1 Add core training Makefile commands
+  - Implement `make train-production` that calls `python scripts/production_training_workflow.py`
+  - Add support for CONFIG and TEMPLATE parameters for custom configurations
+  - Implement `make train-production-template TEMPLATE=<name>` for template-based training
+  - Add `make train-production-config CONFIG=<path>` for custom config file training
+  - _Requirements: 6.1, 6.2_
+
+- [x] 9.2 Add monitoring and evaluation Makefile commands
+  - Implement `make monitor-training` that launches TensorBoard with runs directory
+  - Create `make evaluate-model` that runs model evaluation scripts
+  - Add `make list-models` that calls model registry listing functionality
+  - Implement `make compare-models MODELS=<model1,model2>` for model comparison
+  - _Requirements: 3.5, 4.4, 5.3_
+
+- [x] 9.3 Add dataset management Makefile commands
+  - Implement `make setup-dataset` for dataset preparation and validation
+  - Add `make download-dataset` for automatic PlantVillage dataset download
+  - Create `make validate-dataset` for dataset integrity checking
+  - Implement `make analyze-dataset` for dataset statistics and reporting
+  - _Requirements: 1.1, 1.2, 1.3_
 
 - [x] 10. Create comprehensive documentation and user guides
   - Write production training guide with examples
@@ -243,7 +236,7 @@
   - _Requirements: 3.4, 4.6, 7.6_
 
 - [x] 10.1 Write production training documentation
-  - Create comprehensive training guide in `docs/production_training.md`
+  - Create comprehensive training guide in `scripts/README_vision_training.md`
   - Add configuration examples for different training scenarios
   - Write model management and deployment guide
   - Create troubleshooting guide with common issues and solutions
@@ -279,3 +272,27 @@
   - Optimize memory usage during training and evaluation
   - Implement training pipeline caching for faster iterations
   - _Requirements: 7.1, 7.2, 7.4, 7.6_
+
+- [ ] 14. Enhance production training robustness and monitoring
+  - Implement comprehensive error recovery and retry mechanisms for training failures
+  - Add real-time training health monitoring with automatic alerts
+  - Create training pipeline stress testing and failure simulation
+  - Implement automatic model quality validation with rollback capabilities
+  - Add comprehensive logging and debugging tools for production issues
+  - _Requirements: 6.2, 6.5, 7.4, 3.1_
+
+- [ ] 15. Optimize training pipeline for edge cases and production scenarios
+  - Add support for training with corrupted or incomplete datasets
+  - Implement graceful handling of system resource fluctuations during training
+  - Create automatic hyperparameter tuning based on dataset characteristics
+  - Add support for incremental training and model updates
+  - Implement training pipeline benchmarking and performance regression detection
+  - _Requirements: 7.1, 7.2, 7.6, 2.2_
+
+- [ ] 16. Enhance model deployment and production integration
+  - Create automated model deployment pipeline from training to production
+  - Implement A/B testing framework for model performance comparison in production
+  - Add model performance monitoring and drift detection in production
+  - Create automated rollback mechanisms for underperforming models
+  - Implement model serving optimization and inference acceleration
+  - _Requirements: 5.5, 8.1, 8.2, 8.3_

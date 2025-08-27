@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """Script to list all registered models."""
 
-from src.training.model_registry import ModelRegistry
+import sys
+from pathlib import Path
+
+# Add src to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from training.model_registry import ModelRegistry
 
 
 def main():
