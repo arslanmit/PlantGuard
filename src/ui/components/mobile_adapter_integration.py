@@ -7,6 +7,7 @@ and mobile-optimized preprocessing.
 """
 
 import logging
+from contextlib import suppress
 from datetime import datetime
 from typing import Any
 
