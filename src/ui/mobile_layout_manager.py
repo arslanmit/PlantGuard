@@ -35,6 +35,9 @@ class MobileLayoutManager:
         self._setup_viewport()
         self._apply_base_mobile_styles()
 
+        # Initialize performance optimizations
+        self._initialize_performance_optimizations()
+
     def _setup_viewport(self) -> None:
         """Set up mobile-specific viewport meta tags."""
         viewport_meta = """
@@ -301,6 +304,95 @@ class MobileLayoutManager:
         # Mobile-only system - use mobile column count
         return st.columns(mobile_cols)
 
+    def _get_fallback_css(self) -> str:
+        """Generate fallback CSS for mobile layout with fixed 428px design."""
+        return """
+        <style>
+        :root {
+            --mobile-max-width: 428px;
+            --primary-color: #16A34A;
+            --primary-hover: #15803D;
+            --accent-color: #22C55E;
+            --background-color: #F8FAFC;
+            --surface-color: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --spacing-unit: 16px;
+            --touch-target-size: 48px;
+            --border-radius: 12px;
+        }
+        
+        .mobile-fallback {
+            width: 100%;
+            max-width: var(--mobile-max-width);
+            padding: var(--spacing-unit);
+            margin: 0 auto;
+            background-color: var(--background-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .mobile-fallback-container {
+            width: 100%;
+            max-width: 428px;
+            margin: 0 auto;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        
+        .mobile-fallback-section {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 24px;
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .mobile-fallback-button {
+            min-height: var(--touch-target-size);
+            min-width: var(--touch-target-size);
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        
+        .mobile-fallback-button:hover {
+            background-color: var(--primary-hover);
+        }
+        </style>
+        """
+
+    @property
+    def performance_optimizer(self) -> Any:
+        """Get performance optimizer instance or fallback configuration."""
+        if hasattr(self, "_performance_optimizer") and self._performance_optimizer is not None:
+            return self._performance_optimizer
+        else:
+            # Return fallback configuration when optimizer is not available
+            return {
+                "status": "fallback",
+                "optimization_level": "basic",
+                "memory_management": False,
+                "lazy_loading": False,
+                "cache_enabled": False,
+                "bundle_optimization": False,
+            }
+
+    @property
+    def bundle_optimizer(self) -> dict[str, Any] | None:
+        """Get bundle optimizer instance or None if not available."""
+        if hasattr(self, "_bundle_optimizer"):
+            return self._bundle_optimizer
+        else:
+            return None
+
     def apply_touch_optimization(self) -> None:
         """Apply touch-specific optimizations."""
         touch_css = """
@@ -328,6 +420,67 @@ class MobileLayoutManager:
         </style>
         """
         st.markdown(touch_css, unsafe_allow_html=True)
+
+    def load_fallback_css(self) -> None:
+        """Load fallback CSS for compatibility mode."""
+        try:
+            fallback_css = self._get_fallback_css()
+            st.markdown(fallback_css, unsafe_allow_html=True)
+            logger.debug("Fallback CSS loaded successfully")
+        except Exception as e:
+            logger.warning(f"Failed to load fallback CSS: {e}")
+
+    def create_css_bundle(self, css_files: dict[str, str], bundle_name: str) -> bool:
+        """Create CSS bundle using bundle optimizer."""
+        try:
+            if hasattr(self, "_bundle_optimizer") and self._bundle_optimizer:
+                return self._bundle_optimizer.create_css_bundle(css_files, bundle_name)
+            else:
+                logger.debug("Bundle optimizer not available, skipping CSS bundling")
+                return False
+        except Exception as e:
+            logger.warning(f"Failed to create CSS bundle: {e}")
+            return False
+
+    def load_css_bundle(self, bundle_name: str) -> bool:
+        """Load CSS bundle by name."""
+        try:
+            if hasattr(self, "_bundle_optimizer") and self._bundle_optimizer:
+                return self._bundle_optimizer.load_bundle(bundle_name)
+            else:
+                logger.debug("Bundle optimizer not available, cannot load CSS bundle")
+                return False
+        except Exception as e:
+            logger.warning(f"Failed to load CSS bundle: {e}")
+            return False
+
+    def _initialize_performance_optimizations(self) -> None:
+        """Initialize performance optimization systems."""
+        try:
+            # Try to initialize bundle optimizer
+            try:
+                from ui.components.mobile_bundle_optimizer import MobileBundleOptimizer
+
+                self._bundle_optimizer = MobileBundleOptimizer()
+                logger.debug("Bundle optimizer initialized")
+            except ImportError:
+                logger.debug("Bundle optimizer not available")
+                self._bundle_optimizer = None
+
+            # Try to initialize performance optimizer
+            try:
+                from ui.components.mobile_performance_optimizer import MobilePerformanceOptimizer
+
+                self._performance_optimizer = MobilePerformanceOptimizer()
+                logger.debug("Performance optimizer initialized")
+            except ImportError:
+                logger.debug("Performance optimizer not available")
+                self._performance_optimizer = None
+
+        except Exception as e:
+            logger.warning(f"Failed to initialize performance optimizations: {e}")
+            self._bundle_optimizer = None
+            self._performance_optimizer = None
 
 
 # Utility functions for mobile layout
