@@ -182,6 +182,7 @@ SKIP_DIRECTORIES = {
     "htmlcov",
     ".mypy_cache",
     ".ruff_cache",
+    ".kiro",
 }
 
 # Files to skip (emoji-related scripts and reports)
