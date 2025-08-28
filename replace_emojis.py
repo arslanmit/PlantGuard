@@ -188,6 +188,9 @@ SKIP_DIRECTORIES = {
     ".mypy_cache",
     ".ruff_cache",
     ".kiro",
+    ".github",
+    ".qoder",
+    ".streamlit",
 }
 
 # Files to skip (emoji-related scripts and reports)
