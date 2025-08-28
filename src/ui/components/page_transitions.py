@@ -21,7 +21,7 @@ class PageTransitionManager:
             "[PLANT] Loading PlantGuard...",
             "[SEARCH] Preparing analysis tools...",
             "[SUMMARY] Setting up interface...",
-            "✨ Almost ready...",
+            "[DESIGN] Almost ready...",
         ]
 
     def render_page_transition(self, from_page: str, to_page: str) -> None:
@@ -133,7 +133,7 @@ class PageTransitionManager:
                 elif i < 70:
                     status_text.text(f"[LAUNCH] Navigating to {to_page}...")
                 else:
-                    status_text.text(f"✨ Loading {to_page}...")
+                    status_text.text(f"[DESIGN] Loading {to_page}...")
 
                 time.sleep(0.01)  # Small delay for animation
 
@@ -211,7 +211,7 @@ class BreadcrumbNavigation:
 
     def _create_breadcrumb_html(self, pages: list) -> str:
         """Create HTML for breadcrumb navigation."""
-        page_icons = {"Home": "[HOME]", "Compare": "[SEARCH]", "History": "[LIBRARY]", "Guide": "[MANUAL]", "Settings": "⚙️"}
+        page_icons = {"Home": "[HOME]", "Compare": "[SEARCH]", "History": "[LIBRARY]", "Guide": "[MANUAL]", "Settings": "[SETTINGS]"}
 
         breadcrumb_items = []
 
@@ -272,7 +272,7 @@ class BreadcrumbNavigation:
                 col1, col2 = st.columns([3, 1])
 
                 with col1:
-                    page_icons = {"Home": "[HOME]", "Compare": "[SEARCH]", "History": "[LIBRARY]", "Guide": "[MANUAL]", "Settings": "⚙️"}
+                    page_icons = {"Home": "[HOME]", "Compare": "[SEARCH]", "History": "[LIBRARY]", "Guide": "[MANUAL]", "Settings": "[SETTINGS]"}
                     icon = page_icons.get(page_name, "[DOCUMENT]")
                     st.markdown(f"{icon} {page_name}")
 
@@ -313,7 +313,7 @@ class MobileNavigationMenu:
             "Compare": {"icon": "[SEARCH]", "description": "Side-by-side comparison"},
             "History": {"icon": "[LIBRARY]", "description": "Analysis history"},
             "Guide": {"icon": "[MANUAL]", "description": "Usage guide"},
-            "Settings": {"icon": "⚙️", "description": "Preferences"},
+            "Settings": {"icon": "[SETTINGS]", "description": "Preferences"},
         }
 
         current_page = st.session_state.get("current_page", "Home")
@@ -446,7 +446,7 @@ class MobileNavigationMenu:
             return None
 
         pages = ["Home", "Compare", "History", "Guide", "Settings"]
-        page_icons = {"Home": "[HOME]", "Compare": "[SEARCH]", "History": "[LIBRARY]", "Guide": "[MANUAL]", "Settings": "⚙️"}
+        page_icons = {"Home": "[HOME]", "Compare": "[SEARCH]", "History": "[LIBRARY]", "Guide": "[MANUAL]", "Settings": "[SETTINGS]"}
 
         current_page = st.session_state.get("current_page", "Home")
 

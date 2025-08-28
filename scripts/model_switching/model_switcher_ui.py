@@ -201,7 +201,7 @@ def main() -> None:
 
             # Model configuration
             st.markdown("---")
-            st.subheader("⚙️ Configuration")
+            st.subheader("[SETTINGS] Configuration")
 
             if st.button("[WRITE] Edit Model Config"):
                 st.info("Model configuration file: `config/models.json`")

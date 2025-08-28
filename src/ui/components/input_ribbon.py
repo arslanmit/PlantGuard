@@ -461,7 +461,7 @@ class InputRibbon:
 
     def render_input_mode_settings(self):
         """Render input mode settings and configuration options."""
-        with st.expander("⚙️ Input Mode Settings", expanded=False):
+        with st.expander("[SETTINGS] Input Mode Settings", expanded=False):
             settings = st.session_state.get("input_mode_settings", {})
 
             col1, col2 = st.columns(2)

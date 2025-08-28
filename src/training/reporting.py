@@ -447,7 +447,7 @@ class TrainingReportGenerator:
             </div>
 
             <div class="section">
-                <h3>⚙️ Hyperparameters</h3>
+                <h3>[SETTINGS] Hyperparameters</h3>
                 <table>
                     <tr><th>Parameter</th><th>Value</th></tr>
         """

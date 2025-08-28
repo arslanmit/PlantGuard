@@ -798,7 +798,7 @@ class AIAgentTestingFramework:
             if avg_time > 1.0:
                 recommendations.append(f"⏱️ Average test time is {avg_time:.2f}s - consider optimization")
             elif avg_time < 0.1:
-                recommendations.append("⚡ Excellent test performance - components are optimized")
+                recommendations.append("[ACTIONS] Excellent test performance - components are optimized")
 
         # Component health analysis
         health_summary = results.get("component_health_summary", {})

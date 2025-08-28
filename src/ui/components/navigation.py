@@ -37,7 +37,7 @@ class NavigationHeader:
                 "keywords": ["help", "guide", "tips", "faq"],
             },
             "Settings": {
-                "icon": "⚙️",
+                "icon": "[SETTINGS]",
                 "description": "Preferences and configuration",
                 "keywords": ["settings", "config", "preferences", "theme"],
             },

@@ -205,7 +205,7 @@ def show_config() -> None:
     with config_path.open() as f:
         config = json.load(f)
 
-    print("⚙️  Current PlantGuard Model Configuration:")
+    print("[SETTINGS]  Current PlantGuard Model Configuration:")
     print("=" * 50)
 
     print(f"Default Model: {config.get('default_model', 'None')}")

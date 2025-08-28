@@ -139,7 +139,7 @@ class MobileVoiceInput(MobileBaseComponent):
 
         with col2:
             # Settings button
-            if st.button("⚙️", key=f"{self.component_id}_voice_settings", help="Voice settings"):
+            if st.button("[SETTINGS]", key=f"{self.component_id}_voice_settings", help="Voice settings"):
                 self._toggle_voice_settings()
 
         # Render voice settings if expanded
@@ -473,7 +473,7 @@ class MobileVoiceInput(MobileBaseComponent):
 
         # Auto-stop if max duration reached
         if current_duration >= max_duration:
-            st.warning("⏰ Maximum recording duration reached. Stopping...")
+            st.warning("[TIME] Maximum recording duration reached. Stopping...")
             self._stop_recording()
 
     def _render_processing_status(self) -> None:

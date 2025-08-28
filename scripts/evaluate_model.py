@@ -180,7 +180,7 @@ def main() -> None:
         validator = AutomatedModelValidator(config=config)
 
         # Run evaluation
-        print("⚡ Running comprehensive model evaluation...")
+        print("[ACTIONS] Running comprehensive model evaluation...")
         result = validator.validate_model(
             model_path=model_path,
             validation_data_loader=val_loader,

@@ -200,7 +200,7 @@ class ProductionWorkflow:
                 config.num_workers = 4
                 config.mixed_precision = True
                 config.epochs = 50
-                self.logger.info("⚡ Using medium-performance configuration")
+                self.logger.info("[PERFORMANCE] Using medium-performance configuration")
 
             elif has_gpu:
                 # Low-end GPU configuration
@@ -334,7 +334,7 @@ class ProductionWorkflow:
             trainer = ProductionTrainer(config, self.dataset_manager)
 
             # Setup training
-            self.logger.info("⚙️  Setting up training environment...")
+            self.logger.info("[SETUP] Setting up training environment...")
             if not trainer.setup_training():
                 self.logger.error("[TODO] Training setup failed")
                 return False
@@ -399,20 +399,20 @@ class ProductionWorkflow:
             self.logger.info("=" * 50)
 
             # Step 1: Validate prerequisites
-            self.logger.info("1️⃣  Validating prerequisites...")
+            self.logger.info("[STEP 1] Validating prerequisites...")
             is_valid, errors = self.validate_prerequisites()
 
             if not is_valid:
                 self.logger.error("[TODO] Prerequisites validation failed:")
                 for error in errors:
-                    self.logger.error(f"   • {error}")
+                    self.logger.error(f"   - {error}")
                 self.send_notification(False, "Prerequisites validation failed")
                 return 1
 
             self.logger.info("[DONE] All prerequisites validated")
 
             # Step 2: Load/select configuration
-            self.logger.info("2️⃣  Selecting configuration...")
+            self.logger.info("[STEP 2] Selecting configuration...")
             config: TrainingConfig
             # Highest precedence: explicit config file
             if self.config_path is not None:
@@ -432,7 +432,7 @@ class ProductionWorkflow:
             self.logger.info(f"[DETAILS] Configuration: {config.batch_size} batch size, {config.epochs} epochs")
 
             # Step 3: Run production training
-            self.logger.info("3️⃣  Running production training...")
+            self.logger.info("[STEP 3] Running production training...")
             success = self.run_production_training(config)
 
             if success:

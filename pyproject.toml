@@ -125,7 +125,7 @@ dependencies = [
 
 # [TOOL] Development Tools - For coding and maintaining PlantGuard
 dev = [
-  "ruff>=0.12.8",        # ⚡ Super fast Python linter & formatter
+  "ruff>=0.12.8",        # [ACTIONS] Super fast Python linter & formatter
   "mypy>=1.17.1",        # [SEARCH] Type checking (catches bugs early)
   "pytest>=8.4.1",       # [TEST] Testing framework
   "pytest-cov>=6.2.1",   # [SUMMARY] Test coverage reports

@@ -245,7 +245,7 @@ class ComprehensiveMobileTestRunner:
 
         print(f"\n[STATUS] OVERALL STATUS: {status_symbols.get(overall_status, '[UNKNOWN]')} {overall_status.upper()}")
         print(f"[STATS] Test Scripts Executed: {summary['total_test_scripts']}")
-        print(f"⏰ Test Completed: {results['timestamp']}")
+        print(f"[TIME] Test Completed: {results['timestamp']}")
 
         print("\n[DETAILS] REQUIREMENT COVERAGE:")
         print("-" * 50)
@@ -266,7 +266,7 @@ class ComprehensiveMobileTestRunner:
         print("-" * 50)
         for script_name, script_result in summary["script_results"].items():
             status = script_result["status"]
-            symbol = status_symbols.get(status, "❓")
+            symbol = status_symbols.get(status, "[UNKNOWN]")
             print(f"   {symbol} {script_name}: {status.upper()}")
 
             if "total_tests" in script_result:

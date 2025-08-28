@@ -543,7 +543,7 @@ class HistoryManager:
 
     def render_management_controls(self) -> None:
         """Render history management controls."""
-        st.subheader("⚙️ History Management")
+        st.subheader("[SETTINGS] History Management")
 
         col1, col2, col3 = st.columns([1, 1, 1])
 

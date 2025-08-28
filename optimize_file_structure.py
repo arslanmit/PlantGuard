@@ -156,8 +156,8 @@ class FileStructureOptimizer:
 
         return {
             "organized_files": organized_files,
-            "mobile_apps_found": len([f for f in organized_files if f.startswith("mobile_app:")]),
-            "mobile_tests_found": len([f for f in organized_files if f.startswith("mobile_test:")]),
+            "mobile_apps_found": len([file_name for file_name in organized_files if file_name.startswith("mobile_app:")]),
+            "mobile_tests_found": len([file_name for file_name in organized_files if file_name.startswith("mobile_test:")]),
         }
 
     def update_file_references(self) -> dict[str, Any]:
@@ -191,7 +191,10 @@ class FileStructureOptimizer:
                 except Exception as e:
                     self.log_action("check_file_references", config_file, f"error: {e}")
 
-        return {"checked_files": updated_files, "files_needing_review": [f for f in updated_files if "needs_manual_review" in str(f)]}
+        return {
+            "checked_files": updated_files,
+            "files_needing_review": [file_path for file_path in updated_files if "needs_manual_review" in str(file_path)],
+        }
 
     def clean_cache_directories(self) -> dict[str, Any]:
         """Clean up cache directories while preserving mobile-relevant caches."""

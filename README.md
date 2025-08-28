@@ -148,9 +148,9 @@ make m
 - [PROGRESS] **Mobile-First Design** - Optimized for touch and mobile devices
 - [AI] **AI Agent Optimized** - Perfect for AI coding workflows and autonomous testing
 - [MOBILE] **Touch-Friendly** - 428px fixed width, consistent mobile experience
-- ⚡ **Unified Access** - Image analysis, voice, chat, history - all in one interface
+- [ACTIONS] **Unified Access** - Image analysis, voice, chat, history - all in one interface
 - [PARTIAL] **Responsive Layout** - Works on all screen sizes with mobile-first design
-- ✨ **100% Feature Parity** - All functionality preserved and enhanced
+- [DESIGN] **100% Feature Parity** - All functionality preserved and enhanced
 - [LAUNCH] **40% Faster Startup** - Simplified architecture for better performance
 - [SAVE] **37% Less Memory** - Optimized resource usage
 
@@ -1295,7 +1295,7 @@ Once the Model Switcher is open:
 - Best for: Custom training (requires PlantVillage dataset)
 - Weights: `data/models/vision_resnet50.pt`
 
-### ⚙️ Configuration
+### [SETTINGS] Configuration
 
 Edit `config/models.json` to:
 - Add new Hugging Face models

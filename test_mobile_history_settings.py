@@ -129,7 +129,7 @@ def main():
                 st.download_button("Download History", data=json_data, file_name="test_history.json", mime="application/json")
 
     elif test_mode == "Settings Card":
-        st.markdown("## ⚙️ Testing Mobile Settings Card")
+        st.markdown("## [SETTINGS] Testing Mobile Settings Card")
 
         # Create and render settings card component
         settings_card = MobileSettingsCard("test_settings_card", "App Settings")
@@ -154,7 +154,7 @@ def main():
         st.markdown("## [PARTIAL] Testing Both Components")
 
         # Tab interface for both components
-        tab1, tab2 = st.tabs(["[LIBRARY] History", "⚙️ Settings"])
+        tab1, tab2 = st.tabs(["[LIBRARY] History", "[SETTINGS] Settings"])
 
         with tab1:
             history_view = MobileHistoryView("test_history_both", "Analysis History")

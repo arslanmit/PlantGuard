@@ -487,7 +487,7 @@ def main():
 
         print(f"\n[COMPUTER] System Classification: {summary['system_classification'].replace('_', ' ').title()}")
         print(f"[SUMMARY] Expected Performance: {summary['expected_performance'].replace('_', ' ').title()}")
-        print(f"⚡ Optimization Potential: {summary['optimization_potential'].title()}")
+        print(f"[ACTIONS] Optimization Potential: {summary['optimization_potential'].title()}")
 
         print("\n[TOOL] System Specs:")
         print(f"  Memory: {system_info['memory']['total_gb']:.1f} GB")
@@ -504,7 +504,7 @@ def main():
             if pytorch_info.get("cuda_available"):
                 print(f"  [INTERACTIVE] CUDA GPUs: {pytorch_info['device_count']}")
 
-        print("\n⚡ Primary Recommendations:")
+        print("\n[ACTIONS] Primary Recommendations:")
         for rec in summary["primary_recommendations"]:
             print(f"  • {rec}")
 

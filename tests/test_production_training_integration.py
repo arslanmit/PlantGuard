@@ -40,7 +40,7 @@ class TestProductionTrainingIntegration:
         checkpoint = {
             "model_state_dict": {"layer.weight": torch.randn(10, 5)},
             "num_classes": 38,
-            "class_names": [f"class_{i}" for i in range(38)],
+            "class_names": [f"class_{class_idx}" for class_idx in range(38)],
         }
         torch.save(checkpoint, model_path)
 
@@ -125,7 +125,7 @@ class TestProductionTrainingIntegration:
         checkpoint = {
             "model_state_dict": {"layer.weight": torch.randn(10, 5)},
             "num_classes": 38,
-            "class_names": [f"class_{i}" for i in range(38)],
+            "class_names": [f"class_{class_idx}" for class_idx in range(38)],
         }
         torch.save(checkpoint, model_path)
 
@@ -162,8 +162,8 @@ class TestProductionTrainingIntegration:
     def test_migration_utility_integration(self) -> None:
         """Test the migration utility script integration."""
         legacy_models = []
-        for i in range(2):
-            legacy_path = self.temp_dir / f"legacy_model_{i}.pt"
+        for model_idx in range(2):
+            legacy_path = self.temp_dir / f"legacy_model_{model_idx}.pt"
             checkpoint = {
                 "model_state_dict": {"layer.weight": torch.randn(10, 5)},
                 "num_classes": 38,
@@ -205,7 +205,7 @@ class TestProductionTrainingIntegration:
         checkpoint = {
             "model_state_dict": {"layer.weight": torch.randn(10, 5)},
             "num_classes": 38,
-            "class_names": [f"class_{i}" for i in range(38)],
+            "class_names": [f"class_{class_idx}" for class_idx in range(38)],
         }
         torch.save(checkpoint, model_path)
 
@@ -261,7 +261,7 @@ class TestProductionTrainingIntegration:
         checkpoint = {
             "model_state_dict": {"layer.weight": torch.randn(10, 5)},
             "num_classes": 38,
-            "class_names": [f"class_{i}" for i in range(38)],
+            "class_names": [f"class_{class_idx}" for class_idx in range(38)],
             "model_version": "1.0.0",
             "training_metadata": {
                 "training_date": "2024-08-17",

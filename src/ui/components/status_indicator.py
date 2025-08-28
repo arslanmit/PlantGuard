@@ -139,7 +139,7 @@ class StatusIndicator:
 
     def render_performance_indicators(self) -> None:
         """Render performance status indicators."""
-        st.markdown("### ⚡ Performance Status")
+        st.markdown("### [ACTIONS] Performance Status")
 
         # Mock performance data - in real app this would come from actual metrics
         performance_data = {

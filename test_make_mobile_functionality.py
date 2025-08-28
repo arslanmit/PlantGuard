@@ -8,6 +8,7 @@ the mobile application can start properly.
 Requirements covered: 7.2 (Validate that make mobile command works correctly)
 """
 
+import contextlib
 import json
 import logging
 import os
@@ -120,7 +121,7 @@ class MakeMobileTester:
                     validation_results[f"validation_{i + 1}"] = {"command": " ".join(cmd), "error": str(e), "success": False}
 
             # Check overall success
-            failed_validations = [v for v in validation_results.values() if not v.get("success", False)]
+            failed_validations = [validation for validation in validation_results.values() if not validation.get("success", False)]
 
             if failed_validations:
                 return {
@@ -191,7 +192,7 @@ class MakeMobileTester:
 
         except Exception as e:
             # Clean up any remaining processes
-            with suppress(Exception):
+            with contextlib.suppress(Exception):
                 if "proc" in locals() and proc.poll() is None:
                     os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
 
@@ -251,9 +252,9 @@ class MakeMobileTester:
         results["summary"] = {
             "overall_status": overall_status,
             "total_tests": len(tests),
-            "passed": len([r for r in results.values() if isinstance(r, dict) and r.get("status") == "passed"]),
-            "failed": len([r for r in results.values() if isinstance(r, dict) and r.get("status") == "failed"]),
-            "warnings": len([r for r in results.values() if isinstance(r, dict) and r.get("status") == "warning"]),
+            "passed": len([result for result in results.values() if isinstance(result, dict) and result.get("status") == "passed"]),
+            "failed": len([result for result in results.values() if isinstance(result, dict) and result.get("status") == "failed"]),
+            "warnings": len([result for result in results.values() if isinstance(result, dict) and result.get("status") == "warning"]),
         }
 
         return results

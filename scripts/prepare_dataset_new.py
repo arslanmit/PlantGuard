@@ -70,7 +70,7 @@ def main() -> None:
     )
 
     print(f"[SUMMARY] Preparing dataset from {source_dir} to {output_dir}...")
-    print("⚙️  Configuration:")
+    print("[SETTINGS]  Configuration:")
     print(f"  Train ratio: {config.train_ratio}")
     print(f"  Validation ratio: {config.val_ratio}")
     print(f"  Random seed: {config.random_seed}")

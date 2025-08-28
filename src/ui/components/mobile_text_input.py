@@ -176,7 +176,7 @@ class MobileTextInput(MobileBaseComponent):
 
         with col2:
             # Settings button
-            if st.button("⚙️", key=f"{self.component_id}_text_settings", help="Text settings"):
+            if st.button("[SETTINGS]", key=f"{self.component_id}_text_settings", help="Text settings"):
                 self._toggle_text_settings()
 
         # Handle send button click

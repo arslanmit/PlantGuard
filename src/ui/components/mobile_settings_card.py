@@ -639,7 +639,7 @@ class MobileSettingsCard:
 
     def render_functionality_section(self) -> None:
         """Render functionality settings section."""
-        st.markdown("### ⚙️ Functionality")
+        st.markdown("### [SETTINGS] Functionality")
 
         # Auto analysis
         self.render_toggle_setting("auto_analysis", "Auto Analysis", "Automatically analyze images when uploaded")
@@ -804,7 +804,7 @@ class MobileSettingsCard:
                 st.markdown(
                     f"""
                 <div class="mobile-settings-header">
-                    <div class="mobile-settings-title">⚙️ {self.title}</div>
+                    <div class="mobile-settings-title">[SETTINGS] {self.title}</div>
                     <div class="mobile-settings-subtitle">Customize your PlantGuard experience</div>
                 </div>
                 """,
@@ -833,7 +833,7 @@ class MobileSettingsCard:
                         self.render_accessibility_section()
 
                 # Functionality section
-                if self.render_section_header("functionality", "Functionality", "⚙️", "functionality" in settings_data["expanded_sections"]):
+                if self.render_section_header("functionality", "Functionality", "[SETTINGS]", "functionality" in settings_data["expanded_sections"]):
                     with st.container():
                         self.render_functionality_section()
 

@@ -344,7 +344,7 @@ def demo_analysis_display(accessibility_manager):
 def demo_settings_card(accessibility_manager):
     """Demonstrate accessible settings card component."""
     st.markdown("""
-    ### ⚙️ Accessible Settings Demo
+    ### [SETTINGS] Accessible Settings Demo
     
     This component demonstrates:
     - Grouped related settings with fieldsets
@@ -394,7 +394,7 @@ def demo_settings_card(accessibility_manager):
 def render_accessibility_settings_demo(accessibility_manager):
     """Render accessibility settings demonstration."""
     settings_heading = accessibility_manager.create_accessible_heading(
-        text="⚙️ Live Accessibility Settings", level=2, heading_id="settings-demo-heading"
+        text="[SETTINGS] Live Accessibility Settings", level=2, heading_id="settings-demo-heading"
     )
     st.markdown(settings_heading, unsafe_allow_html=True)
 

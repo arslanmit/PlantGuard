@@ -128,11 +128,11 @@ class MigrationHelper:
             print(f"[DONE] New Command: {migration['new_command']}")
             print()
             print("[MOBILE] PlantGuard is now mobile-only for simplified maintenance")
-            print("✨ All desktop functionality is preserved in the mobile interface")
+            print("[DESIGN] All desktop functionality is preserved in the mobile interface")
             print()
             print(f"[LAUNCH] Quick Fix: {migration['suggestion']}")
         else:
-            print(f"❓ {migration['message']}")
+            print(f"[UNKNOWN] {migration['message']}")
             print(f"[TIP] {migration['suggestion']}")
 
         print()
@@ -153,7 +153,7 @@ class MigrationHelper:
             print(f"[MOBILE] New Location: {migration['new_location']}")
             print(f"[PROGRESS] Migration Status: {migration['migration_status']}")
         else:
-            print(f"❓ {migration['message']}")
+            print(f"[UNKNOWN] {migration['message']}")
 
         print()
         print("[LAUNCH] Access via: make mobile")

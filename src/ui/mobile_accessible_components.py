@@ -448,7 +448,7 @@ class AccessibleMobileSettingsCard(MobileComponent):
 
         # Accessible heading
         heading_html = self.accessibility_manager.create_accessible_heading(
-            text="⚙️ Settings", level=2, heading_id=f"{self.component_id}-heading", aria_label="Application settings and accessibility options"
+            text="[SETTINGS] Settings", level=2, heading_id=f"{self.component_id}-heading", aria_label="Application settings and accessibility options"
         )
         st.markdown(heading_html, unsafe_allow_html=True)
 
@@ -488,7 +488,7 @@ class AccessibleMobileSettingsCard(MobileComponent):
 
         # Performance settings
         performance_heading = self.accessibility_manager.create_accessible_heading(
-            text="⚡ Performance Settings",
+            text="[ACTIONS] Performance Settings",
             level=3,
             heading_id=f"{self.component_id}-performance-heading",
             aria_label="Performance and optimization options",

@@ -328,11 +328,11 @@ class MobileChatInterface(MobileBaseComponent):
                 self._export_chat()
 
         with col3:
-            if st.button("⚙️ Settings", key=f"{self.component_id}_settings", use_container_width=True):
+            if st.button("[SETTINGS] Settings", key=f"{self.component_id}_settings", use_container_width=True):
                 self._show_chat_settings()
 
         with col4:
-            if st.button("❓ Help", key=f"{self.component_id}_help", use_container_width=True):
+            if st.button("[UNKNOWN] Help", key=f"{self.component_id}_help", use_container_width=True):
                 self._show_chat_help()
 
     def _handle_user_message(self, message: str) -> None:
@@ -585,7 +585,7 @@ class MobileChatInterface(MobileBaseComponent):
 
     def _show_chat_settings(self) -> None:
         """Show chat settings."""
-        with st.expander("⚙️ Chat Settings", expanded=True):
+        with st.expander("[SETTINGS] Chat Settings", expanded=True):
             st.write("**Current Settings:**")
             st.write(f"• Max message length: {self.chat_config['max_message_length']} characters")
             st.write(f"• Max history: {self.chat_config['max_history_length']} messages")
@@ -594,7 +594,7 @@ class MobileChatInterface(MobileBaseComponent):
 
     def _show_chat_help(self) -> None:
         """Show chat help information."""
-        with st.expander("❓ Chat Help", expanded=True):
+        with st.expander("[UNKNOWN] Chat Help", expanded=True):
             st.markdown("""
             **How to use PlantGuard Chat:**
             

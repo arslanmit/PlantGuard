@@ -368,7 +368,7 @@ class MobileTestingOptimizationSuite:
 
                 # Create components to test memory usage
                 components = []
-                for i in range(10):
+                for component_idx in range(10):
                     try:
                         from ui.components.mobile_layout_manager import MobileLayoutManager
 
@@ -450,9 +450,9 @@ class MobileTestingOptimizationSuite:
             start_time = time.time()
 
             # Perform multiple state operations
-            for i in range(50):
-                state_manager.set_component_state(f"component_{i}", {"data": f"value_{i}"})
-                state_manager.get_component_state(f"component_{i}")
+            for state_idx in range(50):
+                state_manager.set_component_state(f"component_{state_idx}", {"data": f"value_{state_idx}"})
+                state_manager.get_component_state(f"component_{state_idx}")
 
             state_time = time.time() - start_time
 

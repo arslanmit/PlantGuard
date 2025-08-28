@@ -354,11 +354,11 @@ model_configs = {
         "options": {
             "vit_base_plants": "[ACHIEVEMENT] Vision Transformer (Best - 100%)",
             "resnet50_plantvillage_v1": "[MICROSCOPE] ResNet50 (Balanced - 95%)",
-            "mobilenet_fast": "⚡ MobileNet (Fast - 90%)",
+            "mobilenet_fast": "[ACTIONS] MobileNet (Fast - 90%)",
         },
         "badges": {
             "vit_base_plants": ("[ACHIEVEMENT]", "100%", "badge-green"),
-            "mobilenet_fast": ("⚡", "90%", "badge-orange"),
+            "mobilenet_fast": ("[ACTIONS]", "90%", "badge-orange"),
         },
     },
     "audio": {
@@ -514,7 +514,7 @@ with col3:
 
 # Quick actions row
 st.markdown("---")
-st.markdown("### ⚡ Quick Actions")
+st.markdown("### [ACTIONS] Quick Actions")
 
 action_col1, action_col2, action_col3, action_col4 = st.columns(4)
 
@@ -791,7 +791,7 @@ with tab3:
                 f"Q: {chat['question'][:50]}..." if len(chat["question"]) > 50 else f"Q: {chat['question']}",
                 expanded=(i == 0),
             ):
-                st.markdown(f"**❓ Question:** {chat['question']}")
+                st.markdown(f"**[UNKNOWN] Question:** {chat['question']}")
                 st.markdown(f"**[AI] Answer:** {chat['answer']}")
 
         # Clear history button
@@ -1129,7 +1129,7 @@ with tab5:
 
     # Configuration management
     st.markdown("---")
-    st.markdown("### ⚙️ Configuration Management")
+    st.markdown("### [SETTINGS] Configuration Management")
 
     config_col1, config_col2 = st.columns([1, 1])
 

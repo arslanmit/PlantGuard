@@ -408,7 +408,7 @@ streamlit run scripts/model_switching/app_with_model_manager.py
 - **Best for**: Custom training (requires PlantVillage dataset)
 - **Model**: Your local ResNet50 model
 
-## ⚙️ Configuration
+## [SETTINGS] Configuration
 
 Edit `config/models.json` to:
 - Add new Hugging Face models
@@ -542,7 +542,7 @@ def main() -> None:
     print("   streamlit run scripts/model_switching/model_switcher_ui.py")
     print("   streamlit run scripts/model_switching/app_with_model_manager.py")
 
-    print("\n✨ **Key Features**:")
+    print("\n[DESIGN] **Key Features**:")
     print("   [DONE] Switch models with single command")
     print("   [DONE] Compare model performance")
     print("   [DONE] Web UI for easy switching")

@@ -129,10 +129,10 @@ def main() -> None:
     # Proceed with main content in main_col
     with main_col:
         # Main content area
-        tab1, tab2, tab3 = st.tabs(["[SEARCH] Detection", "[SUMMARY] Batch Analysis", "⚙️ Settings"])
+        tab1, tab2, tab3 = st.tabs(["[SEARCH] Detection", "[SUMMARY] Batch Analysis", "[SETTINGS] Settings"])
 
     # Main content area
-    tab1, tab2, tab3 = st.tabs(["[SEARCH] Detection", "[SUMMARY] Batch Analysis", "⚙️ Settings"])
+    tab1, tab2, tab3 = st.tabs(["[SEARCH] Detection", "[SUMMARY] Batch Analysis", "[SETTINGS] Settings"])
 
     with tab1:
         st.header("[SEARCH] Plant Disease Detection")
@@ -278,7 +278,7 @@ def main() -> None:
                 st.error("[TODO] No model loaded for batch analysis")
 
     with tab3:
-        st.header("⚙️ Settings & Configuration")
+        st.header("[SETTINGS] Settings & Configuration")
 
         # Model comparison
         st.subheader("[ACHIEVEMENT] Model Comparison")

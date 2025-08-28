@@ -262,7 +262,7 @@ def main():
             if test_name == "overall_summary":
                 continue
 
-            status_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(result["status"], "❓")
+            status_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(result["status"], "[UNKNOWN]")
 
             print(f"  {status_icon} {test_name}: {result['status']}")
 
@@ -271,7 +271,7 @@ def main():
 
         # Overall summary
         summary = final_validation["overall_summary"]
-        summary_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(summary["status"], "❓")
+        summary_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(summary["status"], "[UNKNOWN]")
 
         print(f"\n{summary_icon} Overall Status: {summary['status']}")
         print(f"  {summary['details']}")

@@ -98,7 +98,7 @@ class MobileCameraInput(MobileBaseComponent):
 
             with col2:
                 # Settings button for camera configuration
-                if st.button("⚙️", key=f"{self.component_id}_settings", help="Camera settings"):
+                if st.button("[SETTINGS]", key=f"{self.component_id}_settings", help="Camera settings"):
                     self._toggle_camera_settings()
 
             # Handle camera button click

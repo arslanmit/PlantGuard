@@ -209,7 +209,7 @@ class MobilePerformanceOptimizer:
 
         # Scan Python files for imports
         python_files = list(self.project_root.glob("**/*.py"))
-        python_files = [f for f in python_files if not any(part.startswith(".") for part in f.parts)]
+        python_files = [file_path for file_path in python_files if not any(part.startswith(".") for part in file_path.parts)]
 
         import_patterns = set()
         for py_file in python_files:
@@ -289,7 +289,7 @@ class MobilePerformanceOptimizer:
 
     def optimize_mobile_caching(self) -> dict[str, Any]:
         """Optimize caching strategies for mobile application."""
-        logger.info("⚡ Optimizing mobile caching...")
+        logger.info("[OPTIMIZE] Optimizing mobile caching...")
 
         optimization_results = {}
 
@@ -740,13 +740,13 @@ def main():
         streamlit_test = optimizer.run_streamlit_performance_test()
 
         print("\n[CHART] PERFORMANCE SUMMARY:")
-        print(f"  • Total startup time: {startup_times.get('total_estimated', -1):.3f}s")
-        print(f"  • Memory usage: {memory_data.get('rss_mb', -1):.1f}MB")
-        print(f"  • Unused packages: {len(dep_analysis.get('unused_packages', []))}")
-        print(f"  • Streamlit test: {'[DONE] PASS' if streamlit_test.get('startup_successful') else '[TODO] FAIL'}")
+        print(f"  - Total startup time: {startup_times.get('total_estimated', -1):.3f}s")
+        print(f"  - Memory usage: {memory_data.get('rss_mb', -1):.1f}MB")
+        print(f"  - Unused packages: {len(dep_analysis.get('unused_packages', []))}")
+        print(f"  - Streamlit test: {'[DONE] PASS' if streamlit_test.get('startup_successful') else '[TODO] FAIL'}")
 
     if args.optimize or args.all:
-        print("\n⚡ OPTIMIZING PERFORMANCE")
+        print("\n[ACTIONS] OPTIMIZING PERFORMANCE")
         print("-" * 30)
 
         # Optimize mobile caching

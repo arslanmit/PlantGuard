@@ -304,7 +304,7 @@ class ImageInterface:
         if not images:
             return []
 
-        st.subheader(f"⚙️ Batch Processing ({len(images)} images)")
+        st.subheader(f"[SETTINGS] Batch Processing ({len(images)} images)")
 
         # Processing options
         col1, col2, col3 = st.columns([1, 1, 1])

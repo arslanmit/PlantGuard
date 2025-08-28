@@ -42,7 +42,6 @@ EMOJI_MAPPINGS = {
     "💡": "[TIP]",
     "⚠️": "[WARNING]",
     "🎊": "[CELEBRATION]",
-
     # Additional emojis found in codebase
     "🌐": "[NETWORK]",
     "🌟": "[FEATURE]",
@@ -141,6 +140,11 @@ EMOJI_MAPPINGS = {
     "🧹": "[CLEAN]",
     "🪝": "[HOOK]",
     "🪴": "[POT]",
+    "✨": "[DESIGN]",
+    "⚡": "[ACTIONS]",
+    "⚙️": "[SETTINGS]",
+    "❓": "[UNKNOWN]",
+    "⏰": "[TIME]",
 }
 
 # File extensions to process
@@ -360,23 +364,11 @@ Examples:
         """,
     )
 
-    parser.add_argument(
-        "--path", 
-        default=".", 
-        help="Root path to process (default: current directory)"
-    )
+    parser.add_argument("--path", default=".", help="Root path to process (default: current directory)")
 
-    parser.add_argument(
-        "--no-backup", 
-        action="store_true", 
-        help="Do not create backup files"
-    )
+    parser.add_argument("--no-backup", action="store_true", help="Do not create backup files")
 
-    parser.add_argument(
-        "--dry-run", 
-        action="store_true", 
-        help="Show what would be changed without making changes"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Show what would be changed without making changes")
 
     args = parser.parse_args()
 
@@ -391,11 +383,7 @@ Examples:
         sys.exit(1)
 
     # Create replacer and process
-    replacer = EmojiReplacer(
-        root_path=str(root_path), 
-        backup=not args.no_backup, 
-        dry_run=args.dry_run
-    )
+    replacer = EmojiReplacer(root_path=str(root_path), backup=not args.no_backup, dry_run=args.dry_run)
 
     try:
         replacer.process_directory()

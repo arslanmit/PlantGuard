@@ -186,7 +186,7 @@ def validate_user_issue_resolution():
         print()
         return True
     else:
-        failed_tests = len([r for r in validation_results if not r])
+        failed_tests = len([result for result in validation_results if not result])
         print("[FAIL] USER ISSUE NOT FULLY RESOLVED")
         print("=" * 70)
         print(f"[FAIL] {failed_tests} out of {len(validation_results)} validation tests failed")

@@ -619,7 +619,7 @@ class MobileComprehensiveTestingSuite:
 
                 # Create and destroy components to test memory management
                 components = []
-                for i in range(20):
+                for component_idx in range(20):
                     components.extend(
                         [
                             MobileLayoutManager(f"mem_layout_{i}"),
@@ -727,9 +727,9 @@ class MobileComprehensiveTestingSuite:
             start_time = time.time()
 
             # Perform intensive state operations
-            for i in range(200):
+            for state_idx in range(200):
                 state_data = {
-                    "component_id": f"component_{i}",
+                    "component_id": f"component_{state_idx}",
                     "data": {"value": f"test_value_{i}", "timestamp": time.time()},
                     "metadata": {"created": time.time(), "updated": time.time()},
                 }
@@ -2304,7 +2304,7 @@ def main():
 
             # Priority actions
             if summary.get("priority_actions"):
-                st.subheader("⚡ Priority Actions")
+                st.subheader("[PRIORITY] Priority Actions")
                 for action in summary.get("priority_actions", []):
                     st.markdown(f"- {action}")
 
@@ -2315,15 +2315,19 @@ def main():
             compliance_cols = st.columns(2)
 
             with compliance_cols[0]:
-                st.write("**1.1 Mobile-First Interface:**", "[DONE] Compliant" if compliance.get("1.1_mobile_first_interface") else "[TODO] Non-Compliant")
+                st.write(
+                    "**1.1 Mobile-First Interface:**", "[DONE] Compliant" if compliance.get("1.1_mobile_first_interface") else "[TODO] Non-Compliant"
+                )
                 st.write("**1.3 Responsive Layout:**", "[DONE] Compliant" if compliance.get("1.3_responsive_layout") else "[TODO] Non-Compliant")
 
             with compliance_cols[1]:
                 st.write(
-                    "**6.4 Performance Optimization:**", "[DONE] Compliant" if compliance.get("6.4_performance_optimization") else "[TODO] Non-Compliant"
+                    "**6.4 Performance Optimization:**",
+                    "[DONE] Compliant" if compliance.get("6.4_performance_optimization") else "[TODO] Non-Compliant",
                 )
                 st.write(
-                    "**7.1 Accessibility Compliance:**", "[DONE] Compliant" if compliance.get("7.1_accessibility_compliance") else "[TODO] Non-Compliant"
+                    "**7.1 Accessibility Compliance:**",
+                    "[DONE] Compliant" if compliance.get("7.1_accessibility_compliance") else "[TODO] Non-Compliant",
                 )
 
         # Display optimization recommendations

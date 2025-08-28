@@ -216,9 +216,9 @@ class MobileIntegrationValidator:
         results["summary"] = {
             "overall_status": overall_status,
             "total_tests": len(tests),
-            "passed": len([r for r in results.values() if isinstance(r, dict) and r.get("status") == "passed"]),
-            "failed": len([r for r in results.values() if isinstance(r, dict) and r.get("status") == "failed"]),
-            "warnings": len([r for r in results.values() if isinstance(r, dict) and r.get("status") == "warning"]),
+            "passed": len([result for result in results.values() if isinstance(result, dict) and result.get("status") == "passed"]),
+            "failed": len([result for result in results.values() if isinstance(result, dict) and result.get("status") == "failed"]),
+            "warnings": len([result for result in results.values() if isinstance(result, dict) and result.get("status") == "warning"]),
         }
 
         return results

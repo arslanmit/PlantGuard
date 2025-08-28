@@ -174,7 +174,7 @@ class FinalSystemValidator:
                 except Exception as e:
                     import_results.append(f"[TODO] {module_name}.{class_name} - {e!s}")
 
-            failed_imports = [r for r in import_results if "[TODO]" in r]
+            failed_imports = [result for result in import_results if "[TODO]" in result]
             status = "passed" if not failed_imports else "failed"
 
             return {
@@ -218,9 +218,12 @@ class FinalSystemValidator:
                         if target in line and not line.strip().startswith("#"):
                             target_found = True
                             # Check next few lines for redirect pattern
-                            for j in range(i + 1, min(i + 6, len(lines))):
-                                if "echo" in lines[j] and (
-                                    "removed" in lines[j] or "deprecated" in lines[j] or "mobile-only" in lines[j] or "Use:" in lines[j]
+                            for next_line_idx in range(i + 1, min(i + 6, len(lines))):
+                                if "echo" in lines[next_line_idx] and (
+                                    "removed" in lines[next_line_idx]
+                                    or "deprecated" in lines[next_line_idx]
+                                    or "mobile-only" in lines[next_line_idx]
+                                    or "Use:" in lines[next_line_idx]
                                 ):
                                     is_redirect = True
                                     break
@@ -423,7 +426,7 @@ class FinalSystemValidator:
 
         for test_name, result in self.results.items():
             status_emoji = {"passed": "[DONE]", "failed": "[TODO]", "warning": "[WARNING]"}
-            print(f"{status_emoji.get(result['status'], '❓')} {test_name}: {result['status'].upper()}")
+            print(f"{status_emoji.get(result['status'], '[UNKNOWN]')} {test_name}: {result['status'].upper()}")
             print(f"   {result['details']}")
 
         print(f"\n[PROGRESS] Overall Status: {overall_status.upper()}")
@@ -431,7 +434,7 @@ class FinalSystemValidator:
 
         if overall_status == "passed":
             print("\n[SUCCESS] Mobile-only migration validation completed successfully!")
-            print("✨ The system is ready for mobile-only operation.")
+            print("[DESIGN] The system is ready for mobile-only operation.")
         elif overall_status == "warning":
             print("\n[WARNING]  Migration validation completed with warnings.")
             print("[TOOL] Review warnings and address if necessary.")

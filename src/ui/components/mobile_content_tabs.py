@@ -429,7 +429,7 @@ class MobileContentTabs(MobileComponent):
 
         # Settings card header
         st.markdown('<div class="mobile-expandable-card-header">', unsafe_allow_html=True)
-        if st.button("⚙️ App Settings & Preferences", key=f"{self.component_id}_settings_card", use_container_width=True):
+        if st.button("[SETTINGS] App Settings & Preferences", key=f"{self.component_id}_settings_card", use_container_width=True):
             st.session_state.settings_expanded = not st.session_state.get("settings_expanded", True)
         st.markdown("</div>", unsafe_allow_html=True)
 

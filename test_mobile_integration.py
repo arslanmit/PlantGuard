@@ -256,7 +256,7 @@ def main():
         st.markdown("---")
         st.markdown("## [PROGRESS] Component Demonstration")
 
-        demo_tab1, demo_tab2 = st.tabs(["[LIBRARY] History Demo", "⚙️ Settings Demo"])
+        demo_tab1, demo_tab2 = st.tabs(["[LIBRARY] History Demo", "[SETTINGS] Settings Demo"])
 
         with demo_tab1:
             try:

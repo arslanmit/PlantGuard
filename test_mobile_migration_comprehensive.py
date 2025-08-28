@@ -65,9 +65,9 @@ class MobileMigrationTester:
         results["summary"] = {
             "overall_status": overall_status,
             "total_tests": len(tests),
-            "passed": len([r for r in results.values() if isinstance(r, dict) and r.get("status") == "passed"]),
-            "failed": len([r for r in results.values() if isinstance(r, dict) and r.get("status") == "failed"]),
-            "warnings": len([r for r in results.values() if isinstance(r, dict) and r.get("status") == "warning"]),
+            "passed": len([result for result in results.values() if isinstance(result, dict) and result.get("status") == "passed"]),
+            "failed": len([result for result in results.values() if isinstance(result, dict) and result.get("status") == "failed"]),
+            "warnings": len([result for result in results.values() if isinstance(result, dict) and result.get("status") == "warning"]),
         }
 
         return results
@@ -188,9 +188,9 @@ class MobileMigrationTester:
 
         # Filter out test files and cache directories
         python_files = [
-            f
-            for f in python_files
-            if not any(exclude in str(f) for exclude in ["__pycache__", ".pytest_cache", ".mypy_cache", ".venv", "venv", ".git"])
+            file_path
+            for file_path in python_files
+            if not any(exclude in str(file_path) for exclude in ["__pycache__", ".pytest_cache", ".mypy_cache", ".venv", "venv", ".git"])
         ]
 
         broken_imports = []

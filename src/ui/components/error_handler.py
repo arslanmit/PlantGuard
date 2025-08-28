@@ -23,7 +23,7 @@ class ErrorHandler:
             "input_error": {"icon": "[WRITE]", "title": "Input Error", "color": "#F59E0B"},
             "network_error": {"icon": "[NETWORK]", "title": "Network Error", "color": "#8B5CF6"},
             "file_error": {"icon": "[FOLDER]", "title": "File Error", "color": "#EF4444"},
-            "system_error": {"icon": "⚙️", "title": "System Error", "color": "#64748B"},
+            "system_error": {"icon": "[SETTINGS]", "title": "System Error", "color": "#64748B"},
             "validation_error": {"icon": "[DONE]", "title": "Validation Error", "color": "#F59E0B"},
         }
 

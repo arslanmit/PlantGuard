@@ -93,7 +93,7 @@ class InterfaceToggle:
                     "Choose your interface:",
                     options=["simple", "expert"],
                     index=0 if current_mode == "simple" else 1,
-                    format_func=lambda x: "[PROGRESS] Simple Mode" if x == "simple" else "⚙️ Expert Mode",
+                    format_func=lambda x: "[PROGRESS] Simple Mode" if x == "simple" else "[SETTINGS] Expert Mode",
                     key="interface_mode_radio",
                 )
 
@@ -120,7 +120,7 @@ class InterfaceToggle:
 
                 with col2:
                     if st.button(
-                        "⚙️ Expert",
+                        "[SETTINGS] Expert",
                         key="expert_mode_btn",
                         help="Full-featured interface with all options",
                         use_container_width=True,
@@ -129,7 +129,7 @@ class InterfaceToggle:
                         st.rerun()
 
                 # Current mode indicator
-                mode_emoji = "[PROGRESS]" if current_mode == "simple" else "⚙️"
+                mode_emoji = "[PROGRESS]" if current_mode == "simple" else "[SETTINGS]"
                 mode_name = "Simple" if current_mode == "simple" else "Expert"
                 st.info(f"{mode_emoji} Current Mode: **{mode_name}**")
 
@@ -149,7 +149,7 @@ class InterfaceToggle:
 
             with col2:
                 if st.button(
-                    "⚙️ Expert",
+                    "[SETTINGS] Expert",
                     key="inline_expert_btn",
                     type="primary" if current_mode == "expert" else "secondary",
                     help="Full functionality with detailed controls",
@@ -161,7 +161,7 @@ class InterfaceToggle:
                 if current_mode == "simple":
                     st.success("[PROGRESS] **Simple Mode Active** - Streamlined interface")
                 else:
-                    st.info("⚙️ **Expert Mode Active** - Full functionality")
+                    st.info("[SETTINGS] **Expert Mode Active** - Full functionality")
 
     def render_mode_explanation(self) -> None:
         """Render explanation of current mode."""
@@ -191,21 +191,21 @@ class InterfaceToggle:
                 - Focused attention areas
                 """)
         else:
-            with st.expander("⚙️ **Expert Mode Features**", expanded=False):
+            with st.expander("[SETTINGS] **Expert Mode Features**", expanded=False):
                 st.markdown("""
                 **Full functionality for power users:**
 
-                ⚙️ **Advanced Controls**
+                [SETTINGS] **Advanced Controls**
                 - All configuration options
                 - Detailed metrics and charts
                 - Batch processing capabilities
 
-                ⚙️ **Comprehensive Analysis**
+                [SETTINGS] **Comprehensive Analysis**
                 - Multiple model comparisons
                 - Detailed probability breakdowns
                 - Advanced visualization options
 
-                ⚙️ **Professional Tools**
+                [SETTINGS] **Professional Tools**
                 - Export in multiple formats
                 - Custom analysis parameters
                 - Integration options
@@ -377,7 +377,7 @@ if __name__ == "__main__":
 
     # Test feature visibility
     if toggle.should_show_feature("expert-only"):
-        st.info("⚙️ This is an expert-only feature!")
+        st.info("[SETTINGS] This is an expert-only feature!")
 
     if toggle.should_show_feature("simple-only"):
         st.success("[PROGRESS] This is a simple-mode feature!")

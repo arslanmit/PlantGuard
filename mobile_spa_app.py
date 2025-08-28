@@ -712,11 +712,11 @@ class MobilePlantGuardApp:
                                     # Show recommendations
                                     if result.get("recommendations"):
                                         st.markdown("**Recommendations:**")
-                                        for rec in result["recommendations"][:3]:
-                                            if rec.strip():
-                                                st.write(f"• {rec.strip()}")
+                                        for recommendation in result["recommendations"][:3]:
+                                            if recommendation.strip():
+                                                st.write(f"• {recommendation.strip()}")
                                 else:
-                                    st.error(f":x: Analysis failed: {result['error']}")
+                                    st.error(f"[ERROR] Analysis failed: {result['error']}")
 
         except Exception as e:
             logger.error(f"Enhanced image analysis tab rendering failed: {e}")
@@ -939,9 +939,9 @@ class MobilePlantGuardApp:
                         recommendations = analysis.get("recommendations", [])
                         if recommendations:
                             st.markdown("**Key Recommendations:**")
-                            for rec in recommendations[:3]:
-                                if rec.strip():
-                                    st.write(f"• {rec.strip()}")
+                            for recommendation in recommendations[:3]:
+                                if recommendation.strip():
+                                    st.write(f"• {recommendation.strip()}")
                     else:
                         # Regular analysis display
                         st.json(analysis)
@@ -1110,7 +1110,7 @@ class MobilePlantGuardApp:
             status_items.append("[ERROR] Core Adapters: Not Loaded")
 
         # Performance optimization status
-        try:
+        with contextlib.suppress(Exception):
             perf_report = self.performance_optimizer.get_performance_report()
             memory_pressure = perf_report.get("memory_pressure", "unknown")
 
@@ -1120,11 +1120,12 @@ class MobilePlantGuardApp:
                 status_items.append("[WARN] Memory: Warning")
             else:
                 status_items.append("[CRITICAL] Memory: Critical")
-        except Exception:
+
+        if not any("Memory:" in item for item in status_items):
             status_items.append("[UNKNOWN] Memory: Unknown")
 
         # Cache status
-        try:
+        with contextlib.suppress(Exception):
             cache_stats = self.performance_optimizer.cache.get_stats()
             hit_rate = cache_stats.get("hit_rate", 0)
 
@@ -1134,7 +1135,8 @@ class MobilePlantGuardApp:
                 status_items.append("[GOOD] Cache: Good")
             else:
                 status_items.append("[POOR] Cache: Poor")
-        except Exception:
+
+        if not any("Cache:" in item for item in status_items):
             status_items.append("[UNKNOWN] Cache: Unknown")
 
         for status in status_items:
@@ -1253,7 +1255,7 @@ class MobilePlantGuardApp:
                         self.performance_optimizer.cache.clear()
 
                     # Clear session state
-                    keys_to_clear = [k for k in st.session_state if k.startswith("mobile_")]
+                    keys_to_clear = [key for key in st.session_state if key.startswith("mobile_")]
                     for key in keys_to_clear:
                         del st.session_state[key]
 
@@ -1344,7 +1346,7 @@ class MobilePlantGuardApp:
 
             if st.button("[RESTART] Try Full Restart", use_container_width=True, key="spa_full_restart"):
                 # Clear all mobile app state
-                keys_to_clear = [k for k in st.session_state if k.startswith("mobile_")]
+                keys_to_clear = [key for key in st.session_state if key.startswith("mobile_")]
                 for key in keys_to_clear:
                     del st.session_state[key]
                 st.success("Full restart initiated - page will refresh once")
@@ -1363,7 +1365,7 @@ class MobilePlantGuardApp:
             st.markdown("[DESIGN] **Design:** Always 428px width (mobile-first)")
 
             # Fixed mobile design indicator
-            st.success("✨ **Always-Visible Design** - No hidden menus!")
+            st.success("[DESIGN] **Always-Visible Design** - No hidden menus!")
             st.info("[GEOMETRY] **Fixed Width:** 428px on all screens")
 
         # Component status in expandable section
@@ -1384,7 +1386,7 @@ class MobilePlantGuardApp:
                     st.error(f"[ERROR] {component}")
 
         # Quick actions in expandable section
-        with st.expander("⚡ Quick Actions", expanded=False):
+        with st.expander("[ACTIONS] Quick Actions", expanded=False):
             col1, col2 = st.columns(2)
 
             with col1:
