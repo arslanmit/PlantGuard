@@ -315,7 +315,7 @@ def test_new_adapter() -> None:
             image = Image.open(img_path)
             raw_class, readable_name, confidence, plant_type = adapter.predict_with_readable_name(image)
 
-            logger.info("🌿 %s", Path(img_path).name)
+            logger.info("[LEAF] %s", Path(img_path).name)
             logger.info("   Plant: %s", plant_type)
             logger.info("   Disease: %s", readable_name)
             logger.info("   Confidence: %.1%", confidence)

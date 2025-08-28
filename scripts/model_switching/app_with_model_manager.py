@@ -29,13 +29,13 @@ def main() -> None:
     """Main PlantGuard application with model switching."""
     st.set_page_config(
         page_title="PlantGuard - Plant Disease Detection",
-        page_icon="🌱",
+        page_icon="[PLANT]",
         layout="wide",
         initial_sidebar_state="expanded",
     )
 
     # Header
-    st.title("🌱 PlantGuard")
+    st.title("[PLANT] PlantGuard")
     st.markdown("**Multimodal Plant Disease Detection System**")
 
     # Initialize model manager
@@ -129,19 +129,19 @@ def main() -> None:
     # Proceed with main content in main_col
     with main_col:
         # Main content area
-        tab1, tab2, tab3 = st.tabs(["🔍 Detection", "[SUMMARY] Batch Analysis", "⚙️ Settings"])
+        tab1, tab2, tab3 = st.tabs(["[SEARCH] Detection", "[SUMMARY] Batch Analysis", "⚙️ Settings"])
 
     # Main content area
-    tab1, tab2, tab3 = st.tabs(["🔍 Detection", "[SUMMARY] Batch Analysis", "⚙️ Settings"])
+    tab1, tab2, tab3 = st.tabs(["[SEARCH] Detection", "[SUMMARY] Batch Analysis", "⚙️ Settings"])
 
     with tab1:
-        st.header("🔍 Plant Disease Detection")
+        st.header("[SEARCH] Plant Disease Detection")
 
         # Image input methods
         col1, col2 = st.columns([2, 1])
 
         with col1:
-            st.subheader("📸 Upload Image")
+            st.subheader("[PHOTO] Upload Image")
 
             uploaded_file = st.file_uploader(
                 "Choose a plant image",
@@ -167,20 +167,20 @@ def main() -> None:
 
                     # Get prediction
                     if "error" not in current_model_info:
-                        with st.spinner("🔍 Analyzing plant..."):
+                        with st.spinner("[SEARCH] Analyzing plant..."):
                             result = manager.get_readable_prediction(image)
 
                         # Display results with styling
                         st.markdown("### [PROGRESS] Detection Results")
 
                         # Main results
-                        st.metric("🌿 Plant Type", result["plant_type"])
-                        st.metric("🦠 Disease", result["disease"])
+                        st.metric("[LEAF] Plant Type", result["plant_type"])
+                        st.metric("[VIRUS] Disease", result["disease"])
                         st.metric("[SUMMARY] Confidence", result["confidence_percentage"])
 
                         # Health status with color coding
                         if result["is_healthy"]:
-                            st.success("💚 Plant is Healthy!")
+                            st.success("[HEALTHY] Plant is Healthy!")
                         else:
                             st.warning("[WARNING] Disease Detected")
 
@@ -188,7 +188,7 @@ def main() -> None:
                         st.info(f"[TIP] {result['recommendation']}")
 
                         # Model info
-                        st.caption(f"🤖 Analyzed by: {result['model_info']['model_name']}")
+                        st.caption(f"[AI] Analyzed by: {result['model_info']['model_name']}")
 
                         # Detailed results in expander
                         with st.expander("[TOOL] Technical Details"):
@@ -207,7 +207,7 @@ def main() -> None:
                     st.error(f"Error analyzing image: {e}")
 
             else:
-                st.info("👆 Upload an image or select a sample to start detection")
+                st.info("[POINTER] Upload an image or select a sample to start detection")
 
     with tab2:
         st.header("[SUMMARY] Batch Analysis")
@@ -281,12 +281,12 @@ def main() -> None:
         st.header("⚙️ Settings & Configuration")
 
         # Model comparison
-        st.subheader("🏆 Model Comparison")
+        st.subheader("[ACHIEVEMENT] Model Comparison")
 
         if models:
             model_data = []
             for model in models:
-                status_icon = "🟢" if model["is_current"] else "⚪" if model["enabled"] else "🔴"
+                status_icon = "[GREEN]" if model["is_current"] else "⚪" if model["enabled"] else "[RED]"
                 model_data.append(
                     {
                         "Status": status_icon,
@@ -300,7 +300,7 @@ def main() -> None:
             st.dataframe(model_data, use_container_width=True)
 
         # Configuration info
-        st.subheader("📝 Configuration")
+        st.subheader("[WRITE] Configuration")
         st.info("""
         **Model Configuration File:** `config/models.json`
 
@@ -312,7 +312,7 @@ def main() -> None:
         """)
 
         # System info
-        st.subheader("💻 System Information")
+        st.subheader("[COMPUTER] System Information")
         if "error" not in current_model_info:
             st.code(f"""
 Device: {current_model_info["device"]}
@@ -322,7 +322,7 @@ Configuration: config/models.json
             """)
 
         # Quick benchmark
-        if st.button("🏁 Run Quick Benchmark"):
+        if st.button("[FINISH] Run Quick Benchmark"):
             with st.spinner("Benchmarking models..."):
                 # This would run the benchmark from model_switcher.py
                 st.info("Benchmark feature - run `python scripts/model_switching/model_switcher.py --benchmark` in terminal")

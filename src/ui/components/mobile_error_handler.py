@@ -336,7 +336,7 @@ class MobileErrorHandler:
             ErrorSeverity.CRITICAL: "#FCA5A5",
         }
 
-        severity_icons = {ErrorSeverity.LOW: "i", ErrorSeverity.MEDIUM: "[WARNING]", ErrorSeverity.HIGH: "[TODO]", ErrorSeverity.CRITICAL: "🚨"}
+        severity_icons = {ErrorSeverity.LOW: "i", ErrorSeverity.MEDIUM: "[WARNING]", ErrorSeverity.HIGH: "[TODO]", ErrorSeverity.CRITICAL: "[ALERT]"}
 
         color = severity_colors.get(error_info.severity, "#FEF3C7")
         icon = severity_icons.get(error_info.severity, "[WARNING]")
@@ -377,7 +377,7 @@ class MobileErrorHandler:
 
     def _display_critical_error(self) -> None:
         """Display critical error when error handler itself fails."""
-        st.error("🚨 Critical system error. Please refresh the page.")
+        st.error("[ALERT] Critical system error. Please refresh the page.")
 
         if st.button("[PARTIAL] Refresh Page", key="critical_error_refresh"):
             st.experimental_rerun()
@@ -510,7 +510,7 @@ class MobileErrorHandler:
         st.markdown(
             """
         <div class="mobile-card mobile-fallback">
-            <h4>📝 Input Unavailable</h4>
+            <h4>[WRITE] Input Unavailable</h4>
             <p>This input method is temporarily unavailable. Please try another input option.</p>
         </div>
         """,

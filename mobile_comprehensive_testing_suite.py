@@ -2239,9 +2239,9 @@ class MobileComprehensiveTestingSuite:
 
 def main():
     """Main function to run the comprehensive testing suite."""
-    st.set_page_config(page_title="Mobile PlantGuard Comprehensive Testing", page_icon="🧪", layout="wide")
+    st.set_page_config(page_title="Mobile PlantGuard Comprehensive Testing", page_icon="[TEST]", layout="wide")
 
-    st.title("🧪 Mobile PlantGuard Comprehensive Testing Suite")
+    st.title("[TEST] Mobile PlantGuard Comprehensive Testing Suite")
     st.markdown("**Task 11.2: Perform comprehensive testing and optimization**")
 
     if not COMPONENTS_AVAILABLE:
@@ -2298,7 +2298,7 @@ def main():
                 st.metric("User Experience", f"{individual_scores.get('user_experience', 0):.1f}%")
 
             # Key findings
-            st.subheader("🔍 Key Findings")
+            st.subheader("[SEARCH] Key Findings")
             for finding in summary.get("key_findings", []):
                 st.markdown(f"- {finding}")
 
@@ -2336,7 +2336,7 @@ def main():
                     st.markdown(f"- {rec}")
 
         # Display full results
-        with st.expander("📄 Full Test Results (JSON)", expanded=False):
+        with st.expander("[DOCUMENT] Full Test Results (JSON)", expanded=False):
             st.json(results)
 
 

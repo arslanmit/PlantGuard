@@ -83,7 +83,7 @@ def list_huggingface_plant_models() -> None:
         },
     ]
 
-    print("🤗 Popular Plant Disease Models on Hugging Face:")
+    print("[HUG] Popular Plant Disease Models on Hugging Face:")
     print("=" * 60)
 
     for model in models:
@@ -213,7 +213,7 @@ def show_config() -> None:
 
     print("\n[DETAILS] Models:")
     for model_key, model_config in config.get("models", {}).items():
-        status = "🟢 Enabled" if model_config.get("enabled", True) else "🔴 Disabled"
+        status = "[GREEN] Enabled" if model_config.get("enabled", True) else "[RED] Disabled"
         default = " (DEFAULT)" if model_key == config.get("default_model") else ""
 
         print(f"\n  {model_key}{default}")

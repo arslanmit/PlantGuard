@@ -83,7 +83,7 @@ def _print_results(
     logger.info("")
 
     # Show available classes
-    logger.info("🏷️  Available model classes:")
+    logger.info("[TAG]  Available model classes:")
     for i, class_name in enumerate(vision_adapter.class_names):
         logger.info("  %2d: %s", i, class_name)
 
@@ -91,7 +91,7 @@ def _print_results(
 def main() -> None:
     """Test the model on sample images."""
     logging.basicConfig(level=logging.INFO)
-    logger.info("🌱 PlantGuard Model Test")
+    logger.info("[PLANT] PlantGuard Model Test")
     logger.info("=" * 50)
 
     # Load model
@@ -118,7 +118,7 @@ def main() -> None:
     correct_status = 0
     total = 0
 
-    logger.info("🔍 Testing images:")
+    logger.info("[SEARCH] Testing images:")
     logger.info("-" * 80)
 
     for sample in metadata.get("sample_images", []):
@@ -153,8 +153,8 @@ def main() -> None:
             correct_status += 1
 
         # Status icons
-        plant_icon = "🌿" if plant_correct else "[TODO]"
-        status_icon = "💚" if status_correct else "💔"
+        plant_icon = "[LEAF]" if plant_correct else "[TODO]"
+        status_icon = "[HEALTHY]" if status_correct else "[BROKEN]"
         exact_icon = "[DONE]" if (exact_correct and plant_correct) else "[TODO]"
 
         logger.info("%s %s", exact_icon, sample["filename"])

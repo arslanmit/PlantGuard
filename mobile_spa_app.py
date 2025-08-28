@@ -1015,7 +1015,7 @@ class MobilePlantGuardApp:
                         st.rerun()
 
             # AI Agent controls
-            st.markdown("**🤖 AI Agent**")
+            st.markdown("**[AI] AI Agent**")
 
             if st.button("Run Component Tests", use_container_width=True):
                 with st.spinner("Running AI agent tests..."):
@@ -1205,9 +1205,9 @@ class MobilePlantGuardApp:
     def render_ai_agent_status(self) -> None:
         """Render AI agent status indicator in main content without page redirects."""
         # Move AI agent status to main content instead of sidebar
-        with st.expander("🤖 AI Agent Status", expanded=False):
+        with st.expander("[AI] AI Agent Status", expanded=False):
             if st.session_state.get("ai_agent_active", False):
-                st.success("🤖 AI Agent Active")
+                st.success("[AI] AI Agent Active")
 
                 if st.button("Run Tests", use_container_width=True, key="spa_ai_tests"):
                     with st.spinner("AI Agent running tests..."):
@@ -1247,7 +1247,7 @@ class MobilePlantGuardApp:
                     st.rerun()
 
             with col2:
-                if st.button("🧹 Clear Cache & Restart", use_container_width=True, key="spa_clear_restart"):
+                if st.button("[CLEAN] Clear Cache & Restart", use_container_width=True, key="spa_clear_restart"):
                     # Clear performance cache
                     with contextlib.suppress(builtins.BaseException):
                         self.performance_optimizer.cache.clear()
@@ -1281,7 +1281,7 @@ class MobilePlantGuardApp:
             if uploaded_file:
                 st.image(uploaded_file, caption="Uploaded Image", use_container_width=True)
 
-                if st.button("🔬 Basic Analysis", use_container_width=True):
+                if st.button("[MICROSCOPE] Basic Analysis", use_container_width=True):
                     if st.session_state.get("mobile_adapters_loaded", False) and self.vision_adapter:
                         with st.spinner("Analyzing..."):
                             try:
@@ -1364,7 +1364,7 @@ class MobilePlantGuardApp:
 
             # Fixed mobile design indicator
             st.success("✨ **Always-Visible Design** - No hidden menus!")
-            st.info("📐 **Fixed Width:** 428px on all screens")
+            st.info("[GEOMETRY] **Fixed Width:** 428px on all screens")
 
         # Component status in expandable section
         with st.expander("[TOOL] Component Status", expanded=False):
@@ -1424,7 +1424,7 @@ def main():
         """)
 
         # Show debug information in expander
-        with st.expander("🐛 Debug Information"):
+        with st.expander("[BUG] Debug Information"):
             st.markdown(f"**Error:** {e!s}")
             st.markdown(f"**Session State Keys:** {list(st.session_state.keys())}")
             st.markdown(f"**Python Path:** {sys.path[:3]}...")

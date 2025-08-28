@@ -98,7 +98,7 @@ class ChatInterface:
         try:
             st.session_state[self.session_key] = []
             logger.info("Conversation cleared")
-            st.toast("Conversation cleared", icon="🧹")
+            st.toast("Conversation cleared", icon="[CLEAN]")
         except Exception as e:
             logger.warning(f"Failed to clear conversation: {e}")
             st.toast("Failed to clear conversation", icon="[WARNING]")
@@ -108,7 +108,7 @@ class ChatInterface:
         messages = self.get_messages()
 
         if not messages:
-            st.info("💬 Start a conversation by typing a message below!")
+            st.info("[CHAT] Start a conversation by typing a message below!")
             return
 
         # Create scrollable chat container
@@ -135,7 +135,7 @@ class ChatInterface:
                     st.write(message.content)
 
                     # Show timestamp in expander
-                    with st.expander("📅 Message Details", expanded=False):
+                    with st.expander("[DATE] Message Details", expanded=False):
                         st.caption(f"Time: {message.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
                         if message.metadata:
                             st.caption(f"Metadata: {message.metadata}")
@@ -234,7 +234,7 @@ class ChatInterface:
         try:
             messages = self.get_messages()
             if not messages:
-                st.toast("No messages to export", icon="📝")
+                st.toast("No messages to export", icon="[WRITE]")
                 return None
 
             # Create DataFrame
@@ -270,7 +270,7 @@ class ChatInterface:
         try:
             messages = self.get_messages()
             if not messages:
-                st.toast("No messages to export", icon="📝")
+                st.toast("No messages to export", icon="[WRITE]")
                 return None
 
             # Create PDF
@@ -286,7 +286,7 @@ class ChatInterface:
             story = []
 
             # Title
-            story.append(Paragraph("🌿 PlantGuard Conversation Export", title_style))
+            story.append(Paragraph("[LEAF] PlantGuard Conversation Export", title_style))
             story.append(Paragraph(f"Exported on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles["Normal"]))
             story.append(Spacer(1, 20))
 
@@ -319,7 +319,7 @@ class ChatInterface:
         col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
         with col1:
-            if st.button("🧹 Clear Chat", help="Clear all messages"):
+            if st.button("[CLEAN] Clear Chat", help="Clear all messages"):
                 self.clear_conversation()
                 st.rerun()
 
@@ -342,7 +342,7 @@ class ChatInterface:
                 pdf_content = self.export_conversation_pdf()
                 if pdf_content:
                     st.download_button(
-                        "📄 Export PDF",
+                        "[DOCUMENT] Export PDF",
                         data=pdf_content,
                         file_name=f"plantguard_chat_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
                         mime="application/pdf",
@@ -355,7 +355,7 @@ class ChatInterface:
 
     def render_search_interface(self) -> None:
         """Render conversation search interface."""
-        st.subheader("🔍 Search Conversation")
+        st.subheader("[SEARCH] Search Conversation")
 
         search_query = st.text_input("Search messages:", placeholder="Enter search terms...", help="Search through conversation history")
 
@@ -398,7 +398,7 @@ class ChatInterface:
 
         # Search interface (in sidebar or collapsible section)
         if show_search and self.get_messages():
-            with st.expander("🔍 Search & Manage", expanded=False):
+            with st.expander("[SEARCH] Search & Manage", expanded=False):
                 self.render_search_interface()
 
         # Chat input
@@ -421,7 +421,7 @@ def create_chat_interface(session_key: str = "messages") -> ChatInterface:
 # Example usage and testing
 if __name__ == "__main__":
     # Test the chat interface
-    st.title("🌿 PlantGuard Chat Interface Test")
+    st.title("[LEAF] PlantGuard Chat Interface Test")
 
     # Create chat interface
     chat = create_chat_interface()

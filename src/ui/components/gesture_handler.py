@@ -209,11 +209,11 @@ class EnhancedGestureHandler:
         .swipe-right-indicator::after { content: 'Swipe Right →'; }
         .swipe-up-indicator::after { content: '↑ Swipe Up'; }
         .swipe-down-indicator::after { content: '↓ Swipe Down'; }
-        .pinch-in-indicator::after { content: '🤏 Pinch In'; }
-        .pinch-out-indicator::after { content: '👐 Pinch Out'; }
-        .tap-indicator::after { content: '👆 Tap'; }
-        .double-tap-indicator::after { content: '👆👆 Double Tap'; }
-        .long-press-indicator::after { content: '👆⏱️ Long Press'; }
+        .pinch-in-indicator::after { content: '[SMALL] Pinch In'; }
+        .pinch-out-indicator::after { content: '[HANDS] Pinch Out'; }
+        .tap-indicator::after { content: '[POINTER] Tap'; }
+        .double-tap-indicator::after { content: '[POINTER][POINTER] Double Tap'; }
+        .long-press-indicator::after { content: '[POINTER]⏱️ Long Press'; }
         
         /* Touch-Optimized Buttons */
         .mobile-button-touch {
@@ -891,7 +891,7 @@ class EnhancedGestureHandler:
     def render_gesture_debug_info(self):
         """Render debug information for gesture testing."""
         if st.checkbox("Show Gesture Debug Info", value=False):
-            st.markdown("### 🤏 Gesture Debug Information")
+            st.markdown("### [SMALL] Gesture Debug Information")
 
             gesture_state = st.session_state.get("gesture_state", {})
 
@@ -972,7 +972,7 @@ def create_gesture_handler() -> GestureHandler:
 
 # Usage example for integration
 if __name__ == "__main__":
-    st.title("🤏 Gesture Handler Test")
+    st.title("[SMALL] Gesture Handler Test")
 
     # Create gesture handler
     gesture_handler = create_gesture_handler()

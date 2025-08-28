@@ -21,7 +21,7 @@ from ui.components.mobile_history_view import MobileHistoryView  # noqa: E402
 from ui.components.mobile_settings_card import MobileSettingsCard  # noqa: E402
 
 # Page configuration
-st.set_page_config(page_title="Mobile History & Settings Test", page_icon="🧪", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Mobile History & Settings Test", page_icon="[TEST]", layout="wide", initial_sidebar_state="collapsed")
 
 # Apply mobile CSS
 st.markdown(
@@ -83,7 +83,7 @@ def create_sample_history():
 
 def main():
     """Main test application."""
-    st.title("🧪 Mobile History & Settings Test")
+    st.title("[TEST] Mobile History & Settings Test")
 
     # Create sample data
     create_sample_history()
@@ -94,7 +94,7 @@ def main():
     st.markdown("---")
 
     if test_mode == "History View":
-        st.markdown("## 📚 Testing Mobile History View")
+        st.markdown("## [LIBRARY] Testing Mobile History View")
 
         # Create and render history view component
         history_view = MobileHistoryView("test_history_view", "Analysis History")
@@ -154,7 +154,7 @@ def main():
         st.markdown("## [PARTIAL] Testing Both Components")
 
         # Tab interface for both components
-        tab1, tab2 = st.tabs(["📚 History", "⚙️ Settings"])
+        tab1, tab2 = st.tabs(["[LIBRARY] History", "⚙️ Settings"])
 
         with tab1:
             history_view = MobileHistoryView("test_history_both", "Analysis History")
@@ -178,14 +178,14 @@ def main():
         st.metric("User Preferences", prefs_count)
 
     # Debug information
-    with st.expander("🐛 Debug Information"):
+    with st.expander("[BUG] Debug Information"):
         st.markdown("**Session State Keys:**")
         st.write(list(st.session_state.keys()))
 
         if st.button("Clear All Session State", key="clear_session"):
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
-            st.toast("Session state cleared!", icon="🗑️")
+            st.toast("Session state cleared!", icon="[DELETE]")
             st.rerun()
 
 

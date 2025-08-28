@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def test_mobile_input_components():
     """Test all mobile input components."""
-    st.title("🧪 Mobile Input Components Test")
+    st.title("[TEST] Mobile Input Components Test")
 
     st.markdown("---")
     st.markdown("## Testing Mobile Input Components")
@@ -64,7 +64,7 @@ def test_mobile_input_components():
         st.markdown("### 3. Component Rendering Test")
 
         # Create tabs for each component
-        tab1, tab2, tab3, tab4 = st.tabs(["📷 Camera", "📁 Upload", "🎤 Voice", "💬 Text"])
+        tab1, tab2, tab3, tab4 = st.tabs(["[CAMERA] Camera", "[FOLDER] Upload", "[VOICE] Voice", "[CHAT] Text"])
 
         with tab1:
             st.markdown("#### Camera Input Component")
@@ -111,7 +111,7 @@ def test_mobile_input_components():
         # Component interaction test
         st.markdown("### 5. Component Interaction Test")
 
-        if st.button("🧪 Test Component Methods"):
+        if st.button("[TEST] Test Component Methods"):
             test_results = []
 
             for name, component in components:
@@ -151,7 +151,7 @@ def test_mobile_input_components():
 
 if __name__ == "__main__":
     # Configure Streamlit page
-    st.set_page_config(page_title="Mobile Input Components Test", page_icon="🧪", layout="wide")
+    st.set_page_config(page_title="Mobile Input Components Test", page_icon="[TEST]", layout="wide")
 
     # Run tests
     test_mobile_input_components()

@@ -40,8 +40,8 @@ class MobileChatInterface(MobileBaseComponent):
             "enable_image_context": True,
             "auto_scroll": True,
             "message_timestamp": True,
-            "user_avatar": "🧑‍🌾",
-            "bot_avatar": "🌿",
+            "user_avatar": "[PERSON]‍[GRAIN]",
+            "bot_avatar": "[LEAF]",
         }
 
         # Initialize chat state
@@ -116,7 +116,7 @@ class MobileChatInterface(MobileBaseComponent):
         welcome_message = {
             "id": f"msg_{datetime.now().strftime('%Y%m%d_%H%M%S')}_welcome",
             "type": "bot",
-            "content": "🌿 Hello! I'm your PlantGuard assistant. I can help you with plant care questions, disease identification, and treatment advice. How can I help you today?",
+            "content": "[LEAF] Hello! I'm your PlantGuard assistant. I can help you with plant care questions, disease identification, and treatment advice. How can I help you today?",
             "timestamp": datetime.now().isoformat(),
             "context": None,
         }
@@ -162,17 +162,17 @@ class MobileChatInterface(MobileBaseComponent):
             current_disease = chat_data["context"].get("current_disease")
 
             if current_disease:
-                st.markdown(f"<small>🔬 Context: {current_disease['name']}</small>", unsafe_allow_html=True)
+                st.markdown(f"<small>[MICROSCOPE] Context: {current_disease['name']}</small>", unsafe_allow_html=True)
 
         with col3:
             # Chat controls
-            if st.button("🧹", key=f"{self.component_id}_clear", help="Clear chat"):
+            if st.button("[CLEAN]", key=f"{self.component_id}_clear", help="Clear chat"):
                 self._clear_chat()
 
     def _render_chat_messages(self, messages: list[dict[str, Any]]) -> None:
         """Render chat messages with mobile-optimized bubbles."""
         if not messages:
-            st.info("💬 Start a conversation by typing a message below!")
+            st.info("[CHAT] Start a conversation by typing a message below!")
             return
 
         # Create scrollable container for messages
@@ -244,7 +244,7 @@ class MobileChatInterface(MobileBaseComponent):
             """
         <div class="mobile-typing-indicator">
             <div class="message-content bot-message">
-                <div class="message-avatar">🌿</div>
+                <div class="message-avatar">[LEAF]</div>
                 <div class="message-bubble bot-bubble typing">
                     <div class="typing-dots">
                         <span></span>
@@ -261,7 +261,7 @@ class MobileChatInterface(MobileBaseComponent):
 
     def _render_chat_input(self) -> None:
         """Render chat input with send button."""
-        st.markdown("### 💬 Ask a Question")
+        st.markdown("### [CHAT] Ask a Question")
 
         # Input area
         col1, col2 = st.columns([4, 1])
@@ -280,12 +280,12 @@ class MobileChatInterface(MobileBaseComponent):
             st.markdown("<br>", unsafe_allow_html=True)  # Spacing
 
             send_button = st.button(
-                "📤\nSend", key=f"{self.component_id}_send", use_container_width=True, type="primary", disabled=not user_input.strip()
+                "[UPLOAD]\nSend", key=f"{self.component_id}_send", use_container_width=True, type="primary", disabled=not user_input.strip()
             )
 
             # Voice input button (if enabled)
             if self.chat_config["enable_voice_input"]:
-                voice_button = st.button("🎤\nVoice", key=f"{self.component_id}_voice", use_container_width=True, help="Use voice input")
+                voice_button = st.button("[VOICE]\nVoice", key=f"{self.component_id}_voice", use_container_width=True, help="Use voice input")
 
                 if voice_button:
                     self._handle_voice_input()
@@ -304,15 +304,15 @@ class MobileChatInterface(MobileBaseComponent):
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("🌱 Plant Care", key=f"{self.component_id}_quick_care", use_container_width=True):
+            if st.button("[PLANT] Plant Care", key=f"{self.component_id}_quick_care", use_container_width=True):
                 self._handle_user_message("How do I take care of my plant?")
 
         with col2:
-            if st.button("🔍 Symptoms", key=f"{self.component_id}_quick_symptoms", use_container_width=True):
+            if st.button("[SEARCH] Symptoms", key=f"{self.component_id}_quick_symptoms", use_container_width=True):
                 self._handle_user_message("What do these symptoms mean?")
 
         with col3:
-            if st.button("💊 Treatment", key=f"{self.component_id}_quick_treatment", use_container_width=True):
+            if st.button("[TREATMENT] Treatment", key=f"{self.component_id}_quick_treatment", use_container_width=True):
                 self._handle_user_message("How should I treat this disease?")
 
     def _render_chat_controls(self) -> None:
@@ -324,7 +324,7 @@ class MobileChatInterface(MobileBaseComponent):
                 self._show_chat_history()
 
         with col2:
-            if st.button("📤 Export", key=f"{self.component_id}_export", use_container_width=True):
+            if st.button("[UPLOAD] Export", key=f"{self.component_id}_export", use_container_width=True):
                 self._export_chat()
 
         with col3:
@@ -442,19 +442,19 @@ class MobileChatInterface(MobileBaseComponent):
         message_lower = user_message.lower()
 
         if any(word in message_lower for word in ["water", "watering"]):
-            return "🚰 For watering, check the soil moisture first. Most plants prefer soil that's slightly moist but not waterlogged. Water when the top inch of soil feels dry."
+            return "[WATER] For watering, check the soil moisture first. Most plants prefer soil that's slightly moist but not waterlogged. Water when the top inch of soil feels dry."
 
         elif any(word in message_lower for word in ["light", "sun", "sunlight"]):
             return "☀️ Most plants need bright, indirect light. Direct sunlight can burn leaves, while too little light causes weak growth. Adjust placement based on your plant's needs."
 
         elif any(word in message_lower for word in ["disease", "sick", "problem"]):
-            return "🔍 If your plant looks sick, first check for common issues: overwatering, pests, or inadequate light. Take a clear photo and use PlantGuard's analysis feature for specific diagnosis."
+            return "[SEARCH] If your plant looks sick, first check for common issues: overwatering, pests, or inadequate light. Take a clear photo and use PlantGuard's analysis feature for specific diagnosis."
 
         elif any(word in message_lower for word in ["fertilizer", "feed", "nutrients"]):
-            return "🌱 Feed your plants during growing season (spring/summer) with balanced fertilizer. Follow package instructions and don't over-fertilize, which can harm plants."
+            return "[PLANT] Feed your plants during growing season (spring/summer) with balanced fertilizer. Follow package instructions and don't over-fertilize, which can harm plants."
 
         else:
-            return "🌿 I'm here to help with plant care! You can ask about watering, lighting, diseases, fertilizing, or any other plant-related questions. Feel free to be specific about your plant and its symptoms."
+            return "[LEAF] I'm here to help with plant care! You can ask about watering, lighting, diseases, fertilizing, or any other plant-related questions. Feel free to be specific about your plant and its symptoms."
 
     def _get_current_context(self) -> dict[str, Any]:
         """Get current chat context."""
@@ -520,7 +520,7 @@ class MobileChatInterface(MobileBaseComponent):
 
     def _handle_voice_input(self) -> None:
         """Handle voice input (placeholder for future implementation)."""
-        st.info("🎤 Voice input feature coming soon! For now, please type your question.")
+        st.info("[VOICE] Voice input feature coming soon! For now, please type your question.")
 
     def _clear_chat(self) -> None:
         """Clear chat history."""
@@ -541,7 +541,7 @@ class MobileChatInterface(MobileBaseComponent):
 
         # Add welcome message
         self._add_welcome_message()
-        st.success("🧹 Chat cleared!")
+        st.success("[CLEAN] Chat cleared!")
 
     def _show_chat_history(self) -> None:
         """Show chat history in expandable section."""
@@ -579,7 +579,7 @@ class MobileChatInterface(MobileBaseComponent):
             timestamp = self._format_message_timestamp(msg["timestamp"])
             export_text += f"[{timestamp}] {sender}: {msg['content']}\n\n"
 
-        st.text_area("📤 Chat Export", value=export_text, height=200, key=f"{self.component_id}_export_text")
+        st.text_area("[UPLOAD] Chat Export", value=export_text, height=200, key=f"{self.component_id}_export_text")
 
         st.success("[DONE] Chat history ready to export! Copy the text above.")
 
@@ -598,9 +598,9 @@ class MobileChatInterface(MobileBaseComponent):
             st.markdown("""
             **How to use PlantGuard Chat:**
             
-            🌿 **Ask Questions:** Type any plant care question
-            📷 **Use Context:** Chat knows about your recent plant analysis
-            🎤 **Voice Input:** Use the voice button (coming soon)
+            [LEAF] **Ask Questions:** Type any plant care question
+            [CAMERA] **Use Context:** Chat knows about your recent plant analysis
+            [VOICE] **Voice Input:** Use the voice button (coming soon)
             [DETAILS] **Quick Actions:** Use preset question buttons
             
             **Example Questions:**

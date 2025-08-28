@@ -221,7 +221,7 @@ def run_desktop_compatibility_tests():
 
 
 if __name__ == '__main__':
-    print("🧪 Running Mobile Desktop Compatibility Tests...")
+    print("[TEST] Running Mobile Desktop Compatibility Tests...")
     print("=" * 60)
     
     results = run_desktop_compatibility_tests()
@@ -234,11 +234,11 @@ if __name__ == '__main__':
     print(f"Success: {'[DONE] PASSED' if results['success'] else '[TODO] FAILED'}")
     
     if not results['success']:
-        print("\n🔍 Issues Found:")
+        print("\n[SEARCH] Issues Found:")
         for failure in results['details']['failures']:
             print(f"  [TODO] {failure}")
         for error in results['details']['errors']:
             print(f"  [ERROR] {error}")
     else:
         print("\n[SUCCESS] All desktop compatibility tests passed!")
-        print("💻 Mobile PlantGuard is ready for desktop use!")
+        print("[COMPUTER] Mobile PlantGuard is ready for desktop use!")

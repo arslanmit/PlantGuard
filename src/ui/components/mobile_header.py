@@ -221,7 +221,7 @@ class MobileHeader(MobileComponent):
         self.initialize_header_state()
 
         # Title section - streamlined
-        st.markdown(f"## 🌿 {self.title}")
+        st.markdown(f"## [LEAF] {self.title}")
         st.markdown(f"*{self.subtitle}*")
 
         # Actions section - direct rendering
@@ -241,7 +241,7 @@ class MobileHeader(MobileComponent):
             if self.show_model_switcher:
                 current_model = st.session_state.current_vision_model
                 model_name = st.session_state.available_models.get(current_model, current_model)
-                if st.button(f"🤖 {model_name}", key=f"{self.component_id}_compact_model", use_container_width=True):
+                if st.button(f"[AI] {model_name}", key=f"{self.component_id}_compact_model", use_container_width=True):
                     self._show_model_switcher_modal()
 
         with col3:
@@ -284,7 +284,7 @@ class MobileHeader(MobileComponent):
 
     def _show_model_switcher_modal(self) -> None:
         """Show model switcher in modal/expander for compact mode."""
-        with st.expander("🤖 Select AI Model", expanded=True):
+        with st.expander("[AI] Select AI Model", expanded=True):
             model_options = list(st.session_state.available_models.keys())
 
             for model_key in model_options:

@@ -20,9 +20,9 @@ def render_status_indicator(status: object, label: str = "", size: str = "medium
     """
     # Status configurations
     status_config = {
-        "loaded": {"color": "#22C55E", "icon": "🟢", "text": "Loaded"},
-        "loading": {"color": "#F59E0B", "icon": "🟡", "text": "Loading"},
-        "error": {"color": "#EF4444", "icon": "🔴", "text": "Error"},
+        "loaded": {"color": "#22C55E", "icon": "[GREEN]", "text": "Loaded"},
+        "loading": {"color": "#F59E0B", "icon": "[YELLOW]", "text": "Loading"},
+        "error": {"color": "#EF4444", "icon": "[RED]", "text": "Error"},
         "offline": {"color": "#64748B", "icon": "⚪", "text": "Offline"},
         "ready": {"color": "#22C55E", "icon": "[DONE]", "text": "Ready"},
         "warning": {"color": "#F59E0B", "icon": "[WARNING]", "text": "Warning"},
@@ -123,7 +123,7 @@ class StatusIndicator:
 
     def render_connection_status(self) -> None:
         """Render network/connection status."""
-        st.markdown("### 🌐 Connection Status")
+        st.markdown("### [NETWORK] Connection Status")
 
         col1, col2 = st.columns(2)
 
@@ -185,10 +185,10 @@ class StatusIndicator:
 
         if loaded_count == total_count and total_count > 0:
             _status = "ready"
-            text = f"🟢 Ready ({loaded_count}/{total_count})"
+            text = f"[GREEN] Ready ({loaded_count}/{total_count})"
         elif loaded_count > 0:
             _status = "loading"
-            text = f"🟡 Loading ({loaded_count}/{total_count})"
+            text = f"[YELLOW] Loading ({loaded_count}/{total_count})"
         else:
             _status = "offline"
             text = "⚪ Initializing"
@@ -201,7 +201,7 @@ class StatusIndicator:
                 padding: 0.5rem;
             '>
                 <span style='font-weight: 600;'>{text}</span><br>
-                <span style='color: #64748B;'>🔒 Offline Mode</span>
+                <span style='color: #64748B;'>[SECURE] Offline Mode</span>
             </div>
             """,
             unsafe_allow_html=True,
@@ -230,7 +230,7 @@ class StatusIndicator:
             st.info("No status updates yet")
             return
 
-        st.markdown("### 📜 Recent Status Updates")
+        st.markdown("### [SCROLL] Recent Status Updates")
 
         for update in reversed(self.status_history[-10:]):  # Show last 10
             col1, col2, col3 = st.columns([2, 1, 3])

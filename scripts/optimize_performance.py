@@ -485,7 +485,7 @@ def main():
         print("[LAUNCH] PlantGuard Performance Analysis Results")
         print("=" * 50)
 
-        print(f"\n💻 System Classification: {summary['system_classification'].replace('_', ' ').title()}")
+        print(f"\n[COMPUTER] System Classification: {summary['system_classification'].replace('_', ' ').title()}")
         print(f"[SUMMARY] Expected Performance: {summary['expected_performance'].replace('_', ' ').title()}")
         print(f"⚡ Optimization Potential: {summary['optimization_potential'].title()}")
 
@@ -500,9 +500,9 @@ def main():
             print(f"  PyTorch Device: {device.upper()}")
 
             if pytorch_info.get("mps_available"):
-                print("  🍎 Apple Silicon MPS: Available")
+                print("  [APPLE] Apple Silicon MPS: Available")
             if pytorch_info.get("cuda_available"):
-                print(f"  🎮 CUDA GPUs: {pytorch_info['device_count']}")
+                print(f"  [INTERACTIVE] CUDA GPUs: {pytorch_info['device_count']}")
 
         print("\n⚡ Primary Recommendations:")
         for rec in summary["primary_recommendations"]:
@@ -518,7 +518,7 @@ def main():
 
         if args.benchmark:
             benchmarks = results["benchmarks"]
-            print("\n📈 Performance Benchmarks:")
+            print("\n[CHART] Performance Benchmarks:")
 
             cpu_bench = benchmarks.get("cpu_benchmark", {})
             if cpu_bench:
@@ -532,7 +532,7 @@ def main():
         print(f"\n⏱️  Analysis completed in {results['analysis_time_seconds']} seconds")
 
         if args.save_config:
-            print(f"💾 Configuration saved to {args.save_config}")
+            print(f"[SAVE] Configuration saved to {args.save_config}")
 
 
 if __name__ == "__main__":

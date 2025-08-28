@@ -35,7 +35,7 @@ class AccessibleMobileCameraInput(MobileComponent):
 
         # Accessible heading
         heading_html = self.accessibility_manager.create_accessible_heading(
-            text="📷 Camera Input", level=2, heading_id=f"{self.component_id}-heading", aria_label="Camera input section for plant image capture"
+            text="[CAMERA] Camera Input", level=2, heading_id=f"{self.component_id}-heading", aria_label="Camera input section for plant image capture"
         )
         st.markdown(heading_html, unsafe_allow_html=True)
 
@@ -49,7 +49,7 @@ class AccessibleMobileCameraInput(MobileComponent):
 
         # Accessible camera button
         button_html = self.accessibility_manager.create_accessible_button(
-            text="📷 Activate Camera",
+            text="[CAMERA] Activate Camera",
             button_id=f"{self.component_id}-button",
             aria_label="Activate device camera to capture plant image",
             aria_describedby=f"{self.component_id}-help",
@@ -156,7 +156,7 @@ class AccessibleMobileUploadInput(MobileComponent):
 
         # Accessible heading
         heading_html = self.accessibility_manager.create_accessible_heading(
-            text="📁 File Upload", level=2, heading_id=f"{self.component_id}-heading", aria_label="File upload section for plant images"
+            text="[FOLDER] File Upload", level=2, heading_id=f"{self.component_id}-heading", aria_label="File upload section for plant images"
         )
         st.markdown(heading_html, unsafe_allow_html=True)
 
@@ -185,7 +185,7 @@ class AccessibleMobileUploadInput(MobileComponent):
                     aria-describedby="{self.component_id}-upload-help"
                 />
                 <div class="mobile-upload-text">
-                    <span aria-hidden="true">📁</span>
+                    <span aria-hidden="true">[FOLDER]</span>
                     <span>Tap to select image</span>
                     <span class="sr-only">Supported formats: JPEG, JPG, PNG. Maximum size: 200MB</span>
                 </div>
@@ -262,7 +262,7 @@ class AccessibleMobileAnalysisDisplay(MobileComponent):
 
         # Accessible heading
         heading_html = self.accessibility_manager.create_accessible_heading(
-            text="🔬 Analysis Results", level=2, heading_id=f"{self.component_id}-heading", aria_label="Plant disease analysis results section"
+            text="[MICROSCOPE] Analysis Results", level=2, heading_id=f"{self.component_id}-heading", aria_label="Plant disease analysis results section"
         )
         st.markdown(heading_html, unsafe_allow_html=True)
 
@@ -284,7 +284,7 @@ class AccessibleMobileAnalysisDisplay(MobileComponent):
         empty_state_html = f"""
         <div class="mobile-card" role="region" aria-labelledby="{self.component_id}-empty-heading">
             <h3 id="{self.component_id}-empty-heading" class="mobile-heading-3">
-                🌿 Ready for Analysis
+                [LEAF] Ready for Analysis
             </h3>
             <p role="note" aria-describedby="{self.component_id}-empty-heading">
                 Upload an image or take a photo to get started with plant disease detection.
@@ -466,7 +466,7 @@ class AccessibleMobileSettingsCard(MobileComponent):
 
         # Model settings section
         model_heading = self.accessibility_manager.create_accessible_heading(
-            text="🤖 Model Settings", level=3, heading_id=f"{self.component_id}-model-heading", aria_label="AI model configuration options"
+            text="[AI] Model Settings", level=3, heading_id=f"{self.component_id}-model-heading", aria_label="AI model configuration options"
         )
         st.markdown(model_heading, unsafe_allow_html=True)
 
@@ -512,7 +512,7 @@ class AccessibleMobileSettingsCard(MobileComponent):
 
         # Save settings button
         save_button_html = self.accessibility_manager.create_accessible_button(
-            text="💾 Save Settings", button_id=f"{self.component_id}-save-button", aria_label="Save all settings changes", button_type="primary"
+            text="[SAVE] Save Settings", button_id=f"{self.component_id}-save-button", aria_label="Save all settings changes", button_type="primary"
         )
         st.markdown(save_button_html, unsafe_allow_html=True)
 

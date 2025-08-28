@@ -142,7 +142,7 @@ class MobileInputRibbon(MobileComponent):
             {
                 "id": "text",
                 "title": "Text Chat",
-                "icon": "💬",
+                "icon": "[CHAT]",
                 "description": "Ask questions about plant care",
                 "enabled": True,
                 "primary": True,
@@ -152,7 +152,7 @@ class MobileInputRibbon(MobileComponent):
             {
                 "id": "voice",
                 "title": "Voice",
-                "icon": "🎤",
+                "icon": "[VOICE]",
                 "description": "Record voice questions",
                 "enabled": st.session_state.get("microphone_available", True),
                 "primary": True,
@@ -162,7 +162,7 @@ class MobileInputRibbon(MobileComponent):
             {
                 "id": "camera",
                 "title": "Camera",
-                "icon": "📷",
+                "icon": "[CAMERA]",
                 "description": "Take photo of plant",
                 "enabled": st.session_state.get("camera_available", True),
                 "primary": True,
@@ -172,7 +172,7 @@ class MobileInputRibbon(MobileComponent):
             {
                 "id": "upload",
                 "title": "Upload",
-                "icon": "📎",
+                "icon": "[ATTACH]",
                 "description": "Upload image file",
                 "enabled": True,
                 "primary": False,
@@ -273,7 +273,7 @@ class MobileInputRibbon(MobileComponent):
 
         for i, method in enumerate(methods):
             with cols[i]:
-                status_color = "🟢" if method["enabled"] else "🔴"
+                status_color = "[GREEN]" if method["enabled"] else "[RED]"
                 st.markdown(f"{status_color} **{method['title']}**")
                 st.markdown(f"{method['status_icon']} {method['status'].title()}")
 

@@ -29,7 +29,7 @@ def test_different_preprocessing() -> None:
         return
     image = Image.open(test_image_path)
 
-    print(f"🔍 Testing preprocessing on: {test_image_path}")
+    print(f"[SEARCH] Testing preprocessing on: {test_image_path}")
     print(f"Original image size: {image.size}")
     print(f"Original image mode: {image.mode}")
     print()
@@ -117,7 +117,7 @@ def show_top_predictions() -> None:
         # Get top 5
         top5_prob, top5_idx = torch.topk(probabilities, 5, dim=1)
 
-        print(f"🏆 Top 5 predictions for {test_image_path}:")
+        print(f"[ACHIEVEMENT] Top 5 predictions for {test_image_path}:")
         print("   (Ground truth: Apple - Apple Scab)")
         print()
 
@@ -129,7 +129,7 @@ def show_top_predictions() -> None:
 
 
 def main() -> None:
-    print("🧪 PlantGuard Preprocessing Test")
+    print("[TEST] PlantGuard Preprocessing Test")
     print("=" * 60)
 
     test_different_preprocessing()

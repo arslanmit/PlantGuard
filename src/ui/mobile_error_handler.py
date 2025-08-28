@@ -329,7 +329,7 @@ class MobileErrorHandler:
 
         # Display appropriate Streamlit message based on severity
         if severity == "critical":
-            st.error(f"🚨 Critical Error: {base_message}")
+            st.error(f"[ALERT] Critical Error: {base_message}")
             st.error("Please refresh the page or contact support.")
         elif severity == "high":
             st.error(f"[WARNING] {base_message}")

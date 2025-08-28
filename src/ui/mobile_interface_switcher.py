@@ -110,7 +110,7 @@ class MobileInterfaceSwitcher:
                 return "mobile"
 
         with col2:
-            if st.button("💻 Desktop", type="primary" if current_preference == "desktop" else "secondary", use_container_width=True):
+            if st.button("[COMPUTER] Desktop", type="primary" if current_preference == "desktop" else "secondary", use_container_width=True):
                 self.set_interface_preference("desktop")
                 return "desktop"
 
@@ -265,7 +265,7 @@ class MobileInterfaceSwitcher:
             if st.session_state.get("is_mobile_device"):
                 st.success("[MOBILE] Mobile device detected")
             else:
-                st.info("💻 Desktop device detected")
+                st.info("[COMPUTER] Desktop device detected")
 
 
 # Global instance

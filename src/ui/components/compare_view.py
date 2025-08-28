@@ -105,7 +105,7 @@ class CompareView:
         """
         slot_label = "A" if slot == 0 else "B"
 
-        st.subheader(f"🖼️ Image {slot_label}")
+        st.subheader(f"[IMAGE] Image {slot_label}")
 
         if not available_images:
             st.info("No images available for comparison")
@@ -139,7 +139,7 @@ class CompareView:
             st.info("Select images for both slots to enable synchronized viewing")
             return
 
-        st.subheader("🔍 Synchronized Viewer")
+        st.subheader("[SEARCH] Synchronized Viewer")
 
         # Sync controls
         col1, col2, col3 = st.columns([1, 1, 1])
@@ -231,7 +231,7 @@ class CompareView:
             st.info("Analysis results needed for comparative metrics")
             return
 
-        st.subheader("📈 Comparative Analysis Metrics")
+        st.subheader("[CHART] Comparative Analysis Metrics")
 
         result_a = st.session_state.comparison_results[0]
         result_b = st.session_state.comparison_results[1]
@@ -335,7 +335,7 @@ class CompareView:
         if not all(st.session_state.comparison_results):
             return
 
-        st.subheader("📤 Export Comparison")
+        st.subheader("[UPLOAD] Export Comparison")
 
         col1, col2 = st.columns(2)
 
@@ -369,13 +369,13 @@ class CompareView:
                 )
 
         with col2:
-            if st.button("📄 Export as Report"):
+            if st.button("[DOCUMENT] Export as Report"):
                 st.info("PDF report export functionality would be implemented here")
 
     def render_single_image_guidance(self) -> None:
         """Render guidance for single image scenarios."""
         st.info("""
-        📝 **Comparison Mode Tips:**
+        [WRITE] **Comparison Mode Tips:**
 
         - Upload or capture at least 2 images to enable comparison
         - Use different angles of the same plant to track disease progression
@@ -413,7 +413,7 @@ class CompareView:
             st.markdown("---")
 
             # Tabs for different comparison views
-            tab1, tab2, tab3, tab4 = st.tabs(["🔍 Viewer", "[SUMMARY] Metrics", "📈 Probabilities", "🔬 Difference"])
+            tab1, tab2, tab3, tab4 = st.tabs(["[SEARCH] Viewer", "[SUMMARY] Metrics", "[CHART] Probabilities", "[MICROSCOPE] Difference"])
 
             with tab1:
                 self.render_synchronized_viewer()

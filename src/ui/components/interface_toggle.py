@@ -76,7 +76,7 @@ class InterfaceToggle:
                 """
             <div class="interface-toggle-container">
                 <div class="interface-toggle">
-                    <span>🧠</span>
+                    <span>[BRAIN]</span>
                     <span style="color: var(--text-light); font-size: 0.8rem;">Interface:</span>
                 </div>
             </div>
@@ -88,7 +88,7 @@ class InterfaceToggle:
             # Fallback to a left column if no explicit container is available
             left_col, right_col = st.columns([1, 4])
             with left_col:
-                st.markdown("### 🧠 Interface Mode")
+                st.markdown("### [BRAIN] Interface Mode")
                 new_mode = st.radio(
                     "Choose your interface:",
                     options=["simple", "expert"],
@@ -105,7 +105,7 @@ class InterfaceToggle:
             # Use left column as a static sidebar instead of Streamlit's st.sidebar
             left_col, _ = st.columns([1, 4])
             with left_col:
-                st.markdown("### 🧠 Interface Mode")
+                st.markdown("### [BRAIN] Interface Mode")
                 col1, col2 = st.columns(2)
 
                 with col1:
@@ -134,7 +134,7 @@ class InterfaceToggle:
                 st.info(f"{mode_emoji} Current Mode: **{mode_name}**")
 
         elif position == "inline":
-            st.markdown("#### 🧠 Interface Mode")
+            st.markdown("#### [BRAIN] Interface Mode")
             col1, col2, col3 = st.columns([1, 1, 2])
 
             with col1:
@@ -212,7 +212,7 @@ class InterfaceToggle:
                 """)
 
         # Option to hide explanations
-        if st.button("🙈 Hide Mode Explanations", key="hide_explanations"):
+        if st.button("[HIDE] Hide Mode Explanations", key="hide_explanations"):
             st.session_state.show_mode_explanation = False
             st.rerun()
 
@@ -255,7 +255,7 @@ class InterfaceToggle:
         checker = feature_map.get(feature_type)
         return checker() if checker is not None else True
 
-    def render_adhd_heading(self, text: str, emoji: str = "🌱", level: str = "primary") -> None:
+    def render_adhd_heading(self, text: str, emoji: str = "[PLANT]", level: str = "primary") -> None:
         """Render ADHD-friendly heading with emoji.
 
         Args:
@@ -346,7 +346,7 @@ def create_interface_toggle() -> InterfaceToggle:
 
 # Example usage
 if __name__ == "__main__":
-    st.title("🧠 Interface Toggle Test")
+    st.title("[BRAIN] Interface Toggle Test")
 
     # Create toggle
     toggle = create_interface_toggle()
@@ -361,17 +361,17 @@ if __name__ == "__main__":
     toggle.render_mode_explanation()
 
     # Test ADHD-friendly headings
-    toggle.render_adhd_heading("Plant Disease Detection", "🌱", "primary")
+    toggle.render_adhd_heading("Plant Disease Detection", "[PLANT]", "primary")
     toggle.render_section_heading("Analysis Results", "[SUMMARY]")
 
     # Test progress steps
     if toggle.should_show_feature("basic"):
         toggle.render_progress_steps(
             [
-                ("📷", "Upload", "completed"),
-                ("🔍", "Analyze", "active"),
+                ("[CAMERA]", "Upload", "completed"),
+                ("[SEARCH]", "Analyze", "active"),
                 ("[DETAILS]", "Results", "pending"),
-                ("💾", "Save", "pending"),
+                ("[SAVE]", "Save", "pending"),
             ]
         )
 

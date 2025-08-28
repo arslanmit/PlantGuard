@@ -1,4 +1,4 @@
-# 🌿 PlantGuard — Mobile-First Plant Disease Detection
+# [LEAF] PlantGuard — Mobile-First Plant Disease Detection
 
 **AI-powered plant disease detection with mobile-optimized interface - AI agent optimized**
 
@@ -103,12 +103,12 @@ PlantGuard has been **completely refactored** into a mobile-first application th
 ## [PROGRESS] **CURRENT CAPABILITIES**
 
 ### **Production-Ready Features**
-- **🤖 **Multi-Model Support**: Switch between Vision Transformer (100% accuracy), MobileNet (95% accuracy), and local ResNet50
+- **[AI] **Multi-Model Support**: Switch between Vision Transformer (100% accuracy), MobileNet (95% accuracy), and local ResNet50
 - **[PARTIAL] **Hot Model Switching**: Change models without restarting the application
-- **🖼️ **Advanced Image Analysis**: Upload leaf photos for AI-powered disease classification with confidence scoring
-- **🎙️ **Real-time Voice Input**: Record via microphone or upload audio files (wav/mp3/m4a) with Streamlit WebRTC
-- **💬 **Interactive Text Q&A**: Ask questions about plant diseases and get knowledge base responses
-- **🌐 **Hugging Face Integration**: Automatic downloading and caching of pre-trained models
+- **[IMAGE] **Advanced Image Analysis**: Upload leaf photos for AI-powered disease classification with confidence scoring
+- **[MICROPHONE]️ **Real-time Voice Input**: Record via microphone or upload audio files (wav/mp3/m4a) with Streamlit WebRTC
+- **[CHAT] **Interactive Text Q&A**: Ask questions about plant diseases and get knowledge base responses
+- **[NETWORK] **Hugging Face Integration**: Automatic downloading and caching of pre-trained models
 - **[SUMMARY] **Model Benchmarking**: Compare performance across different models with built-in testing
 - **[TOOL] **Development Tools**: 40+ intuitive Makefile commands for streamlined workflow
 
@@ -146,13 +146,13 @@ make m
 
 **[MOBILE] Mobile-Only Interface Features:**
 - [PROGRESS] **Mobile-First Design** - Optimized for touch and mobile devices
-- 🤖 **AI Agent Optimized** - Perfect for AI coding workflows and autonomous testing
+- [AI] **AI Agent Optimized** - Perfect for AI coding workflows and autonomous testing
 - [MOBILE] **Touch-Friendly** - 428px fixed width, consistent mobile experience
 - ⚡ **Unified Access** - Image analysis, voice, chat, history - all in one interface
 - [PARTIAL] **Responsive Layout** - Works on all screen sizes with mobile-first design
 - ✨ **100% Feature Parity** - All functionality preserved and enhanced
 - [LAUNCH] **40% Faster Startup** - Simplified architecture for better performance
-- 💾 **37% Less Memory** - Optimized resource usage
+- [SAVE] **37% Less Memory** - Optimized resource usage
 
 ## [MOBILE] **MOBILE-FIRST DESIGN**
 
@@ -175,13 +175,13 @@ make m
 - **AI Adapters**: Vision/Audio/Text → All preserved and optimized
 - **Offline Mode**: Local inference → Fully maintained
 
-### **📚 Migration Resources**
+### **[LIBRARY] Migration Resources**
 - **Complete Guide**: `cat MOBILE_MIGRATION_GUIDE.md`
 - **Feature Parity**: `cat MOBILE_FEATURE_PARITY.md`
 - **Migration Helper**: `python scripts/migration_helper.py`
 
 **[PROGRESS] All functionality is preserved in the mobile interface with enhanced mobile-first design!**
-- 🎮 **Batch Processing** - Analyze multiple images at once
+- [INTERACTIVE] **Batch Processing** - Analyze multiple images at once
 - [SUMMARY] **Real-time Results** - Immediate AI analysis with confidence scoring
 
 ### **Alternative Launch Commands**
@@ -304,7 +304,7 @@ make update          # Update all dependencies
 make info            # Project overview and quick commands
 ```
 
-#### **🎨 User Experience Enhancements**
+#### **[DESIGN] User Experience Enhancements**
 
 **Smart Error Handling**:
 - Commands check for prerequisites and install them automatically
@@ -368,19 +368,19 @@ make restart         # Restart application during development
 
 ## [SUMMARY] **DATASET OVERVIEW**
 
-### **Production-Ready PlantVillage Dataset** 🌿
+### **Production-Ready PlantVillage Dataset** [LEAF]
 
 PlantGuard is powered by a comprehensive, production-ready dataset with **54,305 high-quality plant images** across **38 disease classes** covering **15 major crop types**. The dataset totals **27.2 GB** and is optimally split for training (43,429 images) and validation (10,876 images).
 
-#### **🌾 Crop Coverage & Disease Detection Capabilities**
+#### **[GRAIN] Crop Coverage & Disease Detection Capabilities**
 
-**🍎 Apple (4 classes - 3,171 images)**
+**[APPLE] Apple (4 classes - 3,171 images)**
 - Apple Scab (630 images)
 - Black Rot (621 images)
 - Cedar Apple Rust (275 images)
 - Healthy Apple (1,645 images)
 
-**🍅 Tomato (8 classes - 16,183 images)** - *Most comprehensive coverage*
+**[TOMATO] Tomato (8 classes - 16,183 images)** - *Most comprehensive coverage*
 - Bacterial Spot (2,127 images)
 - Early Blight (1,000 images)
 - Late Blight (1,909 images)
@@ -392,24 +392,24 @@ PlantGuard is powered by a comprehensive, production-ready dataset with **54,305
 - Tomato Mosaic Virus (373 images)
 - Healthy Tomato (1,591 images)
 
-**🌽 Corn/Maize (4 classes - 3,852 images)**
+**[CROP] Corn/Maize (4 classes - 3,852 images)**
 - Cercospora Leaf Spot/Gray Leaf Spot (513 images)
 - Common Rust (1,192 images)
 - Northern Leaf Blight (985 images)
 - Healthy Corn (1,162 images)
 
-**🍇 Grape (4 classes - 4,062 images)**
+**[GRAPE] Grape (4 classes - 4,062 images)**
 - Black Rot (1,180 images)
 - Esca (Black Measles) (1,383 images)
 - Leaf Blight (Isariopsis Leaf Spot) (1,076 images)
 - Healthy Grape (423 images)
 
-**🥔 Potato (3 classes - 2,152 images)**
+**[POTATO] Potato (3 classes - 2,152 images)**
 - Early Blight (1,000 images)
 - Late Blight (1,000 images)
 - Healthy Potato (152 images)
 
-**🍑 Other Major Crops (15 classes - 24,885 images)**
+**[CHERRY] Other Major Crops (15 classes - 24,885 images)**
 - **Orange**: Huanglongbing/Citrus Greening (5,507 images) - *Second largest class*
 - **Soybean**: Healthy (5,090 images) - *Third largest class*
 - **Peach**: Bacterial Spot (2,297 images), Healthy (360 images)
@@ -420,7 +420,7 @@ PlantGuard is powered by a comprehensive, production-ready dataset with **54,305
 - **Cherry**: Powdery Mildew (1,052 images), Healthy (854 images)
 - **Raspberry**: Healthy (371 images)
 
-#### **📈 Dataset Quality & Training Insights**
+#### **[CHART] Dataset Quality & Training Insights**
 
 **Class Distribution Analysis:**
 - **Well-Balanced Classes**: 23 classes have 500-2,500 samples (optimal for deep learning)
@@ -615,7 +615,7 @@ make compare-models MODELS="v1.0.0,v1.1.0,v1.2.0"        # Compare multiple mode
 }
 ```
 
-#### **📈 Model Registry & Versioning**
+#### **[CHART] Model Registry & Versioning**
 
 **Semantic Versioning**:
 - **MAJOR.MINOR.PATCH** format (e.g., plantguard_v1.2.3)
@@ -721,7 +721,7 @@ make download-dataset
 # Validate dataset integrity
 make validate-dataset
 # Output:
-# 🔍 Validating PlantVillage dataset at data/processed/plantvillage...
+# [SEARCH] Validating PlantVillage dataset at data/processed/plantvillage...
 # [SUMMARY] Results for PlantVillage dataset:
 #   Total files: 54305
 #   Valid files: 54305
@@ -733,7 +733,7 @@ make validate-dataset
 make analyze-dataset
 # Output:
 # [SUMMARY] Analyzing PlantVillage dataset at data/processed/plantvillage...
-# 📈 Dataset Analysis for PlantVillage dataset:
+# [CHART] Dataset Analysis for PlantVillage dataset:
 #   Name: plantvillage
 #   Total samples: 54305
 #   Number of classes: 38
@@ -807,7 +807,7 @@ config = DatasetConfig(train_ratio=0.8, random_seed=42)
 dm.prepare_dataset(source_dir, output_dir, config)
 ```
 
-## 🏗️ **SYSTEM ARCHITECTURE**
+## [ARCHITECTURE] **SYSTEM ARCHITECTURE**
 
 ### **Core Implementation Structure**
 
@@ -861,11 +861,11 @@ PlantGuard/
 ```
 User Input → [Streamlit UI] → [Model Manager] → [Selected Model] → [Response Generation]
      ↓              ↓              ↓              ↓                    ↓
-📸 Image      → VisionAdapter  → Model Manager → Vision Transformer  → Disease Classification
+[PHOTO] Image      → VisionAdapter  → Model Manager → Vision Transformer  → Disease Classification
                                     ↓          → MobileNet           → Plant Type Detection
                                     ↓          → Local ResNet50      → Health Assessment
-🎙️ Audio      → AudioAdapter   → Whisper     → Transcription       → Text Processing
-💬 Text       → TextAdapter    → DistilBERT  → Intent              → Knowledge Base
+[MICROPHONE]️ Audio      → AudioAdapter   → Whisper     → Transcription       → Text Processing
+[CHAT] Text       → TextAdapter    → DistilBERT  → Intent              → Knowledge Base
 [PARTIAL] Multimodal → PlantGuardBot  → Fusion MLP  → Combined            → Final Response
 ```
 
@@ -881,7 +881,7 @@ User Input → [Streamlit UI] → [Model Manager] → [Selected Model] → [Resp
 | **Text (DistilBERT)** | [PARTIAL] Structure | [PARTIAL] Pending | [DONE] UI Ready | **Integration Ready** |
 | **Fusion (MLP)** | [PARTIAL] Planned | [PARTIAL] Pending | [PARTIAL] Pending | **Architecture Ready** |
 
-## 🔒 **PRIVACY & SECURITY**
+## [SECURE] **PRIVACY & SECURITY**
 
 ### **Offline-First Architecture**
 - **[DONE] Complete Local Processing**: All ML inference runs locally (no cloud APIs)
@@ -902,7 +902,7 @@ User Input → [Streamlit UI] → [Model Manager] → [Selected Model] → [Resp
 - **[DONE] Type Safety**: Complete MyPy type checking
 - **[DONE] Input Sanitization**: Validated file uploads and user inputs
 
-## 🔬 **TECHNICAL SPECIFICATIONS**
+## [MICROSCOPE] **TECHNICAL SPECIFICATIONS**
 
 ### **Machine Learning Stack**
 - **Vision Models**:
@@ -1055,25 +1055,25 @@ make validate        # Check project setup
 make models-info     # Show model status
 ```
 
-## 🔮 **FUTURE ENHANCEMENTS**
+## [PREDICTION] **FUTURE ENHANCEMENTS**
 
 ### **Planned Features**
-- **🤖 Advanced Model Integration**: Complete Whisper-tiny + DistilBERT implementation with model switching
+- **[AI] Advanced Model Integration**: Complete Whisper-tiny + DistilBERT implementation with model switching
 - **[PARTIAL] Enhanced Model Management**: Custom model uploads, versioning, and automated benchmarking
-- **🌐 Multi-language Support**: Internationalization for global agricultural use
+- **[NETWORK] Multi-language Support**: Internationalization for global agricultural use
 - **�  Mobile Optimization**: Progressive Web App (PWA) capabilities with model selection
 - **� Extaended Hugging Face Integration**: Community model sharing and automatic model discovery
 - **[SUMMARY] Advanced Analytics**: Model performance tracking, disease progression monitoring, and comparative analysis
 - **[PROGRESS] Custom Dataset Training**: Tools for training on user-specific plant varieties with multiple architectures
-- **🧠 Ensemble Methods**: Combine predictions from multiple models for improved accuracy
+- **[BRAIN] Ensemble Methods**: Combine predictions from multiple models for improved accuracy
 
 ### **Research Directions**
-- **🧬 Genetic Disease Markers**: Integration with plant genomics data
-- **🌡️ Environmental Factors**: Weather and soil condition integration
-- **📈 Predictive Modeling**: Early warning systems for disease outbreaks
-- **🤝 Collaborative Diagnosis**: Expert validation and community feedback systems
+- **[DNA] Genetic Disease Markers**: Integration with plant genomics data
+- **[TEMPERATURE]️ Environmental Factors**: Weather and soil condition integration
+- **[CHART] Predictive Modeling**: Early warning systems for disease outbreaks
+- **[HANDSHAKE] Collaborative Diagnosis**: Expert validation and community feedback systems
 
-## 🧪 **TESTING & VALIDATION STATUS**
+## [TEST] **TESTING & VALIDATION STATUS**
 
 ### **Comprehensive Test Coverage** [DONE]
 - [DONE] **Unit Tests**: Core component functionality validated
@@ -1163,19 +1163,19 @@ make lint           # Code quality with Ruff (0 violations)
 ## [SUMMARY] **DEPENDENCY MANAGEMENT**
 
 ### **Production-Ready Stack** [DONE]
-- **🔥 PyTorch Ecosystem**: torch, torchvision, torchaudio, torchmetrics
-- **🧠 ML Libraries**: transformers, accelerate, datasets, scikit-learn
-- **🖼️ Computer Vision**: opencv-python-headless, Pillow
-- **🎵 Audio Processing**: librosa, soundfile, SpeechRecognition
-- **🌐 Web Interface**: streamlit, streamlit-webrtc, pycloudflared
+- **[HOT] PyTorch Ecosystem**: torch, torchvision, torchaudio, torchmetrics
+- **[BRAIN] ML Libraries**: transformers, accelerate, datasets, scikit-learn
+- **[IMAGE] Computer Vision**: opencv-python-headless, Pillow
+- **[SOUND] Audio Processing**: librosa, soundfile, SpeechRecognition
+- **[NETWORK] Web Interface**: streamlit, streamlit-webrtc, pycloudflared
 - **[SUMMARY] Data Science**: numpy, pandas, matplotlib, seaborn
 
 ### **Development Ecosystem** [DONE]
-- **🔍 Code Quality**: ruff (formatting + linting), mypy (type checking)
-- **🧪 Testing**: pytest, pytest-cov, pytest-mock
-- **🔒 Security**: bandit (security scanning), safety (vulnerability checks)
-- **📚 Documentation**: sphinx, sphinx-rtd-theme
-- **📓 Notebooks**: jupyter, ipykernel
+- **[SEARCH] Code Quality**: ruff (formatting + linting), mypy (type checking)
+- **[TEST] Testing**: pytest, pytest-cov, pytest-mock
+- **[SECURE] Security**: bandit (security scanning), safety (vulnerability checks)
+- **[LIBRARY] Documentation**: sphinx, sphinx-rtd-theme
+- **[NOTEBOOK] Notebooks**: jupyter, ipykernel
 - **[LAUNCH] ML Tools**: wandb (experiment tracking), optuna (hyperparameter optimization)
 
 ### **Streamlined Setup Process**
@@ -1191,7 +1191,7 @@ make training-deps   # ML training tools
 make all-deps        # Everything combined
 ```
 
-## 📄 **LICENSE & ATTRIBUTION**
+## [DOCUMENT] **LICENSE & ATTRIBUTION**
 
 **MIT License** - see [LICENSE](LICENSE) file for details.
 
@@ -1214,9 +1214,9 @@ make all-deps        # Everything combined
 
 ---
 
-**🌿 PlantGuard** - *Empowering farmers with AI-driven plant health insights*
+**[LEAF] PlantGuard** - *Empowering farmers with AI-driven plant health insights*
 
-## 🌱 Model Switching - Quick Start Guide
+## [PLANT] Model Switching - Quick Start Guide
 
 ### [LAUNCH] Easy Model Switching Commands
 
@@ -1276,7 +1276,7 @@ Once the Model Switcher is open:
 - Click "Switch Model" (also available in the main content area)
 - The selected model will load and become the current model
 
-### 🤖 Available Models
+### [AI] Available Models
 
 #### 1. Vision Transformer (vit_best) - RECOMMENDED
 - Accuracy: 100% on your test set
@@ -1373,7 +1373,7 @@ if st.button("Switch to Fast Model"):
 
 In the Model Switcher UI, simply select a model from the sidebar and click "Switch Model".
 
-### 🏁 Quick Test
+### [FINISH] Quick Test
 
 Test your setup:
 ```bash
@@ -1394,7 +1394,7 @@ streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502
 
 ---
 
-## 📚 Documentation
+## [LIBRARY] Documentation
 
 ### Complete Mobile Guide
 For comprehensive mobile implementation details, see:
@@ -1414,4 +1414,4 @@ For comprehensive mobile implementation details, see:
 
 ---
 
-**🌿 PlantGuard provides comprehensive plant disease detection with unified documentation in the Mobile PlantGuard Complete Guide!**
+**[LEAF] PlantGuard provides comprehensive plant disease detection with unified documentation in the Mobile PlantGuard Complete Guide!**

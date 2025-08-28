@@ -27,7 +27,7 @@ def _load_model_and_processor(model_name: str) -> tuple[Any, Any, list[str]] | d
         # Get class labels
         if hasattr(model.config, "id2label"):
             class_labels = [model.config.id2label[i] for i in range(model.config.num_labels)]
-            print(f"🏷️  Sample classes: {class_labels[:5]}...")
+            print(f"[TAG]  Sample classes: {class_labels[:5]}...")
         else:
             class_labels = [f"class_{i}" for i in range(model.config.num_labels)]
             print("[WARNING]  No class labels found, using indices")
@@ -125,8 +125,8 @@ def _process_sample_with_validation(
 
     # Display results
     overall_icon = "[DONE]" if overall_correct else "[TODO]"
-    plant_icon = "🌿" if plant_match else "[TODO]"
-    status_icon = "💚" if status_match else "💔"
+    plant_icon = "[LEAF]" if plant_match else "[TODO]"
+    status_icon = "[HEALTHY]" if status_match else "[BROKEN]"
 
     result = {
         "filename": sample["filename"],
@@ -198,7 +198,7 @@ def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) ->
     status_correct = 0
 
     samples = metadata.get("sample_images", [])
-    print(f"\n🧪 Testing on {len(samples)} images:")
+    print(f"\n[TEST] Testing on {len(samples)} images:")
     print("-" * 80)
 
     for sample in samples:
@@ -229,7 +229,7 @@ def print_results(results: dict[str, Any]) -> None:
         return
 
     print("=" * 80)
-    print(f"🌱 RESULTS FOR {results['model_name']}")
+    print(f"[PLANT] RESULTS FOR {results['model_name']}")
     print("=" * 80)
 
     print("\n[SUMMARY] SUMMARY STATISTICS")
@@ -245,7 +245,7 @@ def print_results(results: dict[str, Any]) -> None:
 
 def main() -> None:
     """Test multiple Hugging Face models."""
-    print("🤗 Testing Hugging Face Plant Disease Models")
+    print("[HUG] Testing Hugging Face Plant Disease Models")
     print("=" * 80)
 
     # Models to test
@@ -288,7 +288,7 @@ def main() -> None:
 
     # Compare models
     if len(all_results) > 1:
-        print("\n🏆 MODEL COMPARISON")
+        print("\n[ACHIEVEMENT] MODEL COMPARISON")
         print("=" * 50)
 
         valid_results = [r for r in all_results if "error" not in r]
@@ -301,7 +301,7 @@ def main() -> None:
 
             # Find best model
             best_model = max(valid_results, key=lambda x: x["overall_accuracy"])
-            print(f"\n🥇 Best performing model: {best_model['model_name']}")
+            print(f"\n[FIRST] Best performing model: {best_model['model_name']}")
             print(f"   Overall accuracy: {best_model['overall_accuracy']:.1%}")
 
     print("\n[TIP] NEXT STEPS:")

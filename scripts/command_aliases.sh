@@ -79,5 +79,5 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     echo "  source scripts/command_aliases.sh"
     echo "  plantguard_run  # Shows migration message and runs 'make mobile'"
     echo ""
-    echo -e "${YELLOW}📚 For complete migration guide: cat MOBILE_MIGRATION_GUIDE.md${NC}"
+    echo -e "${YELLOW}[LIBRARY] For complete migration guide: cat MOBILE_MIGRATION_GUIDE.md${NC}"
 fi

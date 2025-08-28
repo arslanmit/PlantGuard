@@ -28,7 +28,7 @@ class InputRibbon:
                 "supports_multiple": True,
             },
             "voice": {
-                "icon": "🎙️",
+                "icon": "[MICROPHONE]️",
                 "label": "Voice",
                 "description": "Record voice questions or describe symptoms",
                 "color": "#10B981",
@@ -36,7 +36,7 @@ class InputRibbon:
                 "supports_multiple": True,
             },
             "camera": {
-                "icon": "📷",
+                "icon": "[CAMERA]",
                 "label": "Camera",
                 "description": "Take photos directly with your device camera",
                 "color": "#0EA5E9",
@@ -44,7 +44,7 @@ class InputRibbon:
                 "supports_multiple": False,
             },
             "upload": {
-                "icon": "🖼️",
+                "icon": "[IMAGE]",
                 "label": "Upload",
                 "description": "Upload plant images from your device",
                 "color": "#8B5CF6",
@@ -294,7 +294,7 @@ class InputRibbon:
         self._cleanup_temporary_data()
 
         with contextlib.suppress(Exception):
-            st.toast("🧹 All inputs cleared", icon="🧹")
+            st.toast("[CLEAN] All inputs cleared", icon="[CLEAN]")
         logger.info("Cleared all input modes and data")
 
         # Force rerun to update UI
@@ -702,7 +702,7 @@ class InputRibbon:
         if summary["mode_count"] == 0:
             return
 
-        st.markdown("### 🔗 Multimodal Input Preview")
+        st.markdown("### [LINK] Multimodal Input Preview")
 
         if summary["mode_count"] > 1:
             st.info(f"[PROGRESS] **Multimodal Analysis Ready:** {summary['mode_count']} input modes active")
@@ -739,7 +739,7 @@ class InputRibbon:
             if "content" in input_data:
                 files = input_data["content"]
                 if isinstance(files, list):
-                    st.write(f"📁 {len(files)} file(s) uploaded")
+                    st.write(f"[FOLDER] {len(files)} file(s) uploaded")
                     for i, file in enumerate(files[:3]):
                         st.image(file, width=150, caption=f"Image {i + 1}")
                     if len(files) > 3:

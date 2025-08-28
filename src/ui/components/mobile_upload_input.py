@@ -105,7 +105,7 @@ class MobileUploadInput(MobileBaseComponent):
         """Render the main upload interface."""
         # File uploader with mobile optimization
         uploaded_file = st.file_uploader(
-            "📁 Select Plant Image",
+            "[FOLDER] Select Plant Image",
             type=self.upload_config["allowed_types"],
             key=f"{self.component_id}_uploader",
             help=f"Upload plant images (max {self.upload_config['max_file_size'] // (1024 * 1024)}MB)",
@@ -121,7 +121,7 @@ class MobileUploadInput(MobileBaseComponent):
         st.markdown(
             """
             <div class="mobile-upload-dropzone">
-                <div class="upload-icon">📁</div>
+                <div class="upload-icon">[FOLDER]</div>
                 <p>Drag and drop plant images here</p>
                 <p class="upload-hint">or use the button above</p>
             </div>
@@ -267,7 +267,7 @@ class MobileUploadInput(MobileBaseComponent):
         """Render upload progress indicator."""
         progress = upload_data.get("upload_progress", 0)
 
-        st.markdown("### 📤 Uploading...")
+        st.markdown("### [UPLOAD] Uploading...")
         progress_bar = st.progress(progress / 100)
 
         if progress < 100:
@@ -277,10 +277,10 @@ class MobileUploadInput(MobileBaseComponent):
 
     def _render_uploaded_files(self, uploaded_files: list[dict[str, Any]]) -> None:
         """Render list of uploaded files."""
-        st.markdown("### 📁 Recent Uploads")
+        st.markdown("### [FOLDER] Recent Uploads")
 
         for i, file_info in enumerate(reversed(uploaded_files[-3:])):  # Show last 3 files
-            with st.expander(f"📄 {file_info['filename']}", expanded=(i == 0)):
+            with st.expander(f"[DOCUMENT] {file_info['filename']}", expanded=(i == 0)):
                 col1, col2 = st.columns([2, 1])
 
                 with col1:
@@ -296,7 +296,7 @@ class MobileUploadInput(MobileBaseComponent):
 
                 with col2:
                     # Action buttons
-                    if st.button("🔍 Analyze", key=f"{self.component_id}_analyze_{i}"):
+                    if st.button("[SEARCH] Analyze", key=f"{self.component_id}_analyze_{i}"):
                         self._trigger_analysis(file_info["image"], file_info["filename"])
 
                     if st.button("[TODO] Remove", key=f"{self.component_id}_remove_{i}"):
@@ -304,7 +304,7 @@ class MobileUploadInput(MobileBaseComponent):
 
     def _render_current_file(self, file_info: dict[str, Any]) -> None:
         """Render the currently selected file."""
-        st.markdown("### 🖼️ Current Image")
+        st.markdown("### [IMAGE] Current Image")
 
         # Display image
         col1, col2, col3 = st.columns([1, 2, 1])
@@ -326,11 +326,11 @@ class MobileUploadInput(MobileBaseComponent):
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            if st.button("🔍 Analyze", key=f"{self.component_id}_analyze_current"):
+            if st.button("[SEARCH] Analyze", key=f"{self.component_id}_analyze_current"):
                 self._trigger_analysis(file_info["image"], file_info["filename"])
 
         with col2:
-            if st.button("💾 Save", key=f"{self.component_id}_save_current"):
+            if st.button("[SAVE] Save", key=f"{self.component_id}_save_current"):
                 self._save_image(file_info)
 
         with col3:
@@ -366,7 +366,7 @@ class MobileUploadInput(MobileBaseComponent):
         state["data"]["upload_data"] = upload_data
         self.set_state(state)
 
-        st.success(f"🗑️ Removed: {filename}")
+        st.success(f"[DELETE] Removed: {filename}")
 
     def _clear_current_file(self) -> None:
         """Clear the current file selection."""
@@ -376,7 +376,7 @@ class MobileUploadInput(MobileBaseComponent):
         state["data"]["upload_data"] = upload_data
         self.set_state(state)
 
-        st.success("🧹 Current file cleared")
+        st.success("[CLEAN] Current file cleared")
 
     def _save_image(self, file_info: dict[str, Any]) -> None:
         """Save uploaded image to temporary file."""
@@ -392,7 +392,7 @@ class MobileUploadInput(MobileBaseComponent):
                 state["data"]["upload_data"] = upload_data
                 self.set_state(state)
 
-                st.success(f"💾 Image saved: {file_info['filename']}")
+                st.success(f"[SAVE] Image saved: {file_info['filename']}")
 
         except Exception as e:
             logger.error("Image save failed: %s", e)
@@ -405,7 +405,7 @@ class MobileUploadInput(MobileBaseComponent):
             from .mobile_adapter_integration import mobile_integration
 
             # Perform analysis using mobile integration
-            with st.spinner(f"🔍 Analyzing {filename}..."):
+            with st.spinner(f"[SEARCH] Analyzing {filename}..."):
                 analysis_result = mobile_integration.analyze_image(image=image, source="upload", component_id=self.component_id)
 
                 # Extract results
@@ -419,7 +419,7 @@ class MobileUploadInput(MobileBaseComponent):
 
                 # Display result with enhanced information
                 if confidence > 0.7:
-                    st.success(f"🌿 Analysis Complete: {disease_name} ({confidence:.1%} confidence)")
+                    st.success(f"[LEAF] Analysis Complete: {disease_name} ({confidence:.1%} confidence)")
                 elif confidence > 0.4:
                     st.warning(f"[WARNING] Moderate confidence: {disease_name} ({confidence:.1%} confidence)")
                 else:
@@ -463,4 +463,4 @@ class MobileUploadInput(MobileBaseComponent):
     def clear_upload_state(self) -> None:
         """Clear all upload state and files."""
         self._initialize_upload_state()
-        st.success("🧹 Upload state cleared")
+        st.success("[CLEAN] Upload state cleared")

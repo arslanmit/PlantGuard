@@ -157,7 +157,7 @@ class ModelSwitcher:
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.markdown("#### 👁️ Vision")
+            st.markdown("#### [VISION] Vision")
             current_vision = self.get_current_model("vision")
             if current_vision:
                 info = self.get_model_info("vision", current_vision)
@@ -167,7 +167,7 @@ class ModelSwitcher:
                 st.warning("No vision model selected")
 
         with col2:
-            st.markdown("#### 🎤 Audio")
+            st.markdown("#### [VOICE] Audio")
             current_audio = self.get_current_model("audio")
             if current_audio:
                 info = self.get_model_info("audio", current_audio)
@@ -177,7 +177,7 @@ class ModelSwitcher:
                 st.warning("No audio model selected")
 
         with col3:
-            st.markdown("#### 💬 Text")
+            st.markdown("#### [CHAT] Text")
             current_text = self.get_current_model("text")
             if current_text:
                 info = self.get_model_info("text", current_text)

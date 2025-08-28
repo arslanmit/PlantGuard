@@ -41,11 +41,11 @@ def list_models_legacy(manager: PlantGuardModelManager) -> None:
     """List all available models (legacy mode)."""
     models = manager.list_available_models()
 
-    print("🤖 Available PlantGuard Models:")
+    print("[AI] Available PlantGuard Models:")
     print("=" * 60)
 
     for model in models:
-        status = "🟢 CURRENT" if model["is_current"] else "⚪ Available" if model["enabled"] else "🔴 Disabled"
+        status = "[GREEN] CURRENT" if model["is_current"] else "⚪ Available" if model["enabled"] else "[RED] Disabled"
         accuracy = f"{model['accuracy']:.1%}" if model["accuracy"] > 0 else "Unknown"
 
         print(f"\n[DETAILS] {model['id']}")
@@ -61,7 +61,7 @@ def list_models_registry() -> None:
     registry = ModelRegistry()
     models = registry.list_models()
 
-    print("🤖 Available PlantGuard Models (Registry):")
+    print("[AI] Available PlantGuard Models (Registry):")
     print("=" * 60)
 
     if not models:
@@ -168,14 +168,14 @@ def test_model_legacy(manager: PlantGuardModelManager, image_path: str) -> None:
         image = Image.open(image_path)
         result = manager.get_readable_prediction(image)
 
-        print(f"🔍 Testing: {Path(image_path).name}")
+        print(f"[SEARCH] Testing: {Path(image_path).name}")
         print("=" * 50)
-        print(f"🌿 Plant Type: {result['plant_type']}")
-        print(f"🦠 Disease: {result['disease']}")
-        print(f"💚 Healthy: {'Yes' if result['is_healthy'] else 'No'}")
+        print(f"[LEAF] Plant Type: {result['plant_type']}")
+        print(f"[VIRUS] Disease: {result['disease']}")
+        print(f"[HEALTHY] Healthy: {'Yes' if result['is_healthy'] else 'No'}")
         print(f"[SUMMARY] Confidence: {result['confidence_percentage']}")
         print(f"[TIP] Recommendation: {result['recommendation']}")
-        print(f"🤖 Model: {result['model_info']['model_name']}")
+        print(f"[AI] Model: {result['model_info']['model_name']}")
 
     except Exception as e:
         print(f"[TODO] Failed to test image: {e}")
@@ -191,13 +191,13 @@ def test_model_registry(adapter: VisionAdapter, image_path: str) -> None:
         image = Image.open(image_path)
         raw_class, readable_name, confidence, plant_type = adapter.predict_with_readable_name(image)
 
-        print(f"🔍 Testing: {Path(image_path).name}")
+        print(f"[SEARCH] Testing: {Path(image_path).name}")
         print("=" * 50)
-        print(f"🌿 Plant Type: {plant_type}")
-        print(f"🦠 Disease: {readable_name}")
-        print(f"💚 Healthy: {'Yes' if adapter.is_healthy(raw_class) else 'No'}")
+        print(f"[LEAF] Plant Type: {plant_type}")
+        print(f"[VIRUS] Disease: {readable_name}")
+        print(f"[HEALTHY] Healthy: {'Yes' if adapter.is_healthy(raw_class) else 'No'}")
         print(f"[SUMMARY] Confidence: {confidence:.1%}")
-        print(f"🤖 Raw Class: {raw_class}")
+        print(f"[AI] Raw Class: {raw_class}")
 
     except Exception as e:
         print(f"[TODO] Failed to test image: {e}")
@@ -296,7 +296,7 @@ def main() -> None:
                 "num_classes": 38,
             }
             model_id = registry.register_model(Path(output_path), metadata)
-            print(f"📝 Model registered with ID: {model_id}")
+            print(f"[WRITE] Model registered with ID: {model_id}")
 
         except Exception as e:
             print(f"[TODO] Migration failed: {e}")
@@ -336,7 +336,7 @@ def main() -> None:
         if LEGACY_MODE:
             if current_adapter and current_adapter.is_loaded:
                 info = current_adapter.get_model_info()
-                print("🤖 Current Model:")
+                print("[AI] Current Model:")
                 print("=" * 30)
                 print(f"Classes: {info['num_classes']}")
                 print(f"Device: {info['device']}")
@@ -346,7 +346,7 @@ def main() -> None:
         else:
             info = manager.get_current_model_info()
             if "error" not in info:
-                print("🤖 Current Model:")
+                print("[AI] Current Model:")
                 print("=" * 30)
                 print(f"Name: {info['name']}")
                 print(f"Type: {info['type']}")
@@ -369,9 +369,9 @@ def main() -> None:
             # Show current model if any
             info = manager.get_current_model_info()
             if "error" not in info:
-                print(f"🤖 Current Model: {info['name']}")
+                print(f"[AI] Current Model: {info['name']}")
             else:
-                print("🤖 No model currently loaded")
+                print("[AI] No model currently loaded")
 
         print("\n[TIP] Quick Commands:")
         print("  python scripts/model_switching/model_switcher.py --list              # List all models")

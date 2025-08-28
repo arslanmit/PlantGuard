@@ -37,7 +37,7 @@ class MobilePerformanceTest:
         """
         self.test_start_time = time.time()
 
-        st.markdown("### 🧪 Running Mobile Performance Tests")
+        st.markdown("### [TEST] Running Mobile Performance Tests")
 
         # Create progress bar
         progress_bar = st.progress(0)
@@ -502,7 +502,7 @@ def render_mobile_performance_test_ui() -> None:
             mobile_performance_test.render_test_results(results)
 
     # Show current performance stats
-    with st.expander("📈 Current Performance Stats"):
+    with st.expander("[CHART] Current Performance Stats"):
         try:
             perf_report = mobile_performance_optimizer.get_performance_report()
             offline_stats = mobile_offline_manager.get_offline_stats()

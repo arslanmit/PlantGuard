@@ -386,7 +386,7 @@ class HistoryManager:
         """
         try:
             if not st.session_state.history_entries:
-                st.toast("No history to export", icon="📝")
+                st.toast("No history to export", icon="[WRITE]")
                 return None
 
             # Prepare data for CSV
@@ -419,7 +419,7 @@ class HistoryManager:
 
     def render_search_interface(self) -> None:
         """Render history search and filter interface."""
-        st.subheader("🔍 Search & Filter History")
+        st.subheader("[SEARCH] Search & Filter History")
 
         col1, col2, col3 = st.columns([2, 1, 1])
 
@@ -463,7 +463,7 @@ class HistoryManager:
             st.info("No history entries found matching your criteria")
             return
 
-        st.subheader(f"📚 History Grid ({len(entries)} entries)")
+        st.subheader(f"[LIBRARY] History Grid ({len(entries)} entries)")
 
         # Create grid
         for i in range(0, len(entries), cols):
@@ -495,16 +495,16 @@ class HistoryManager:
                     # Tags
                     if entry.tags:
                         tag_str = " ".join([f"#{tag}" for tag in entry.tags[:2]])
-                        st.caption(f"🏷️ {tag_str}")
+                        st.caption(f"[TAG] {tag_str}")
 
                     # Action buttons
                     col_view, col_del = st.columns(2)
                     with col_view:
-                        if st.button("👁️", key=f"view_{entry.entry_id}", help="View details"):
+                        if st.button("[VISION]", key=f"view_{entry.entry_id}", help="View details"):
                             st.session_state.selected_history_entry = entry
 
                     with col_del:
-                        if st.button("🗑️", key=f"delete_{entry.entry_id}", help="Delete entry"):
+                        if st.button("[DELETE]", key=f"delete_{entry.entry_id}", help="Delete entry"):
                             if self.delete_entry(entry.entry_id):
                                 st.toast("Entry deleted", icon="[DONE]")
                                 st.rerun()
@@ -565,7 +565,7 @@ class HistoryManager:
                 st.rerun()
 
         with col3:
-            if st.button("🗑️ Clear All", help="Delete all history entries"):
+            if st.button("[DELETE] Clear All", help="Delete all history entries"):
                 if st.session_state.get("confirm_clear_history", False):
                     self.clear_history()
                     st.session_state.confirm_clear_history = False
@@ -576,12 +576,12 @@ class HistoryManager:
 
     def render_complete_history_interface(self) -> None:
         """Render the complete history management interface."""
-        st.header("📚 Analysis History")
+        st.header("[LIBRARY] Analysis History")
 
         # Check if we have any history
         if not st.session_state.history_entries:
             st.info("""
-            📝 **No analysis history yet**
+            [WRITE] **No analysis history yet**
 
             Your analysis history will appear here after you process plant images.
             History includes:
@@ -633,7 +633,7 @@ def create_history_manager(history_file: str = "data/plantguard_history.json") -
 # Example usage and testing
 if __name__ == "__main__":
     # Test the history manager
-    st.title("📚 PlantGuard History Manager Test")
+    st.title("[LIBRARY] PlantGuard History Manager Test")
 
     # Create history manager
     history_manager = create_history_manager()

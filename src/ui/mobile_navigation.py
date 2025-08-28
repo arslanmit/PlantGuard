@@ -55,9 +55,9 @@ class MobileNavigationManager:
     def _initialize_default_navigation(self) -> None:
         """Initialize default navigation items for PlantGuard."""
         default_items = [
-            NavigationItem(id="image_analysis", title="Image Analysis", icon="📸", description="Analyze plant images for disease detection"),
-            NavigationItem(id="voice_assistant", title="Voice Assistant", icon="🎤", description="Voice-powered plant care assistance"),
-            NavigationItem(id="chat_interface", title="Chat", icon="💬", description="Text-based plant care chat"),
+            NavigationItem(id="image_analysis", title="Image Analysis", icon="[PHOTO]", description="Analyze plant images for disease detection"),
+            NavigationItem(id="voice_assistant", title="Voice Assistant", icon="[VOICE]", description="Voice-powered plant care assistance"),
+            NavigationItem(id="chat_interface", title="Chat", icon="[CHAT]", description="Text-based plant care chat"),
             NavigationItem(id="history_settings", title="History & Settings", icon="[SUMMARY]", description="View analysis history and app settings"),
         ]
 
@@ -314,7 +314,7 @@ class MobileNavigationManager:
         current_route = self.get_current_route()
 
         with st.sidebar:
-            st.markdown("### 🧭 Navigation")
+            st.markdown("### [COMPASS] Navigation")
 
             selected_route = None
 
@@ -353,7 +353,7 @@ class MobileNavigationManager:
         if current_item:
             breadcrumb_html = f"""
             <div style='padding: 0.5rem 0; color: #666; font-size: 0.9rem;'>
-                🏠 Home > {current_item.icon} {current_item.title}
+                [HOME] Home > {current_item.icon} {current_item.title}
             </div>
             """
             st.markdown(breadcrumb_html, unsafe_allow_html=True)

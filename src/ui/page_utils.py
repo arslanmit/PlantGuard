@@ -85,7 +85,7 @@ class PlantGuardPageUtils:
             f"""
             <div style='text-align: center; padding: 1.5rem 0; background: linear-gradient(135deg, #4CAF50, #45a049);
                         border-radius: 15px; margin-bottom: 2rem; color: white;'>
-                <h1 style='margin: 0; font-size: 2rem;'>🌿 {title}</h1>
+                <h1 style='margin: 0; font-size: 2rem;'>[LEAF] {title}</h1>
                 <p style='margin: 0; font-size: 1rem; opacity: 0.9;'>{description}</p>
             </div>
             """,

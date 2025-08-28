@@ -124,7 +124,7 @@ class MobileTextInput(MobileBaseComponent):
         """Render the main text input interface."""
         # Text input area with mobile optimization
         current_text = st.text_area(
-            "💬 Ask your plant care question",
+            "[CHAT] Ask your plant care question",
             value=text_data.get("current_text", ""),
             height=120,
             max_chars=self.text_config["max_length"],
@@ -149,7 +149,7 @@ class MobileTextInput(MobileBaseComponent):
             if char_count > self.text_config["character_limit_warning"]:
                 st.warning(f"[WARNING] {char_count}/{char_limit} characters")
             else:
-                st.info(f"📝 {char_count}/{char_limit} characters")
+                st.info(f"[WRITE] {char_count}/{char_limit} characters")
 
         with col2:
             # Suggestions toggle
@@ -158,7 +158,7 @@ class MobileTextInput(MobileBaseComponent):
 
         with col3:
             # Clear text button
-            if st.button("🧹 Clear", key=f"{self.component_id}_clear_text"):
+            if st.button("[CLEAN] Clear", key=f"{self.component_id}_clear_text"):
                 self._clear_current_text()
 
         # Send button and quick actions
@@ -166,7 +166,7 @@ class MobileTextInput(MobileBaseComponent):
 
         with col1:
             send_clicked = st.button(
-                "📤 Send Message",
+                "[UPLOAD] Send Message",
                 key=f"{self.component_id}_send_btn",
                 help="Send your question",
                 use_container_width=True,
@@ -226,13 +226,13 @@ class MobileTextInput(MobileBaseComponent):
 
     def _render_text_history(self, text_history: list[dict[str, Any]]) -> None:
         """Render recent text input history."""
-        st.markdown("### 📝 Recent Questions")
+        st.markdown("### [WRITE] Recent Questions")
 
         # Show last 3 questions
         recent_history = text_history[-3:] if len(text_history) > 3 else text_history
 
         for i, entry in enumerate(reversed(recent_history)):
-            with st.expander(f"💬 {entry['text'][:50]}...", expanded=(i == 0)):
+            with st.expander(f"[CHAT] {entry['text'][:50]}...", expanded=(i == 0)):
                 col1, col2 = st.columns([3, 1])
 
                 with col1:
@@ -252,7 +252,7 @@ class MobileTextInput(MobileBaseComponent):
 
     def _render_text_settings(self) -> None:
         """Render text input settings panel."""
-        with st.expander("💬 Text Settings", expanded=True):
+        with st.expander("[CHAT] Text Settings", expanded=True):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -344,7 +344,7 @@ class MobileTextInput(MobileBaseComponent):
             # Clear current text
             self._clear_current_text()
 
-            st.success("📤 Question sent successfully!")
+            st.success("[UPLOAD] Question sent successfully!")
 
         except Exception as e:
             logger.error("Text submission failed: %s", e)
@@ -393,7 +393,7 @@ class MobileTextInput(MobileBaseComponent):
             context = {"recent_analysis": recent_analysis[0]} if recent_analysis else None
 
             # Process text and generate response
-            with st.spinner("🤖 Processing your question..."):
+            with st.spinner("[AI] Processing your question..."):
                 processing_result = mobile_integration.process_text_query(text=text, source="text", component_id=self.component_id, context=context)
 
                 # Extract response
@@ -409,7 +409,7 @@ class MobileTextInput(MobileBaseComponent):
                     self._update_history_with_response(text, response)
 
                     # Display response in an expandable section
-                    with st.expander("🤖 AI Response", expanded=True):
+                    with st.expander("[AI] AI Response", expanded=True):
                         st.write(response)
 
                         # Show context if available
@@ -419,7 +419,7 @@ class MobileTextInput(MobileBaseComponent):
                         if disease_context and confidence_context > 0:
                             st.info(f"[TIP] This response is based on your recent analysis: {disease_context} ({confidence_context:.1%} confidence)")
 
-                    st.success("🤖 Response generated!")
+                    st.success("[AI] Response generated!")
                 else:
                     st.warning("[WARNING] No response generated. Please try rephrasing your question.")
 
@@ -478,7 +478,7 @@ class MobileTextInput(MobileBaseComponent):
         state["data"]["text_data"] = text_data
         self.set_state(state)
 
-        st.success("🗑️ Removed from history")
+        st.success("[DELETE] Removed from history")
 
     def _clear_current_text(self) -> None:
         """Clear current text input."""
@@ -524,4 +524,4 @@ class MobileTextInput(MobileBaseComponent):
     def clear_text_state(self) -> None:
         """Clear all text input state."""
         self._initialize_text_state()
-        st.success("🧹 Text input state cleared")
+        st.success("[CLEAN] Text input state cleared")

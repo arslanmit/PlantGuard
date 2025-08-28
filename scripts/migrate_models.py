@@ -204,7 +204,7 @@ def main() -> None:
 
     if args.scan or args.migrate_all:
         # Scan for legacy models
-        print("🔍 Scanning for legacy models...")
+        print("[SEARCH] Scanning for legacy models...")
         legacy_models = scan_for_legacy_models()
 
         if not legacy_models:
@@ -219,7 +219,7 @@ def main() -> None:
             return
 
         if args.dry_run:
-            print("\n🔍 Dry run - would migrate:")
+            print("\n[SEARCH] Dry run - would migrate:")
             for model_path in legacy_models:
                 print(f"   - {model_path} -> migrated_{model_path.stem}")
             return
@@ -258,7 +258,7 @@ def main() -> None:
             return
 
         if args.dry_run:
-            print(f"🔍 Dry run - would migrate: {model_path}")
+            print(f"[SEARCH] Dry run - would migrate: {model_path}")
             return
 
         model_id = migrate_model(

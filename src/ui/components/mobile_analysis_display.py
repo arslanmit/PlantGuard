@@ -141,7 +141,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
             """
         <div class="mobile-card mobile-empty-state">
             <div class="empty-state-content">
-                <div class="empty-state-icon">🌿</div>
+                <div class="empty-state-icon">[LEAF]</div>
                 <h3>Ready for Analysis</h3>
                 <p>Upload an image, take a photo, or use voice input to get started with plant disease detection.</p>
                 <div class="empty-state-tips">
@@ -184,7 +184,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
 
         with col3:
             if st.button(
-                "🔍 Details",
+                "[SEARCH] Details",
                 key=f"{self.component_id}_mode_detailed",
                 type="primary" if current_mode == "detailed" else "secondary",
                 use_container_width=True,
@@ -201,7 +201,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
 
     def _render_latest_result(self, result: dict[str, Any]) -> None:
         """Render the latest analysis result."""
-        st.markdown("### 🔬 Latest Analysis")
+        st.markdown("### [MICROSCOPE] Latest Analysis")
 
         # Extract result data
         disease_name, confidence = result.get("prediction", ("Unknown", 0.0))
@@ -217,7 +217,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
         <div class="mobile-card mobile-analysis-result">
             <div class="analysis-header">
                 <h4 class="disease-name">{disease_name}</h4>
-                <span class="analysis-source">📷 {source.title()}</span>
+                <span class="analysis-source">[CAMERA] {source.title()}</span>
             </div>
             
             <div class="confidence-section">
@@ -234,7 +234,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
             </div>
             
             <div class="analysis-timestamp">
-                📅 {self._format_timestamp(timestamp)}
+                [DATE] {self._format_timestamp(timestamp)}
             </div>
         </div>
         """,
@@ -265,7 +265,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
             timestamp = result.get("timestamp", "")
             source = result.get("source", "unknown")
 
-            with st.expander(f"🌿 {disease_name} ({confidence:.1%}) - {self._format_timestamp(timestamp)}", expanded=(i == 0)):
+            with st.expander(f"[LEAF] {disease_name} ({confidence:.1%}) - {self._format_timestamp(timestamp)}", expanded=(i == 0)):
                 col1, col2 = st.columns([2, 1])
 
                 with col1:
@@ -275,7 +275,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
                     st.write(f"**Time:** {self._format_timestamp(timestamp)}")
 
                 with col2:
-                    if st.button("🔍 View Details", key=f"{self.component_id}_view_{i}", use_container_width=True):
+                    if st.button("[SEARCH] View Details", key=f"{self.component_id}_view_{i}", use_container_width=True):
                         self._view_detailed_result(i)
 
                     if st.button("[PARTIAL] Re-analyze", key=f"{self.component_id}_reanalyze_{i}", use_container_width=True):
@@ -283,7 +283,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
 
     def _render_detailed_result(self, result: dict[str, Any]) -> None:
         """Render detailed analysis result."""
-        st.markdown("### 🔍 Detailed Analysis")
+        st.markdown("### [SEARCH] Detailed Analysis")
 
         disease_name, confidence = result.get("prediction", ("Unknown", 0.0))
 
@@ -316,11 +316,11 @@ class MobileAnalysisDisplay(MobileBaseComponent):
             st.markdown("**Confidence Assessment:**")
 
             if confidence_level == "high":
-                st.success("🟢 High confidence - Reliable diagnosis")
+                st.success("[GREEN] High confidence - Reliable diagnosis")
             elif confidence_level == "medium":
-                st.warning("🟡 Medium confidence - Consider expert consultation")
+                st.warning("[YELLOW] Medium confidence - Consider expert consultation")
             else:
-                st.error("🔴 Low confidence - Expert consultation recommended")
+                st.error("[RED] Low confidence - Expert consultation recommended")
 
         # Disease information
         disease_info = self._get_disease_info(disease_name)
@@ -349,19 +349,19 @@ class MobileAnalysisDisplay(MobileBaseComponent):
 
             # Immediate actions
             if "immediate" in treatment:
-                st.markdown("**🚨 Immediate Actions:**")
+                st.markdown("**[ALERT] Immediate Actions:**")
                 for action in treatment["immediate"]:
                     st.write(f"• {action}")
 
             # Preventive measures
             if "preventive" in treatment:
-                st.markdown("**🛡️ Prevention:**")
+                st.markdown("**[SHIELD] Prevention:**")
                 for prevention in treatment["preventive"]:
                     st.write(f"• {prevention}")
 
             # Organic options
             if "organic" in treatment:
-                st.markdown("**🌱 Organic Options:**")
+                st.markdown("**[PLANT] Organic Options:**")
                 for organic in treatment["organic"]:
                     st.write(f"• {organic}")
         else:
@@ -382,9 +382,9 @@ class MobileAnalysisDisplay(MobileBaseComponent):
 
     def _render_disease_information(self, disease_info: dict[str, Any]) -> None:
         """Render detailed disease information."""
-        st.markdown("### 📚 Disease Information")
+        st.markdown("### [LIBRARY] Disease Information")
 
-        with st.expander("🔬 Disease Details", expanded=False):
+        with st.expander("[MICROSCOPE] Disease Details", expanded=False):
             if "description" in disease_info:
                 st.write(f"**Description:** {disease_info['description']}")
 
@@ -405,11 +405,11 @@ class MobileAnalysisDisplay(MobileBaseComponent):
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            if st.button("📤 Share", key=f"{self.component_id}_share"):
+            if st.button("[UPLOAD] Share", key=f"{self.component_id}_share"):
                 self._share_result(result)
 
         with col2:
-            if st.button("💾 Save", key=f"{self.component_id}_save"):
+            if st.button("[SAVE] Save", key=f"{self.component_id}_save"):
                 self._save_result(result)
 
         with col3:
@@ -516,7 +516,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
         disease_name, confidence = result.get("prediction", ("Unknown", 0.0))
 
         share_text = f"""
-🌿 PlantGuard Analysis Result
+[LEAF] PlantGuard Analysis Result
 
 Disease: {disease_name}
 Confidence: {confidence:.1%}
@@ -525,14 +525,14 @@ Time: {self._format_timestamp(result.get("timestamp", ""))}
 Generated by PlantGuard AI Plant Disease Detection
         """.strip()
 
-        st.text_area("📤 Share Result", value=share_text, height=150, key=f"{self.component_id}_share_text")
+        st.text_area("[UPLOAD] Share Result", value=share_text, height=150, key=f"{self.component_id}_share_text")
 
         st.success("[DONE] Result ready to share! Copy the text above.")
 
     def _save_result(self, result: dict[str, Any]) -> None:
         """Save analysis result."""
         # In a real implementation, this would save to local storage or file
-        st.success("💾 Result saved to analysis history!")
+        st.success("[SAVE] Result saved to analysis history!")
 
     def _reanalyze_result(self, result: dict[str, Any]) -> None:
         """Re-analyze the image from result."""
@@ -583,7 +583,7 @@ Generated by PlantGuard AI Plant Disease Detection
         # Clear component state
         self._initialize_analysis_state()
 
-        st.success("🧹 Analysis results cleared!")
+        st.success("[CLEAN] Analysis results cleared!")
 
     def get_current_result(self) -> dict[str, Any] | None:
         """Get current analysis result."""

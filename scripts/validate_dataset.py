@@ -38,7 +38,7 @@ def main() -> None:
 
     for dataset_path, dataset_name in datasets_to_check:
         if Path(dataset_path).exists():
-            print(f"🔍 Validating {dataset_name} at {dataset_path}...")
+            print(f"[SEARCH] Validating {dataset_name} at {dataset_path}...")
             result = dm.validate_dataset(Path(dataset_path))
 
             print(f"[SUMMARY] Results for {dataset_name}:")
@@ -54,7 +54,7 @@ def main() -> None:
                 all_valid = False
 
             if result.errors:
-                print("  🚨 Errors:")
+                print("  [ALERT] Errors:")
                 for error in result.errors:
                     print(f"    - {error}")
 

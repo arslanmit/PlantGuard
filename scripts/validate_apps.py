@@ -70,7 +70,7 @@ def validate_switcher_app() -> bool:
 
 def main() -> None:
     """Run validation checks."""
-    print("🔍 Validating PlantGuard applications...")
+    print("[SEARCH] Validating PlantGuard applications...")
     print()
 
     main_ok = validate_main_app()

@@ -17,22 +17,22 @@ class NavigationHeader:
     def __init__(self):
         self.pages = {
             "Home": {
-                "icon": "🏠",
+                "icon": "[HOME]",
                 "description": "Main analysis interface",
                 "keywords": ["chat", "analyze", "main", "home"],
             },
             "Compare": {
-                "icon": "🔍",
+                "icon": "[SEARCH]",
                 "description": "Side-by-side image comparison",
                 "keywords": ["compare", "diff", "before", "after"],
             },
             "History": {
-                "icon": "📚",
+                "icon": "[LIBRARY]",
                 "description": "Analysis history and exports",
                 "keywords": ["history", "past", "export", "results"],
             },
             "Guide": {
-                "icon": "📖",
+                "icon": "[MANUAL]",
                 "description": "Usage guide and help",
                 "keywords": ["help", "guide", "tips", "faq"],
             },
@@ -56,7 +56,7 @@ class NavigationHeader:
             # Render navigation into the left column
             selected_page = current_page
             with left_col:
-                st.markdown("### 🧭 Navigation")
+                st.markdown("### [COMPASS] Navigation")
 
                 for page_name, page_info in self.pages.items():
                     button_type = "primary" if page_name == current_page else "secondary"
@@ -219,7 +219,7 @@ class NavigationHeader:
         """Render always-visible mobile navigation - no hamburger menu."""
 
         # Always-visible navigation header
-        st.markdown("### 🧭 Navigation")
+        st.markdown("### [COMPASS] Navigation")
         st.markdown("All features directly accessible:")
 
         # Always show all navigation options in a grid
@@ -282,7 +282,7 @@ class NavigationHeader:
             if not st.session_state.nav_collapsed:
                 # Show current page name
                 current_page_info = self.pages.get(current_page, {})
-                st.markdown(f"**{current_page_info.get('icon', '📄')} {current_page}**")
+                st.markdown(f"**{current_page_info.get('icon', '[DOCUMENT]')} {current_page}**")
 
         # Render navigation content if not collapsed
         if not st.session_state.nav_collapsed:
@@ -331,7 +331,7 @@ class NavigationHeader:
             breadcrumb_items = []
             for i, page_visit in enumerate(recent_pages):
                 page_name = page_visit["page"]
-                page_icon = self.pages.get(page_name, {}).get("icon", "📄")
+                page_icon = self.pages.get(page_name, {}).get("icon", "[DOCUMENT]")
 
                 if i == len(recent_pages) - 1:
                     # Current page (not clickable)
@@ -395,7 +395,7 @@ class NavigationHeader:
 
     def render_page_search(self) -> str | None:
         """Render page search functionality."""
-        with st.expander("🔍 Search Pages", expanded=False):
+        with st.expander("[SEARCH] Search Pages", expanded=False):
             search_query = st.text_input("Search for a page:", placeholder="Type page name, description, or keyword...", key="page_search")
 
             if search_query:
@@ -439,7 +439,7 @@ class NavigationSidebar:
             container = left_col
 
         with container:
-            st.markdown("### 🧭 Navigation")
+            st.markdown("### [COMPASS] Navigation")
 
             # Quick navigation buttons
             current_page = st.session_state.get("current_page", "Home")

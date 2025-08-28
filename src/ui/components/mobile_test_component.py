@@ -87,7 +87,7 @@ class MobileTestComponent(MobileBaseComponent):
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("🧪 Test State", key=f"{self.component_id}_test_state"):
+            if st.button("[TEST] Test State", key=f"{self.component_id}_test_state"):
                 self._test_state_management()
 
         with col2:

@@ -43,13 +43,13 @@ def main():
     """Main PlantGuard application with model switching."""
     st.set_page_config(
         page_title="PlantGuard - Plant Disease Detection",
-        page_icon="🌱",
+        page_icon="[PLANT]",
         layout="wide",
         initial_sidebar_state="expanded"
     )
 
     # Header
-    st.title("🌱 PlantGuard")
+    st.title("[PLANT] PlantGuard")
     st.markdown("**Multimodal Plant Disease Detection System**")
 
     # Initialize model manager
@@ -294,7 +294,7 @@ def main():
         if models:
             model_data = []
             for model in models:
-                status_icon = "🟢" if model["is_current"] else "⚪" if model["enabled"] else "🔴"
+                status_icon = "[GREEN]" if model["is_current"] else "⚪" if model["enabled"] else "[RED]"
                 model_data.append({
                     "Status": status_icon,
                     "Model": model["name"],
@@ -484,7 +484,7 @@ if st.button("Switch to Fast Model"):
     st.rerun()  # Refresh the app
 ```
 
-## 🏁 Quick Test
+## [FINISH] Quick Test
 
 Test your setup:
 ```bash
@@ -530,7 +530,7 @@ def main() -> None:
     print("   - Auto-loading of best models")
     print("   - Batch analysis support")
 
-    print("\n📖 **Quick Start Guide**: MODEL_SWITCHING_GUIDE.md")
+    print("\n[MANUAL] **Quick Start Guide**: MODEL_SWITCHING_GUIDE.md")
     print("   - All commands and examples")
     print("   - Performance comparisons")
     print("   - Configuration instructions")
@@ -550,10 +550,10 @@ def main() -> None:
     print("   [DONE] Hot-swapping in Streamlit")
     print("   [DONE] Batch analysis support")
 
-    print("\n🏆 **Your Models**:")
-    print("   🥇 Vision Transformer: 100% accuracy (BEST)")
-    print("   🥈 MobileNet: 95% accuracy (FAST)")
-    print("   🥉 Local ResNet: 5% accuracy (TRAINING NEEDED)")
+    print("\n[ACHIEVEMENT] **Your Models**:")
+    print("   [FIRST] Vision Transformer: 100% accuracy (BEST)")
+    print("   [SECOND] MobileNet: 95% accuracy (FAST)")
+    print("   [THIRD] Local ResNet: 5% accuracy (TRAINING NEEDED)")
 
 
 if __name__ == "__main__":

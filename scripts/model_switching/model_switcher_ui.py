@@ -35,13 +35,13 @@ def process_image(image: Image.Image, image_name: str, manager: "PlantGuardModel
         col_a, col_b = st.columns(2)
 
         with col_a:
-            st.metric("🌿 Plant Type", result["plant_type"])
-            st.metric("🦠 Disease", result["disease"])
+            st.metric("[LEAF] Plant Type", result["plant_type"])
+            st.metric("[VIRUS] Disease", result["disease"])
 
         with col_b:
             st.metric("[SUMMARY] Confidence", result["confidence_percentage"])
             health_status = "Healthy [DONE]" if result["is_healthy"] else "Diseased [WARNING]"
-            st.metric("💚 Health Status", health_status)
+            st.metric("[HEALTHY] Health Status", health_status)
 
         # Additional info
         st.info(f"[TIP] **Recommendation:** {result['recommendation']}")
@@ -57,7 +57,7 @@ def process_image(image: Image.Image, image_name: str, manager: "PlantGuardModel
             )
 
         # Show model info
-        st.markdown("### 🤖 Model Information")
+        st.markdown("### [AI] Model Information")
         st.write(f"**Model:** {current_model_info['name']}")
         st.write(f"**Type:** {current_model_info['type']}")
         if current_model_info.get("description"):
@@ -69,9 +69,9 @@ def process_image(image: Image.Image, image_name: str, manager: "PlantGuardModel
 
 def main() -> None:
     """Main Streamlit app."""
-    st.set_page_config(page_title="PlantGuard Model Switcher", page_icon="🌱", layout="wide")
+    st.set_page_config(page_title="PlantGuard Model Switcher", page_icon="[PLANT]", layout="wide")
 
-    st.title("🌱 PlantGuard Model Switcher")
+    st.title("[PLANT] PlantGuard Model Switcher")
     st.markdown("Easy switching between different plant disease detection models")
 
     # Initialize model manager
@@ -82,7 +82,7 @@ def main() -> None:
         return
 
     # Sidebar for model selection
-    st.sidebar.header("🤖 Model Selection")
+    st.sidebar.header("[AI] Model Selection")
 
     # Get available models
     models = manager.list_available_models()
@@ -146,7 +146,7 @@ def main() -> None:
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.header("🔍 Test Current Model")
+        st.header("[SEARCH] Test Current Model")
 
         # Central switch button mirrors sidebar for convenience
         if st.button("[PARTIAL] Switch Model", help="Load the selected model from the sidebar"):
@@ -187,7 +187,7 @@ def main() -> None:
         if models:
             model_data = []
             for model in models:
-                status = "🟢 Current" if model["is_current"] else "⚪ Available" if model["enabled"] else "🔴 Disabled"
+                status = "[GREEN] Current" if model["is_current"] else "⚪ Available" if model["enabled"] else "[RED] Disabled"
                 model_data.append(
                     {
                         "Model": model["name"],
@@ -203,7 +203,7 @@ def main() -> None:
             st.markdown("---")
             st.subheader("⚙️ Configuration")
 
-            if st.button("📝 Edit Model Config"):
+            if st.button("[WRITE] Edit Model Config"):
                 st.info("Model configuration file: `config/models.json`")
                 st.markdown("""
                 You can edit the configuration file to:

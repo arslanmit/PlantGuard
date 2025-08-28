@@ -87,7 +87,7 @@ class MobileCameraInput(MobileBaseComponent):
             col1, col2 = st.columns([3, 1])
 
             with col1:
-                camera_button_text = "📷 Stop Camera" if camera_data.get("camera_active") else "📷 Take Photo"
+                camera_button_text = "[CAMERA] Stop Camera" if camera_data.get("camera_active") else "[CAMERA] Take Photo"
                 camera_clicked = st.button(
                     camera_button_text,
                     key=f"{self.component_id}_camera_btn",
@@ -136,11 +136,11 @@ class MobileCameraInput(MobileBaseComponent):
                 # Activating camera
                 camera_data["camera_error"] = None
                 camera_data["stream_active"] = True
-                st.success("📷 Camera activated! Point at plant and capture image.")
+                st.success("[CAMERA] Camera activated! Point at plant and capture image.")
             else:
                 # Deactivating camera
                 camera_data["stream_active"] = False
-                st.info("📷 Camera deactivated.")
+                st.info("[CAMERA] Camera deactivated.")
 
             # Update state
             state["data"]["camera_data"] = camera_data
@@ -153,7 +153,7 @@ class MobileCameraInput(MobileBaseComponent):
     def _render_camera_interface(self) -> None:
         """Render the camera streaming interface using streamlit-webrtc."""
         try:
-            st.markdown("### 📷 Camera View")
+            st.markdown("### [CAMERA] Camera View")
 
             # Create WebRTC streamer for camera access
             webrtc_ctx = webrtc_streamer(
@@ -169,7 +169,7 @@ class MobileCameraInput(MobileBaseComponent):
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("📸 Capture", key=f"{self.component_id}_capture", disabled=not webrtc_ctx.state.playing):
+                if st.button("[PHOTO] Capture", key=f"{self.component_id}_capture", disabled=not webrtc_ctx.state.playing):
                     self._capture_image(webrtc_ctx)
 
             with col2:
@@ -182,9 +182,9 @@ class MobileCameraInput(MobileBaseComponent):
 
             # Display camera status
             if webrtc_ctx.state.playing:
-                st.success("🟢 Camera is active")
+                st.success("[GREEN] Camera is active")
             else:
-                st.warning("🟡 Camera is starting...")
+                st.warning("[YELLOW] Camera is starting...")
 
         except Exception as e:
             logger.error("Camera interface rendering failed: %s", e)
@@ -235,7 +235,7 @@ class MobileCameraInput(MobileBaseComponent):
                 # Trigger analysis
                 self._trigger_analysis(image)
 
-                st.success("📸 Image captured successfully!")
+                st.success("[PHOTO] Image captured successfully!")
 
             else:
                 st.error("[TODO] Failed to capture image. Please try again.")
@@ -292,7 +292,7 @@ class MobileCameraInput(MobileBaseComponent):
 
     def _render_camera_settings(self) -> None:
         """Render camera settings panel."""
-        with st.expander("📷 Camera Settings", expanded=True):
+        with st.expander("[CAMERA] Camera Settings", expanded=True):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -332,7 +332,7 @@ class MobileCameraInput(MobileBaseComponent):
 
     def _render_captured_image(self, capture_data: dict[str, Any]) -> None:
         """Render the last captured image."""
-        st.markdown("### 📸 Captured Image")
+        st.markdown("### [PHOTO] Captured Image")
 
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
@@ -346,11 +346,11 @@ class MobileCameraInput(MobileBaseComponent):
                 self._clear_capture()
 
         with col2:
-            if st.button("💾 Save", key=f"{self.component_id}_save"):
+            if st.button("[SAVE] Save", key=f"{self.component_id}_save"):
                 self._save_image(capture_data)
 
         with col3:
-            if st.button("🔍 Analyze", key=f"{self.component_id}_analyze"):
+            if st.button("[SEARCH] Analyze", key=f"{self.component_id}_analyze"):
                 self._trigger_analysis(capture_data["image"])
 
         with col4:
@@ -364,7 +364,7 @@ class MobileCameraInput(MobileBaseComponent):
         camera_data["last_capture"] = None
         state["data"]["camera_data"] = camera_data
         self.set_state(state)
-        st.success("🗑️ Image cleared")
+        st.success("[DELETE] Image cleared")
 
     def _save_image(self, capture_data: dict[str, Any]) -> None:
         """Save captured image to temporary file."""
@@ -380,7 +380,7 @@ class MobileCameraInput(MobileBaseComponent):
                 state["data"]["camera_data"] = camera_data
                 self.set_state(state)
 
-                st.success(f"💾 Image saved: {capture_data['filename']}")
+                st.success(f"[SAVE] Image saved: {capture_data['filename']}")
 
         except Exception as e:
             logger.error("Image save failed: %s", e)
@@ -393,7 +393,7 @@ class MobileCameraInput(MobileBaseComponent):
             from .mobile_adapter_integration import mobile_integration
 
             # Perform analysis using mobile integration
-            with st.spinner("🔍 Analyzing plant image..."):
+            with st.spinner("[SEARCH] Analyzing plant image..."):
                 analysis_result = mobile_integration.analyze_image(image=image, source="camera", component_id=self.component_id)
 
                 # Extract results
@@ -407,7 +407,7 @@ class MobileCameraInput(MobileBaseComponent):
 
                 # Display result with mobile-optimized feedback
                 if confidence > 0.7:
-                    st.success(f"🌿 Analysis Complete: {disease_name} ({confidence:.1%} confidence)")
+                    st.success(f"[LEAF] Analysis Complete: {disease_name} ({confidence:.1%} confidence)")
                 elif confidence > 0.4:
                     st.warning(f"[WARNING] Moderate confidence: {disease_name} ({confidence:.1%} confidence)")
                     st.info("[TIP] Try taking another photo with better lighting or closer to the affected area.")
@@ -446,4 +446,4 @@ class MobileCameraInput(MobileBaseComponent):
     def clear_camera_state(self) -> None:
         """Clear all camera state and captured images."""
         self._initialize_camera_state()
-        st.success("🧹 Camera state cleared")
+        st.success("[CLEAN] Camera state cleared")

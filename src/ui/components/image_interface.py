@@ -209,7 +209,7 @@ class ImageInterface:
 
                 if expand:
                     # Zoom controls
-                    st.subheader("🔍 Zoom Controls")
+                    st.subheader("[SEARCH] Zoom Controls")
                     zoom_level = st.slider("Zoom", 0.1, 3.0, 1.0, 0.1)
 
                     if zoom_level != 1.0:
@@ -228,7 +228,7 @@ class ImageInterface:
         Returns:
             List of uploaded PIL Images
         """
-        st.subheader("📁 Image Upload")
+        st.subheader("[FOLDER] Image Upload")
 
         uploaded_files = st.file_uploader(
             "Choose image files",
@@ -240,7 +240,7 @@ class ImageInterface:
         images = []
 
         if uploaded_files:
-            with st.status(f"📸 Processing {len(uploaded_files)} image(s)...", expanded=True) as status:
+            with st.status(f"[PHOTO] Processing {len(uploaded_files)} image(s)...", expanded=True) as status:
                 valid_images = 0
 
                 for i, uploaded_file in enumerate(uploaded_files):
@@ -273,7 +273,7 @@ class ImageInterface:
         Returns:
             Captured PIL Image or None
         """
-        st.subheader("📷 Camera Capture")
+        st.subheader("[CAMERA] Camera Capture")
 
         # Camera input
         camera_image = st.camera_input("Take a photo", help="Use your device's camera to capture a plant image")
@@ -282,7 +282,7 @@ class ImageInterface:
             # Load and validate captured image
             image = self.load_and_validate_image(camera_image)
             if image:
-                st.success("📸 Photo captured successfully!")
+                st.success("[PHOTO] Photo captured successfully!")
                 st.session_state.captured_image = image
 
                 # Show preview
@@ -358,7 +358,7 @@ class ImageInterface:
             st.info("No images to display")
             return
 
-        st.subheader(f"🖼️ Image Gallery ({len(images)} images)")
+        st.subheader(f"[IMAGE] Image Gallery ({len(images)} images)")
 
         # Create grid
         for i in range(0, len(images), cols):
@@ -399,7 +399,7 @@ class ImageInterface:
             st.metric("Avg Size", f"{avg_size:,.0f}px")
 
         with col4:
-            if st.button("🧹 Clear All"):
+            if st.button("[CLEAN] Clear All"):
                 st.session_state.uploaded_images = []
                 st.session_state.captured_image = None
                 st.session_state.processed_images = []
@@ -411,10 +411,10 @@ class ImageInterface:
         Returns:
             List of processed PIL Images
         """
-        st.header("📸 Image Input & Camera")
+        st.header("[PHOTO] Image Input & Camera")
 
         # Interface tabs
-        tab1, tab2 = st.tabs(["📁 Upload Images", "📷 Camera Capture"])
+        tab1, tab2 = st.tabs(["[FOLDER] Upload Images", "[CAMERA] Camera Capture"])
 
         all_images = []
 
@@ -472,7 +472,7 @@ def create_image_interface() -> ImageInterface:
 # Example usage and testing
 if __name__ == "__main__":
     # Test the image interface
-    st.title("📸 PlantGuard Image Interface Test")
+    st.title("[PHOTO] PlantGuard Image Interface Test")
 
     # Create image interface
     image_interface = create_image_interface()

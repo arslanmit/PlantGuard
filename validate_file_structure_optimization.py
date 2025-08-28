@@ -223,7 +223,7 @@ def validate_mobile_assets_only(workspace_root: Path) -> dict[str, Any]:
 def main():
     """Main validation function."""
 
-    print("🔍 Validating Task 10: File Structure Optimization")
+    print("[SEARCH] Validating Task 10: File Structure Optimization")
     print("=" * 60)
 
     results = validate_task_10_requirements()
@@ -252,7 +252,7 @@ def main():
     with open(results_file, "w") as f:
         json.dump(results, f, indent=2, default=str)
 
-    print(f"\n📄 Detailed results saved to: {results_file}")
+    print(f"\n[DOCUMENT] Detailed results saved to: {results_file}")
 
     return results
 

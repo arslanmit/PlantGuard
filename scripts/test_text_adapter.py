@@ -12,7 +12,7 @@ from core.nlp import TextAdapter
 
 def test_text_adapter():
     """Test TextAdapter functionality."""
-    print("🧪 Testing TextAdapter implementation...")
+    print("[TEST] Testing TextAdapter implementation...")
 
     # Initialize TextAdapter
     adapter = TextAdapter()
@@ -76,7 +76,7 @@ def test_text_adapter():
 
 def test_knowledge_base_coverage():
     """Test knowledge base coverage."""
-    print("\n🔍 Testing knowledge base coverage...")
+    print("\n[SEARCH] Testing knowledge base coverage...")
 
     adapter = TextAdapter()
 

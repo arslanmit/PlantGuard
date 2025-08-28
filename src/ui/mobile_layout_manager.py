@@ -255,7 +255,7 @@ class MobileLayoutManager:
         st.markdown(
             """
         <div class="mobile-section">
-            <h1 class="mobile-title">🌿 PlantGuard</h1>
+            <h1 class="mobile-title">[LEAF] PlantGuard</h1>
             <p class="mobile-text">AI-powered plant disease detection</p>
         </div>
         """,

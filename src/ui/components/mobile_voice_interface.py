@@ -167,10 +167,10 @@ class MobileVoiceInterface(MobileComponent):
         Returns:
             bytes: Recorded audio data or None
         """
-        st.markdown("### 🎤 Voice Recording")
+        st.markdown("### [VOICE] Voice Recording")
 
         # Create tabs for recording vs upload
-        record_tab, upload_tab = st.tabs(["🎙️ Record Voice", "📁 Upload Audio"])
+        record_tab, upload_tab = st.tabs(["[MICROPHONE]️ Record Voice", "[FOLDER] Upload Audio"])
 
         recorded_audio = None
 
@@ -223,17 +223,17 @@ class MobileVoiceInterface(MobileComponent):
             str: Transcribed text
         """
         if not has_audio:
-            st.info("🎵 Record or upload audio to start transcription")
+            st.info("[SOUND] Record or upload audio to start transcription")
             return ""
 
-        st.markdown("#### 📝 Transcription")
+        st.markdown("#### [WRITE] Transcription")
 
         # Transcription controls
         col1, col2 = st.columns(2)
 
         with col1:
             transcribe_clicked = st.button(
-                "🔤 Transcribe Audio",
+                "[TEXT] Transcribe Audio",
                 key=f"{self.component_id}_transcribe",
                 use_container_width=True,
                 disabled=st.session_state.get("transcription_in_progress", False),
@@ -241,7 +241,7 @@ class MobileVoiceInterface(MobileComponent):
             )
 
         with col2:
-            clear_clicked = st.button("🗑️ Clear Audio", key=f"{self.component_id}_clear_audio", use_container_width=True)
+            clear_clicked = st.button("[DELETE] Clear Audio", key=f"{self.component_id}_clear_audio", use_container_width=True)
 
         if clear_clicked:
             self.clear_audio_data()
@@ -349,14 +349,14 @@ class MobileVoiceInterface(MobileComponent):
         if not transcribed_text.strip():
             return ""
 
-        st.markdown("#### 🤔 Plant Care Question")
+        st.markdown("#### [THINKING] Plant Care Question")
 
         # Show the question
         st.markdown("**Your Question:**")
-        st.info(f"💬 {transcribed_text}")
+        st.info(f"[CHAT] {transcribed_text}")
 
         # Ask question button
-        ask_clicked = st.button("🌱 Get Plant Care Answer", key=f"{self.component_id}_ask_question", use_container_width=True, type="primary")
+        ask_clicked = st.button("[PLANT] Get Plant Care Answer", key=f"{self.component_id}_ask_question", use_container_width=True, type="primary")
 
         response = st.session_state.get("voice_response", "")
 
@@ -366,7 +366,7 @@ class MobileVoiceInterface(MobileComponent):
         # Show response
         if response:
             st.markdown("**AI Response:**")
-            st.markdown(f"🤖 {response}")
+            st.markdown(f"[AI] {response}")
 
         return response
 
@@ -405,13 +405,13 @@ class MobileVoiceInterface(MobileComponent):
 
 I'd be happy to help! Here are some general plant care tips:
 
-🌱 **Watering**: Check soil moisture before watering. Most plants prefer slightly moist soil.
+[PLANT] **Watering**: Check soil moisture before watering. Most plants prefer slightly moist soil.
 
 ☀️ **Light**: Ensure your plant gets appropriate light for its species.
 
-🌿 **Air Circulation**: Good airflow helps prevent fungal issues.
+[LEAF] **Air Circulation**: Good airflow helps prevent fungal issues.
 
-🪴 **Soil**: Use well-draining soil appropriate for your plant type.
+[POT] **Soil**: Use well-draining soil appropriate for your plant type.
 
 For specific advice about your plant's symptoms or care needs, consider consulting with a local plant expert or uploading a photo for visual analysis."""
 

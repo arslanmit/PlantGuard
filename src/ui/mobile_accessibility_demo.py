@@ -87,7 +87,7 @@ def main():
 def render_accessibility_overview(accessibility_manager):
     """Render accessibility overview section."""
     overview_heading = accessibility_manager.create_accessible_heading(
-        text="🌟 Accessibility Features Overview", level=2, heading_id="overview-heading"
+        text="[FEATURE] Accessibility Features Overview", level=2, heading_id="overview-heading"
     )
     st.markdown(overview_heading, unsafe_allow_html=True)
 
@@ -127,7 +127,7 @@ def render_accessibility_overview(accessibility_manager):
 
     with col2:
         st.markdown("""
-        ### 👁️ Visual Accessibility
+        ### [VISION] Visual Accessibility
         
         - **High Contrast Mode**: Enhanced contrast options
         - **Font Scaling**: Adjustable text sizes
@@ -137,7 +137,7 @@ def render_accessibility_overview(accessibility_manager):
         """)
 
         st.markdown("""
-        ### 🔊 Audio & Announcements
+        ### [SPEAKER] Audio & Announcements
         
         - **Live Regions**: Dynamic content announcements
         - **Status Updates**: Real-time status communication
@@ -166,7 +166,7 @@ def render_accessibility_overview(accessibility_manager):
 
 def render_component_demonstrations(accessibility_manager):
     """Render component demonstrations section."""
-    demo_heading = accessibility_manager.create_accessible_heading(text="🧩 Accessible Component Demonstrations", level=2, heading_id="demo-heading")
+    demo_heading = accessibility_manager.create_accessible_heading(text="[PUZZLE] Accessible Component Demonstrations", level=2, heading_id="demo-heading")
     st.markdown(demo_heading, unsafe_allow_html=True)
 
     # Component selection
@@ -193,7 +193,7 @@ def render_component_demonstrations(accessibility_manager):
 def demo_camera_input(accessibility_manager):
     """Demonstrate accessible camera input component."""
     st.markdown("""
-    ### 📷 Accessible Camera Input Demo
+    ### [CAMERA] Accessible Camera Input Demo
     
     This component demonstrates:
     - ARIA labels for camera activation
@@ -204,7 +204,7 @@ def demo_camera_input(accessibility_manager):
 
     # Create accessible camera button
     camera_button = accessibility_manager.create_accessible_button(
-        text="📷 Activate Camera",
+        text="[CAMERA] Activate Camera",
         button_id="demo-camera-button",
         aria_label="Activate device camera to capture plant image for disease analysis",
         aria_describedby="camera-help-text",
@@ -232,7 +232,7 @@ def demo_camera_input(accessibility_manager):
 def demo_upload_input(accessibility_manager):
     """Demonstrate accessible upload input component."""
     st.markdown("""
-    ### 📁 Accessible File Upload Demo
+    ### [FOLDER] Accessible File Upload Demo
     
     This component demonstrates:
     - Proper form labels and associations
@@ -277,7 +277,7 @@ def demo_upload_input(accessibility_manager):
 def demo_analysis_display(accessibility_manager):
     """Demonstrate accessible analysis display component."""
     st.markdown("""
-    ### 🔬 Accessible Analysis Display Demo
+    ### [MICROSCOPE] Accessible Analysis Display Demo
     
     This component demonstrates:
     - Structured result presentation with ARIA
@@ -423,7 +423,7 @@ def render_accessibility_settings_demo(accessibility_manager):
 def render_testing_validation_demo(accessibility_manager):
     """Render testing and validation demonstration."""
     testing_heading = accessibility_manager.create_accessible_heading(
-        text="🧪 Accessibility Testing & Validation", level=2, heading_id="testing-heading"
+        text="[TEST] Accessibility Testing & Validation", level=2, heading_id="testing-heading"
     )
     st.markdown(testing_heading, unsafe_allow_html=True)
 

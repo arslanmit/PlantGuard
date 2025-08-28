@@ -77,7 +77,7 @@ def create_sample_analysis_results():
 
 def demo_mobile_analysis_display():
     """Demonstrate MobileAnalysisDisplay component."""
-    st.markdown("## 🔬 Mobile Analysis Display Demo")
+    st.markdown("## [MICROSCOPE] Mobile Analysis Display Demo")
 
     # Create component
     analysis_display = MobileAnalysisDisplay(component_id="demo_analysis_display", title="Plant Disease Analysis")
@@ -94,10 +94,10 @@ def demo_mobile_analysis_display():
             st.success("[DONE] Sample analysis results added!")
 
     with col2:
-        if st.button("🧹 Clear Results", key="clear_analysis_results"):
+        if st.button("[CLEAN] Clear Results", key="clear_analysis_results"):
             if "analysis_results" in st.session_state:
                 st.session_state.analysis_results = []
-            st.success("🧹 Analysis results cleared!")
+            st.success("[CLEAN] Analysis results cleared!")
 
     with col3:
         results_count = len(st.session_state.get("analysis_results", []))
@@ -130,7 +130,7 @@ def demo_mobile_recommendations():
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if st.button("🌿 Add Disease Context", key="add_disease_context"):
+        if st.button("[LEAF] Add Disease Context", key="add_disease_context"):
             # Add sample analysis result for context
             sample_image = Image.new("RGB", (200, 200), color="#90EE90")
 
@@ -148,10 +148,10 @@ def demo_mobile_recommendations():
             st.success("[DONE] Disease context added!")
 
     with col2:
-        if st.button("🧹 Clear Context", key="clear_recommendations_context"):
+        if st.button("[CLEAN] Clear Context", key="clear_recommendations_context"):
             if "analysis_results" in st.session_state:
                 st.session_state.analysis_results = []
-            st.success("🧹 Context cleared!")
+            st.success("[CLEAN] Context cleared!")
 
     with col3:
         has_context = recommendations.has_recommendations()
@@ -175,7 +175,7 @@ def demo_mobile_recommendations():
 
 def demo_mobile_chat_interface():
     """Demonstrate MobileChatInterface component."""
-    st.markdown("## 💬 Mobile Chat Interface Demo")
+    st.markdown("## [CHAT] Mobile Chat Interface Demo")
 
     # Create component
     chat_interface = MobileChatInterface(component_id="demo_chat_interface", title="Plant Care Assistant")
@@ -184,7 +184,7 @@ def demo_mobile_chat_interface():
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if st.button("💬 Add Sample Messages", key="add_sample_messages"):
+        if st.button("[CHAT] Add Sample Messages", key="add_sample_messages"):
             # Add some sample messages
             sample_messages = [
                 {
@@ -227,9 +227,9 @@ def demo_mobile_chat_interface():
             st.success("[DONE] Sample messages added!")
 
     with col2:
-        if st.button("🧹 Clear Chat", key="clear_chat_demo"):
+        if st.button("[CLEAN] Clear Chat", key="clear_chat_demo"):
             chat_interface._clear_chat()
-            st.success("🧹 Chat cleared!")
+            st.success("[CLEAN] Chat cleared!")
 
     with col3:
         message_count = chat_interface.get_message_count()
@@ -255,7 +255,7 @@ def demo_mobile_chat_interface():
 
 def demo_components_integration():
     """Demonstrate integration between display components."""
-    st.markdown("## 🔗 Components Integration Demo")
+    st.markdown("## [LINK] Components Integration Demo")
 
     st.info("""
     This section demonstrates how the mobile display components work together:
@@ -289,10 +289,10 @@ def demo_components_integration():
             st.info("Now all components will share this analysis context.")
 
     with col2:
-        if st.button("🧹 Clear Integration", key="clear_integration"):
+        if st.button("[CLEAN] Clear Integration", key="clear_integration"):
             if "analysis_results" in st.session_state:
                 st.session_state.analysis_results = []
-            st.success("🧹 Integration context cleared!")
+            st.success("[CLEAN] Integration context cleared!")
 
     # Show integration status
     has_context = "analysis_results" in st.session_state and len(st.session_state.analysis_results) > 0
@@ -316,14 +316,14 @@ def demo_components_integration():
 
 def main():
     """Main demo application."""
-    st.set_page_config(page_title="Mobile Display Components Demo", page_icon="🌿", layout="wide", initial_sidebar_state="collapsed")
+    st.set_page_config(page_title="Mobile Display Components Demo", page_icon="[LEAF]", layout="wide", initial_sidebar_state="collapsed")
 
     # Load styles
     load_mobile_display_styles()
 
     # Main header
     st.markdown("""
-    # 🌿 PlantGuard Mobile Display Components Demo
+    # [LEAF] PlantGuard Mobile Display Components Demo
     
     This demo showcases the mobile-optimized display components for plant disease analysis,
     treatment recommendations, and conversational interaction.
@@ -331,22 +331,22 @@ def main():
 
     # Navigation
     demo_option = st.selectbox(
-        "Choose Demo Section:", ["🔬 Analysis Display", "[TIP] Recommendations", "💬 Chat Interface", "🔗 Integration Demo", "[SUMMARY] All Components"]
+        "Choose Demo Section:", ["[MICROSCOPE] Analysis Display", "[TIP] Recommendations", "[CHAT] Chat Interface", "[LINK] Integration Demo", "[SUMMARY] All Components"]
     )
 
     st.markdown("---")
 
     # Render selected demo
-    if demo_option == "🔬 Analysis Display":
+    if demo_option == "[MICROSCOPE] Analysis Display":
         demo_mobile_analysis_display()
 
     elif demo_option == "[TIP] Recommendations":
         demo_mobile_recommendations()
 
-    elif demo_option == "💬 Chat Interface":
+    elif demo_option == "[CHAT] Chat Interface":
         demo_mobile_chat_interface()
 
-    elif demo_option == "🔗 Integration Demo":
+    elif demo_option == "[LINK] Integration Demo":
         demo_components_integration()
 
     elif demo_option == "[SUMMARY] All Components":
@@ -363,7 +363,7 @@ def main():
         col1, col2 = st.columns(2)
 
         with col1:
-            st.markdown("### 🔬 Analysis Display")
+            st.markdown("### [MICROSCOPE] Analysis Display")
             analysis_display = MobileAnalysisDisplay("all_demo_analysis")
             analysis_display.render()
 
@@ -372,7 +372,7 @@ def main():
             recommendations.render()
 
         with col2:
-            st.markdown("### 💬 Chat Interface")
+            st.markdown("### [CHAT] Chat Interface")
             chat_interface = MobileChatInterface("all_demo_chat")
             chat_interface.render()
 
@@ -381,7 +381,7 @@ def main():
     st.markdown(
         """
     <div style='text-align: center; color: #666; font-size: 0.9rem;'>
-        🌿 PlantGuard Mobile Display Components Demo<br>
+        [LEAF] PlantGuard Mobile Display Components Demo<br>
         Built with Streamlit • Optimized for Mobile • AI-Powered Plant Care
     </div>
     """,

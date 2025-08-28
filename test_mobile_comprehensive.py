@@ -126,7 +126,7 @@ def test_adapter_integration():
 
 def run_comprehensive_tests():
     """Run all comprehensive tests."""
-    st.title("🧪 Mobile Comprehensive Testing Suite")
+    st.title("[TEST] Mobile Comprehensive Testing Suite")
 
     tests = [
         ("Component Imports", test_mobile_component_imports),

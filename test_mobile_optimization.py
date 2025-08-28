@@ -19,7 +19,7 @@ sys.path.insert(0, str(src_path))
 
 def test_mobile_app_imports():
     """Test that all mobile app imports work correctly."""
-    print("🧪 Testing mobile app imports...")
+    print("[TEST] Testing mobile app imports...")
 
     try:
         # Test mobile app import
@@ -44,7 +44,7 @@ def test_mobile_app_imports():
 
 def test_mobile_app_class():
     """Test mobile app class initialization."""
-    print("\n🧪 Testing mobile app class...")
+    print("\n[TEST] Testing mobile app class...")
 
     try:
         import mobile_spa_app
@@ -79,7 +79,7 @@ def test_mobile_app_class():
 
 def test_performance_optimizer():
     """Test performance optimizer integration."""
-    print("\n🧪 Testing performance optimizer...")
+    print("\n[TEST] Testing performance optimizer...")
 
     try:
         from ui.components.mobile_performance_optimizer import mobile_performance_optimizer
@@ -105,7 +105,7 @@ def test_performance_optimizer():
 
 def test_core_adapters():
     """Test core adapter functionality."""
-    print("\n🧪 Testing core adapters...")
+    print("\n[TEST] Testing core adapters...")
 
     try:
         from core.audio import AudioAdapter

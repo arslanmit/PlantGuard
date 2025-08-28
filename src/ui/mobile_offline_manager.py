@@ -153,9 +153,9 @@ class MobileOfflineManager:
         network_info = st.session_state[MobileOfflineManager.NETWORK_STATUS_KEY]
 
         status_messages = {
-            NetworkStatus.ONLINE: ("🟢", "Online", "All features available"),
-            NetworkStatus.LIMITED: ("🟡", "Limited Connection", "Some features may be slower"),
-            NetworkStatus.OFFLINE: ("🔴", "Offline", "Using cached data only"),
+            NetworkStatus.ONLINE: ("[GREEN]", "Online", "All features available"),
+            NetworkStatus.LIMITED: ("[YELLOW]", "Limited Connection", "Some features may be slower"),
+            NetworkStatus.OFFLINE: ("[RED]", "Offline", "Using cached data only"),
             NetworkStatus.UNKNOWN: ("⚪", "Unknown", "Checking connection..."),
         }
 

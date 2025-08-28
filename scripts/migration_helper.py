@@ -119,7 +119,7 @@ class MigrationHelper:
         """Show help for a deprecated command."""
         migration = self.get_command_migration(command)
 
-        print("🚨 PlantGuard Migration Notice")
+        print("[ALERT] PlantGuard Migration Notice")
         print("=" * 50)
         print()
 
@@ -136,20 +136,20 @@ class MigrationHelper:
             print(f"[TIP] {migration['suggestion']}")
 
         print()
-        print("📚 For complete migration guide: cat MOBILE_MIGRATION_GUIDE.md")
+        print("[LIBRARY] For complete migration guide: cat MOBILE_MIGRATION_GUIDE.md")
         print("[PROGRESS] For feature parity info: cat MOBILE_FEATURE_PARITY.md")
 
     def show_feature_help(self, feature: str) -> None:
         """Show help for a specific feature migration."""
         migration = self.get_feature_migration(feature)
 
-        print(f"🔍 Feature Migration: {feature}")
+        print(f"[SEARCH] Feature Migration: {feature}")
         print("=" * 50)
         print()
 
         if migration["status"] == "preserved":
             print("[DONE] Feature Status: Preserved and Enhanced")
-            print(f"📍 Old Location: {migration['old_location']}")
+            print(f"[LOCATION] Old Location: {migration['old_location']}")
             print(f"[MOBILE] New Location: {migration['new_location']}")
             print(f"[PROGRESS] Migration Status: {migration['migration_status']}")
         else:

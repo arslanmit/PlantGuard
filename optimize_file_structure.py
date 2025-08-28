@@ -283,11 +283,11 @@ def main():
     print("FILE STRUCTURE OPTIMIZATION SUMMARY")
     print("=" * 60)
 
-    print(f"\n📁 Empty Directories Removed: {results['empty_directories']['total_removed']}")
-    print(f"🎨 Mobile Assets Organized: {results['mobile_assets']['total_kept']} kept, {results['mobile_assets']['total_removed']} removed")
+    print(f"\n[FOLDER] Empty Directories Removed: {results['empty_directories']['total_removed']}")
+    print(f"[DESIGN] Mobile Assets Organized: {results['mobile_assets']['total_kept']} kept, {results['mobile_assets']['total_removed']} removed")
     print(f"[MOBILE] Mobile Apps Found: {results['mobile_structure']['mobile_apps_found']}")
-    print(f"🧪 Mobile Tests Found: {results['mobile_structure']['mobile_tests_found']}")
-    print(f"🧹 Cache Directories Cleaned: {results['cache_cleanup']['total_cleaned']}")
+    print(f"[TEST] Mobile Tests Found: {results['mobile_structure']['mobile_tests_found']}")
+    print(f"[CLEAN] Cache Directories Cleaned: {results['cache_cleanup']['total_cleaned']}")
 
     print("\n[DONE] Structure Validation:")
     validation = results["validation"]

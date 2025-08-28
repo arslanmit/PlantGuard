@@ -116,7 +116,7 @@ class MobileErrorRecoveryIntegration:
         col1, col2 = st.columns(2)
 
         with col1:
-            st.markdown("### 🌐 Network Status")
+            st.markdown("### [NETWORK] Network Status")
             MobileOfflineManager.display_network_status()
 
             # Show offline queue if applicable
@@ -132,7 +132,7 @@ class MobileErrorRecoveryIntegration:
             error_summary = MobileErrorHandler.get_error_summary()
 
             if error_summary["total_errors"] > 0:
-                st.warning(f"🚨 {error_summary['recent_errors_1h']} recent errors")
+                st.warning(f"[ALERT] {error_summary['recent_errors_1h']} recent errors")
 
                 # Show error breakdown
                 if error_summary["error_by_severity"]:
@@ -433,7 +433,7 @@ class MobileErrorRecoveryIntegration:
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("🧹 Clean System", help="Clean up errors and cache"):
+                if st.button("[CLEAN] Clean System", help="Clean up errors and cache"):
                     maintenance_results = MobileErrorRecoveryIntegration.perform_system_maintenance()
                     st.success(f"Cleaned {maintenance_results['errors_cleared']} errors, {maintenance_results['cache_cleaned']} cache entries")
 

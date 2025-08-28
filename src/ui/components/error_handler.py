@@ -19,10 +19,10 @@ class ErrorHandler:
 
     def __init__(self):
         self.error_types = {
-            "model_error": {"icon": "🤖", "title": "Model Error", "color": "#EF4444"},
-            "input_error": {"icon": "📝", "title": "Input Error", "color": "#F59E0B"},
-            "network_error": {"icon": "🌐", "title": "Network Error", "color": "#8B5CF6"},
-            "file_error": {"icon": "📁", "title": "File Error", "color": "#EF4444"},
+            "model_error": {"icon": "[AI]", "title": "Model Error", "color": "#EF4444"},
+            "input_error": {"icon": "[WRITE]", "title": "Input Error", "color": "#F59E0B"},
+            "network_error": {"icon": "[NETWORK]", "title": "Network Error", "color": "#8B5CF6"},
+            "file_error": {"icon": "[FOLDER]", "title": "File Error", "color": "#EF4444"},
             "system_error": {"icon": "⚙️", "title": "System Error", "color": "#64748B"},
             "validation_error": {"icon": "[DONE]", "title": "Validation Error", "color": "#F59E0B"},
         }
@@ -82,7 +82,7 @@ class ErrorHandler:
 
         # Error details in expander
         if show_details or st.session_state.get("debug_mode", False):
-            with st.expander("🔍 Error Details", expanded=False):
+            with st.expander("[SEARCH] Error Details", expanded=False):
                 col1, col2 = st.columns(2)
 
                 with col1:
@@ -168,7 +168,7 @@ class ErrorHandler:
                     st.rerun()
 
             with col2:
-                if st.button("🧹 Clear Cache", key=f"clear_cache_{error_info['id']}"):
+                if st.button("[CLEAN] Clear Cache", key=f"clear_cache_{error_info['id']}"):
                     self._clear_model_cache()
                     st.success("Cache cleared! Please try again.")
 
@@ -180,7 +180,7 @@ class ErrorHandler:
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("📝 Try Different Input", key=f"new_input_{error_info['id']}"):
+                if st.button("[WRITE] Try Different Input", key=f"new_input_{error_info['id']}"):
                     self._clear_current_inputs()
                     st.info("Inputs cleared. Please try a different file or input method.")
 
@@ -192,7 +192,7 @@ class ErrorHandler:
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("📁 Try Different File", key=f"new_file_{error_info['id']}"):
+                if st.button("[FOLDER] Try Different File", key=f"new_file_{error_info['id']}"):
                     self._clear_file_inputs()
                     st.info("File inputs cleared. Please select a different file.")
 
@@ -209,7 +209,7 @@ class ErrorHandler:
                     st.rerun()
 
             with col2:
-                if st.button("🏠 Go to Home", key=f"home_{error_info['id']}"):
+                if st.button("[HOME] Go to Home", key=f"home_{error_info['id']}"):
                     st.session_state.current_page = "Home"
                     st.rerun()
 
@@ -275,7 +275,7 @@ class ErrorHandler:
 
     def _show_file_format_help(self):
         """Show file format help."""
-        with st.expander("📁 Supported File Formats", expanded=True):
+        with st.expander("[FOLDER] Supported File Formats", expanded=True):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -322,12 +322,12 @@ class ErrorHandler:
         _error_info = self.handle_error(error, error_type="system_error", context=context, show_details=False)
 
         # Provide content focus options instead of page navigation
-        st.markdown("### 🏠 Content Focus Options:")
+        st.markdown("### [HOME] Content Focus Options:")
 
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("🏠 Focus on Image Analysis", key="error_focus_home"):
+            if st.button("[HOME] Focus on Image Analysis", key="error_focus_home"):
                 st.session_state.focused_content = "image_analysis"
                 st.success("Focused on Image Analysis - no page refresh!")
 
@@ -341,7 +341,7 @@ class ErrorHandler:
                 st.success("Focused on History - no page refresh!")
 
         with col3:
-            if st.button("📚 View History"):
+            if st.button("[LIBRARY] View History"):
                 st.session_state.current_page = "History"
                 st.rerun()
 
@@ -352,7 +352,7 @@ class ErrorHandler:
             error_count = st.session_state.get("error_count", 0)
 
             if recent_errors:
-                with st.expander(f"🐛 Error Summary ({error_count} total)", expanded=False):
+                with st.expander(f"[BUG] Error Summary ({error_count} total)", expanded=False):
                     for error in recent_errors[-5:]:  # Show last 5 errors
                         st.markdown(f"**{error['timestamp']}** - {error['type']}: {error['user_message']}")
 

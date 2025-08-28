@@ -375,7 +375,7 @@ class MobileLayoutManager:
                 """
             <div class="mobile-section">
                 <div class="mobile-card-header">
-                    <h1 class="mobile-card-title">🌿 PlantGuard Mobile</h1>
+                    <h1 class="mobile-card-title">[LEAF] PlantGuard Mobile</h1>
                     <div class="mobile-status-indicator" id="mobile-status">
                         <span style="color: var(--success-color);">●</span> Ready
                     </div>

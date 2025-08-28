@@ -378,9 +378,9 @@ def main():
     else:
         if result["success"]:
             print("[DONE] Dataset download and preparation completed successfully!")
-            print(f"📁 Location: {result['final_dataset_info'].get('location', 'Unknown')}")
+            print(f"[FOLDER] Location: {result['final_dataset_info'].get('location', 'Unknown')}")
             print(f"[SUMMARY] Classes: {result['final_dataset_info'].get('classes', 0)}")
-            print(f"🖼️  Total files: {result['final_dataset_info'].get('total_files', 0)}")
+            print(f"[IMAGE]  Total files: {result['final_dataset_info'].get('total_files', 0)}")
             print(f"⏱️  Total time: {result['total_time_seconds']:.1f} seconds")
         else:
             print(f"[TODO] Download failed: {result['error']}")

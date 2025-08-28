@@ -434,7 +434,7 @@ class EndToEndIntegrationTest:
 
         # Log summary
         logger.info("=" * 60)
-        logger.info("🏁 INTEGRATION TEST SUMMARY")
+        logger.info("[FINISH] INTEGRATION TEST SUMMARY")
         logger.info("=" * 60)
         logger.info(f"Total tests: {total_tests}")
         logger.info(f"Passed: {self.results['tests_passed']}")

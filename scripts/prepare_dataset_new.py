@@ -54,7 +54,7 @@ def main() -> None:
 
         if source_dir is None:
             print("[TODO] Raw PlantVillage dataset not found")
-            print("🔍 Checked locations:")
+            print("[SEARCH] Checked locations:")
             for location in raw_locations:
                 print(f"  - {location}")
             print("[TIP] Please run 'make download-dataset' or download manually")
@@ -84,7 +84,7 @@ def main() -> None:
 
     if success:
         print("[DONE] Dataset preparation completed")
-        print(f"📁 Dataset prepared at {output_dir}")
+        print(f"[FOLDER] Dataset prepared at {output_dir}")
         print("[TIP] Run 'make analyze-dataset' to see statistics")
     else:
         print("[TODO] Dataset preparation failed")

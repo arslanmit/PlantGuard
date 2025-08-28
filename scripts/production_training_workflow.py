@@ -168,7 +168,7 @@ class ProductionWorkflow:
 
         config: TrainingConfig
         if selected_template and selected_template.exists():
-            self.logger.info(f"📄 Loading configuration template: {selected_template}")
+            self.logger.info(f"[DOCUMENT] Loading configuration template: {selected_template}")
             try:
                 config = load_config(selected_template)
                 # Ensure a unique experiment name per run
@@ -208,7 +208,7 @@ class ProductionWorkflow:
                 config.num_workers = 2
                 config.mixed_precision = False
                 config.epochs = 30
-                self.logger.info("🔋 Using low-resource GPU configuration")
+                self.logger.info("[BATTERY] Using low-resource GPU configuration")
 
             else:
                 # CPU-only configuration
@@ -217,7 +217,7 @@ class ProductionWorkflow:
                 config.mixed_precision = False
                 config.epochs = 20
                 config.device = "cpu"
-                self.logger.info("💻 Using CPU-only configuration")
+                self.logger.info("[COMPUTER] Using CPU-only configuration")
 
         # Store dataset path separately (will be passed to trainer)
         self.selected_dataset_path = dataset_path
@@ -254,7 +254,7 @@ class ProductionWorkflow:
         # If a path is provided, use it directly
         tpath = Path(template)
         if tpath.exists() and tpath.is_file():
-            self.logger.info(f"📄 Loading configuration template file: {tpath}")
+            self.logger.info(f"[DOCUMENT] Loading configuration template file: {tpath}")
             return load_config(tpath)
 
         # Otherwise, interpret as a template name and resolve under generated dir
@@ -267,7 +267,7 @@ class ProductionWorkflow:
         ]
         for candidate in candidates:
             if candidate.exists():
-                self.logger.info(f"📄 Loading configuration template: {candidate}")
+                self.logger.info(f"[DOCUMENT] Loading configuration template: {candidate}")
                 return load_config(candidate)
 
         # As a final fallback, try base templates directory (non-generated)
@@ -279,7 +279,7 @@ class ProductionWorkflow:
         ]
         for candidate in candidates:
             if candidate.exists():
-                self.logger.info(f"📄 Loading configuration template: {candidate}")
+                self.logger.info(f"[DOCUMENT] Loading configuration template: {candidate}")
                 return load_config(candidate)
 
         raise FileNotFoundError(f"Template '{template}' not found as a file or in config/training_templates(/**)/")
@@ -296,7 +296,7 @@ class ProductionWorkflow:
         # Find the best available dataset
         try:
             actual_dataset_path = self.selected_dataset_path
-            self.logger.info(f"📂 Preparing dataset from {actual_dataset_path} to {expected_path}")
+            self.logger.info(f"[DIRECTORY] Preparing dataset from {actual_dataset_path} to {expected_path}")
 
             # Create the expected directory structure
             expected_path.parent.mkdir(parents=True, exist_ok=True)
@@ -357,7 +357,7 @@ class ProductionWorkflow:
 
                 model_id = self.model_registry.register_model(model_path=training_result.best_model_path, metadata=model_metadata)
 
-                self.logger.info(f"📝 Model registered with ID: {model_id}")
+                self.logger.info(f"[WRITE] Model registered with ID: {model_id}")
 
                 # Generate training report
                 report_path = monitor.save_training_report(training_result)
@@ -380,7 +380,7 @@ class ProductionWorkflow:
     def send_notification(self, success: bool, message: str) -> None:
         """Send training completion notification."""
         status = "[DONE] SUCCESS" if success else "[TODO] FAILED"
-        self.logger.info(f"🔔 NOTIFICATION: {status} - {message}")
+        self.logger.info(f"[NOTIFICATION] NOTIFICATION: {status} - {message}")
 
         # In a real production environment, you might send:
         # - Email notifications
@@ -395,7 +395,7 @@ class ProductionWorkflow:
             Exit code (0 for success, 1 for failure)
         """
         try:
-            self.logger.info("🌿 PlantGuard Production Training Workflow")
+            self.logger.info("[LEAF] PlantGuard Production Training Workflow")
             self.logger.info("=" * 50)
 
             # Step 1: Validate prerequisites
@@ -416,7 +416,7 @@ class ProductionWorkflow:
             config: TrainingConfig
             # Highest precedence: explicit config file
             if self.config_path is not None:
-                self.logger.info(f"📄 Loading configuration from file: {self.config_path}")
+                self.logger.info(f"[DOCUMENT] Loading configuration from file: {self.config_path}")
                 config = load_config(self.config_path)
                 # Ensure unique experiment name
                 config.experiment_name = f"production_training_{int(time.time())}"
@@ -427,7 +427,7 @@ class ProductionWorkflow:
                 config.experiment_name = f"production_training_{int(time.time())}"
             # Fallback: auto-select based on resources
             else:
-                self.logger.info("🧠 Auto-selecting optimal configuration based on resources...")
+                self.logger.info("[BRAIN] Auto-selecting optimal configuration based on resources...")
                 config = self.select_optimal_config()
             self.logger.info(f"[DETAILS] Configuration: {config.batch_size} batch size, {config.epochs} epochs")
 

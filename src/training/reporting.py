@@ -400,7 +400,7 @@ class TrainingReportGenerator:
         </head>
         <body>
             <div class="header">
-                <h1>🌿 PlantGuard Training Report</h1>
+                <h1>[LEAF] PlantGuard Training Report</h1>
                 <h2>{experiment_name}</h2>
                 <p>Generated on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
             </div>
@@ -422,7 +422,7 @@ class TrainingReportGenerator:
             </div>
 
             <div class="section">
-                <h3>🔍 Training Analysis</h3>
+                <h3>[SEARCH] Training Analysis</h3>
                 <p><strong>Convergence:</strong> {conv_str}</p>
                 <p><strong>Overfitting:</strong> {overfit_str}</p>
                 <p><strong>Final Train-Val Gap:</strong> {curve_analysis.final_gap:.4f}</p>
@@ -431,7 +431,7 @@ class TrainingReportGenerator:
             </div>
 
             <div class="section">
-                <h3>🏗️ Model Architecture</h3>
+                <h3>[ARCHITECTURE] Model Architecture</h3>
                 <div class="metric">
                     <strong>Total Parameters:</strong> {model_analysis.total_parameters:,}
                 </div>
@@ -463,7 +463,7 @@ class TrainingReportGenerator:
         if system_info:
             html_content += """
             <div class="section">
-                <h3>💻 System Information</h3>
+                <h3>[COMPUTER] System Information</h3>
                 <table>
                     <tr><th>Component</th><th>Details</th></tr>
             """
@@ -474,7 +474,7 @@ class TrainingReportGenerator:
 
         html_content += """
             <div class="section">
-                <h3>📈 Visualizations</h3>
+                <h3>[CHART] Visualizations</h3>
                 <p>Training curves and model architecture plots are available as separate PNG files in the experiment directory.</p>
             </div>
         </body>

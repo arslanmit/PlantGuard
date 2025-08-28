@@ -468,10 +468,10 @@ class MobileSettingsCard:
 
     def render_model_section(self) -> None:
         """Render model switching section."""
-        st.markdown("### 🤖 AI Models")
+        st.markdown("### [AI] AI Models")
 
         # Vision model
-        st.markdown("#### 👁️ Vision Model")
+        st.markdown("#### [VISION] Vision Model")
         available_vision = self.model_switcher.get_available_models("vision")
         current_vision = self.model_switcher.get_current_model("vision")
 
@@ -508,11 +508,11 @@ class MobileSettingsCard:
                 self.model_switcher.set_model("vision", model_id)
                 st.session_state.user_preferences["preferred_vision_model"] = model_id
                 self._mark_settings_changed()
-                st.toast(f"Vision model changed to {model_info.get('name', model_id)}", icon="👁️")
+                st.toast(f"Vision model changed to {model_info.get('name', model_id)}", icon="[VISION]")
                 st.rerun()
 
         # Audio model
-        st.markdown("#### 🎤 Audio Model")
+        st.markdown("#### [VOICE] Audio Model")
         available_audio = self.model_switcher.get_available_models("audio")
         current_audio = self.model_switcher.get_current_model("audio")
 
@@ -545,11 +545,11 @@ class MobileSettingsCard:
                 self.model_switcher.set_model("audio", model_id)
                 st.session_state.user_preferences["preferred_audio_model"] = model_id
                 self._mark_settings_changed()
-                st.toast(f"Audio model changed to {model_info.get('name', model_id)}", icon="🎤")
+                st.toast(f"Audio model changed to {model_info.get('name', model_id)}", icon="[VOICE]")
                 st.rerun()
 
         # Text model
-        st.markdown("#### 💬 Text Model")
+        st.markdown("#### [CHAT] Text Model")
         available_text = self.model_switcher.get_available_models("text")
         current_text = self.model_switcher.get_current_model("text")
 
@@ -579,7 +579,7 @@ class MobileSettingsCard:
                 self.model_switcher.set_model("text", model_id)
                 st.session_state.user_preferences["preferred_text_model"] = model_id
                 self._mark_settings_changed()
-                st.toast(f"Text model changed to {model_info.get('name', model_id)}", icon="💬")
+                st.toast(f"Text model changed to {model_info.get('name', model_id)}", icon="[CHAT]")
                 st.rerun()
 
         # Auto model switching
@@ -587,7 +587,7 @@ class MobileSettingsCard:
 
     def render_appearance_section(self) -> None:
         """Render appearance settings section."""
-        st.markdown("### 🎨 Appearance")
+        st.markdown("### [DESIGN] Appearance")
 
         # Theme setting
         self.render_select_setting(
@@ -707,7 +707,7 @@ class MobileSettingsCard:
             state["data"]["settings_card"]["last_saved"] = datetime.now().isoformat()
             self.state_manager.set_component_state(self.component_id, state)
 
-            st.toast("Settings saved successfully!", icon="💾")
+            st.toast("Settings saved successfully!", icon="[SAVE]")
 
         except Exception as e:
             logger.error(f"Failed to save settings: {e}")
@@ -778,7 +778,7 @@ class MobileSettingsCard:
                 self.model_switcher.import_configuration(import_data["model_configuration"])
 
             self._mark_settings_changed()
-            st.toast("Settings imported successfully!", icon="📥")
+            st.toast("Settings imported successfully!", icon="[DOWNLOAD]")
             st.rerun()
             return True
 
@@ -818,12 +818,12 @@ class MobileSettingsCard:
                 settings_data = state["data"]["settings_card"]
 
                 # Model section
-                if self.render_section_header("models", "AI Models", "🤖", "models" in settings_data["expanded_sections"]):
+                if self.render_section_header("models", "AI Models", "[AI]", "models" in settings_data["expanded_sections"]):
                     with st.container():
                         self.render_model_section()
 
                 # Appearance section
-                if self.render_section_header("appearance", "Appearance", "🎨", "appearance" in settings_data["expanded_sections"]):
+                if self.render_section_header("appearance", "Appearance", "[DESIGN]", "appearance" in settings_data["expanded_sections"]):
                     with st.container():
                         self.render_appearance_section()
 
@@ -850,19 +850,19 @@ class MobileSettingsCard:
                 col1, col2, col3 = st.columns(3)
 
                 with col1:
-                    if st.button("💾 Save", key=f"{self.component_id}_save", use_container_width=True):
+                    if st.button("[SAVE] Save", key=f"{self.component_id}_save", use_container_width=True):
                         self._save_settings()
 
                 with col2:
                     if st.button("[PARTIAL] Reset", key=f"{self.component_id}_reset", use_container_width=True):
                         self._reset_settings()
 
-                with col3, st.expander("📤 Export/Import"):
+                with col3, st.expander("[UPLOAD] Export/Import"):
                     # Export
-                    if st.button("📤 Export Settings", key=f"{self.component_id}_export", use_container_width=True):
+                    if st.button("[UPLOAD] Export Settings", key=f"{self.component_id}_export", use_container_width=True):
                         settings_json = self._export_settings()
                         st.download_button(
-                            "💾 Download Settings",
+                            "[SAVE] Download Settings",
                             data=settings_json,
                             file_name=f"plantguard_settings_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                             mime="application/json",
@@ -872,13 +872,13 @@ class MobileSettingsCard:
 
                     # Import
                     uploaded_file = st.file_uploader(
-                        "📥 Import Settings", type=["json"], key=f"{self.component_id}_import", help="Upload a previously exported settings file"
+                        "[DOWNLOAD] Import Settings", type=["json"], key=f"{self.component_id}_import", help="Upload a previously exported settings file"
                     )
 
                     if uploaded_file is not None:
                         try:
                             settings_content = uploaded_file.read().decode("utf-8")
-                            if st.button("📥 Apply Imported Settings", key=f"{self.component_id}_apply_import", use_container_width=True):
+                            if st.button("[DOWNLOAD] Apply Imported Settings", key=f"{self.component_id}_apply_import", use_container_width=True):
                                 self._import_settings(settings_content)
                         except Exception as e:
                             st.error(f"Error reading settings file: {e}")

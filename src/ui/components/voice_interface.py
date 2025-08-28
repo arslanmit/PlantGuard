@@ -233,7 +233,7 @@ class VoiceInterface:
             fig.add_trace(go.Scatter(x=time_axis, y=audio_data, mode="lines", name="Waveform", line={"color": "#1f77b4", "width": 1}))
 
             fig.update_layout(
-                title="🎵 Audio Waveform",
+                title="[SOUND] Audio Waveform",
                 xaxis_title="Time (seconds)",
                 yaxis_title="Amplitude",
                 height=200,
@@ -253,7 +253,7 @@ class VoiceInterface:
         Returns:
             Recorded audio data or None
         """
-        st.subheader("🎙️ Microphone Recording")
+        st.subheader("[MICROPHONE]️ Microphone Recording")
 
         # WebRTC configuration
         rtc_configuration = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
@@ -280,7 +280,7 @@ class VoiceInterface:
 
         # Recording status
         if getattr(webrtc_ctx, "state", None) is not None and getattr(webrtc_ctx.state, "playing", False):
-            st.success("🔴 Recording... Click 'Stop' when finished")
+            st.success("[RED] Recording... Click 'Stop' when finished")
             st.session_state.audio_recording = True
         elif st.session_state.audio_recording:
             st.session_state.audio_recording = False
@@ -314,7 +314,7 @@ class VoiceInterface:
         Returns:
             Uploaded audio data or None
         """
-        st.subheader("📁 Audio File Upload")
+        st.subheader("[FOLDER] Audio File Upload")
 
         uploaded_file = st.file_uploader(
             "Choose an audio file",
@@ -330,7 +330,7 @@ class VoiceInterface:
                 return None
 
             # Load and process audio
-            with st.status("🎵 Processing audio file...", expanded=True) as status:
+            with st.status("[SOUND] Processing audio file...", expanded=True) as status:
                 st.write("Loading audio file...")
                 audio_data, sample_rate = self.load_audio_file(uploaded_file)
 
@@ -363,11 +363,11 @@ class VoiceInterface:
         if audio_data is None:
             return ""
 
-        st.subheader("📝 Audio Transcription")
+        st.subheader("[WRITE] Audio Transcription")
 
         # Transcription button
         if st.button("[PROGRESS] Transcribe Audio", type="primary"):
-            with st.status("🎤 Transcribing audio...", expanded=True) as status:
+            with st.status("[VOICE] Transcribing audio...", expanded=True) as status:
                 st.write("Using local Whisper model...")
                 transcription = self.transcribe_audio_local(audio_data)
 
@@ -410,7 +410,7 @@ class VoiceInterface:
                 st.metric("Words", word_count)
 
         with col3:
-            if st.button("🧹 Clear Audio"):
+            if st.button("[CLEAN] Clear Audio"):
                 st.session_state.recorded_audio = None
                 st.session_state.audio_transcription = ""
                 st.rerun()
@@ -421,10 +421,10 @@ class VoiceInterface:
         Returns:
             Tuple of (audio_data, transcription)
         """
-        st.header("🎙️ Voice & Audio Processing")
+        st.header("[MICROPHONE]️ Voice & Audio Processing")
 
         # Interface tabs
-        tab1, tab2 = st.tabs(["🎙️ Microphone", "📁 Upload File"])
+        tab1, tab2 = st.tabs(["[MICROPHONE]️ Microphone", "[FOLDER] Upload File"])
 
         audio_data = None
 
@@ -461,7 +461,7 @@ def create_voice_interface() -> VoiceInterface:
 # Example usage and testing
 if __name__ == "__main__":
     # Test the voice interface
-    st.title("🎙️ PlantGuard Voice Interface Test")
+    st.title("[MICROPHONE]️ PlantGuard Voice Interface Test")
 
     # Create voice interface
     voice = create_voice_interface()

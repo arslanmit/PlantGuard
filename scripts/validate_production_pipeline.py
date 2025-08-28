@@ -535,7 +535,7 @@ class ProductionPipelineValidator:
 
         # Log summary
         logger.info("=" * 60)
-        logger.info("🏁 VALIDATION SUMMARY")
+        logger.info("[FINISH] VALIDATION SUMMARY")
         logger.info("=" * 60)
         logger.info(f"Total tests: {total_tests}")
         logger.info(f"Passed: {self.results['tests_passed']}")

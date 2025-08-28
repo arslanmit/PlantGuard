@@ -159,7 +159,7 @@ class MobileRecommendations(MobileBaseComponent):
                 <h3>No Analysis Available</h3>
                 <p>Perform a plant disease analysis to get personalized treatment recommendations.</p>
                 <div class="general-tips">
-                    <h4>🌱 General Plant Care Tips:</h4>
+                    <h4>[PLANT] General Plant Care Tips:</h4>
                     <ul>
                         <li>Ensure proper watering (not too much, not too little)</li>
                         <li>Provide adequate sunlight for your plant type</li>
@@ -233,19 +233,19 @@ class MobileRecommendations(MobileBaseComponent):
         # Immediate actions
         if "immediate" in treatment:
             expanded = self._is_section_expanded("immediate")
-            with st.expander("🚨 Immediate Actions", expanded=expanded):
+            with st.expander("[ALERT] Immediate Actions", expanded=expanded):
                 self._render_treatment_section(treatment["immediate"], "Take these actions right away:", "immediate")
 
         # Preventive measures
         if "preventive" in treatment:
             expanded = self._is_section_expanded("preventive")
-            with st.expander("🛡️ Preventive Measures", expanded=expanded):
+            with st.expander("[SHIELD] Preventive Measures", expanded=expanded):
                 self._render_treatment_section(treatment["preventive"], "To prevent future occurrences:", "preventive")
 
         # Organic treatments
         if "organic" in treatment:
             expanded = self._is_section_expanded("organic")
-            with st.expander("🌱 Organic Treatment Options", expanded=expanded):
+            with st.expander("[PLANT] Organic Treatment Options", expanded=expanded):
                 self._render_treatment_section(treatment["organic"], "Natural and organic solutions:", "organic")
 
         # Chemical treatments (if available)
@@ -275,14 +275,14 @@ class MobileRecommendations(MobileBaseComponent):
 
         if prevention:
             expanded = self._is_section_expanded("prevention")
-            with st.expander("🔒 Prevention Tips", expanded=expanded):
+            with st.expander("[SECURE] Prevention Tips", expanded=expanded):
                 st.markdown("**To prevent this disease in the future:**")
 
                 for tip in prevention:
                     st.write(f"• {tip}")
         else:
             # Generic prevention tips
-            with st.expander("🔒 General Prevention Tips", expanded=False):
+            with st.expander("[SECURE] General Prevention Tips", expanded=False):
                 st.markdown("""
                 **General disease prevention:**
                 • Maintain proper plant spacing for air circulation
@@ -295,7 +295,7 @@ class MobileRecommendations(MobileBaseComponent):
     def _render_disease_details(self, disease_info: dict[str, Any]) -> None:
         """Render detailed disease information."""
         expanded = self._is_section_expanded("detailed")
-        with st.expander("📚 Disease Information", expanded=expanded):
+        with st.expander("[LIBRARY] Disease Information", expanded=expanded):
             # Basic information
             if "description" in disease_info:
                 st.markdown(f"**Description:** {disease_info['description']}")
@@ -370,7 +370,7 @@ class MobileRecommendations(MobileBaseComponent):
         Confidence Level: {confidence:.1%} ({confidence_level.title()})
         """)
 
-        with st.expander("🌱 General Plant Care", expanded=True):
+        with st.expander("[PLANT] General Plant Care", expanded=True):
             st.markdown("""
             **Basic Plant Health Measures:**
             • Ensure proper drainage to prevent root rot
@@ -389,20 +389,20 @@ class MobileRecommendations(MobileBaseComponent):
 
     def _render_sharing_section(self, disease_name: str, confidence: float) -> None:
         """Render sharing and notes section."""
-        st.markdown("### 📤 Share & Notes")
+        st.markdown("### [UPLOAD] Share & Notes")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            if st.button("📤 Share Recommendations", key=f"{self.component_id}_share", use_container_width=True):
+            if st.button("[UPLOAD] Share Recommendations", key=f"{self.component_id}_share", use_container_width=True):
                 self._generate_shareable_recommendations(disease_name, confidence)
 
         with col2:
-            if st.button("💾 Save to Notes", key=f"{self.component_id}_save", use_container_width=True):
+            if st.button("[SAVE] Save to Notes", key=f"{self.component_id}_save", use_container_width=True):
                 self._save_recommendations_to_notes(disease_name, confidence)
 
         # Custom notes section
-        with st.expander("📝 Personal Notes", expanded=False):
+        with st.expander("[WRITE] Personal Notes", expanded=False):
             state = self.get_state()
             current_notes = state["data"]["recommendations_data"].get("custom_notes", "")
 
@@ -421,7 +421,7 @@ class MobileRecommendations(MobileBaseComponent):
         """Generate shareable recommendations text."""
         disease_info = self._get_disease_info(disease_name)
 
-        share_text = f"""🌿 PlantGuard Treatment Recommendations
+        share_text = f"""[LEAF] PlantGuard Treatment Recommendations
 
 Disease: {disease_name}
 Confidence: {confidence:.1%}
@@ -433,26 +433,26 @@ Date: {datetime.now().strftime("%Y-%m-%d %H:%M")}
             treatment = disease_info["treatment"]
 
             if "immediate" in treatment:
-                share_text += "🚨 IMMEDIATE ACTIONS:\n"
+                share_text += "[ALERT] IMMEDIATE ACTIONS:\n"
                 for action in treatment["immediate"]:
                     share_text += f"• {action}\n"
                 share_text += "\n"
 
             if "preventive" in treatment:
-                share_text += "🛡️ PREVENTION:\n"
+                share_text += "[SHIELD] PREVENTION:\n"
                 for prevention in treatment["preventive"]:
                     share_text += f"• {prevention}\n"
                 share_text += "\n"
 
             if "organic" in treatment:
-                share_text += "🌱 ORGANIC OPTIONS:\n"
+                share_text += "[PLANT] ORGANIC OPTIONS:\n"
                 for organic in treatment["organic"]:
                     share_text += f"• {organic}\n"
                 share_text += "\n"
 
         share_text += "Generated by PlantGuard AI Plant Disease Detection"
 
-        st.text_area("📤 Shareable Recommendations", value=share_text, height=200, key=f"{self.component_id}_share_text")
+        st.text_area("[UPLOAD] Shareable Recommendations", value=share_text, height=200, key=f"{self.component_id}_share_text")
 
         st.success("[DONE] Recommendations ready to share! Copy the text above.")
 
@@ -473,7 +473,7 @@ Date: {datetime.now().strftime("%Y-%m-%d %H:%M")}
         state["data"]["recommendations_data"] = recommendations_data
         self.set_state(state)
 
-        st.success("💾 Recommendations saved to your notes!")
+        st.success("[SAVE] Recommendations saved to your notes!")
 
     def _save_custom_notes(self, notes: str) -> None:
         """Save custom notes to component state."""
@@ -596,4 +596,4 @@ Date: {datetime.now().strftime("%Y-%m-%d %H:%M")}
     def clear_recommendations(self) -> None:
         """Clear current recommendations."""
         self._initialize_recommendations_state()
-        st.success("🧹 Recommendations cleared!")
+        st.success("[CLEAN] Recommendations cleared!")

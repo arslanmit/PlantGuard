@@ -106,7 +106,7 @@ class MobileAudioProcessor(MobileBaseComponent):
 
     def _render_audio_upload_interface(self) -> None:
         """Render audio file upload interface."""
-        st.markdown("### 🎵 Audio Upload")
+        st.markdown("### [SOUND] Audio Upload")
 
         # File uploader
         uploaded_audio = st.file_uploader(
@@ -261,7 +261,7 @@ class MobileAudioProcessor(MobileBaseComponent):
                 processed_audio_path = self._enhance_audio(audio_file_path)
 
             # Perform transcription using mobile integration
-            with st.spinner("🎧 Converting speech to text..."):
+            with st.spinner("[AUDIO] Converting speech to text..."):
                 transcription_result = mobile_integration.transcribe_audio(
                     audio_file=processed_audio_path, source="upload", component_id=self.component_id
                 )
@@ -289,7 +289,7 @@ class MobileAudioProcessor(MobileBaseComponent):
 
                 # Display success
                 st.success(f"[DONE] Transcription completed in {processing_time:.1f}s")
-                st.info(f"📝 **Transcribed Text:** {transcription}")
+                st.info(f"[WRITE] **Transcribed Text:** {transcription}")
 
                 # Process the transcribed text for plant-related queries
                 self._process_transcribed_text(transcription)
@@ -428,25 +428,25 @@ class MobileAudioProcessor(MobileBaseComponent):
 
             if is_plant_related:
                 # Process as plant-related query
-                with st.spinner("🤖 Analyzing your plant question..."):
+                with st.spinner("[AI] Analyzing your plant question..."):
                     processing_result = mobile_integration.process_text_query(
                         text=transcription, source="audio_upload", component_id=self.component_id
                     )
 
                     response = processing_result.get("response", "")
                     if response:
-                        with st.expander("🌿 Plant Care Response", expanded=True):
+                        with st.expander("[LEAF] Plant Care Response", expanded=True):
                             st.write(response)
             else:
                 # General transcription - just show the text
-                st.info("💬 Transcription completed. If you have plant-related questions, please be more specific.")
+                st.info("[CHAT] Transcription completed. If you have plant-related questions, please be more specific.")
 
         except Exception as e:
             logger.error("Transcribed text processing failed: %s", e)
 
     def _render_processing_status(self) -> None:
         """Render audio processing status."""
-        st.markdown("### 🎵 Processing Audio")
+        st.markdown("### [SOUND] Processing Audio")
 
         progress_bar = st.progress(0)
         status_text = st.empty()
@@ -467,11 +467,11 @@ class MobileAudioProcessor(MobileBaseComponent):
 
     def _render_transcription_history(self, history: list[dict[str, Any]]) -> None:
         """Render transcription history."""
-        st.markdown("### 📝 Transcription History")
+        st.markdown("### [WRITE] Transcription History")
 
         # Show recent transcriptions
         for i, entry in enumerate(reversed(history[-5:])):  # Show last 5
-            with st.expander(f"🎵 {entry['filename']} - {entry['timestamp'][:19]}", expanded=(i == 0)):
+            with st.expander(f"[SOUND] {entry['filename']} - {entry['timestamp'][:19]}", expanded=(i == 0)):
                 col1, col2 = st.columns([2, 1])
 
                 with col1:
@@ -491,7 +491,7 @@ class MobileAudioProcessor(MobileBaseComponent):
                         st.info("Please upload the audio file again to reprocess.")
 
                 with col2:
-                    if st.button("💬 Ask Question", key=f"{self.component_id}_ask_{i}"):
+                    if st.button("[CHAT] Ask Question", key=f"{self.component_id}_ask_{i}"):
                         self._process_transcribed_text(entry["transcription"])
 
                 with col3:
@@ -517,7 +517,7 @@ class MobileAudioProcessor(MobileBaseComponent):
         state["data"]["audio_processing"] = audio_data
         self.set_state(state)
 
-        st.success("🗑️ History entry removed")
+        st.success("[DELETE] History entry removed")
 
     def get_transcription_history(self) -> list[dict[str, Any]]:
         """Get transcription history."""
@@ -533,4 +533,4 @@ class MobileAudioProcessor(MobileBaseComponent):
         state["data"]["audio_processing"] = audio_data
         self.set_state(state)
 
-        st.success("🧹 Transcription history cleared")
+        st.success("[CLEAN] Transcription history cleared")

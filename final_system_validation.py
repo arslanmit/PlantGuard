@@ -25,7 +25,7 @@ class FinalSystemValidator:
 
     def validate_desktop_files_removed(self) -> dict[str, Any]:
         """Validate that all desktop files have been properly removed."""
-        print("🔍 Validating desktop files removal...")
+        print("[SEARCH] Validating desktop files removal...")
 
         desktop_files_to_check = [
             "spa_app.py",
@@ -61,7 +61,7 @@ class FinalSystemValidator:
 
     def validate_imports(self) -> dict[str, Any]:
         """Validate that no broken imports remain in the codebase."""
-        print("🔍 Validating imports...")
+        print("[SEARCH] Validating imports...")
 
         python_files = list(Path().glob("**/*.py"))
         broken_imports = []
@@ -141,7 +141,7 @@ class FinalSystemValidator:
 
     def validate_mobile_app_functionality(self) -> dict[str, Any]:
         """Test that mobile application can be imported and basic functionality works."""
-        print("🔍 Validating mobile application functionality...")
+        print("[SEARCH] Validating mobile application functionality...")
 
         try:
             # Test mobile app import
@@ -189,7 +189,7 @@ class FinalSystemValidator:
 
     def validate_makefile_targets(self) -> dict[str, Any]:
         """Validate that Makefile targets work as expected."""
-        print("🔍 Validating Makefile targets...")
+        print("[SEARCH] Validating Makefile targets...")
 
         try:
             makefile_path = Path("Makefile")
@@ -268,7 +268,7 @@ class FinalSystemValidator:
 
     def validate_file_structure(self) -> dict[str, Any]:
         """Validate that file structure is optimized and clean."""
-        print("🔍 Validating file structure...")
+        print("[SEARCH] Validating file structure...")
 
         try:
             # Check for empty directories
@@ -427,7 +427,7 @@ class FinalSystemValidator:
             print(f"   {result['details']}")
 
         print(f"\n[PROGRESS] Overall Status: {overall_status.upper()}")
-        print(f"📝 {overall_message}")
+        print(f"[WRITE] {overall_message}")
 
         if overall_status == "passed":
             print("\n[SUCCESS] Mobile-only migration validation completed successfully!")
@@ -455,7 +455,7 @@ def main():
         with open(report_file, "w") as f:
             json.dump(final_report, f, indent=2)
 
-        print(f"\n📄 Full report saved to: {report_file}")
+        print(f"\n[DOCUMENT] Full report saved to: {report_file}")
 
         # Exit with appropriate code
         if final_report["overall_status"] == "failed":

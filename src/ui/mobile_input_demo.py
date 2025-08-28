@@ -141,7 +141,7 @@ def render_demo_header():
     st.markdown(
         """
         <div style="text-align: center; padding: 20px 0;">
-            <h1>🌿 PlantGuard Mobile Input Demo</h1>
+            <h1>[LEAF] PlantGuard Mobile Input Demo</h1>
             <p style="color: #666; font-size: 18px;">
                 Experience mobile-optimized plant care assistance
             </p>
@@ -159,17 +159,17 @@ def render_input_grid():
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("📷 Camera\nTake Photo", key="camera_grid_btn", help="Use device camera to capture plant images", use_container_width=True):
+        if st.button("[CAMERA] Camera\nTake Photo", key="camera_grid_btn", help="Use device camera to capture plant images", use_container_width=True):
             st.session_state.selected_input = "camera"
 
-        if st.button("🎤 Voice\nAsk Question", key="voice_grid_btn", help="Record voice question about plant care", use_container_width=True):
+        if st.button("[VOICE] Voice\nAsk Question", key="voice_grid_btn", help="Record voice question about plant care", use_container_width=True):
             st.session_state.selected_input = "voice"
 
     with col2:
-        if st.button("📁 Upload\nSelect Image", key="upload_grid_btn", help="Upload plant image from device storage", use_container_width=True):
+        if st.button("[FOLDER] Upload\nSelect Image", key="upload_grid_btn", help="Upload plant image from device storage", use_container_width=True):
             st.session_state.selected_input = "upload"
 
-        if st.button("💬 Text\nType Message", key="text_grid_btn", help="Type your plant care question", use_container_width=True):
+        if st.button("[CHAT] Text\nType Message", key="text_grid_btn", help="Type your plant care question", use_container_width=True):
             st.session_state.selected_input = "text"
 
 
@@ -178,7 +178,7 @@ def render_selected_component():
     selected = st.session_state.get("selected_input")
 
     if not selected:
-        st.info("👆 Select an input method above to get started")
+        st.info("[POINTER] Select an input method above to get started")
         return
 
     st.markdown("---")
@@ -196,19 +196,19 @@ def render_selected_component():
 
     # Render selected component
     if selected == "camera":
-        st.markdown("### 📷 Camera Input")
+        st.markdown("### [CAMERA] Camera Input")
         components["camera"].render()
 
     elif selected == "upload":
-        st.markdown("### 📁 Upload Input")
+        st.markdown("### [FOLDER] Upload Input")
         components["upload"].render()
 
     elif selected == "voice":
-        st.markdown("### 🎤 Voice Input")
+        st.markdown("### [VOICE] Voice Input")
         components["voice"].render()
 
     elif selected == "text":
-        st.markdown("### 💬 Text Input")
+        st.markdown("### [CHAT] Text Input")
         components["text"].render()
 
 
@@ -216,7 +216,7 @@ def render_analysis_results():
     """Render analysis results if available."""
     if "analysis_results" in st.session_state and st.session_state.analysis_results:
         st.markdown("---")
-        st.markdown("### 🔍 Analysis Results")
+        st.markdown("### [SEARCH] Analysis Results")
 
         # Show latest result
         latest_result = st.session_state.analysis_results[-1]
@@ -237,18 +237,18 @@ def render_analysis_results():
 
             # Confidence indicator
             if confidence > 0.7:
-                st.success("🟢 High confidence result")
+                st.success("[GREEN] High confidence result")
             elif confidence > 0.5:
-                st.warning("🟡 Medium confidence result")
+                st.warning("[YELLOW] Medium confidence result")
             else:
-                st.error("🔴 Low confidence result")
+                st.error("[RED] Low confidence result")
 
 
 def render_chat_history():
     """Render chat history if available."""
     if "chat_history" in st.session_state and st.session_state.chat_history:
         st.markdown("---")
-        st.markdown("### 💬 Chat History")
+        st.markdown("### [CHAT] Chat History")
 
         # Show recent messages
         recent_messages = st.session_state.chat_history[-5:]  # Last 5 messages
@@ -288,10 +288,10 @@ def render_demo_footer():
         st.markdown("""
         **PlantGuard Mobile Input Demo** showcases the mobile-optimized input components:
         
-        - **📷 Camera Input**: Real-time camera access for plant image capture
-        - **📁 Upload Input**: File selection with drag-and-drop support
-        - **🎤 Voice Input**: Audio recording with speech-to-text processing
-        - **💬 Text Input**: Chat interface with suggestions and validation
+        - **[CAMERA] Camera Input**: Real-time camera access for plant image capture
+        - **[FOLDER] Upload Input**: File selection with drag-and-drop support
+        - **[VOICE] Voice Input**: Audio recording with speech-to-text processing
+        - **[CHAT] Text Input**: Chat interface with suggestions and validation
         
         **Features:**
         - Touch-optimized interface with 48px minimum touch targets
@@ -322,11 +322,11 @@ def render_demo_footer():
 
                 with col2:
                     if component.has_error():
-                        st.markdown("🔴 Error")
+                        st.markdown("[RED] Error")
                     elif component.is_loading():
-                        st.markdown("🟡 Loading")
+                        st.markdown("[YELLOW] Loading")
                     else:
-                        st.markdown("🟢 Ready")
+                        st.markdown("[GREEN] Ready")
 
                 with col3:
                     st.write(f"ID: {component.component_id}")
@@ -335,7 +335,7 @@ def render_demo_footer():
 def main():
     """Main demo application."""
     # Configure Streamlit page
-    st.set_page_config(page_title="PlantGuard Mobile Input Demo", page_icon="🌿", layout="wide", initial_sidebar_state="collapsed")
+    st.set_page_config(page_title="PlantGuard Mobile Input Demo", page_icon="[LEAF]", layout="wide", initial_sidebar_state="collapsed")
 
     # Load mobile CSS
     load_mobile_css()

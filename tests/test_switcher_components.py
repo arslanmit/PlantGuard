@@ -125,7 +125,7 @@ class TestModelSwitcherStandalone:
 #             {
 #                 "id": "test_mode",
 #                 "label": "Test Mode",
-#                 "icon": "🧪",
+#                 "icon": "[TEST]",
 #                 "description": "Test description",
 #             }
 #         ]

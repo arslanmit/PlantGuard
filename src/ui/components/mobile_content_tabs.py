@@ -160,7 +160,7 @@ class MobileContentTabs(MobileComponent):
                 "id": "image_analysis",
                 "title": "Image Analysis",
                 "short_title": "Image",
-                "icon": "🖼️",
+                "icon": "[IMAGE]",
                 "description": "Analyze plant images for disease detection",
                 "enabled": True,
                 "primary": True,
@@ -169,7 +169,7 @@ class MobileContentTabs(MobileComponent):
                 "id": "voice_assistant",
                 "title": "Voice Assistant",
                 "short_title": "Voice",
-                "icon": "🎤",
+                "icon": "[VOICE]",
                 "description": "Voice-powered plant care assistant",
                 "enabled": True,
                 "primary": True,
@@ -178,7 +178,7 @@ class MobileContentTabs(MobileComponent):
                 "id": "chat_interface",
                 "title": "Chat Assistant",
                 "short_title": "Chat",
-                "icon": "💬",
+                "icon": "[CHAT]",
                 "description": "Text-based plant care Q&A",
                 "enabled": True,
                 "primary": True,
@@ -210,7 +210,7 @@ class MobileContentTabs(MobileComponent):
 
         # Always-visible tabs header
         st.markdown('<div class="mobile-tabs-always-visible-header">', unsafe_allow_html=True)
-        st.markdown("### 🌿 All PlantGuard Features")
+        st.markdown("### [LEAF] All PlantGuard Features")
         st.markdown("**All features directly accessible - no hidden content**")
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -361,7 +361,7 @@ class MobileContentTabs(MobileComponent):
 
     def _render_image_analysis_placeholder(self) -> None:
         """Render placeholder for image analysis tab."""
-        st.markdown("#### 📸 Image Analysis")
+        st.markdown("#### [PHOTO] Image Analysis")
 
         # File uploader
         uploaded_file = st.file_uploader("Upload plant image", type=["jpg", "jpeg", "png"], key=f"{self.component_id}_image_uploader")
@@ -378,9 +378,9 @@ class MobileContentTabs(MobileComponent):
 
     def _render_voice_assistant_placeholder(self) -> None:
         """Render placeholder for voice assistant tab."""
-        st.markdown("#### 🎤 Voice Assistant")
+        st.markdown("#### [VOICE] Voice Assistant")
 
-        if st.button("🎙️ Start Recording", key=f"{self.component_id}_voice_record", use_container_width=True):
+        if st.button("[MICROPHONE]️ Start Recording", key=f"{self.component_id}_voice_record", use_container_width=True):
             st.info("[PARTIAL] Voice recording will be integrated with AudioAdapter")
 
         st.markdown("**How to use:**")
@@ -390,7 +390,7 @@ class MobileContentTabs(MobileComponent):
 
     def _render_chat_interface_placeholder(self) -> None:
         """Render placeholder for chat interface tab."""
-        st.markdown("#### 💬 Chat Assistant")
+        st.markdown("#### [CHAT] Chat Assistant")
 
         # Chat input
         user_input = st.text_input(
@@ -413,7 +413,7 @@ class MobileContentTabs(MobileComponent):
 
         # History card header
         st.markdown('<div class="mobile-expandable-card-header">', unsafe_allow_html=True)
-        if st.button("📈 Recent Analysis History", key=f"{self.component_id}_history_card", use_container_width=True):
+        if st.button("[CHART] Recent Analysis History", key=f"{self.component_id}_history_card", use_container_width=True):
             st.session_state.history_expanded = not st.session_state.get("history_expanded", True)
         st.markdown("</div>", unsafe_allow_html=True)
 

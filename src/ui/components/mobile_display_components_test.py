@@ -440,7 +440,7 @@ class TestMobileDisplayComponentsIntegration:
 
 def run_mobile_display_tests():
     """Run all mobile display component tests."""
-    print("🧪 Running Mobile Display Components Tests...")
+    print("[TEST] Running Mobile Display Components Tests...")
 
     try:
         # Test MobileAnalysisDisplay

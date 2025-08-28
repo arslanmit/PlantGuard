@@ -18,8 +18,8 @@ class PageTransitionManager:
     def __init__(self):
         self.transition_duration = 0.3  # seconds
         self.loading_messages = [
-            "🌱 Loading PlantGuard...",
-            "🔍 Preparing analysis tools...",
+            "[PLANT] Loading PlantGuard...",
+            "[SEARCH] Preparing analysis tools...",
             "[SUMMARY] Setting up interface...",
             "✨ Almost ready...",
         ]
@@ -55,7 +55,7 @@ class PageTransitionManager:
                 font-size: 2rem;
                 margin-bottom: 1rem;
             '>
-                🌿 PlantGuard
+                [LEAF] PlantGuard
             </div>
             <div style='
                 color: #64748B;
@@ -211,13 +211,13 @@ class BreadcrumbNavigation:
 
     def _create_breadcrumb_html(self, pages: list) -> str:
         """Create HTML for breadcrumb navigation."""
-        page_icons = {"Home": "🏠", "Compare": "🔍", "History": "📚", "Guide": "📖", "Settings": "⚙️"}
+        page_icons = {"Home": "[HOME]", "Compare": "[SEARCH]", "History": "[LIBRARY]", "Guide": "[MANUAL]", "Settings": "⚙️"}
 
         breadcrumb_items = []
 
         for i, page_visit in enumerate(pages):
             page_name = page_visit["page"]
-            page_icon = page_icons.get(page_name, "📄")
+            page_icon = page_icons.get(page_name, "[DOCUMENT]")
 
             if i == len(pages) - 1:
                 # Current page (highlighted)
@@ -237,7 +237,7 @@ class BreadcrumbNavigation:
             margin: 0.5rem 0;
             font-size: 0.875rem;
         '>
-            <span style="color: #64748B;">📍 Navigation:</span> {breadcrumb_text}
+            <span style="color: #64748B;">[LOCATION] Navigation:</span> {breadcrumb_text}
         </div>
         """
 
@@ -251,7 +251,7 @@ class BreadcrumbNavigation:
         if not page_history:
             return
 
-        with st.expander("📚 Page History", expanded=False):
+        with st.expander("[LIBRARY] Page History", expanded=False):
             # Show last 10 page visits
             recent_visits = page_history[-10:]
 
@@ -272,8 +272,8 @@ class BreadcrumbNavigation:
                 col1, col2 = st.columns([3, 1])
 
                 with col1:
-                    page_icons = {"Home": "🏠", "Compare": "🔍", "History": "📚", "Guide": "📖", "Settings": "⚙️"}
-                    icon = page_icons.get(page_name, "📄")
+                    page_icons = {"Home": "[HOME]", "Compare": "[SEARCH]", "History": "[LIBRARY]", "Guide": "[MANUAL]", "Settings": "⚙️"}
+                    icon = page_icons.get(page_name, "[DOCUMENT]")
                     st.markdown(f"{icon} {page_name}")
 
                 with col2:
@@ -301,7 +301,7 @@ class MobileNavigationMenu:
         st.markdown(
             """
             <div style='text-align: center; margin-bottom: 16px;'>
-                <h2 style='margin: 0; color: #22C55E;'>🌿 PlantGuard Mobile</h2>
+                <h2 style='margin: 0; color: #22C55E;'>[LEAF] PlantGuard Mobile</h2>
                 <p style='margin: 4px 0; color: #666; font-size: 14px;'>All features directly accessible</p>
             </div>
             """,
@@ -309,17 +309,17 @@ class MobileNavigationMenu:
         )
 
         pages = {
-            "Home": {"icon": "🏠", "description": "Main analysis interface"},
-            "Compare": {"icon": "🔍", "description": "Side-by-side comparison"},
-            "History": {"icon": "📚", "description": "Analysis history"},
-            "Guide": {"icon": "📖", "description": "Usage guide"},
+            "Home": {"icon": "[HOME]", "description": "Main analysis interface"},
+            "Compare": {"icon": "[SEARCH]", "description": "Side-by-side comparison"},
+            "History": {"icon": "[LIBRARY]", "description": "Analysis history"},
+            "Guide": {"icon": "[MANUAL]", "description": "Usage guide"},
             "Settings": {"icon": "⚙️", "description": "Preferences"},
         }
 
         current_page = st.session_state.get("current_page", "Home")
 
         # Always-visible navigation grid (2x3 layout)
-        st.markdown("### 🧭 Navigation")
+        st.markdown("### [COMPASS] Navigation")
 
         # First row
         col1, col2 = st.columns(2)
@@ -446,7 +446,7 @@ class MobileNavigationMenu:
             return None
 
         pages = ["Home", "Compare", "History", "Guide", "Settings"]
-        page_icons = {"Home": "🏠", "Compare": "🔍", "History": "📚", "Guide": "📖", "Settings": "⚙️"}
+        page_icons = {"Home": "[HOME]", "Compare": "[SEARCH]", "History": "[LIBRARY]", "Guide": "[MANUAL]", "Settings": "⚙️"}
 
         current_page = st.session_state.get("current_page", "Home")
 
@@ -456,7 +456,7 @@ class MobileNavigationMenu:
 
         for i, page_name in enumerate(pages):
             with cols[i]:
-                icon = page_icons.get(page_name, "📄")
+                icon = page_icons.get(page_name, "[DOCUMENT]")
                 button_type = "primary" if page_name == current_page else "secondary"
 
                 if st.button(

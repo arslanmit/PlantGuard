@@ -154,7 +154,7 @@ class ResponsiveLayout:
                 self._render_content_with_error_handling(right_content, "Analysis Results")
 
             if left_content:
-                st.markdown("### 💬 Chat Interface")
+                st.markdown("### [CHAT] Chat Interface")
                 self._render_content_with_error_handling(left_content, "Chat Interface")
 
         except Exception as e:
@@ -382,7 +382,7 @@ class ResponsiveLayoutManager:
 
             st.set_page_config(
                 page_title=page_title,
-                page_icon="🌿",
+                page_icon="[LEAF]",
                 layout=layout,
                 initial_sidebar_state=initial_sidebar_state,
                 menu_items={"About": ("PlantGuard - AI-powered plant disease detection with offline processing")},

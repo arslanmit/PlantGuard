@@ -189,9 +189,9 @@ def test_css_compatibility():
 
 def main():
     """Main integration test."""
-    st.set_page_config(page_title="Mobile Integration Test", page_icon="🧪", layout="wide")
+    st.set_page_config(page_title="Mobile Integration Test", page_icon="[TEST]", layout="wide")
 
-    st.title("🧪 Mobile History & Settings Integration Test")
+    st.title("[TEST] Mobile History & Settings Integration Test")
     st.markdown("Testing integration with existing mobile PlantGuard components")
 
     # Run all tests
@@ -207,7 +207,7 @@ def main():
 
     results = {}
 
-    st.markdown("## 🔍 Running Integration Tests")
+    st.markdown("## [SEARCH] Running Integration Tests")
 
     for test_name, test_func in tests:
         st.markdown(f"### {test_name}")
@@ -256,7 +256,7 @@ def main():
         st.markdown("---")
         st.markdown("## [PROGRESS] Component Demonstration")
 
-        demo_tab1, demo_tab2 = st.tabs(["📚 History Demo", "⚙️ Settings Demo"])
+        demo_tab1, demo_tab2 = st.tabs(["[LIBRARY] History Demo", "⚙️ Settings Demo"])
 
         with demo_tab1:
             try:

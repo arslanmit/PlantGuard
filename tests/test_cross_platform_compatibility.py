@@ -317,7 +317,7 @@ class TestCrossPlatformCompatibility:
     def test_unicode_path_handling(self, temp_dir):
         """Test handling of Unicode characters in file paths."""
         # Create dataset with Unicode characters in path
-        unicode_dataset_dir = temp_dir / "测试数据集_тест_🌿"
+        unicode_dataset_dir = temp_dir / "测试数据集_тест_[LEAF]"
 
         classes = ["健康_healthy", "病变_diseased"]
 

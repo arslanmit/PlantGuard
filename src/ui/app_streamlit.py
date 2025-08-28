@@ -35,7 +35,7 @@ from ui.components import ModelSwitcher
 logger = logging.getLogger(__name__)
 
 # Get current selections
-st.set_page_config(page_title="PlantGuard", page_icon="🌿", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="PlantGuard", page_icon="[LEAF]", layout="wide", initial_sidebar_state="expanded")
 
 # Custom CSS for improved UI
 st.markdown(
@@ -176,7 +176,7 @@ st.markdown(
 st.markdown(
     """
 <div class="main-header">
-    <h1>🌿 PlantGuard AI</h1>
+    <h1>[LEAF] PlantGuard AI</h1>
     <p>Advanced Multimodal Plant Disease Detection System</p>
 </div>
 """,
@@ -348,45 +348,45 @@ st.markdown(
 # Model configurations with rich display names
 model_configs = {
     "vision": {
-        "icon": "👁️",
+        "icon": "[VISION]",
         "title": "Vision Model",
         "description": "AI model for plant image analysis",
         "options": {
-            "vit_base_plants": "🏆 Vision Transformer (Best - 100%)",
-            "resnet50_plantvillage_v1": "🔬 ResNet50 (Balanced - 95%)",
+            "vit_base_plants": "[ACHIEVEMENT] Vision Transformer (Best - 100%)",
+            "resnet50_plantvillage_v1": "[MICROSCOPE] ResNet50 (Balanced - 95%)",
             "mobilenet_fast": "⚡ MobileNet (Fast - 90%)",
         },
         "badges": {
-            "vit_base_plants": ("🏆", "100%", "badge-green"),
+            "vit_base_plants": ("[ACHIEVEMENT]", "100%", "badge-green"),
             "mobilenet_fast": ("⚡", "90%", "badge-orange"),
         },
     },
     "audio": {
-        "icon": "🎤",
+        "icon": "[VOICE]",
         "title": "Audio Model",
         "description": "AI model for voice processing",
         "options": {
             "whisper_tiny_local": "[PROGRESS] Whisper Tiny (Local)",
-            "wav2vec2_plant_sounds": "🌿 Wav2Vec2 (Plant Sounds)",
+            "wav2vec2_plant_sounds": "[LEAF] Wav2Vec2 (Plant Sounds)",
         },
         "badges": {
             "whisper_tiny_local": ("[PROGRESS]", "Local", "badge-green"),
-            "wav2vec2_plant_sounds": ("🌿", "Beta", "badge-orange"),
+            "wav2vec2_plant_sounds": ("[LEAF]", "Beta", "badge-orange"),
         },
     },
     "text": {
-        "icon": "💬",
+        "icon": "[CHAT]",
         "title": "Text Model",
         "description": "AI model for plant care questions",
         "options": {
-            "distilbert_plant_qa_v1": "🧠 DistilBERT (Plant Q&A)",
-            "roberta_plant_care": "🌱 RoBERTa (Advanced)",
-            "t5_small_plant_qa": "📝 T5 Small (Creative)",
+            "distilbert_plant_qa_v1": "[BRAIN] DistilBERT (Plant Q&A)",
+            "roberta_plant_care": "[PLANT] RoBERTa (Advanced)",
+            "t5_small_plant_qa": "[WRITE] T5 Small (Creative)",
         },
         "badges": {
-            "distilbert_plant_qa_v1": ("🧠", "Stable", "badge-green"),
-            "roberta_plant_care": ("🌱", "Advanced", "badge-blue"),
-            "t5_small_plant_qa": ("📝", "Creative", "badge-purple"),
+            "distilbert_plant_qa_v1": ("[BRAIN]", "Stable", "badge-green"),
+            "roberta_plant_care": ("[PLANT]", "Advanced", "badge-blue"),
+            "t5_small_plant_qa": ("[WRITE]", "Creative", "badge-purple"),
         },
     },
 }
@@ -498,19 +498,19 @@ current_models = st.session_state.get(
 # Model status display
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.markdown("### 🌱 Vision Model")
+    st.markdown("### [PLANT] Vision Model")
     st.info(f"**Active:** {current_models.get('vision', 'Unknown')}")
-    st.metric("Status", "🟢 Loaded", "Ready")
+    st.metric("Status", "[GREEN] Loaded", "Ready")
 
 with col2:
-    st.markdown("### 🎤 Audio Model")
+    st.markdown("### [VOICE] Audio Model")
     st.info(f"**Active:** {current_models.get('audio', 'Unknown')}")
-    st.metric("Status", "🟢 Loaded", "Ready")
+    st.metric("Status", "[GREEN] Loaded", "Ready")
 
 with col3:
-    st.markdown("### 💬 Text Model")
+    st.markdown("### [CHAT] Text Model")
     st.info(f"**Active:** {current_models.get('text', 'Unknown')}")
-    st.metric("Status", "🟢 Loaded", "Ready")
+    st.metric("Status", "[GREEN] Loaded", "Ready")
 
 # Quick actions row
 st.markdown("---")
@@ -533,22 +533,22 @@ with action_col3:
         st.info("[TIP] Model configuration is available in the Model Management tab!")
 
 with action_col4:
-    if st.button("📈 Performance", use_container_width=True, help="View model performance metrics"):
+    if st.button("[CHART] Performance", use_container_width=True, help="View model performance metrics"):
         st.info("[TIP] Detailed performance analysis available in the Model Management tab!")
 
 st.markdown("---")
-st.markdown("## 🌿 Plant Analysis Tools")
+st.markdown("## [LEAF] Plant Analysis Tools")
 st.markdown("*Use the tools below to analyze your plants with AI-powered detection*")
 
 # Main content tabs with improved design
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["🖼️ Vision Analysis", "🎤 Audio Processing", "💬 Text Q&A", "📚 Training", "[TOOL] Model Management"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["[IMAGE] Vision Analysis", "[VOICE] Audio Processing", "[CHAT] Text Q&A", "[LIBRARY] Training", "[TOOL] Model Management"])
 
 # Vision Analysis Tab
 with tab1:
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.subheader("📤 Upload Plant Image")
+        st.subheader("[UPLOAD] Upload Plant Image")
         img_file = st.file_uploader(
             "Choose a leaf photo for analysis",
             ["png", "jpg", "jpeg"],
@@ -568,8 +568,8 @@ with tab1:
             st.image(img, use_container_width=True, caption=f"Image: {img_name}")
 
             # Analysis button with improved styling
-            if st.button("🔍 Analyze Plant", key="img", type="primary", use_container_width=True):
-                with st.spinner("🤖 AI is analyzing your plant..."):
+            if st.button("[SEARCH] Analyze Plant", key="img", type="primary", use_container_width=True):
+                with st.spinner("[AI] AI is analyzing your plant..."):
                     try:
                         raw_class, readable_name, confidence, plant_type = vision_adapter.predict_with_readable_name(img)
 
@@ -577,7 +577,7 @@ with tab1:
                         st.markdown(
                             """
                         <div class="result-card">
-                            <h3>🔬 Analysis Results</h3>
+                            <h3>[MICROSCOPE] Analysis Results</h3>
                         </div>
                         """,
                             unsafe_allow_html=True,
@@ -587,10 +587,10 @@ with tab1:
                         metric_col1, metric_col2, metric_col3 = st.columns(3)
 
                         with metric_col1:
-                            st.metric("🌱 Plant Type", plant_type)
+                            st.metric("[PLANT] Plant Type", plant_type)
 
                         with metric_col2:
-                            st.metric("🦠 Condition", readable_name)
+                            st.metric("[VIRUS] Condition", readable_name)
 
                         with metric_col3:
                             # Color-coded confidence
@@ -621,18 +621,18 @@ with tab1:
                     except Exception as e:
                         st.error(f"[TODO] Analysis failed: {e!s}")
         else:
-            st.info("👆 Upload an image or select a sample to begin analysis")
+            st.info("[POINTER] Upload an image or select a sample to begin analysis")
 
 # Audio Processing Tab
 with tab2:
-    st.subheader("🎤 Voice & Audio Analysis")
+    st.subheader("[VOICE] Voice & Audio Analysis")
     st.info("[TIP] Ask questions about plant care or describe symptoms using voice or audio files")
 
     # Audio input methods
     audio_col1, audio_col2 = st.columns([1, 1])
 
     with audio_col1:
-        st.markdown("### 🎙️ Live Recording")
+        st.markdown("### [MICROPHONE]️ Live Recording")
 
         if "audio_buf" not in st.session_state:
             st.session_state.audio_buf = []
@@ -656,19 +656,19 @@ with tab2:
         # Recording controls
         if st.button("[PROGRESS] Process Recording", key="mic_analyze", type="primary", use_container_width=True):
             if st.session_state.audio_buf:
-                with st.spinner("🎧 Processing audio..."):
+                with st.spinner("[AUDIO] Processing audio..."):
                     try:
                         audio_data = np.concatenate(st.session_state.audio_buf, axis=0)
                         sf.write("mic.wav", audio_data, 48000)
                         text = audio_adapter.transcribe("mic.wav")
 
-                        st.markdown("### 📝 Transcription Results")
+                        st.markdown("### [WRITE] Transcription Results")
                         st.text_area("What you said:", text, height=100, disabled=True)
 
                         # Generate response if it's a question
                         if text.strip():
                             response = text_adapter.generate_response("general", text)
-                            st.markdown("### 🤖 AI Response")
+                            st.markdown("### [AI] AI Response")
                             st.success(response)
 
                         st.session_state.audio_buf = []
@@ -682,7 +682,7 @@ with tab2:
                 st.warning("[WARNING] No audio detected. Please record something first!")
 
     with audio_col2:
-        st.markdown("### 📁 File Upload")
+        st.markdown("### [FOLDER] File Upload")
 
         audio_file = st.file_uploader("Upload audio file", ["wav", "mp3", "m4a"], help="Supported formats: WAV, MP3, M4A")
 
@@ -690,7 +690,7 @@ with tab2:
             st.audio(audio_file, format="audio/wav")
 
             if st.button("[PROGRESS] Process File", key="file_analyze", type="primary", use_container_width=True):
-                with st.spinner("🎧 Processing uploaded audio..."):
+                with st.spinner("[AUDIO] Processing uploaded audio..."):
                     try:
                         # Save uploaded file temporarily
                         tmp_path = Path("tmp_audio")
@@ -699,13 +699,13 @@ with tab2:
                         # Transcribe
                         text = audio_adapter.transcribe(str(tmp_path))
 
-                        st.markdown("### 📝 Transcription Results")
+                        st.markdown("### [WRITE] Transcription Results")
                         st.text_area("Transcribed text:", text, height=100, disabled=True)
 
                         # Generate response if it's a question
                         if text.strip():
                             response = text_adapter.generate_response("general", text)
-                            st.markdown("### 🤖 AI Response")
+                            st.markdown("### [AI] AI Response")
                             st.success(response)
 
                         # Clean up temp file
@@ -714,11 +714,11 @@ with tab2:
                     except Exception as e:
                         st.error(f"[TODO] Audio processing failed: {e!s}")
         else:
-            st.info("👆 Upload an audio file to begin processing")
+            st.info("[POINTER] Upload an audio file to begin processing")
 
 # Text Q&A Tab
 with tab3:
-    st.subheader("💬 Plant Care Assistant")
+    st.subheader("[CHAT] Plant Care Assistant")
     st.info("[TIP] Ask questions about plant diseases, treatments, or general plant care")
 
     # Chat interface
@@ -729,7 +729,7 @@ with tab3:
     question_col1, question_col2 = st.columns([4, 1])
 
     # Sample questions (placed BEFORE the input to allow prefill without state mutation errors)
-    st.markdown("### 🔍 Sample Questions")
+    st.markdown("### [SEARCH] Sample Questions")
     sample_questions = [
         "How to treat powdery mildew?",
         "What causes yellow leaves in plants?",
@@ -768,7 +768,7 @@ with tab3:
 
     # Process question
     if (ask_button and user_question.strip()) or (user_question and st.session_state.get("auto_submit", False)):
-        with st.spinner("🤖 AI is thinking..."):
+        with st.spinner("[AI] AI is thinking..."):
             try:
                 response = text_adapter.generate_response("general", user_question)
 
@@ -784,7 +784,7 @@ with tab3:
 
     # Display chat history
     if st.session_state.chat_history:
-        st.markdown("### 💬 Conversation History")
+        st.markdown("### [CHAT] Conversation History")
 
         for i, chat in enumerate(reversed(st.session_state.chat_history[-5:])):  # Show last 5
             with st.expander(
@@ -792,10 +792,10 @@ with tab3:
                 expanded=(i == 0),
             ):
                 st.markdown(f"**❓ Question:** {chat['question']}")
-                st.markdown(f"**🤖 Answer:** {chat['answer']}")
+                st.markdown(f"**[AI] Answer:** {chat['answer']}")
 
         # Clear history button
-        if st.button("🗑️ Clear History", help="Clear conversation history"):
+        if st.button("[DELETE] Clear History", help="Clear conversation history"):
             st.session_state.chat_history = []
             st.rerun()
 
@@ -803,7 +803,7 @@ with tab3:
 
 # Training Tab
 with tab4:
-    st.subheader("📚 Training Runs & Reports")
+    st.subheader("[LIBRARY] Training Runs & Reports")
     st.info("Select a training run to view its artifacts, metrics, and open TensorBoard.")
 
     # Base runs directory
@@ -855,21 +855,21 @@ with tab4:
         # Visualizations
         vis_col1, vis_col2 = st.columns(2)
         with vis_col1:
-            st.markdown("### 📈 Training Curves")
+            st.markdown("### [CHART] Training Curves")
             if curves_path.exists():
                 st.image(str(curves_path), use_container_width=True)
             else:
                 st.info("training_curves.png not found for this run")
 
         with vis_col2:
-            st.markdown("### 🧠 Model Architecture")
+            st.markdown("### [BRAIN] Model Architecture")
             if arch_path.exists():
                 st.image(str(arch_path), use_container_width=True)
             else:
                 st.info("model_architecture.png not found for this run")
 
         # Downloads
-        st.markdown("### 📄 Reports & Downloads")
+        st.markdown("### [DOCUMENT] Reports & Downloads")
         dl_cols = st.columns(4)
         with dl_cols[0]:
             if report_path.exists():
@@ -963,7 +963,7 @@ with tab5:
     mgmt_col1, mgmt_col2 = st.columns([1, 1])
 
     with mgmt_col1:
-        st.markdown("### 🤖 Model Selection & Switching")
+        st.markdown("### [AI] Model Selection & Switching")
 
         # Get available models
         try:
@@ -1038,7 +1038,7 @@ with tab5:
             if models:
                 model_data = []
                 for model in models:
-                    status = "🟢 Current" if model["is_current"] else "⚪ Available" if model["enabled"] else "🔴 Disabled"
+                    status = "[GREEN] Current" if model["is_current"] else "⚪ Available" if model["enabled"] else "[RED] Disabled"
                     model_data.append(
                         {
                             "Model": model["name"],
@@ -1057,7 +1057,7 @@ with tab5:
 
     # Model testing section
     st.markdown("---")
-    st.markdown("### 🔍 Test Current Model")
+    st.markdown("### [SEARCH] Test Current Model")
 
     test_col1, test_col2 = st.columns([1, 1])
 
@@ -1087,7 +1087,7 @@ with tab5:
             st.image(img, caption=f"Testing: {img_name}", use_container_width=True)
 
             # Test button
-            if st.button("🧪 Test Model", type="primary", use_container_width=True, key="test_model_btn"):
+            if st.button("[TEST] Test Model", type="primary", use_container_width=True, key="test_model_btn"):
                 if "error" not in current_model_info:
                     with st.spinner("Analyzing image..."):
                         try:
@@ -1099,13 +1099,13 @@ with tab5:
                             col_a, col_b = st.columns(2)
 
                             with col_a:
-                                st.metric("🌿 Plant Type", result["plant_type"])
-                                st.metric("🦠 Disease", result["disease"])
+                                st.metric("[LEAF] Plant Type", result["plant_type"])
+                                st.metric("[VIRUS] Disease", result["disease"])
 
                             with col_b:
                                 st.metric("[SUMMARY] Confidence", result["confidence_percentage"])
                                 health_status = "Healthy [DONE]" if result["is_healthy"] else "Diseased [WARNING]"
-                                st.metric("💚 Health Status", health_status)
+                                st.metric("[HEALTHY] Health Status", health_status)
 
                             # Additional info
                             st.info(f"[TIP] **Recommendation:** {result['recommendation']}")
@@ -1125,7 +1125,7 @@ with tab5:
                 else:
                     st.error("[TODO] No model loaded for testing")
         else:
-            st.info("👆 Upload an image or select a sample to test the current model")
+            st.info("[POINTER] Upload an image or select a sample to test the current model")
 
     # Configuration management
     st.markdown("---")
@@ -1136,7 +1136,7 @@ with tab5:
     with config_col1:
         st.markdown("**Current Configuration File:** `config/models.json`")
 
-        if st.button("📝 View Config", help="Display current model configuration"):
+        if st.button("[WRITE] View Config", help="Display current model configuration"):
             try:
                 with open("config/models.json") as f:
                     config_content = f.read()
@@ -1163,14 +1163,14 @@ with tab5:
         - Configure device preferences
         """)
 
-        if st.button("📁 Open Config Folder", help="View configuration folder information"):
+        if st.button("[FOLDER] Open Config Folder", help="View configuration folder information"):
             config_dir = Path("config")
             if config_dir.exists():
                 st.success("[DONE] Configuration folder found!")
                 st.info(f"**Configuration Directory:** `{config_dir.absolute()}`")
 
                 # Show folder contents
-                st.markdown("**📁 Folder Contents:**")
+                st.markdown("**[FOLDER] Folder Contents:**")
                 try:
                     config_files = list(config_dir.glob("*.json"))
                     if config_files:

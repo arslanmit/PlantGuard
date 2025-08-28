@@ -259,18 +259,18 @@ def register_default_content_areas(spa_manager: MobileSPAManager) -> None:
     """Register default PlantGuard content areas."""
 
     def image_analysis_content():
-        st.markdown("### 📸 Image Analysis")
+        st.markdown("### [PHOTO] Image Analysis")
         st.file_uploader("Upload plant image", type=["jpg", "jpeg", "png"], key="spa_image_upload")
         st.info("Upload an image to analyze your plant's health")
 
     def voice_assistant_content():
-        st.markdown("### 🎤 Voice Assistant")
-        if st.button("🎙️ Start Recording", key="spa_voice_record"):
+        st.markdown("### [VOICE] Voice Assistant")
+        if st.button("[MICROPHONE]️ Start Recording", key="spa_voice_record"):
             st.info("Voice recording feature")
         st.info("Voice assistant for plant care questions")
 
     def chat_interface_content():
-        st.markdown("### 💬 Chat Assistant")
+        st.markdown("### [CHAT] Chat Assistant")
         st.text_input("Ask about plant care", key="spa_chat_input", placeholder="How often should I water my plants?")
         st.info("Chat with AI about plant care")
 
@@ -283,7 +283,7 @@ def register_default_content_areas(spa_manager: MobileSPAManager) -> None:
             st.success("Notifications enabled")
 
     # Register all content areas
-    spa_manager.register_content_area("image_analysis", "Image Analysis", "📸", image_analysis_content)
-    spa_manager.register_content_area("voice_assistant", "Voice Assistant", "🎤", voice_assistant_content)
-    spa_manager.register_content_area("chat_interface", "Chat Assistant", "💬", chat_interface_content)
+    spa_manager.register_content_area("image_analysis", "Image Analysis", "[PHOTO]", image_analysis_content)
+    spa_manager.register_content_area("voice_assistant", "Voice Assistant", "[VOICE]", voice_assistant_content)
+    spa_manager.register_content_area("chat_interface", "Chat Assistant", "[CHAT]", chat_interface_content)
     spa_manager.register_content_area("history_settings", "History & Settings", "[SUMMARY]", history_settings_content)

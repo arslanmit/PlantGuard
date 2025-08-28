@@ -60,7 +60,7 @@ class BackwardCompatibilityValidator:
 
     def validate_makefile_redirects(self) -> dict[str, bool]:
         """Validate that deprecated commands exist in Makefile with redirects."""
-        print("🔍 Validating Makefile redirects...")
+        print("[SEARCH] Validating Makefile redirects...")
 
         try:
             with open("Makefile") as f:
@@ -90,7 +90,7 @@ class BackwardCompatibilityValidator:
 
     def validate_mobile_commands(self) -> dict[str, bool]:
         """Validate that mobile commands exist and work."""
-        print("🔍 Validating mobile commands...")
+        print("[SEARCH] Validating mobile commands...")
 
         results = {}
 
@@ -121,7 +121,7 @@ class BackwardCompatibilityValidator:
 
     def validate_documentation_files(self) -> dict[str, bool]:
         """Validate that all required documentation files exist."""
-        print("🔍 Validating documentation files...")
+        print("[SEARCH] Validating documentation files...")
 
         results = {}
 
@@ -148,7 +148,7 @@ class BackwardCompatibilityValidator:
 
     def validate_migration_helper(self) -> dict[str, bool]:
         """Validate migration helper script functionality."""
-        print("🔍 Validating migration helper script...")
+        print("[SEARCH] Validating migration helper script...")
 
         results = {}
 
@@ -215,7 +215,7 @@ class BackwardCompatibilityValidator:
 
     def validate_readme_updates(self) -> dict[str, bool]:
         """Validate that README has been updated for mobile-only."""
-        print("🔍 Validating README updates...")
+        print("[SEARCH] Validating README updates...")
 
         results = {}
 
@@ -257,7 +257,7 @@ class BackwardCompatibilityValidator:
 
     def run_comprehensive_validation(self) -> dict[str, dict]:
         """Run all validation tests."""
-        print("🧪 Running Comprehensive Backward Compatibility Validation")
+        print("[TEST] Running Comprehensive Backward Compatibility Validation")
         print("=" * 60)
         print()
 
@@ -308,7 +308,7 @@ class BackwardCompatibilityValidator:
         with open(report_path, "w") as f:
             json.dump(results, f, indent=2)
 
-        print(f"📄 Detailed validation report saved to: {report_path}")
+        print(f"[DOCUMENT] Detailed validation report saved to: {report_path}")
 
 
 def main():

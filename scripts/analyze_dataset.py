@@ -40,7 +40,7 @@ def main() -> None:
             print(f"[SUMMARY] Analyzing {dataset_name} at {dataset_path}...")
             info = dm.analyze_dataset(Path(dataset_path))
 
-            print(f"📈 Dataset Analysis for {dataset_name}:")
+            print(f"[CHART] Dataset Analysis for {dataset_name}:")
             print(f"  Name: {info.name}")
             print(f"  Total samples: {info.total_samples:,}")
             print(f"  Number of classes: {info.num_classes}")

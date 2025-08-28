@@ -155,15 +155,15 @@ def main() -> None:
 
     try:
         # Find model and dataset
-        print("🔍 Finding model and dataset...")
+        print("[SEARCH] Finding model and dataset...")
         model_path = find_model_path(args.model_path)
         dataset_path = find_dataset_path(args.dataset_path)
 
-        print(f"📁 Model: {model_path}")
+        print(f"[FOLDER] Model: {model_path}")
         print(f"[SUMMARY] Dataset: {dataset_path}")
 
         # Create data loader
-        print("📚 Loading validation dataset...")
+        print("[LIBRARY] Loading validation dataset...")
         val_loader, class_names = create_data_loader(dataset_path, args.batch_size)
         print(f"[DONE] Loaded {len(val_loader.dataset)} samples, {len(class_names)} classes")
 
@@ -176,7 +176,7 @@ def main() -> None:
         )
 
         # Initialize validator
-        print("🤖 Initializing model validator...")
+        print("[AI] Initializing model validator...")
         validator = AutomatedModelValidator(config=config)
 
         # Run evaluation
@@ -204,8 +204,8 @@ def main() -> None:
         with summary_path.open("w", encoding="utf-8") as f:
             f.write(validator.generate_validation_summary(result))
 
-        print(f"\n📄 Detailed report saved to: {report_path}")
-        print(f"📄 Summary saved to: {summary_path}")
+        print(f"\n[DOCUMENT] Detailed report saved to: {report_path}")
+        print(f"[DOCUMENT] Summary saved to: {summary_path}")
 
         # Exit with appropriate code
         if result.validation_passed:

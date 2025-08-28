@@ -12,7 +12,7 @@ from core.nlp import TextAdapter
 
 def test_integration_scenarios():
     """Test realistic integration scenarios."""
-    print("🔗 Testing TextAdapter integration scenarios...")
+    print("[LINK] Testing TextAdapter integration scenarios...")
 
     adapter = TextAdapter()
 
@@ -68,7 +68,7 @@ def test_integration_scenarios():
 
 def test_knowledge_base_consistency():
     """Test knowledge base consistency with class mappings."""
-    print("\n🔍 Testing knowledge base consistency...")
+    print("\n[SEARCH] Testing knowledge base consistency...")
 
     import json
 

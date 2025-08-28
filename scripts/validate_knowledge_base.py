@@ -20,7 +20,7 @@ def validate_knowledge_base():
     with open("data/knowledge_base/plantvillage_classes.json") as f:
         class_data = json.load(f)
 
-    print("🔍 Validating knowledge base...")
+    print("[SEARCH] Validating knowledge base...")
 
     # Check schema
     required_fields = ["schema_version", "last_updated", "diseases"]

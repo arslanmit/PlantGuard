@@ -123,13 +123,13 @@ class MobileVoiceInput(MobileBaseComponent):
             if voice_data.get("recording"):
                 # Stop recording button
                 if st.button(
-                    "🛑 Stop Recording", key=f"{self.component_id}_stop_btn", help="Stop voice recording", use_container_width=True, type="secondary"
+                    "[HALT] Stop Recording", key=f"{self.component_id}_stop_btn", help="Stop voice recording", use_container_width=True, type="secondary"
                 ):
                     self._stop_recording()
             else:
                 # Start recording button
                 if st.button(
-                    "🎤 Start Recording",
+                    "[VOICE] Start Recording",
                     key=f"{self.component_id}_start_btn",
                     help="Start voice recording (hold to record)",
                     use_container_width=True,
@@ -153,7 +153,7 @@ class MobileVoiceInput(MobileBaseComponent):
     def _render_recording_interface(self) -> None:
         """Render the audio recording interface using streamlit-webrtc."""
         try:
-            st.markdown("### 🎤 Recording...")
+            st.markdown("### [VOICE] Recording...")
 
             # Create WebRTC streamer for audio recording
             webrtc_ctx = webrtc_streamer(
@@ -182,9 +182,9 @@ class MobileVoiceInput(MobileBaseComponent):
 
             # Display recording status
             if webrtc_ctx.state.playing:
-                st.success("🔴 Recording active")
+                st.success("[RED] Recording active")
             else:
-                st.warning("🟡 Starting recording...")
+                st.warning("[YELLOW] Starting recording...")
 
         except Exception as e:
             logger.error("Recording interface failed: %s", e)
@@ -207,7 +207,7 @@ class MobileVoiceInput(MobileBaseComponent):
             state["data"]["voice_data"] = voice_data
             self.set_state(state)
 
-            st.success("🎤 Recording started! Speak your question about plants.")
+            st.success("[VOICE] Recording started! Speak your question about plants.")
 
         except Exception as e:
             logger.error("Failed to start recording: %s", e)
@@ -243,7 +243,7 @@ class MobileVoiceInput(MobileBaseComponent):
             # Process the recorded audio
             self._process_recorded_audio(voice_data)
 
-            st.success(f"🎤 Recording stopped ({duration:.1f}s). Processing...")
+            st.success(f"[VOICE] Recording stopped ({duration:.1f}s). Processing...")
 
         except Exception as e:
             logger.error("Failed to stop recording: %s", e)
@@ -271,7 +271,7 @@ class MobileVoiceInput(MobileBaseComponent):
             state["data"]["voice_data"] = voice_data
             self.set_state(state)
 
-            st.info("🚫 Recording cancelled")
+            st.info("[STOP] Recording cancelled")
 
         except Exception as e:
             logger.error("Failed to cancel recording: %s", e)
@@ -373,7 +373,7 @@ class MobileVoiceInput(MobileBaseComponent):
             from .mobile_adapter_integration import mobile_integration
 
             # Perform transcription using mobile integration
-            with st.spinner("🎧 Converting speech to text..."):
+            with st.spinner("[AUDIO] Converting speech to text..."):
                 transcription_result = mobile_integration.transcribe_audio(audio_file=audio_file_path, source="voice", component_id=self.component_id)
 
                 # Check for success
@@ -413,7 +413,7 @@ class MobileVoiceInput(MobileBaseComponent):
             # Trigger text processing if available
             self._trigger_text_processing(transcription)
 
-            st.success(f'🎧 Speech recognized: "{transcription}"')
+            st.success(f'[AUDIO] Speech recognized: "{transcription}"')
 
         except Exception as e:
             logger.error("Text processing failed: %s", e)
@@ -430,7 +430,7 @@ class MobileVoiceInput(MobileBaseComponent):
             context = {"recent_analysis": recent_analysis[0]} if recent_analysis else None
 
             # Process text and generate response
-            with st.spinner("🤖 Generating response..."):
+            with st.spinner("[AI] Generating response..."):
                 processing_result = mobile_integration.process_text_query(text=text, source="voice", component_id=self.component_id, context=context)
 
                 # Check for errors
@@ -441,10 +441,10 @@ class MobileVoiceInput(MobileBaseComponent):
                 # Display response
                 response = processing_result.get("response", "")
                 if response:
-                    st.success("🤖 Response generated!")
+                    st.success("[AI] Response generated!")
 
                     # Show response in an expandable section
-                    with st.expander("🤖 AI Response", expanded=True):
+                    with st.expander("[AI] AI Response", expanded=True):
                         st.write(response)
                 else:
                     st.warning("[WARNING] No response generated. Please try rephrasing your question.")
@@ -462,7 +462,7 @@ class MobileVoiceInput(MobileBaseComponent):
         # Progress bar for recording duration
         progress = min(current_duration / max_duration, 1.0)
 
-        st.markdown("### 🔴 Recording in Progress")
+        st.markdown("### [RED] Recording in Progress")
         st.progress(progress)
 
         col1, col2 = st.columns(2)
@@ -478,14 +478,14 @@ class MobileVoiceInput(MobileBaseComponent):
 
     def _render_processing_status(self) -> None:
         """Render processing status indicator."""
-        st.markdown("### 🎧 Processing Audio")
+        st.markdown("### [AUDIO] Processing Audio")
 
         with st.spinner("Converting speech to text..."):
             time.sleep(0.1)  # Small delay for UI responsiveness
 
     def _render_transcription(self, transcription: str) -> None:
         """Render transcription result."""
-        st.markdown("### 🎧 Speech Recognition Result")
+        st.markdown("### [AUDIO] Speech Recognition Result")
 
         # Display transcription in a text area for editing
         edited_transcription = st.text_area(
@@ -514,7 +514,7 @@ class MobileVoiceInput(MobileBaseComponent):
 
     def _render_last_recording(self, recording_data: dict[str, Any]) -> None:
         """Render information about the last recording."""
-        st.markdown("### 🎤 Last Recording")
+        st.markdown("### [VOICE] Last Recording")
 
         col1, col2 = st.columns(2)
 
@@ -532,7 +532,7 @@ class MobileVoiceInput(MobileBaseComponent):
 
     def _render_voice_settings(self) -> None:
         """Render voice settings panel."""
-        with st.expander("🎤 Voice Settings", expanded=True):
+        with st.expander("[VOICE] Voice Settings", expanded=True):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -575,7 +575,7 @@ class MobileVoiceInput(MobileBaseComponent):
         state["data"]["voice_data"] = voice_data
         self.set_state(state)
 
-        st.success("🧹 Transcription cleared")
+        st.success("[CLEAN] Transcription cleared")
 
     def _clear_last_recording(self) -> None:
         """Clear last recording data."""
@@ -585,12 +585,12 @@ class MobileVoiceInput(MobileBaseComponent):
         state["data"]["voice_data"] = voice_data
         self.set_state(state)
 
-        st.success("🗑️ Last recording cleared")
+        st.success("[DELETE] Last recording cleared")
 
     def _clear_voice_state(self) -> None:
         """Clear all voice state."""
         self._initialize_voice_state()
-        st.success("🧹 Voice state cleared")
+        st.success("[CLEAN] Voice state cleared")
 
     def get_last_transcription(self) -> str | None:
         """Get the last transcription result."""

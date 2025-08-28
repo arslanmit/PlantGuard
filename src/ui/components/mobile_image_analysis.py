@@ -139,10 +139,10 @@ class MobileImageAnalysis(MobileComponent):
         Returns:
             PIL.Image: Uploaded image or None
         """
-        st.markdown("### 📸 Upload Plant Image")
+        st.markdown("### [PHOTO] Upload Plant Image")
 
         # Create tabs for different input methods
-        upload_tab, camera_tab = st.tabs(["📎 Upload File", "📷 Camera"])
+        upload_tab, camera_tab = st.tabs(["[ATTACH] Upload File", "[CAMERA] Camera"])
 
         uploaded_image = None
 
@@ -179,7 +179,7 @@ class MobileImageAnalysis(MobileComponent):
         if not image:
             return
 
-        st.markdown("#### 🖼️ Image Preview")
+        st.markdown("#### [IMAGE] Image Preview")
 
         # Display image with mobile-friendly sizing
         col1, col2, col3 = st.columns([1, 2, 1])
@@ -206,7 +206,7 @@ class MobileImageAnalysis(MobileComponent):
 
         with col1:
             analyze_clicked = st.button(
-                "🔍 Analyze Plant",
+                "[SEARCH] Analyze Plant",
                 key=f"{self.component_id}_analyze",
                 use_container_width=True,
                 disabled=st.session_state.get("analysis_in_progress", False),
@@ -214,7 +214,7 @@ class MobileImageAnalysis(MobileComponent):
             )
 
         with col2:
-            clear_clicked = st.button("🗑️ Clear", key=f"{self.component_id}_clear", use_container_width=True)
+            clear_clicked = st.button("[DELETE] Clear", key=f"{self.component_id}_clear", use_container_width=True)
 
         if clear_clicked:
             self.clear_analysis()
@@ -305,7 +305,7 @@ class MobileImageAnalysis(MobileComponent):
             st.error(f"Analysis failed: {results.get('error', 'Unknown error')}")
             return
 
-        st.markdown("### 🔍 Analysis Results")
+        st.markdown("### [SEARCH] Analysis Results")
 
         # Main result card
         is_healthy = results.get("is_healthy", False)
@@ -371,7 +371,7 @@ class MobileImageAnalysis(MobileComponent):
                 - Consult plant care experts if symptoms persist
                 """)
         else:
-            with st.expander("🌱 Healthy Plant Care"):
+            with st.expander("[PLANT] Healthy Plant Care"):
                 st.markdown("""
                 **Keep Your Plant Healthy:**
                 - Maintain current care routine

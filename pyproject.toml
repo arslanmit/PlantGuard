@@ -1,5 +1,5 @@
 # ============================================================================
-# 🌿 PlantGuard - AI Plant Disease Detection System
+# [LEAF] PlantGuard - AI Plant Disease Detection System
 # ============================================================================
 # This file configures the entire PlantGuard project
 #
@@ -9,7 +9,7 @@
 #   make dev      - Development workflow
 #   make help     - See all commands
 #
-# 📝 SECTIONS:
+# [WRITE] SECTIONS:
 #   1. Build System    - How Python packages the project
 #   2. Project Info    - Name, version, description
 #   3. Dependencies    - What libraries we need
@@ -31,13 +31,13 @@ build-backend = "hatchling.build"
 [project]
 name = "plantguard"
 version = "0.2.0"
-description = "🌿 AI-powered plant disease detection with Vision Transformer, MobileNet, and ResNet50 models"
+description = "[LEAF] AI-powered plant disease detection with Vision Transformer, MobileNet, and ResNet50 models"
 authors = [{ name = "PlantGuard Team", email = "umit.arslan@outlook.com" }]
 license = "MIT"
 readme = "README.md"
 requires-python = ">=3.10"
 
-# 🏷️ Keywords for package discovery
+# [TAG] Keywords for package discovery
 keywords = [
   "plant-disease",
   "computer-vision",
@@ -73,7 +73,7 @@ classifiers = [
 # [TIP] TIP: All versions are in requirements.txt - this is just the minimum needed
 
 dependencies = [
-  # 🧠 AI/ML Core - The brain of PlantGuard
+  # [BRAIN] AI/ML Core - The brain of PlantGuard
   "torch>=2.8.0",        # PyTorch - main ML framework
   "torchvision>=0.23.0", # Computer vision models
   "torchaudio>=2.8.0",   # Audio processing
@@ -85,11 +85,11 @@ dependencies = [
   "scikit-learn>=1.7.1", # Traditional ML algorithms
   "PyYAML>=6.0.2",       # YAML configuration files
 
-  # 👁️ Computer Vision - See and understand images
+  # [VISION] Computer Vision - See and understand images
   "opencv-python-headless>=4.12.0.88", # Image processing (no GUI)
   "Pillow>=11.3.0",                    # Image loading and basic editing
 
-  # 🤗 Hugging Face - Pre-trained AI models
+  # [HUG] Hugging Face - Pre-trained AI models
   "transformers>=4.55.0",    # Vision Transformer, BERT, etc.
   "accelerate>=1.10.0",      # Fast model loading
   "datasets>=4.0.0",         # Dataset handling
@@ -97,13 +97,13 @@ dependencies = [
   "tokenizers>=0.21.4",      # Text tokenization
   "safetensors>=0.6.2",      # Safe tensor serialization
 
-  # 🎵 Audio Processing - Hear and understand speech
+  # [SOUND] Audio Processing - Hear and understand speech
   "librosa>=0.11.0",           # Audio analysis
   "soundfile>=0.13.1",         # Audio file reading/writing
   "SpeechRecognition>=3.14.3", # Speech-to-text
   "openai-whisper>=20230314",  # Advanced speech recognition
 
-  # 🌐 Web Interface - The app you see in your browser
+  # [NETWORK] Web Interface - The app you see in your browser
   "streamlit>=1.48.0",            # Main web framework
   "streamlit-webrtc>=0.63.4",     # Real-time audio/video
   "streamlit-option-menu>=0.4.0", # Enhanced UI components
@@ -126,32 +126,32 @@ dependencies = [
 # [TOOL] Development Tools - For coding and maintaining PlantGuard
 dev = [
   "ruff>=0.12.8",        # ⚡ Super fast Python linter & formatter
-  "mypy>=1.17.1",        # 🔍 Type checking (catches bugs early)
-  "pytest>=8.4.1",       # 🧪 Testing framework
+  "mypy>=1.17.1",        # [SEARCH] Type checking (catches bugs early)
+  "pytest>=8.4.1",       # [TEST] Testing framework
   "pytest-cov>=6.2.1",   # [SUMMARY] Test coverage reports
-  "pytest-mock>=3.14.1", # 🎭 Mock objects for testing
-  "bandit>=1.8.6",       # 🔒 Security vulnerability scanner
-  "safety>=3.6.0",       # 🛡️ Check for known security issues
-  "pre-commit>=4.3.0",   # 🪝 Git hooks for code quality
+  "pytest-mock>=3.14.1", # [INTERFACE] Mock objects for testing
+  "bandit>=1.8.6",       # [SECURE] Security vulnerability scanner
+  "safety>=3.6.0",       # [SHIELD] Check for known security issues
+  "pre-commit>=4.3.0",   # [HOOK] Git hooks for code quality
 ]
 
-# 📚 Documentation Tools - Generate beautiful docs
+# [LIBRARY] Documentation Tools - Generate beautiful docs
 docs = [
-  "sphinx>=7.2.6",           # 📖 Documentation generator
-  "sphinx-rtd-theme>=3.0.2", # 🎨 Read the Docs theme
-  "myst-parser>=2.0.0",      # 📝 Markdown support in Sphinx
+  "sphinx>=7.2.6",           # [MANUAL] Documentation generator
+  "sphinx-rtd-theme>=3.0.2", # [DESIGN] Read the Docs theme
+  "myst-parser>=2.0.0",      # [WRITE] Markdown support in Sphinx
 ]
 
-# 📓 Jupyter & Analysis - Interactive development
+# [NOTEBOOK] Jupyter & Analysis - Interactive development
 jupyter = [
-  "jupyter>=1.1.1",     # 📓 Jupyter notebooks
-  "ipykernel>=6.30.1",  # 🐍 Python kernel for notebooks
-  "matplotlib>=3.10.5", # 📈 Plotting and visualization
-  "seaborn>=0.13.2",    # 🎨 Beautiful statistical plots
+  "jupyter>=1.1.1",     # [NOTEBOOK] Jupyter notebooks
+  "ipykernel>=6.30.1",  # [PYTHON] Python kernel for notebooks
+  "matplotlib>=3.10.5", # [CHART] Plotting and visualization
+  "seaborn>=0.13.2",    # [DESIGN] Beautiful statistical plots
   "plotly>=5.24.1",     # [SUMMARY] Interactive plots (also in main deps)
 ]
 
-# 🤖 ML Training & Experiments - Advanced ML features
+# [AI] ML Training & Experiments - Advanced ML features
 training = [
   "wandb>=0.21.1", # [SUMMARY] Experiment tracking (Weights & Biases)
   "optuna>=4.4.0", # [PROGRESS] Hyperparameter optimization
@@ -162,13 +162,13 @@ all = ["plantguard[dev,docs,jupyter,training]"] # Everything
 basic = ["plantguard[jupyter]"]                 # Just notebooks
 full-dev = ["plantguard[dev,docs,jupyter]"]     # Development without ML extras
 
-# 🔗 Project Links - Where to find more info
+# [LINK] Project Links - Where to find more info
 [project.urls]
-"🏠 Homepage" = "https://github.com/arslanmit/PlantGuard"
-"📂 Source Code" = "https://github.com/arslanmit/PlantGuard"
+"[HOME] Homepage" = "https://github.com/arslanmit/PlantGuard"
+"[DIRECTORY] Source Code" = "https://github.com/arslanmit/PlantGuard"
 "[LAUNCH] Try in Colab" = "https://colab.research.google.com/github/arslanmit/PlantGuard/blob/main/notebooks/PlantGuard.ipynb"
 
-# 🖥️ Command Line Tools - Run PlantGuard from terminal
+# [DESKTOP] Command Line Tools - Run PlantGuard from terminal
 [project.scripts]
 plantguard = "src.plantguard_bot:main"                    # Main CLI interface
 plantguard-train = "src.training.production_trainer:main" # Training CLI
@@ -196,7 +196,7 @@ plantguard-train = "src.training.production_trainer:main" # Training CLI
 #   make dev     - Do both format + lint
 
 [tool.mypy]
-python_version = "3.10" # 🐍 Python version we're using
+python_version = "3.10" # [PYTHON] Python version we're using
 strict = false          # [PROGRESS] Gradual typing (not too strict while learning)
 
 # External libraries - ignore missing type information
@@ -234,7 +234,7 @@ exclude = [
   "tests/",     # Test files - ignore all linter rules
 ]
 
-# 🧪 Test files - relaxed rules for tests
+# [TEST] Test files - relaxed rules for tests
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
@@ -249,7 +249,7 @@ check_untyped_defs = false
 #   make test     - Run all tests
 #   make coverage - See test coverage report
 
-# 🧪 Pytest - Testing framework (finds and runs tests)
+# [TEST] Pytest - Testing framework (finds and runs tests)
 [tool.pytest.ini_options]
 minversion = "7.0" # Minimum pytest version
 
@@ -265,13 +265,13 @@ addopts = [
   "--cov-fail-under=80",                    # Fail if coverage is below 80%
 ]
 
-# 📁 Where to find tests and how to recognize them
+# [FOLDER] Where to find tests and how to recognize them
 testpaths = ["tests"]                     # Look for tests in tests/ folder
 python_files = ["test_*.py", "*_test.py"] # Files that contain tests
 python_classes = ["Test*"]                # Test classes start with "Test"
 python_functions = ["test_*"]             # Test functions start with "test_"
 
-# 🏷️ Test markers (categories for organizing tests)
+# [TAG] Test markers (categories for organizing tests)
 markers = [
   "slow: marks tests as slow (skip with: pytest -m 'not slow')",
   "integration: marks tests as integration tests (test multiple components)",
@@ -293,7 +293,7 @@ filterwarnings = [
 source = ["src"] # Measure coverage for src/ folder
 branch = true    # Track branch coverage (if/else paths)
 
-# 🚫 Files to skip when measuring coverage
+# [STOP] Files to skip when measuring coverage
 omit = [
   "*/tests/*",         # Don't measure test files themselves
   "*/test_*",          # Skip test files
@@ -303,7 +303,7 @@ omit = [
 ]
 
 [tool.coverage.report]
-# 🚫 Lines to exclude from coverage (code that doesn't need testing)
+# [STOP] Lines to exclude from coverage (code that doesn't need testing)
 exclude_lines = [
   "pragma: no cover",           # Explicit exclusion comment
   "def __repr__",               # String representation methods
@@ -331,12 +331,12 @@ directory = "htmlcov" # Where to put HTML coverage report
 # [LAUNCH] QUICK COMMANDS:
 #   make security - Run security scan
 
-# 🔒 Bandit - Security linter (finds potential security issues)
+# [SECURE] Bandit - Security linter (finds potential security issues)
 [tool.bandit]
-# 🚫 Folders to skip during security scan
+# [STOP] Folders to skip during security scan
 exclude_dirs = ["tests", "build", "dist", ".venv", "run", "data"]
 
-# 🚫 Security checks to skip (because they're OK for PlantGuard)
+# [STOP] Security checks to skip (because they're OK for PlantGuard)
 skips = [
   "B101", # assert statements (OK for debugging and development)
   "B601", # shell injection (we control the shell commands)
@@ -348,14 +348,14 @@ skips = [
 # 8️⃣ DEVELOPMENT WORKFLOW - Helpful tools and automation
 # ============================================================================
 
-# 🪝 Pre-commit Configuration Reference
+# [HOOK] Pre-commit Configuration Reference
 # =====================================
 # [TIP] Pre-commit runs checks automatically before each git commit
 #
 # [LAUNCH] SETUP:
 #   make setup  (installs pre-commit hooks automatically)
 #
-# 📝 To create .pre-commit-config.yaml manually:
+# [WRITE] To create .pre-commit-config.yaml manually:
 #
 # repos:
 #   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -380,13 +380,13 @@ skips = [
 #   pip install -e .  - Install PlantGuard in development mode
 
 [tool.ruff]
-line-length = 150         # 📏 Reasonable line length for readability
-target-version = "py310"  # 🐍 Python version we support
+line-length = 150         # [MEASURE] Reasonable line length for readability
+target-version = "py310"  # [PYTHON] Python version we support
 fix = true                # [TOOL] Auto-fix issues when possible
-show-fixes = true         # 📝 Show what was fixed
+show-fixes = true         # [WRITE] Show what was fixed
 output-format = "grouped" # [SUMMARY] Group similar issues together
 
-# 📁 Folders to completely exclude from all linting
+# [FOLDER] Folders to completely exclude from all linting
 exclude = [
   "build/",
   "dist/",
@@ -404,11 +404,11 @@ exclude = [
   "**/tests/**",    # Also exclude tests in any subdirectory
 ]
 
-# 🔍 What Ruff checks for (focused on essential rules)
+# [SEARCH] What Ruff checks for (focused on essential rules)
 [tool.ruff.lint]
 select = [
   # ============================================================================
-  # 🐍 CORE PYTHON RULES - Essential code quality
+  # [PYTHON] CORE PYTHON RULES - Essential code quality
   # ============================================================================
   "E", # pycodestyle errors (spacing, indentation, line length)
   "F", # pyflakes (unused imports, undefined variables, syntax errors)
@@ -416,33 +416,33 @@ select = [
   "W", # pycodestyle warnings
 
   # ============================================================================
-  # 🐛 BUG PREVENTION - Catch common mistakes
+  # [BUG] BUG PREVENTION - Catch common mistakes
   # ============================================================================
   "B",  # flake8-bugbear (common Python gotchas and anti-patterns)
   "C4", # flake8-comprehensions (better list/dict comprehensions)
   "UP", # pyupgrade (modern Python syntax, f-strings, type hints)
 
   # ============================================================================
-  # 🔒 SECURITY & SAFETY - Keep code secure
+  # [SECURE] SECURITY & SAFETY - Keep code secure
   # ============================================================================
   "S", # flake8-bandit (security vulnerabilities and unsafe patterns)
 
   # ============================================================================
-  # 📝 CODE STYLE - Clean, readable code
+  # [WRITE] CODE STYLE - Clean, readable code
   # ============================================================================
   "PTH", # flake8-use-pathlib (use pathlib.Path instead of os.path)
   "SIM", # flake8-simplify (simpler, more readable code patterns)
   "RUF", # ruff-specific rules (unique to Ruff linter)
 
   # ============================================================================
-  # 🧪 TESTING - Test code quality
+  # [TEST] TESTING - Test code quality
   # ============================================================================
   "PT", # flake8-pytest-style (pytest best practices)
 ]
 
 extend-ignore = [
   # ============================================================================
-  # 🎨 Code Style Exceptions - Maintain readability over strictness  
+  # [DESIGN] Code Style Exceptions - Maintain readability over strictness  
   # ============================================================================
   "W291", # Trailing whitespace
   "W292", # No newline at end of file
@@ -451,7 +451,7 @@ extend-ignore = [
 
 ignore = [
   # ============================================================================
-  # 🤖 ML/AI Specific Exceptions - Allow common ML patterns
+  # [AI] ML/AI Specific Exceptions - Allow common ML patterns
   # ============================================================================
   "S101",   # Allow assert statements - essential for ML tensor shape validation
   "S301",   # Allow pickle usage - standard for ML model serialization
@@ -472,13 +472,13 @@ ignore = [
   "RUF012", # Allow mutable class attributes - ML model classes need mutable state
 
   # ============================================================================
-  # 🎨 Code Style Exceptions - Maintain readability over strictness  
+  # [DESIGN] Code Style Exceptions - Maintain readability over strictness  
   # ============================================================================
   "E501",   # Allow long lines beyond 120 chars for complex ML expressions
   "COM812", # Allow missing trailing commas - dynamic ML parameter lists
 
   # ============================================================================
-  # 📚 ALL AVAILABLE RULES - Commented for reference
+  # [LIBRARY] ALL AVAILABLE RULES - Commented for reference
   # ============================================================================
   # Uncomment any rule below to add it to the ignore list
 
@@ -874,14 +874,14 @@ ignore = [
   # "PT027",  # Use `pytest.raises()` instead of `unittest`-style `{assertion}`
 ]
 
-# 📦 Import Organization - Keep imports clean and organized
+# [PACKAGE] Import Organization - Keep imports clean and organized
 [tool.ruff.lint.isort]
-# 🏠 Our code (PlantGuard modules)
+# [HOME] Our code (PlantGuard modules)
 known-first-party = ["plantguard", "src"]
 
-# 🌐 External libraries we use (organized by category)
+# [NETWORK] External libraries we use (organized by category)
 known-third-party = [
-  # 🧠 AI/ML Core
+  # [BRAIN] AI/ML Core
   "torch",
   "torchvision",
   "torchaudio",
@@ -892,11 +892,11 @@ known-third-party = [
   "pandas",
   "sklearn",
 
-  # 👁️ Computer Vision
+  # [VISION] Computer Vision
   "cv2",
   "PIL",
 
-  # 🤗 Hugging Face
+  # [HUG] Hugging Face
   "transformers",
   "datasets",
   "accelerate",
@@ -904,23 +904,23 @@ known-third-party = [
   "tokenizers",
   "safetensors",
 
-  # 🎵 Audio
+  # [SOUND] Audio
   "librosa",
   "soundfile",
   "speech_recognition",
   "whisper",
 
-  # 🌐 Web Interface
+  # [NETWORK] Web Interface
   "streamlit",
   "streamlit_webrtc",
   "streamlit_option_menu",
 
-  # 📈 Visualization
+  # [CHART] Visualization
   "matplotlib",
   "seaborn",
   "plotly",
 
-  # 🧪 Testing & ML Tools
+  # [TEST] Testing & ML Tools
   "pytest",
   "wandb",
   "optuna",
@@ -929,19 +929,19 @@ known-third-party = [
 split-on-trailing-comma = true # Split long import lists nicely
 force-single-line = false      # Allow multiple imports per line when short
 
-# 📝 Quote Style - Consistent string quotes
+# [WRITE] Quote Style - Consistent string quotes
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "double"    # Use "double quotes" for strings
 multiline-quotes = "double" # Use """double quotes""" for multi-line
 docstring-quotes = "double" # Use """double quotes""" for docstrings
 
-# 🔒 Security Settings
+# [SECURE] Security Settings
 [tool.ruff.lint.flake8-bandit]
 check-typed-exception = true # Check exception handling
 
-# 📁 Per-file ignores - Different rules for different file types
+# [FOLDER] Per-file ignores - Different rules for different file types
 [tool.ruff.lint.per-file-ignores]
-# 🧪 Test files - Ignore ALL common linter rules that typically apply to tests
+# [TEST] Test files - Ignore ALL common linter rules that typically apply to tests
 "tests/**/*.py" = [
   "S101",   # Allow assert statements in tests
   "S102",   # Allow use of exec detected
@@ -963,7 +963,7 @@ check-typed-exception = true # Check exception handling
   "COM812", # Allow missing trailing commas
 ]
 
-# 📓 Scripts and notebooks - Allow subprocess calls and missing docstrings
+# [NOTEBOOK] Scripts and notebooks - Allow subprocess calls and missing docstrings
 "scripts/**/*.py" = [
   "S603", # Allow subprocess calls in scripts
   "S607", # Allow partial executable paths in scripts
@@ -977,13 +977,13 @@ check-typed-exception = true # Check exception handling
 ]
 
 
-# 🎨 Code Formatting - How code looks
+# [DESIGN] Code Formatting - How code looks
 [tool.ruff.format]
 quote-style = "double" # Use "double quotes"
 indent-style = "space" # Use spaces, not tabs
 line-ending = "auto"   # Auto-detect line endings (Windows/Mac/Linux)
 
-# 📦 Hatchling - Modern Python packaging tool
+# [PACKAGE] Hatchling - Modern Python packaging tool
 [tool.hatch.build.targets.wheel]
 packages = ["src/plantguard"]
 
@@ -1016,12 +1016,12 @@ exclude = [
 #   make dev     - Development workflow
 #   make help    - See all available commands
 #
-# 📚 LEARN MORE:
+# [LIBRARY] LEARN MORE:
 #   - README.md - Full documentation
 #   - Makefile - All available commands
 #   - requirements.txt - Exact dependency versions
 #
-# 🐛 HAVING ISSUES?
+# [BUG] HAVING ISSUES?
 #   make status  - Check project health
 #   make clean   - Clean up temporary files
 #   make fresh   - Fresh installation

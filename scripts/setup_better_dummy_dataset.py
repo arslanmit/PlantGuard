@@ -148,7 +148,7 @@ def create_improved_dummy_dataset(
     print(f"Classes: {num_classes}")
     print(f"Samples per class: {samples_per_class}")
     print(f"Train ratio: {train_ratio}")
-    print("🌿 Using synthetic plant patterns with learnable features")
+    print("[LEAF] Using synthetic plant patterns with learnable features")
 
     for class_idx, class_name in enumerate(selected_classes):
         print(f"Creating class {class_idx}: {class_name}")

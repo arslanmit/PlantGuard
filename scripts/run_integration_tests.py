@@ -279,7 +279,7 @@ class IntegrationTestRunner:
     def print_summary(self) -> None:
         """Print test summary to console."""
         print("\n" + "=" * 80)
-        print("🏁 INTEGRATION TEST SUMMARY")
+        print("[FINISH] INTEGRATION TEST SUMMARY")
         print("=" * 80)
 
         summary = self.test_results["summary"]

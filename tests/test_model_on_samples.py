@@ -301,7 +301,7 @@ def _print_plant_wise_performance(detailed: list[dict[str, Any]]) -> None:
         if result["evaluation"]["class_correct"]:
             plant_stats[plant]["correct"] += 1
 
-    print("\n🌿 PLANT-WISE PERFORMANCE")
+    print("\n[LEAF] PLANT-WISE PERFORMANCE")
     print("-" * 40)
     for plant_name, stats in sorted(plant_stats.items()):
         accuracy = stats["correct"] / stats["total"] if stats["total"] > 0 else 0

@@ -158,7 +158,7 @@ class MobilePerformanceOptimizer:
 
     def measure_memory_footprint(self) -> dict[str, float]:
         """Measure current memory usage and identify optimization opportunities."""
-        logger.info("🧠 Measuring memory footprint...")
+        logger.info("[BRAIN] Measuring memory footprint...")
 
         process = psutil.Process()
         memory_info = process.memory_info()
@@ -189,7 +189,7 @@ class MobilePerformanceOptimizer:
 
     def analyze_dependencies(self) -> dict[str, Any]:
         """Analyze dependencies and identify unused packages."""
-        logger.info("📦 Analyzing dependencies...")
+        logger.info("[PACKAGE] Analyzing dependencies...")
 
         # Read requirements.txt
         requirements_file = self.project_root / "requirements.txt"
@@ -282,7 +282,7 @@ class MobilePerformanceOptimizer:
             "potential_savings": len(unused_packages),
         }
 
-        logger.info(f"📦 Dependencies: {len(used_packages)}/{len(installed_packages)} used, {len(unused_packages)} potentially unused")
+        logger.info(f"[PACKAGE] Dependencies: {len(used_packages)}/{len(installed_packages)} used, {len(unused_packages)} potentially unused")
 
         self.performance_data["dependencies"] = dependency_analysis
         return dependency_analysis
@@ -390,7 +390,7 @@ class MobilePerformanceOptimizer:
 
     def cleanup_unused_files(self) -> dict[str, Any]:
         """Clean up unused files and directories after desktop removal."""
-        logger.info("🧹 Cleaning up unused files...")
+        logger.info("[CLEAN] Cleaning up unused files...")
 
         cleanup_results = {"removed_files": [], "removed_directories": [], "space_saved_mb": 0, "errors": []}
 
@@ -415,7 +415,7 @@ class MobilePerformanceOptimizer:
                     full_path.unlink()
                     cleanup_results["removed_files"].append(str(file_path))
                     cleanup_results["space_saved_mb"] += file_size / (1024 * 1024)
-                    logger.info(f"🗑️ Removed unused file: {file_path}")
+                    logger.info(f"[DELETE] Removed unused file: {file_path}")
                 except Exception as e:
                     cleanup_results["errors"].append(f"Failed to remove {file_path}: {e}")
                     logger.warning(f"[WARNING] Could not remove {file_path}: {e}")
@@ -429,7 +429,7 @@ class MobilePerformanceOptimizer:
                     if not any(full_path.iterdir()):
                         full_path.rmdir()
                         cleanup_results["removed_directories"].append(str(dir_path))
-                        logger.info(f"📁 Removed empty directory: {dir_path}")
+                        logger.info(f"[FOLDER] Removed empty directory: {dir_path}")
                 except Exception as e:
                     cleanup_results["errors"].append(f"Failed to remove directory {dir_path}: {e}")
                     logger.warning(f"[WARNING] Could not remove directory {dir_path}: {e}")
@@ -442,7 +442,7 @@ class MobilePerformanceOptimizer:
 
                 shutil.rmtree(cache_dir)
                 cleanup_results["removed_directories"].append(str(cache_dir.relative_to(self.project_root)))
-                logger.info(f"🗑️ Removed cache directory: {cache_dir.relative_to(self.project_root)}")
+                logger.info(f"[DELETE] Removed cache directory: {cache_dir.relative_to(self.project_root)}")
             except Exception as e:
                 cleanup_results["errors"].append(f"Failed to remove cache {cache_dir}: {e}")
 
@@ -464,7 +464,7 @@ class MobilePerformanceOptimizer:
 
     def optimize_imports(self) -> dict[str, Any]:
         """Optimize imports in mobile application files."""
-        logger.info("📥 Optimizing imports...")
+        logger.info("[DOWNLOAD] Optimizing imports...")
 
         optimization_results = {"files_processed": [], "imports_removed": [], "imports_optimized": [], "errors": []}
 
@@ -720,7 +720,7 @@ def main():
 
     optimizer = MobilePerformanceOptimizer()
 
-    print("🌿 PlantGuard Mobile Performance Optimizer")
+    print("[LEAF] PlantGuard Mobile Performance Optimizer")
     print("=" * 50)
 
     if args.measure or args.all:
@@ -739,7 +739,7 @@ def main():
         # Run Streamlit performance test
         streamlit_test = optimizer.run_streamlit_performance_test()
 
-        print("\n📈 PERFORMANCE SUMMARY:")
+        print("\n[CHART] PERFORMANCE SUMMARY:")
         print(f"  • Total startup time: {startup_times.get('total_estimated', -1):.3f}s")
         print(f"  • Memory usage: {memory_data.get('rss_mb', -1):.1f}MB")
         print(f"  • Unused packages: {len(dep_analysis.get('unused_packages', []))}")
@@ -761,13 +761,13 @@ def main():
         print(f"  • Removed imports: {len(import_results.get('imports_removed', []))}")
 
     if args.cleanup or args.all:
-        print("\n🧹 CLEANING UP RESOURCES")
+        print("\n[CLEAN] CLEANING UP RESOURCES")
         print("-" * 30)
 
         # Clean up unused files
         cleanup_results = optimizer.cleanup_unused_files()
 
-        print("\n🗑️ CLEANUP SUMMARY:")
+        print("\n[DELETE] CLEANUP SUMMARY:")
         print(f"  • Files removed: {len(cleanup_results.get('removed_files', []))}")
         print(f"  • Directories removed: {len(cleanup_results.get('removed_directories', []))}")
         print(f"  • Space saved: {cleanup_results.get('space_saved_mb', 0):.2f}MB")
@@ -784,7 +784,7 @@ def main():
         if report["recommendations"]:
             print("\n[TIP] RECOMMENDATIONS:")
             for i, rec in enumerate(report["recommendations"], 1):
-                priority_emoji = "🔴" if rec["priority"] == "high" else "🟡" if rec["priority"] == "medium" else "🟢"
+                priority_emoji = "[RED]" if rec["priority"] == "high" else "[YELLOW]" if rec["priority"] == "medium" else "[GREEN]"
                 print(f"  {i}. {priority_emoji} {rec['message']}")
                 print(f"     Action: {rec['action']}")
         else:

@@ -251,10 +251,10 @@ class AnalysisCard:
             col1, col2 = st.columns([3, 1])
 
             with col1:
-                st.subheader(f"🔬 {result.prediction.title()}")
+                st.subheader(f"[MICROSCOPE] {result.prediction.title()}")
 
             with col2:
-                st.caption(f"📅 {result.timestamp.strftime('%H:%M:%S')}")
+                st.caption(f"[DATE] {result.timestamp.strftime('%H:%M:%S')}")
 
             # Main content
             col1, col2 = st.columns([2, 1])
@@ -290,7 +290,7 @@ class AnalysisCard:
         """
         disease_info = self.get_disease_info(result.prediction)
 
-        with st.expander("💊 Treatment & Prevention", expanded=False):
+        with st.expander("[TREATMENT] Treatment & Prevention", expanded=False):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -298,7 +298,7 @@ class AnalysisCard:
                 st.info(disease_info["treatment"])
 
             with col2:
-                st.write("**🛡️ Prevention:**")
+                st.write("**[SHIELD] Prevention:**")
                 st.success(disease_info["prevention"])
 
     def render_probability_chart(self, result: AnalysisResult, n_classes: int = 5) -> None:
@@ -485,7 +485,7 @@ def create_sample_result() -> AnalysisResult:
 # Example usage and testing
 if __name__ == "__main__":
     # Test the analysis card
-    st.title("🔬 PlantGuard Analysis Card Test")
+    st.title("[MICROSCOPE] PlantGuard Analysis Card Test")
 
     # Create analysis card
     card = create_analysis_card()

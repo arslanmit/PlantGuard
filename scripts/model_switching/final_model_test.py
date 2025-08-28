@@ -15,7 +15,7 @@ from src.core.huggingface_vision import HuggingFaceVisionAdapter
 
 def comprehensive_test() -> None:
     """Run comprehensive test on all 21 images."""
-    print("🌱 PlantGuard Final Model Test")
+    print("[PLANT] PlantGuard Final Model Test")
     print("Using: Abhiram4/PlantDiseaseDetectorVit2 (Vision Transformer)")
     print("=" * 70)
 
@@ -49,7 +49,7 @@ def comprehensive_test() -> None:
     plant_matches = 0
     status_matches = 0
 
-    print("🔍 Testing all 21 images:")
+    print("[SEARCH] Testing all 21 images:")
     print("-" * 70)
 
     for sample in metadata.get("sample_images", []):
@@ -89,8 +89,8 @@ def comprehensive_test() -> None:
 
         # Icons
         perfect_icon = "[PROGRESS]" if perfect_match else "[TODO]"
-        plant_icon = "🌿" if plant_match else "[TODO]"
-        status_icon = "💚" if status_match else "💔"
+        plant_icon = "[LEAF]" if plant_match else "[TODO]"
+        status_icon = "[HEALTHY]" if status_match else "[BROKEN]"
 
         results.append(
             {
@@ -116,7 +116,7 @@ def comprehensive_test() -> None:
     # Final statistics
     total = len(results)
     print("=" * 70)
-    print("🏆 FINAL RESULTS")
+    print("[ACHIEVEMENT] FINAL RESULTS")
     print("=" * 70)
     print(f"Total images tested: {total}")
     print(f"Perfect matches: {perfect_matches}/{total} ({perfect_matches / total:.1%})")
@@ -136,7 +136,7 @@ def comprehensive_test() -> None:
         if result["perfect_match"]:
             plant_stats[plant]["correct"] += 1
 
-    print("\n🌿 Plant-wise Performance:")
+    print("\n[LEAF] Plant-wise Performance:")
     print("-" * 40)
     for plant, stats in sorted(plant_stats.items()):
         accuracy = stats["correct"] / stats["total"] if stats["total"] > 0 else 0
@@ -149,7 +149,7 @@ def comprehensive_test() -> None:
     healthy_correct = sum(1 for r in healthy_results if r["status_match"])
     diseased_correct = sum(1 for r in diseased_results if r["status_match"])
 
-    print("\n🏥 Health Status Performance:")
+    print("\n[HEALTH] Health Status Performance:")
     print("-" * 40)
     if healthy_results:
         print(f"Healthy plants:  {healthy_correct:2}/{len(healthy_results):2} ({healthy_correct / len(healthy_results):.1%})")
@@ -158,14 +158,14 @@ def comprehensive_test() -> None:
 
     print("\n[SUCCESS] CONCLUSION:")
     if perfect_matches == total:
-        print("🥇 PERFECT SCORE! Your model achieved 100% accuracy!")
+        print("[FIRST] PERFECT SCORE! Your model achieved 100% accuracy!")
         print("   This Hugging Face model is ready for production use.")
     elif perfect_matches >= total * 0.9:
-        print("🥈 EXCELLENT! Over 90% accuracy - great for real-world use.")
+        print("[SECOND] EXCELLENT! Over 90% accuracy - great for real-world use.")
     elif perfect_matches >= total * 0.8:
-        print("🥉 GOOD! Over 80% accuracy - suitable for most applications.")
+        print("[THIRD] GOOD! Over 80% accuracy - suitable for most applications.")
     else:
-        print("📈 NEEDS IMPROVEMENT - Consider trying other models or fine-tuning.")
+        print("[CHART] NEEDS IMPROVEMENT - Consider trying other models or fine-tuning.")
 
     print("\n[TIP] Model Details:")
     print(f"   Model: {adapter.model_name}")

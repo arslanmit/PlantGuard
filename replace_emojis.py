@@ -9,13 +9,13 @@ This script will:
 4. Provide detailed reporting of changes made
 
 Emoji mappings:
-[SUMMARY] -> [SUMMARY]
-[DONE] -> [DONE]
-[PARTIAL] -> [PARTIAL]
-[TODO] -> [TODO]
-[ERROR] -> [ERROR]
-[PROGRESS] -> [PROGRESS]
-[DETAILS] -> [DETAILS]
+📊 -> [SUMMARY]
+✅ -> [DONE]
+🔄 -> [PARTIAL]
+❌ -> [TODO]
+💥 -> [ERROR]
+🎯 -> [PROGRESS]
+📋 -> [DETAILS]
 """
 
 import argparse
@@ -26,6 +26,7 @@ from pathlib import Path
 
 # Emoji to text mappings
 EMOJI_MAPPINGS = {
+    # Original core mappings
     "📊": "[SUMMARY]",
     "✅": "[DONE]",
     "🔄": "[PARTIAL]",
@@ -33,7 +34,6 @@ EMOJI_MAPPINGS = {
     "💥": "[ERROR]",
     "🎯": "[PROGRESS]",
     "📋": "[DETAILS]",
-    # Additional common emojis that might be in the codebase
     "🚀": "[LAUNCH]",
     "🎉": "[SUCCESS]",
     "🔧": "[TOOL]",
@@ -42,6 +42,105 @@ EMOJI_MAPPINGS = {
     "💡": "[TIP]",
     "⚠️": "[WARNING]",
     "🎊": "[CELEBRATION]",
+
+    # Additional emojis found in codebase
+    "🌐": "[NETWORK]",
+    "🌟": "[FEATURE]",
+    "🌡": "[TEMPERATURE]",
+    "🌱": "[PLANT]",
+    "🌽": "[CROP]",
+    "🌾": "[GRAIN]",
+    "🌿": "[LEAF]",
+    "🍅": "[TOMATO]",
+    "🍇": "[GRAPE]",
+    "🍎": "[APPLE]",
+    "🍑": "[CHERRY]",
+    "🎙": "[MICROPHONE]",
+    "🎤": "[VOICE]",
+    "🎧": "[AUDIO]",
+    "🎨": "[DESIGN]",
+    "🎭": "[INTERFACE]",
+    "🎮": "[INTERACTIVE]",
+    "🎵": "[SOUND]",
+    "🏁": "[FINISH]",
+    "🏆": "[ACHIEVEMENT]",
+    "🏗️": "[ARCHITECTURE]",
+    "🏠": "[HOME]",
+    "🏥": "[HEALTH]",
+    "🏷️": "[TAG]",
+    "🐍": "[PYTHON]",
+    "🐛": "[BUG]",
+    "👁️": "[VISION]",
+    "👆": "[POINTER]",
+    "👐": "[HANDS]",
+    "💊": "[TREATMENT]",
+    "💔": "[BROKEN]",
+    "💚": "[HEALTHY]",
+    "💬": "[CHAT]",
+    "💻": "[COMPUTER]",
+    "💾": "[SAVE]",
+    "📁": "[FOLDER]",
+    "📂": "[DIRECTORY]",
+    "📄": "[DOCUMENT]",
+    "📅": "[DATE]",
+    "📈": "[CHART]",
+    "📍": "[LOCATION]",
+    "📎": "[ATTACH]",
+    "📏": "[MEASURE]",
+    "📐": "[GEOMETRY]",
+    "📓": "[NOTEBOOK]",
+    "📖": "[MANUAL]",
+    "📚": "[LIBRARY]",
+    "📜": "[SCROLL]",
+    "📝": "[WRITE]",
+    "📤": "[UPLOAD]",
+    "📥": "[DOWNLOAD]",
+    "📦": "[PACKAGE]",
+    "📷": "[CAMERA]",
+    "📸": "[PHOTO]",
+    "🔊": "[SPEAKER]",
+    "🔋": "[BATTERY]",
+    "🔍": "[SEARCH]",
+    "🔒": "[SECURE]",
+    "🔔": "[NOTIFICATION]",
+    "🔗": "[LINK]",
+    "🔤": "[TEXT]",
+    "🔥": "[HOT]",
+    "🔬": "[MICROSCOPE]",
+    "🔮": "[PREDICTION]",
+    "🔴": "[RED]",
+    "🕒": "[TIME]",
+    "🖥️": "[DESKTOP]",
+    "🖼️": "[IMAGE]",
+    "🗑️": "[DELETE]",
+    "🙈": "[HIDE]",
+    "🚨": "[ALERT]",
+    "🚫": "[STOP]",
+    "🚰": "[WATER]",
+    "🛑": "[HALT]",
+    "🛡️": "[SHIELD]",
+    "🟠": "[ORANGE]",
+    "🟡": "[YELLOW]",
+    "🟢": "[GREEN]",
+    "🤏": "[SMALL]",
+    "🤔": "[THINKING]",
+    "🤖": "[AI]",
+    "🤗": "[HUG]",
+    "🤝": "[HANDSHAKE]",
+    "🥇": "[FIRST]",
+    "🥈": "[SECOND]",
+    "🥉": "[THIRD]",
+    "🥔": "[POTATO]",
+    "🦠": "[VIRUS]",
+    "🧑": "[PERSON]",
+    "🧠": "[BRAIN]",
+    "🧩": "[PUZZLE]",
+    "🧪": "[TEST]",
+    "🧬": "[DNA]",
+    "🧭": "[COMPASS]",
+    "🧹": "[CLEAN]",
+    "🪝": "[HOOK]",
+    "🪴": "[POT]",
 }
 
 # File extensions to process
@@ -164,7 +263,8 @@ class EmojiReplacer:
 
             # Record changes
             relative_path = file_path.relative_to(self.root_path)
-            self.changes_made.append({"file": str(relative_path), "changes": changes})
+            change_info = {"file": str(relative_path), "changes": changes}
+            self.changes_made.append(change_info)
 
             if not self.dry_run:
                 # Create backup if requested
@@ -214,9 +314,7 @@ class EmojiReplacer:
         print(f"Total files with changes: {len(self.changes_made)}")
 
         if self.dry_run:
-            msg = "\n*** THIS WAS A DRY RUN - NO FILES WERE "
-            msg += "ACTUALLY MODIFIED ***"
-            print(msg)
+            print("\n*** THIS WAS A DRY RUN - NO FILES WERE ACTUALLY MODIFIED ***")
 
         print("\nDETAILED CHANGES:")
         print("-" * 40)
@@ -261,11 +359,23 @@ Examples:
         """,
     )
 
-    parser.add_argument("--path", default=".", help="Root path to process (default: current directory)")
+    parser.add_argument(
+        "--path", 
+        default=".", 
+        help="Root path to process (default: current directory)"
+    )
 
-    parser.add_argument("--no-backup", action="store_true", help="Do not create backup files")
+    parser.add_argument(
+        "--no-backup", 
+        action="store_true", 
+        help="Do not create backup files"
+    )
 
-    parser.add_argument("--dry-run", action="store_true", help="Show what would be changed without making changes")
+    parser.add_argument(
+        "--dry-run", 
+        action="store_true", 
+        help="Show what would be changed without making changes"
+    )
 
     args = parser.parse_args()
 
@@ -280,33 +390,32 @@ Examples:
         sys.exit(1)
 
     # Create replacer and process
-    replacer = EmojiReplacer(root_path=str(root_path), backup=not args.no_backup, dry_run=args.dry_run)
+    replacer = EmojiReplacer(
+        root_path=str(root_path), 
+        backup=not args.no_backup, 
+        dry_run=args.dry_run
+    )
 
     try:
         replacer.process_directory()
         replacer.generate_report()
 
         if not args.dry_run and replacer.files_changed > 0:
-            msg = f"\n[DONE] Successfully processed {replacer.files_changed} files!"
-            print(msg)
+            print(f"\n✅ [DONE] Successfully processed {replacer.files_changed} files!")
             if not args.no_backup:
-                print("[TIP] Backup files created with .backup extension")
-                backup_msg = "[TIP] You can remove backups with: "
-                backup_msg += "find . -name '*.backup' -delete"
-                print(backup_msg)
+                print("💡 [TIP] Backup files created with .backup extension")
+                print("💡 [TIP] You can remove backups with: find . -name '*.backup' -delete")
         elif args.dry_run:
-            msg = "\n🔍 Dry run complete. Would modify "
-            msg += f"{replacer.files_changed} files."
-            print(msg)
-            print("[TIP] Run without --dry-run to make actual changes")
+            print(f"\n🔍 [PREVIEW] Dry run complete. Would modify {replacer.files_changed} files.")
+            print("💡 [TIP] Run without --dry-run to make actual changes")
         else:
-            print("\n[DONE] No emoji replacements needed!")
+            print("\n✅ [DONE] No emoji replacements needed!")
 
     except KeyboardInterrupt:
-        print("\n\n[TODO] Operation cancelled by user")
+        print("\n\n❌ [TODO] Operation cancelled by user")
         sys.exit(1)
     except (OSError, UnicodeDecodeError) as e:
-        print(f"\n[ERROR] Error during processing: {e}")
+        print(f"\n💥 [ERROR] Error during processing: {e}")
         sys.exit(1)
 
 

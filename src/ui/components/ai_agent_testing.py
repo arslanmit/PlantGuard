@@ -803,10 +803,10 @@ class AIAgentTestingFramework:
         # Component health analysis
         health_summary = results.get("component_health_summary", {})
         if health_summary.get("poor", 0) > 0:
-            recommendations.append(f"🚨 {health_summary['poor']} component(s) in poor health - requires immediate attention")
+            recommendations.append(f"[ALERT] {health_summary['poor']} component(s) in poor health - requires immediate attention")
 
         if health_summary.get("excellent", 0) == health_summary.get("total_components", 0):
-            recommendations.append("🏆 All components are in excellent health")
+            recommendations.append("[ACHIEVEMENT] All components are in excellent health")
 
         # Issue pattern analysis
         issues = results.get("issues_found", [])
@@ -817,10 +817,10 @@ class AIAgentTestingFramework:
                 issue_types[severity] = issue_types.get(severity, 0) + 1
 
             if issue_types.get("critical", 0) > 0:
-                recommendations.append(f"🔴 {issue_types['critical']} critical issue(s) found - immediate action required")
+                recommendations.append(f"[RED] {issue_types['critical']} critical issue(s) found - immediate action required")
 
             if issue_types.get("high", 0) > 2:
-                recommendations.append(f"🟠 Multiple high-priority issues ({issue_types['high']}) detected")
+                recommendations.append(f"[ORANGE] Multiple high-priority issues ({issue_types['high']}) detected")
 
         # Testing coverage
         if results["components_tested"] > 0:
