@@ -87,7 +87,7 @@ class ChatInterface:
             logger.info(f"Added {role} message to conversation")
         except Exception as e:
             logger.warning(f"Failed to add message: {e}")
-            st.toast("Failed to add message to conversation", icon="⚠️")
+            st.toast("Failed to add message to conversation", icon="[WARNING]")
 
     def get_messages(self) -> list[dict[str, Any]]:
         """Get all messages in the conversation."""
@@ -101,7 +101,7 @@ class ChatInterface:
             st.toast("Conversation cleared", icon="🧹")
         except Exception as e:
             logger.warning(f"Failed to clear conversation: {e}")
-            st.toast("Failed to clear conversation", icon="⚠️")
+            st.toast("Failed to clear conversation", icon="[WARNING]")
 
     def render_chat_history(self) -> None:
         """Render the chat history using st.chat_message with scrollable container."""
@@ -192,7 +192,7 @@ class ChatInterface:
         if chat_input:
             is_valid, error_msg = self.validate_input(chat_input)
             if not is_valid:
-                st.toast(error_msg, icon="⚠️")
+                st.toast(error_msg, icon="[WARNING]")
                 return None
             return chat_input.strip()
 
@@ -258,7 +258,7 @@ class ChatInterface:
 
         except Exception as e:
             logger.warning(f"CSV export failed: {e}")
-            st.toast("Failed to export conversation to CSV", icon="⚠️")
+            st.toast("Failed to export conversation to CSV", icon="[WARNING]")
             return None
 
     def export_conversation_pdf(self) -> bytes | None:
@@ -311,7 +311,7 @@ class ChatInterface:
 
         except Exception as e:
             logger.warning(f"PDF export failed: {e}")
-            st.toast("Failed to export conversation to PDF", icon="⚠️")
+            st.toast("Failed to export conversation to PDF", icon="[WARNING]")
             return None
 
     def render_conversation_controls(self) -> None:
@@ -329,7 +329,7 @@ class ChatInterface:
                 csv_content = self.export_conversation_csv()
                 if csv_content:
                     st.download_button(
-                        "📊 Export CSV",
+                        "[SUMMARY] Export CSV",
                         data=csv_content,
                         file_name=f"plantguard_chat_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                         mime="text/csv",

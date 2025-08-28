@@ -210,7 +210,7 @@ class HistoryManager:
 
         except Exception as e:
             logger.warning(f"Failed to add history entry: {e}")
-            st.toast("Failed to save analysis to history", icon="⚠️")
+            st.toast("Failed to save analysis to history", icon="[WARNING]")
             return ""
 
     def load_history(self) -> list[HistoryEntry]:
@@ -261,7 +261,7 @@ class HistoryManager:
 
         except Exception as e:
             logger.warning(f"Failed to save history: {e}")
-            st.toast("Failed to save history to file", icon="⚠️")
+            st.toast("Failed to save history to file", icon="[WARNING]")
 
     def search_entries(
         self, query: str = "", disease_filter: str = "All", date_range: str = "All time", tags: list[str] | None = None
@@ -373,10 +373,10 @@ class HistoryManager:
             st.session_state.history_entries = []
             self.save_history()
             logger.info("Cleared all history entries")
-            st.toast("History cleared successfully", icon="✅")
+            st.toast("History cleared successfully", icon="[DONE]")
         except Exception as e:
             logger.warning(f"Failed to clear history: {e}")
-            st.toast("Failed to clear history", icon="⚠️")
+            st.toast("Failed to clear history", icon="[WARNING]")
 
     def export_history_csv(self) -> str | None:
         """Export history to CSV format.
@@ -414,7 +414,7 @@ class HistoryManager:
 
         except Exception as e:
             logger.warning(f"CSV export failed: {e}")
-            st.toast("Failed to export history to CSV", icon="⚠️")
+            st.toast("Failed to export history to CSV", icon="[WARNING]")
             return None
 
     def render_search_interface(self) -> None:
@@ -483,7 +483,7 @@ class HistoryManager:
                             '<div style="background-color: #f0f0f0; height: 150px; '
                             "display: flex; align-items: center; justify-content: center; "
                             'border-radius: 8px; margin-bottom: 8px;">'
-                            '<span style="color: #666;">📊 No Image</span></div>',
+                            '<span style="color: #666;">[SUMMARY] No Image</span></div>',
                             unsafe_allow_html=True,
                         )
 
@@ -506,7 +506,7 @@ class HistoryManager:
                     with col_del:
                         if st.button("🗑️", key=f"delete_{entry.entry_id}", help="Delete entry"):
                             if self.delete_entry(entry.entry_id):
-                                st.toast("Entry deleted", icon="✅")
+                                st.toast("Entry deleted", icon="[DONE]")
                                 st.rerun()
 
     def render_history_statistics(self) -> None:
@@ -516,7 +516,7 @@ class HistoryManager:
         if not entries:
             return
 
-        st.subheader("📊 History Statistics")
+        st.subheader("[SUMMARY] History Statistics")
 
         col1, col2, col3, col4 = st.columns(4)
 
@@ -548,7 +548,7 @@ class HistoryManager:
         col1, col2, col3 = st.columns([1, 1, 1])
 
         with col1:
-            if st.button("📊 Export CSV", help="Export all history to CSV"):
+            if st.button("[SUMMARY] Export CSV", help="Export all history to CSV"):
                 csv_content = self.export_history_csv()
                 if csv_content:
                     st.download_button(
@@ -559,9 +559,9 @@ class HistoryManager:
                     )
 
         with col2:
-            if st.button("🔄 Refresh", help="Reload history from file"):
+            if st.button("[PARTIAL] Refresh", help="Reload history from file"):
                 st.session_state.history_entries = self.load_history()
-                st.toast("History refreshed", icon="✅")
+                st.toast("History refreshed", icon="[DONE]")
                 st.rerun()
 
         with col3:

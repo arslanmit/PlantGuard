@@ -105,16 +105,16 @@ class IntegrationTestRunner:
                     logger.warning(f"Could not parse JSON report for {test_name}: {e}")
 
             if test_result["success"]:
-                logger.info(f"✅ {test_name} completed successfully in {duration:.2f}s")
+                logger.info(f"[DONE] {test_name} completed successfully in {duration:.2f}s")
             else:
-                logger.error(f"❌ {test_name} failed in {duration:.2f}s")
+                logger.error(f"[TODO] {test_name} failed in {duration:.2f}s")
                 if result.stderr:
                     logger.error(f"Error output: {result.stderr[:500]}...")
 
             return test_result
 
         except subprocess.TimeoutExpired:
-            logger.error(f"❌ {test_name} timed out after {timeout}s")
+            logger.error(f"[TODO] {test_name} timed out after {timeout}s")
             return {
                 "name": test_name,
                 "file": test_file,
@@ -129,7 +129,7 @@ class IntegrationTestRunner:
             }
 
         except Exception as e:
-            logger.error(f"❌ {test_name} failed with exception: {e}")
+            logger.error(f"[TODO] {test_name} failed with exception: {e}")
             return {
                 "name": test_name,
                 "file": test_file,
@@ -145,7 +145,7 @@ class IntegrationTestRunner:
 
     def run_all_integration_tests(self, include_performance: bool = True, include_slow: bool = False) -> dict[str, Any]:
         """Run all integration tests."""
-        logger.info("🚀 Starting comprehensive integration tests...")
+        logger.info("[LAUNCH] Starting comprehensive integration tests...")
 
         self.test_results["start_time"] = time.time()
 
@@ -215,7 +215,7 @@ class IntegrationTestRunner:
         # Run each test suite
         for suite in test_suites:
             if not Path(suite["file"]).exists():
-                logger.warning(f"⚠️  Test file not found: {suite['file']}")
+                logger.warning(f"[WARNING]  Test file not found: {suite['file']}")
                 continue
 
             result = self.run_test_suite(
@@ -274,7 +274,7 @@ class IntegrationTestRunner:
         with open(output_file, "w") as f:
             json.dump(self.test_results, f, indent=2, default=str)
 
-        logger.info(f"📊 Test report saved to: {output_file}")
+        logger.info(f"[SUMMARY] Test report saved to: {output_file}")
 
     def print_summary(self) -> None:
         """Print test summary to console."""
@@ -294,19 +294,19 @@ class IntegrationTestRunner:
 
         print("\nTest Suite Results:")
         for suite_name, result in self.test_results["test_suites"].items():
-            status = "✅" if result["success"] else "❌"
+            status = "[DONE]" if result["success"] else "[TODO]"
             print(f"  {status} {suite_name}: {result['duration']:.2f}s")
 
         if self.test_results["errors"]:
             print("\nErrors:")
             for error in self.test_results["errors"]:
-                print(f"  ❌ {error['test_suite']}: {error['error']}")
+                print(f"  [TODO] {error['test_suite']}: {error['error']}")
 
         overall_success = summary["failed_tests"] == 0
         if overall_success:
-            print("\n🎉 ALL INTEGRATION TESTS PASSED!")
+            print("\n[SUCCESS] ALL INTEGRATION TESTS PASSED!")
         else:
-            print(f"\n💥 {summary['failed_tests']} TEST(S) FAILED")
+            print(f"\n[ERROR] {summary['failed_tests']} TEST(S) FAILED")
 
         print("=" * 80)
 
@@ -319,7 +319,7 @@ class IntegrationTestRunner:
             python_path = shutil.which("python") or sys.executable
             subprocess.run([python_path, "-m", "pytest", "--version"], check=True, capture_output=True, timeout=10)
         except subprocess.CalledProcessError:
-            logger.error("❌ pytest not available. Install with: pip install pytest")
+            logger.error("[TODO] pytest not available. Install with: pip install pytest")
             return False
 
         # Check if required test files exist
@@ -336,7 +336,7 @@ class IntegrationTestRunner:
                 missing_files.append(file_path)
 
         if missing_files:
-            logger.error(f"❌ Missing test files: {missing_files}")
+            logger.error(f"[TODO] Missing test files: {missing_files}")
             return False
 
         # Check if source modules are importable (use find_spec to avoid unused-imports)
@@ -353,10 +353,10 @@ class IntegrationTestRunner:
             if missing_modules:
                 raise ImportError(f"Missing required modules: {', '.join(missing_modules)}")
         except ImportError as e:
-            logger.error(f"❌ Cannot import required modules: {e}")
+            logger.error(f"[TODO] Cannot import required modules: {e}")
             return False
 
-        logger.info("✅ All prerequisites met")
+        logger.info("[DONE] All prerequisites met")
         return True
 
 
@@ -376,11 +376,11 @@ def main():
 
     # Check prerequisites
     if not runner.check_prerequisites():
-        logger.error("❌ Prerequisites not met. Cannot run tests.")
+        logger.error("[TODO] Prerequisites not met. Cannot run tests.")
         return 1
 
     if args.check_only:
-        logger.info("✅ Prerequisites check passed")
+        logger.info("[DONE] Prerequisites check passed")
         return 0
 
     try:
@@ -397,10 +397,10 @@ def main():
         return 0 if results["summary"]["failed_tests"] == 0 else 1
 
     except KeyboardInterrupt:
-        logger.info("❌ Tests interrupted by user")
+        logger.info("[TODO] Tests interrupted by user")
         return 1
     except Exception as e:
-        logger.error(f"❌ Test runner failed: {e}")
+        logger.error(f"[TODO] Test runner failed: {e}")
         return 1
 
 

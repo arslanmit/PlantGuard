@@ -265,7 +265,7 @@ available_models = {
 }
 
 # Main Model Selection Area (moved from sidebar)
-st.markdown("## 🚀 Advanced Model Selection")
+st.markdown("## [LAUNCH] Advanced Model Selection")
 st.markdown("*Choose the optimal AI models for your plant analysis workflow*")
 st.markdown("---")
 
@@ -366,11 +366,11 @@ model_configs = {
         "title": "Audio Model",
         "description": "AI model for voice processing",
         "options": {
-            "whisper_tiny_local": "🎯 Whisper Tiny (Local)",
+            "whisper_tiny_local": "[PROGRESS] Whisper Tiny (Local)",
             "wav2vec2_plant_sounds": "🌿 Wav2Vec2 (Plant Sounds)",
         },
         "badges": {
-            "whisper_tiny_local": ("🎯", "Local", "badge-green"),
+            "whisper_tiny_local": ("[PROGRESS]", "Local", "badge-green"),
             "wav2vec2_plant_sounds": ("🌿", "Beta", "badge-orange"),
         },
     },
@@ -487,7 +487,7 @@ for i, (model_type, config) in enumerate(model_configs.items()):
 st.markdown("---")
 
 # Current Model Status & Quick Actions (moved from sidebar)
-st.markdown("## 🚀 Current Model Status & Quick Actions")
+st.markdown("## [LAUNCH] Current Model Status & Quick Actions")
 st.markdown("*Monitor your active models and perform quick actions*")
 
 # Get selected models from session state
@@ -519,29 +519,29 @@ st.markdown("### ⚡ Quick Actions")
 action_col1, action_col2, action_col3, action_col4 = st.columns(4)
 
 with action_col1:
-    if st.button("🔄 Reload Models", use_container_width=True, help="Reload all model adapters"):
+    if st.button("[PARTIAL] Reload Models", use_container_width=True, help="Reload all model adapters"):
         st.cache_resource.clear()
-        st.success("✅ Models reloaded successfully!")
+        st.success("[DONE] Models reloaded successfully!")
         st.rerun()
 
 with action_col2:
-    if st.button("📊 Quick Test", use_container_width=True, help="Test current models on sample data"):
-        st.info("💡 Use the Model Management tab for comprehensive testing and benchmarking!")
+    if st.button("[SUMMARY] Quick Test", use_container_width=True, help="Test current models on sample data"):
+        st.info("[TIP] Use the Model Management tab for comprehensive testing and benchmarking!")
 
 with action_col3:
-    if st.button("🔧 Settings", use_container_width=True, help="Access advanced model settings"):
-        st.info("💡 Model configuration is available in the Model Management tab!")
+    if st.button("[TOOL] Settings", use_container_width=True, help="Access advanced model settings"):
+        st.info("[TIP] Model configuration is available in the Model Management tab!")
 
 with action_col4:
     if st.button("📈 Performance", use_container_width=True, help="View model performance metrics"):
-        st.info("💡 Detailed performance analysis available in the Model Management tab!")
+        st.info("[TIP] Detailed performance analysis available in the Model Management tab!")
 
 st.markdown("---")
 st.markdown("## 🌿 Plant Analysis Tools")
 st.markdown("*Use the tools below to analyze your plants with AI-powered detection*")
 
 # Main content tabs with improved design
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["🖼️ Vision Analysis", "🎤 Audio Processing", "💬 Text Q&A", "📚 Training", "🔧 Model Management"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["🖼️ Vision Analysis", "🎤 Audio Processing", "💬 Text Q&A", "📚 Training", "[TOOL] Model Management"])
 
 # Vision Analysis Tab
 with tab1:
@@ -595,21 +595,21 @@ with tab1:
                         with metric_col3:
                             # Color-coded confidence
                             conf_class = "confidence-high" if confidence > 0.8 else "confidence-medium" if confidence > 0.5 else "confidence-low"
-                            st.markdown(f'<p class="{conf_class}">📊 Confidence: {confidence:.1%}</p>', unsafe_allow_html=True)
+                            st.markdown(f'<p class="{conf_class}">[SUMMARY] Confidence: {confidence:.1%}</p>', unsafe_allow_html=True)
 
                         # Health status with better styling
                         if vision_adapter.is_healthy(raw_class):
-                            st.success("✅ Plant appears healthy!")
+                            st.success("[DONE] Plant appears healthy!")
                             st.balloons()
                         else:
-                            st.warning("⚠️ Disease detected - consider treatment")
+                            st.warning("[WARNING] Disease detected - consider treatment")
 
                             # Treatment recommendations
-                            with st.expander("💡 Treatment Recommendations"):
+                            with st.expander("[TIP] Treatment Recommendations"):
                                 st.info("Consult with agricultural experts for proper treatment plans.")
 
                         # Technical details
-                        with st.expander("🔧 Technical Details"):
+                        with st.expander("[TOOL] Technical Details"):
                             st.json(
                                 {
                                     "raw_prediction": raw_class,
@@ -619,14 +619,14 @@ with tab1:
                             )
 
                     except Exception as e:
-                        st.error(f"❌ Analysis failed: {e!s}")
+                        st.error(f"[TODO] Analysis failed: {e!s}")
         else:
             st.info("👆 Upload an image or select a sample to begin analysis")
 
 # Audio Processing Tab
 with tab2:
     st.subheader("🎤 Voice & Audio Analysis")
-    st.info("💡 Ask questions about plant care or describe symptoms using voice or audio files")
+    st.info("[TIP] Ask questions about plant care or describe symptoms using voice or audio files")
 
     # Audio input methods
     audio_col1, audio_col2 = st.columns([1, 1])
@@ -654,7 +654,7 @@ with tab2:
         )
 
         # Recording controls
-        if st.button("🎯 Process Recording", key="mic_analyze", type="primary", use_container_width=True):
+        if st.button("[PROGRESS] Process Recording", key="mic_analyze", type="primary", use_container_width=True):
             if st.session_state.audio_buf:
                 with st.spinner("🎧 Processing audio..."):
                     try:
@@ -677,9 +677,9 @@ with tab2:
                         Path("mic.wav").unlink(missing_ok=True)
 
                     except Exception as e:
-                        st.error(f"❌ Audio processing failed: {e!s}")
+                        st.error(f"[TODO] Audio processing failed: {e!s}")
             else:
-                st.warning("⚠️ No audio detected. Please record something first!")
+                st.warning("[WARNING] No audio detected. Please record something first!")
 
     with audio_col2:
         st.markdown("### 📁 File Upload")
@@ -689,7 +689,7 @@ with tab2:
         if audio_file:
             st.audio(audio_file, format="audio/wav")
 
-            if st.button("🎯 Process File", key="file_analyze", type="primary", use_container_width=True):
+            if st.button("[PROGRESS] Process File", key="file_analyze", type="primary", use_container_width=True):
                 with st.spinner("🎧 Processing uploaded audio..."):
                     try:
                         # Save uploaded file temporarily
@@ -712,14 +712,14 @@ with tab2:
                         tmp_path.unlink(missing_ok=True)
 
                     except Exception as e:
-                        st.error(f"❌ Audio processing failed: {e!s}")
+                        st.error(f"[TODO] Audio processing failed: {e!s}")
         else:
             st.info("👆 Upload an audio file to begin processing")
 
 # Text Q&A Tab
 with tab3:
     st.subheader("💬 Plant Care Assistant")
-    st.info("💡 Ask questions about plant diseases, treatments, or general plant care")
+    st.info("[TIP] Ask questions about plant diseases, treatments, or general plant care")
 
     # Chat interface
     if "chat_history" not in st.session_state:
@@ -741,7 +741,7 @@ with tab3:
     sample_cols = st.columns(len(sample_questions))
     for i, sample_q in enumerate(sample_questions):
         with sample_cols[i]:
-            if st.button(f"💡 {sample_q}", key=f"sample_{i}", help="Click to use this question"):
+            if st.button(f"[TIP] {sample_q}", key=f"sample_{i}", help="Click to use this question"):
                 # Set preset value and rerun BEFORE input is instantiated
                 st.session_state["preset_user_question"] = sample_q
                 st.rerun()
@@ -764,7 +764,7 @@ with tab3:
         )
 
     with question_col2:
-        ask_button = st.button("🚀 Ask", key="qa", type="primary", use_container_width=True)
+        ask_button = st.button("[LAUNCH] Ask", key="qa", type="primary", use_container_width=True)
 
     # Process question
     if (ask_button and user_question.strip()) or (user_question and st.session_state.get("auto_submit", False)):
@@ -780,7 +780,7 @@ with tab3:
                 st.rerun()
 
             except Exception as e:
-                st.error(f"❌ Failed to generate response: {e!s}")
+                st.error(f"[TODO] Failed to generate response: {e!s}")
 
     # Display chat history
     if st.session_state.chat_history:
@@ -895,13 +895,13 @@ with tab4:
                 st.download_button("Download Curves", data=curves_path.read_bytes(), file_name=curves_path.name, mime="image/png")
 
         st.markdown("---")
-        st.markdown("### 📊 TensorBoard")
+        st.markdown("### [SUMMARY] TensorBoard")
         st.caption("Launch TensorBoard to view detailed logs, histograms, and confusion matrices.")
         tb_col1, tb_col2, tb_col3 = st.columns([2, 1, 2])
         with tb_col1:
             tb_port = st.number_input("Port", min_value=1024, max_value=65535, value=6006, step=1)
         with tb_col2:
-            launch_tb = st.button("🚀 Launch TensorBoard", use_container_width=True)
+            launch_tb = st.button("[LAUNCH] Launch TensorBoard", use_container_width=True)
         with tb_col3:
             st.markdown(f"[Open http://localhost:{6006}](http://localhost:{6006})")
 
@@ -947,7 +947,7 @@ with tab4:
 
 # Model Management Tab (Merged from Model Switcher)
 with tab5:
-    st.subheader("🔧 Model Management & Configuration")
+    st.subheader("[TOOL] Model Management & Configuration")
     st.info("Switch between different plant disease detection models, benchmark performance, and manage configurations.")
 
     # Initialize model manager
@@ -956,7 +956,7 @@ with tab5:
 
         model_manager = PlantGuardModelManager(autoload_default=False)
     except ImportError:
-        st.error("❌ Model Manager not available. Please check your installation.")
+        st.error("[TODO] Model Manager not available. Please check your installation.")
         st.stop()
 
     # Two-column layout for model management
@@ -971,7 +971,7 @@ with tab5:
             enabled_models = [m for m in models if m["enabled"]]
 
             if not enabled_models:
-                st.warning("⚠️ No enabled models found")
+                st.warning("[WARNING] No enabled models found")
             else:
                 # Model selection dropdown
                 # Preserve ordering from enabled_models and build parallel lists for labels and ids
@@ -1000,17 +1000,17 @@ with tab5:
                 selected_model_id = option_ids[option_labels.index(selected_display)]
 
                 # Switch model button
-                if st.button("🔄 Switch Model", type="primary", use_container_width=True, key="switch_model_btn"):
+                if st.button("[PARTIAL] Switch Model", type="primary", use_container_width=True, key="switch_model_btn"):
                     with st.spinner(f"Loading model: {selected_model_id}"):
                         if model_manager.switch_model(selected_model_id):
-                            st.success(f"✅ Switched to: {selected_model_id}")
+                            st.success(f"[DONE] Switched to: {selected_model_id}")
                             st.rerun()
                         else:
-                            st.error(f"❌ Failed to switch to: {selected_model_id}")
+                            st.error(f"[TODO] Failed to switch to: {selected_model_id}")
 
                 # Current model info
                 st.markdown("---")
-                st.markdown("### 📊 Current Model")
+                st.markdown("### [SUMMARY] Current Model")
 
                 if "error" not in current_model_info:
                     st.info(f"""
@@ -1028,10 +1028,10 @@ with tab5:
                     st.warning("No model loaded")
 
         except Exception as e:
-            st.error(f"❌ Error loading models: {e}")
+            st.error(f"[TODO] Error loading models: {e}")
 
     with mgmt_col2:
-        st.markdown("### 📊 Model Comparison & Benchmarking")
+        st.markdown("### [SUMMARY] Model Comparison & Benchmarking")
 
         # Show all models in a table
         try:
@@ -1053,7 +1053,7 @@ with tab5:
                 st.info("No models available for comparison")
 
         except Exception as e:
-            st.error(f"❌ Error comparing models: {e}")
+            st.error(f"[TODO] Error comparing models: {e}")
 
     # Model testing section
     st.markdown("---")
@@ -1094,7 +1094,7 @@ with tab5:
                             result = model_manager.get_readable_prediction(img)
 
                             # Display results
-                            st.markdown("### 📋 Test Results")
+                            st.markdown("### [DETAILS] Test Results")
 
                             col_a, col_b = st.columns(2)
 
@@ -1103,15 +1103,15 @@ with tab5:
                                 st.metric("🦠 Disease", result["disease"])
 
                             with col_b:
-                                st.metric("📊 Confidence", result["confidence_percentage"])
-                                health_status = "Healthy ✅" if result["is_healthy"] else "Diseased ⚠️"
+                                st.metric("[SUMMARY] Confidence", result["confidence_percentage"])
+                                health_status = "Healthy [DONE]" if result["is_healthy"] else "Diseased [WARNING]"
                                 st.metric("💚 Health Status", health_status)
 
                             # Additional info
-                            st.info(f"💡 **Recommendation:** {result['recommendation']}")
+                            st.info(f"[TIP] **Recommendation:** {result['recommendation']}")
 
                             # Raw prediction details
-                            with st.expander("🔧 Technical Details"):
+                            with st.expander("[TOOL] Technical Details"):
                                 st.json(
                                     {
                                         "raw_prediction": result["raw_prediction"],
@@ -1121,9 +1121,9 @@ with tab5:
                                 )
 
                         except Exception as e:
-                            st.error(f"❌ Testing failed: {e}")
+                            st.error(f"[TODO] Testing failed: {e}")
                 else:
-                    st.error("❌ No model loaded for testing")
+                    st.error("[TODO] No model loaded for testing")
         else:
             st.info("👆 Upload an image or select a sample to test the current model")
 
@@ -1142,15 +1142,15 @@ with tab5:
                     config_content = f.read()
                 st.json(json.loads(config_content))
             except Exception as e:
-                st.error(f"❌ Error reading config: {e}")
+                st.error(f"[TODO] Error reading config: {e}")
 
-        if st.button("🔄 Reload Config", help="Reload model configuration from file"):
+        if st.button("[PARTIAL] Reload Config", help="Reload model configuration from file"):
             try:
                 model_manager.load_model_configs()
-                st.success("✅ Configuration reloaded successfully!")
+                st.success("[DONE] Configuration reloaded successfully!")
                 st.rerun()
             except Exception as e:
-                st.error(f"❌ Error reloading config: {e}")
+                st.error(f"[TODO] Error reloading config: {e}")
 
     with config_col2:
         st.markdown("**Configuration Options:**")
@@ -1166,7 +1166,7 @@ with tab5:
         if st.button("📁 Open Config Folder", help="View configuration folder information"):
             config_dir = Path("config")
             if config_dir.exists():
-                st.success("✅ Configuration folder found!")
+                st.success("[DONE] Configuration folder found!")
                 st.info(f"**Configuration Directory:** `{config_dir.absolute()}`")
 
                 # Show folder contents
@@ -1182,7 +1182,7 @@ with tab5:
                     st.warning(f"Could not list folder contents: {e}")
 
                 # Platform-specific instructions
-                st.markdown("**💡 To open the folder manually:**")
+                st.markdown("**[TIP] To open the folder manually:**")
                 if platform.system() == "Windows":
                     st.markdown("- Press `Win + R`, type `explorer` and the path above, then press Enter")
                 elif platform.system() == "Darwin":  # macOS
@@ -1191,5 +1191,5 @@ with tab5:
                     st.markdown("- Use your file manager to navigate to the path above")
 
             else:
-                st.error("❌ Configuration folder not found")
+                st.error("[TODO] Configuration folder not found")
                 st.info("The `config/` directory should be created automatically when needed")

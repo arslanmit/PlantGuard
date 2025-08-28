@@ -160,12 +160,12 @@ def main() -> None:
         dataset_path = find_dataset_path(args.dataset_path)
 
         print(f"📁 Model: {model_path}")
-        print(f"📊 Dataset: {dataset_path}")
+        print(f"[SUMMARY] Dataset: {dataset_path}")
 
         # Create data loader
         print("📚 Loading validation dataset...")
         val_loader, class_names = create_data_loader(dataset_path, args.batch_size)
-        print(f"✅ Loaded {len(val_loader.dataset)} samples, {len(class_names)} classes")
+        print(f"[DONE] Loaded {len(val_loader.dataset)} samples, {len(class_names)} classes")
 
         # Setup validation configuration
         config = ValidationConfig(
@@ -209,10 +209,10 @@ def main() -> None:
 
         # Exit with appropriate code
         if result.validation_passed:
-            print(f"\n🎉 VALIDATION PASSED (Score: {result.overall_score:.3f})")
+            print(f"\n[SUCCESS] VALIDATION PASSED (Score: {result.overall_score:.3f})")
             sys.exit(0)
         else:
-            print(f"\n❌ VALIDATION FAILED (Score: {result.overall_score:.3f})")
+            print(f"\n[TODO] VALIDATION FAILED (Score: {result.overall_score:.3f})")
             if result.critical_issues:
                 print("Critical issues:")
                 for issue in result.critical_issues:
@@ -221,7 +221,7 @@ def main() -> None:
 
     except Exception as e:
         logger.exception("Evaluation failed")
-        print(f"\n❌ Evaluation failed: {e}")
+        print(f"\n[TODO] Evaluation failed: {e}")
         sys.exit(1)
 
 

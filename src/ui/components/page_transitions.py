@@ -20,7 +20,7 @@ class PageTransitionManager:
         self.loading_messages = [
             "🌱 Loading PlantGuard...",
             "🔍 Preparing analysis tools...",
-            "📊 Setting up interface...",
+            "[SUMMARY] Setting up interface...",
             "✨ Almost ready...",
         ]
 
@@ -129,9 +129,9 @@ class PageTransitionManager:
             for i in range(101):
                 progress_bar.progress(i)
                 if i < 30:
-                    status_text.text(f"🔄 Leaving {from_page}...")
+                    status_text.text(f"[PARTIAL] Leaving {from_page}...")
                 elif i < 70:
-                    status_text.text(f"🚀 Navigating to {to_page}...")
+                    status_text.text(f"[LAUNCH] Navigating to {to_page}...")
                 else:
                     status_text.text(f"✨ Loading {to_page}...")
 
@@ -330,7 +330,7 @@ class MobileNavigationMenu:
             button_type = "primary" if current_page == "Home" else "secondary"
             button_label = f"{home_info['icon']} Home"
             if current_page == "Home":
-                button_label += " ✅"
+                button_label += " [DONE]"
 
             if st.button(
                 button_label,
@@ -352,7 +352,7 @@ class MobileNavigationMenu:
             button_type = "primary" if current_page == "Compare" else "secondary"
             button_label = f"{compare_info['icon']} Compare"
             if current_page == "Compare":
-                button_label += " ✅"
+                button_label += " [DONE]"
 
             if st.button(
                 button_label,
@@ -377,7 +377,7 @@ class MobileNavigationMenu:
             button_type = "primary" if current_page == "History" else "secondary"
             button_label = f"{history_info['icon']} History"
             if current_page == "History":
-                button_label += " ✅"
+                button_label += " [DONE]"
 
             if st.button(
                 button_label,
@@ -399,7 +399,7 @@ class MobileNavigationMenu:
             button_type = "primary" if current_page == "Guide" else "secondary"
             button_label = f"{guide_info['icon']} Guide"
             if current_page == "Guide":
-                button_label += " ✅"
+                button_label += " [DONE]"
 
             if st.button(
                 button_label,
@@ -421,7 +421,7 @@ class MobileNavigationMenu:
         button_type = "primary" if current_page == "Settings" else "secondary"
         button_label = f"{settings_info['icon']} Settings"
         if current_page == "Settings":
-            button_label += " ✅"
+            button_label += " [DONE]"
 
         if st.button(
             button_label,

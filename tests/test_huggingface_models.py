@@ -14,15 +14,15 @@ from transformers import AutoImageProcessor, AutoModelForImageClassification
 
 def _load_model_and_processor(model_name: str) -> tuple[Any, Any, list[str]] | dict[str, str]:
     """Load model, processor, and class labels."""
-    print(f"🔄 Loading model: {model_name}")
+    print(f"[PARTIAL] Loading model: {model_name}")
 
     try:
         processor = AutoImageProcessor.from_pretrained(model_name)
         model = AutoModelForImageClassification.from_pretrained(model_name)
         model.eval()
 
-        print("✅ Model loaded successfully")
-        print(f"📊 Model has {model.config.num_labels} classes")
+        print("[DONE] Model loaded successfully")
+        print(f"[SUMMARY] Model has {model.config.num_labels} classes")
 
         # Get class labels
         if hasattr(model.config, "id2label"):
@@ -30,11 +30,11 @@ def _load_model_and_processor(model_name: str) -> tuple[Any, Any, list[str]] | d
             print(f"🏷️  Sample classes: {class_labels[:5]}...")
         else:
             class_labels = [f"class_{i}" for i in range(model.config.num_labels)]
-            print("⚠️  No class labels found, using indices")
+            print("[WARNING]  No class labels found, using indices")
 
         return model, processor, class_labels
     except Exception as e:
-        print(f"❌ Failed to load model {model_name}: {e}")
+        print(f"[TODO] Failed to load model {model_name}: {e}")
         return {"error": str(e)}
 
 
@@ -56,7 +56,7 @@ def _predict_image(image_path: Path, model: Any, processor: Any, class_labels: l
         predicted_label = class_labels[predicted_class_id]
         return predicted_label, confidence
     except Exception as e:
-        print(f"❌ Failed to process {image_path}: {e}")
+        print(f"[TODO] Failed to process {image_path}: {e}")
         return None
 
 
@@ -93,13 +93,13 @@ def _process_sample_with_validation(
     """Process a sample with full validation and return result."""
     filename = sample.get("filename")
     if not filename:
-        print("⚠️  Skipping sample with missing filename")
+        print("[WARNING]  Skipping sample with missing filename")
         return None
 
     base = Path(test_images_dir).resolve()
     image_path = (base / filename).resolve()
     if base != image_path and base not in image_path.parents:
-        print(f"⚠️  Skipping unsafe path: {filename}")
+        print(f"[WARNING]  Skipping unsafe path: {filename}")
         return None
 
     if not image_path.exists():
@@ -110,7 +110,7 @@ def _process_sample_with_validation(
     gt_disease = sample.get("disease")
     gt_status = sample.get("status")
     if gt_plant is None or gt_disease is None or gt_status is None:
-        print(f"⚠️  Skipping sample with missing fields: {sample}")
+        print(f"[WARNING]  Skipping sample with missing fields: {sample}")
         return None
 
     # Make prediction
@@ -124,8 +124,8 @@ def _process_sample_with_validation(
     plant_match, status_match, overall_correct = _analyze_prediction(predicted_label, gt_plant, gt_disease, gt_status)
 
     # Display results
-    overall_icon = "✅" if overall_correct else "❌"
-    plant_icon = "🌿" if plant_match else "❌"
+    overall_icon = "[DONE]" if overall_correct else "[TODO]"
+    plant_icon = "🌿" if plant_match else "[TODO]"
     status_icon = "💚" if status_match else "💔"
 
     result = {
@@ -225,14 +225,14 @@ def evaluate_model(model_name: str, test_images_dir: str, metadata_path: str) ->
 def print_results(results: dict[str, Any]) -> None:
     """Print test results in a readable format."""
     if "error" in results:
-        print(f"❌ Error: {results['error']}")
+        print(f"[TODO] Error: {results['error']}")
         return
 
     print("=" * 80)
     print(f"🌱 RESULTS FOR {results['model_name']}")
     print("=" * 80)
 
-    print("\n📊 SUMMARY STATISTICS")
+    print("\n[SUMMARY] SUMMARY STATISTICS")
     print(f"Total test images: {results['total_images']}")
     print(
         f"Overall accuracy: {results['overall_accuracy']:.1%} ({int(results['overall_accuracy'] * results['total_images'])}/{results['total_images']})"
@@ -260,14 +260,14 @@ def main() -> None:
 
     # Check metadata
     if not metadata_path.exists():
-        print(f"❌ Metadata file not found: {metadata_path} - skipping HuggingFace tests")
+        print(f"[TODO] Metadata file not found: {metadata_path} - skipping HuggingFace tests")
         return
 
     try:
         with metadata_path.open() as mf:
             json.load(mf)
     except Exception:
-        print(f"❌ Metadata file invalid: {metadata_path} - skipping HuggingFace tests")
+        print(f"[TODO] Metadata file invalid: {metadata_path} - skipping HuggingFace tests")
         return
 
     all_results: list[dict[str, Any]] = []
@@ -281,7 +281,7 @@ def main() -> None:
             print_results(results)
 
         except Exception as e:
-            print(f"❌ Failed to test {model_name}: {e}")
+            print(f"[TODO] Failed to test {model_name}: {e}")
             continue
 
         print("\n" + "=" * 80)
@@ -304,7 +304,7 @@ def main() -> None:
             print(f"\n🥇 Best performing model: {best_model['model_name']}")
             print(f"   Overall accuracy: {best_model['overall_accuracy']:.1%}")
 
-    print("\n💡 NEXT STEPS:")
+    print("\n[TIP] NEXT STEPS:")
     print("- Choose the best performing model for your PlantGuard application")
     print("- Integrate it into your src/core/vision.py")
     print("- The model can be loaded directly from Hugging Face in your app")

@@ -40,7 +40,7 @@ def test_mobile_input_components():
         voice_input = MobileVoiceInput("test_voice", "Test Voice")
         text_input = MobileTextInput("test_text", "Test Text")
 
-        st.success("✅ All components created successfully!")
+        st.success("[DONE] All components created successfully!")
 
         # Test component metadata
         st.markdown("### 2. Component Metadata Test")
@@ -58,7 +58,7 @@ def test_mobile_input_components():
                 }
             )
 
-        st.success("✅ All component metadata retrieved successfully!")
+        st.success("[DONE] All component metadata retrieved successfully!")
 
         # Test component rendering
         st.markdown("### 3. Component Rendering Test")
@@ -70,33 +70,33 @@ def test_mobile_input_components():
             st.markdown("#### Camera Input Component")
             try:
                 camera_input.render()
-                st.success("✅ Camera component rendered successfully!")
+                st.success("[DONE] Camera component rendered successfully!")
             except Exception as e:
-                st.error(f"❌ Camera component error: {e}")
+                st.error(f"[TODO] Camera component error: {e}")
 
         with tab2:
             st.markdown("#### Upload Input Component")
             try:
                 upload_input.render()
-                st.success("✅ Upload component rendered successfully!")
+                st.success("[DONE] Upload component rendered successfully!")
             except Exception as e:
-                st.error(f"❌ Upload component error: {e}")
+                st.error(f"[TODO] Upload component error: {e}")
 
         with tab3:
             st.markdown("#### Voice Input Component")
             try:
                 voice_input.render()
-                st.success("✅ Voice component rendered successfully!")
+                st.success("[DONE] Voice component rendered successfully!")
             except Exception as e:
-                st.error(f"❌ Voice component error: {e}")
+                st.error(f"[TODO] Voice component error: {e}")
 
         with tab4:
             st.markdown("#### Text Input Component")
             try:
                 text_input.render()
-                st.success("✅ Text component rendered successfully!")
+                st.success("[DONE] Text component rendered successfully!")
             except Exception as e:
-                st.error(f"❌ Text component error: {e}")
+                st.error(f"[TODO] Text component error: {e}")
 
         # Test state management
         st.markdown("### 4. State Management Test")
@@ -106,7 +106,7 @@ def test_mobile_input_components():
             st.write(f"**{name} State:**")
             st.json({"initialized": state.get("initialized"), "component_id": state.get("component_id"), "has_data": bool(state.get("data"))})
 
-        st.success("✅ All component states retrieved successfully!")
+        st.success("[DONE] All component states retrieved successfully!")
 
         # Component interaction test
         st.markdown("### 5. Component Interaction Test")
@@ -129,11 +129,11 @@ def test_mobile_input_components():
                     has_error = component.has_error()
 
                     test_results.append(
-                        {"component": name, "visible": is_visible, "loading": is_loading, "has_error": has_error, "status": "✅ Pass"}
+                        {"component": name, "visible": is_visible, "loading": is_loading, "has_error": has_error, "status": "[DONE] Pass"}
                     )
 
                 except Exception as e:
-                    test_results.append({"component": name, "error": str(e), "status": "❌ Fail"})
+                    test_results.append({"component": name, "error": str(e), "status": "[TODO] Fail"})
 
             # Display results
             for result in test_results:
@@ -142,10 +142,10 @@ def test_mobile_input_components():
                     st.error(f"Error: {result['error']}")
 
         st.markdown("---")
-        st.success("🎉 Mobile Input Components Test Complete!")
+        st.success("[SUCCESS] Mobile Input Components Test Complete!")
 
     except Exception as e:
-        st.error(f"❌ Test failed: {e}")
+        st.error(f"[TODO] Test failed: {e}")
         st.exception(e)
 
 

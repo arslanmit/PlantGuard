@@ -165,16 +165,16 @@ class FinalSystemValidator:
                         spec.loader.exec_module(module)
 
                         if hasattr(module, class_name):
-                            import_results.append(f"✅ {module_name}.{class_name}")
+                            import_results.append(f"[DONE] {module_name}.{class_name}")
                         else:
-                            import_results.append(f"❌ {module_name}.{class_name} - class not found")
+                            import_results.append(f"[TODO] {module_name}.{class_name} - class not found")
                     else:
-                        import_results.append(f"❌ {module_name} - module not found")
+                        import_results.append(f"[TODO] {module_name} - module not found")
 
                 except Exception as e:
-                    import_results.append(f"❌ {module_name}.{class_name} - {e!s}")
+                    import_results.append(f"[TODO] {module_name}.{class_name} - {e!s}")
 
-            failed_imports = [r for r in import_results if "❌" in r]
+            failed_imports = [r for r in import_results if "[TODO]" in r]
             status = "passed" if not failed_imports else "failed"
 
             return {
@@ -330,7 +330,7 @@ class FinalSystemValidator:
 
     def generate_migration_report(self) -> dict[str, Any]:
         """Generate comprehensive migration report."""
-        print("📊 Generating migration report...")
+        print("[SUMMARY] Generating migration report...")
 
         # Count files by type
         python_files = len(list(Path().glob("**/*.py")))
@@ -378,7 +378,7 @@ class FinalSystemValidator:
 
     def run_comprehensive_validation(self) -> dict[str, Any]:
         """Run all validation tests and generate final report."""
-        print("🚀 Starting comprehensive system validation...")
+        print("[LAUNCH] Starting comprehensive system validation...")
         print("=" * 60)
 
         # Run all validation tests
@@ -418,26 +418,26 @@ class FinalSystemValidator:
 
         # Print summary
         print("\n" + "=" * 60)
-        print("📋 VALIDATION SUMMARY")
+        print("[DETAILS] VALIDATION SUMMARY")
         print("=" * 60)
 
         for test_name, result in self.results.items():
-            status_emoji = {"passed": "✅", "failed": "❌", "warning": "⚠️"}
+            status_emoji = {"passed": "[DONE]", "failed": "[TODO]", "warning": "[WARNING]"}
             print(f"{status_emoji.get(result['status'], '❓')} {test_name}: {result['status'].upper()}")
             print(f"   {result['details']}")
 
-        print(f"\n🎯 Overall Status: {overall_status.upper()}")
+        print(f"\n[PROGRESS] Overall Status: {overall_status.upper()}")
         print(f"📝 {overall_message}")
 
         if overall_status == "passed":
-            print("\n🎉 Mobile-only migration validation completed successfully!")
+            print("\n[SUCCESS] Mobile-only migration validation completed successfully!")
             print("✨ The system is ready for mobile-only operation.")
         elif overall_status == "warning":
-            print("\n⚠️  Migration validation completed with warnings.")
-            print("🔧 Review warnings and address if necessary.")
+            print("\n[WARNING]  Migration validation completed with warnings.")
+            print("[TOOL] Review warnings and address if necessary.")
         else:
-            print("\n❌ Migration validation failed.")
-            print("🛠️  Please address the failed tests before proceeding.")
+            print("\n[TODO] Migration validation failed.")
+            print("[TOOL]  Please address the failed tests before proceeding.")
 
         return final_report
 
@@ -466,7 +466,7 @@ def main():
             sys.exit(0)
 
     except Exception as e:
-        print(f"❌ Validation script failed: {e!s}")
+        print(f"[TODO] Validation script failed: {e!s}")
         sys.exit(1)
 
 

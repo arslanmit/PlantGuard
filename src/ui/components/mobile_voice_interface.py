@@ -190,7 +190,7 @@ class MobileVoiceInterface(MobileComponent):
                 st.audio(recorded_audio, format="audio/wav")
 
                 # Recording info
-                st.success("✅ Audio recorded successfully!")
+                st.success("[DONE] Audio recorded successfully!")
 
         with upload_tab:
             uploaded_audio = st.file_uploader(
@@ -209,7 +209,7 @@ class MobileVoiceInterface(MobileComponent):
                     st.audio(recorded_audio, format=f"audio/{uploaded_audio.type.split('/')[1]}")
 
                     # File info
-                    st.success(f"✅ Audio file uploaded: {uploaded_audio.name}")
+                    st.success(f"[DONE] Audio file uploaded: {uploaded_audio.name}")
 
                 except Exception as e:
                     st.error(f"Error processing audio file: {e}")
@@ -322,9 +322,9 @@ class MobileVoiceInterface(MobileComponent):
                 st.session_state.transcribed_text = transcribed_text
 
                 if transcribed_text.strip():
-                    st.success("✅ Transcription completed!")
+                    st.success("[DONE] Transcription completed!")
                 else:
-                    st.warning("⚠️ No speech detected in audio")
+                    st.warning("[WARNING] No speech detected in audio")
 
                 return transcribed_text
 
@@ -437,8 +437,8 @@ For specific advice about your plant's symptoms or care needs, consider consulti
 
         # Check if AudioAdapter is available
         if not st.session_state.get("audio_adapter_loaded", False):
-            st.warning("⚠️ Voice processing not available. Please check system configuration.")
-            st.markdown("📱 Voice features require audio processing capabilities.")
+            st.warning("[WARNING] Voice processing not available. Please check system configuration.")
+            st.markdown("[MOBILE] Voice features require audio processing capabilities.")
             st.markdown("</div>", unsafe_allow_html=True)
             return {"error": "AudioAdapter not loaded", "success": False}
 
@@ -454,7 +454,7 @@ For specific advice about your plant's symptoms or care needs, consider consulti
         response = self.render_voice_question_section(current_text)
 
         # Usage tips
-        with st.expander("💡 Voice Assistant Tips"):
+        with st.expander("[TIP] Voice Assistant Tips"):
             st.markdown("""
             **How to use the Voice Assistant:**
             

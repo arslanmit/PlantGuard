@@ -102,7 +102,7 @@ class MobileSPAManager(MobileComponent):
         current_focus = st.session_state.get("focused_content", "image_analysis")
 
         # Content focus header
-        st.markdown("### 🎯 Focus on Content Area")
+        st.markdown("### [PROGRESS] Focus on Content Area")
         st.markdown("**All content available below - click to highlight section**")
 
         # Create focus buttons (no st.rerun calls)
@@ -121,7 +121,7 @@ class MobileSPAManager(MobileComponent):
                 # Focus button label
                 button_label = f"{content_area['icon']} {content_area['title']}"
                 if is_focused:
-                    button_label += " 🎯"
+                    button_label += " [PROGRESS]"
 
                 button_type = "primary" if is_focused else "secondary"
 
@@ -155,7 +155,7 @@ class MobileSPAManager(MobileComponent):
 
         current_focus = st.session_state.get("focused_content", "image_analysis")
 
-        st.markdown("### 📋 All PlantGuard Features")
+        st.markdown("### [DETAILS] All PlantGuard Features")
         st.markdown("**Scroll through all features - everything on the same page**")
 
         # Render all content areas in sequence
@@ -170,7 +170,7 @@ class MobileSPAManager(MobileComponent):
 
             # Section header with focus indicator
             if is_focused:
-                st.markdown(f"## 🎯 {content_area['icon']} {content_area['title']} (Focused)")
+                st.markdown(f"## [PROGRESS] {content_area['icon']} {content_area['title']} (Focused)")
                 st.markdown('<div class="mobile-focus-indicator">Currently focused section</div>', unsafe_allow_html=True)
             else:
                 st.markdown(f"## {content_area['icon']} {content_area['title']}")
@@ -200,7 +200,7 @@ class MobileSPAManager(MobileComponent):
 
         # SPA status indicator
         st.markdown('<div class="mobile-spa-indicator">', unsafe_allow_html=True)
-        st.success("✅ Single Page Application - No page navigation!")
+        st.success("[DONE] Single Page Application - No page navigation!")
         st.markdown("</div>", unsafe_allow_html=True)
 
         # Render content focus bar (returns focus without page redirect)
@@ -275,7 +275,7 @@ def register_default_content_areas(spa_manager: MobileSPAManager) -> None:
         st.info("Chat with AI about plant care")
 
     def history_settings_content():
-        st.markdown("### 📊 History & Settings")
+        st.markdown("### [SUMMARY] History & Settings")
         st.info("View your analysis history and adjust settings")
 
         # Settings without page redirect
@@ -286,4 +286,4 @@ def register_default_content_areas(spa_manager: MobileSPAManager) -> None:
     spa_manager.register_content_area("image_analysis", "Image Analysis", "📸", image_analysis_content)
     spa_manager.register_content_area("voice_assistant", "Voice Assistant", "🎤", voice_assistant_content)
     spa_manager.register_content_area("chat_interface", "Chat Assistant", "💬", chat_interface_content)
-    spa_manager.register_content_area("history_settings", "History & Settings", "📊", history_settings_content)
+    spa_manager.register_content_area("history_settings", "History & Settings", "[SUMMARY]", history_settings_content)

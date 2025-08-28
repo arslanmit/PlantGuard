@@ -23,24 +23,24 @@ def comprehensive_test() -> None:
     adapter = HuggingFaceVisionAdapter(device="cpu")
 
     if not adapter.is_loaded:
-        print("❌ Failed to load model")
+        print("[TODO] Failed to load model")
         return
 
-    print(f"✅ Model loaded: {adapter.model_name}")
-    print(f"📊 Classes: {len(adapter.class_names)}")
+    print(f"[DONE] Model loaded: {adapter.model_name}")
+    print(f"[SUMMARY] Classes: {len(adapter.class_names)}")
     print()
 
     # Load test metadata (guarded). Exit if metadata not present.
     metadata = {"sample_images": []}
     metadata_path = Path("data/raw/sample_images_metadata.json")
     if not metadata_path.exists():
-        print("⚠️ sample_images_metadata.json not found; skipping final model test.")
+        print("[WARNING] sample_images_metadata.json not found; skipping final model test.")
         return
     try:
         with metadata_path.open(encoding="utf-8") as f:
             metadata = json.load(f)
     except Exception:
-        print("⚠️ Failed to read sample_images_metadata.json; skipping final model test.")
+        print("[WARNING] Failed to read sample_images_metadata.json; skipping final model test.")
         return
 
     # Test all images
@@ -88,8 +88,8 @@ def comprehensive_test() -> None:
             status_matches += 1
 
         # Icons
-        perfect_icon = "🎯" if perfect_match else "❌"
-        plant_icon = "🌿" if plant_match else "❌"
+        perfect_icon = "[PROGRESS]" if perfect_match else "[TODO]"
+        plant_icon = "🌿" if plant_match else "[TODO]"
         status_icon = "💚" if status_match else "💔"
 
         results.append(
@@ -156,7 +156,7 @@ def comprehensive_test() -> None:
     if diseased_results:
         print(f"Diseased plants: {diseased_correct:2}/{len(diseased_results):2} ({diseased_correct / len(diseased_results):.1%})")
 
-    print("\n🎉 CONCLUSION:")
+    print("\n[SUCCESS] CONCLUSION:")
     if perfect_matches == total:
         print("🥇 PERFECT SCORE! Your model achieved 100% accuracy!")
         print("   This Hugging Face model is ready for production use.")
@@ -167,7 +167,7 @@ def comprehensive_test() -> None:
     else:
         print("📈 NEEDS IMPROVEMENT - Consider trying other models or fine-tuning.")
 
-    print("\n💡 Model Details:")
+    print("\n[TIP] Model Details:")
     print(f"   Model: {adapter.model_name}")
     print("   Type: Vision Transformer (ViT)")
     print(f"   Classes: {len(adapter.class_names)}")

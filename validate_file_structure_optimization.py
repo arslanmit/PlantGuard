@@ -234,7 +234,7 @@ def main():
             continue
 
         if isinstance(req_result, dict) and "requirement" in req_result:
-            status_emoji = "✅" if req_result["status"] == "passed" else ("⚠️" if req_result["status"] == "warning" else "❌")
+            status_emoji = "[DONE]" if req_result["status"] == "passed" else ("[WARNING]" if req_result["status"] == "warning" else "[TODO]")
             print(f"\n{status_emoji} {req_result['requirement']}")
             print(f"   Status: {req_result['status']}")
             print(f"   Details: {req_result['details']}")
@@ -244,7 +244,7 @@ def main():
                     print(f"   Issue: {issue}")
 
     # Overall status
-    overall_emoji = "🎉" if results["overall_status"] == "passed" else "⚠️"
+    overall_emoji = "[SUCCESS]" if results["overall_status"] == "passed" else "[WARNING]"
     print(f"\n{overall_emoji} Overall Task 10 Status: {results['overall_status'].upper()}")
 
     # Save detailed results

@@ -28,12 +28,12 @@ def create_checkpoint(args):
     success = framework.create_safety_checkpoint()
 
     if success:
-        print("✅ Safety checkpoint created successfully!")
+        print("[DONE] Safety checkpoint created successfully!")
         print(f"Migration ID: {framework.migration_id}")
         status = framework.get_migration_status()
         print(f"Files backed up: {status['status']['files_backed_up']}")
     else:
-        print("❌ Failed to create safety checkpoint")
+        print("[TODO] Failed to create safety checkpoint")
         sys.exit(1)
 
 
@@ -51,7 +51,7 @@ def validate_migration(args):
         if test_name == "overall_summary":
             continue
 
-        status_icon = {"passed": "✅", "warning": "⚠️", "failed": "❌"}.get(result["status"], "❓")
+        status_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(result["status"], "❓")
 
         print(f"{status_icon} {test_name}: {result['status']}")
         if result["status"] != "passed":
@@ -59,7 +59,7 @@ def validate_migration(args):
 
     # Overall summary
     summary = results["overall_summary"]
-    summary_icon = {"passed": "✅", "warning": "⚠️", "failed": "❌"}.get(summary["status"], "❓")
+    summary_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(summary["status"], "❓")
 
     print(f"\n{summary_icon} Overall Status: {summary['status']}")
     print(f"   {summary['details']}")
@@ -104,9 +104,9 @@ def rollback_migration(args):
     success = framework.rollback_migration()
 
     if success:
-        print("✅ Migration rollback completed successfully")
+        print("[DONE] Migration rollback completed successfully")
     else:
-        print("❌ Migration rollback failed")
+        print("[TODO] Migration rollback failed")
         sys.exit(1)
 
 

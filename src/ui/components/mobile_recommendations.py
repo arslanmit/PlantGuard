@@ -155,7 +155,7 @@ class MobileRecommendations(MobileBaseComponent):
             """
         <div class="mobile-card mobile-empty-recommendations">
             <div class="empty-state-content">
-                <div class="empty-state-icon">💡</div>
+                <div class="empty-state-icon">[TIP]</div>
                 <h3>No Analysis Available</h3>
                 <p>Perform a plant disease analysis to get personalized treatment recommendations.</p>
                 <div class="general-tips">
@@ -182,7 +182,7 @@ class MobileRecommendations(MobileBaseComponent):
         st.markdown(
             f"""
         <div class="mobile-card recommendations-header">
-            <h3>💡 Treatment for {disease_name}</h3>
+            <h3>[TIP] Treatment for {disease_name}</h3>
             <div class="confidence-indicator">
                 <span style="color: {confidence_color}">
                     {confidence:.1%} Confidence ({confidence_level.title()})
@@ -199,7 +199,7 @@ class MobileRecommendations(MobileBaseComponent):
 
         if confidence_level == "low":
             st.error("""
-            ⚠️ **Low Confidence Warning**
+            [WARNING] **Low Confidence Warning**
             
             The AI diagnosis has low confidence. Please consider:
             - Consulting a plant pathologist or expert
@@ -208,7 +208,7 @@ class MobileRecommendations(MobileBaseComponent):
             """)
         elif confidence_level == "medium":
             st.warning("""
-            ⚠️ **Medium Confidence Notice**
+            [WARNING] **Medium Confidence Notice**
             
             The diagnosis is moderately confident. Consider:
             - Monitoring the plant closely after treatment
@@ -217,7 +217,7 @@ class MobileRecommendations(MobileBaseComponent):
             """)
         else:
             st.success("""
-            ✅ **High Confidence Diagnosis**
+            [DONE] **High Confidence Diagnosis**
             
             The AI is confident in this diagnosis. Follow the recommended treatments below.
             """)
@@ -252,7 +252,7 @@ class MobileRecommendations(MobileBaseComponent):
         if "chemical" in treatment:
             expanded = self._is_section_expanded("chemical")
             with st.expander("⚗️ Chemical Treatment Options", expanded=expanded):
-                st.warning("⚠️ Always follow label instructions and safety precautions")
+                st.warning("[WARNING] Always follow label instructions and safety precautions")
                 self._render_treatment_section(treatment["chemical"], "Chemical treatment options:", "chemical")
 
     def _render_treatment_section(self, treatments: list[str], description: str, section_type: str) -> None:
@@ -267,7 +267,7 @@ class MobileRecommendations(MobileBaseComponent):
 
             with col2:
                 if st.button("✓", key=f"{self.component_id}_{section_type}_{i}", help="Mark as done"):
-                    st.success("✅ Marked as completed!")
+                    st.success("[DONE] Marked as completed!")
 
     def _render_prevention_tips(self, disease_info: dict[str, Any]) -> None:
         """Render prevention tips."""
@@ -322,7 +322,7 @@ class MobileRecommendations(MobileBaseComponent):
 
     def _render_generic_recommendations(self, disease_name: str, confidence: float) -> None:
         """Render generic recommendations when specific info is not available."""
-        st.markdown("### 💡 General Treatment Recommendations")
+        st.markdown("### [TIP] General Treatment Recommendations")
 
         confidence_level = self._get_confidence_level(confidence)
 
@@ -341,7 +341,7 @@ class MobileRecommendations(MobileBaseComponent):
             """)
 
         # Generic treatment steps
-        with st.expander("🔧 General Treatment Steps", expanded=True):
+        with st.expander("[TOOL] General Treatment Steps", expanded=True):
             st.markdown("""
             **Immediate Actions:**
             • Remove affected plant parts (leaves, branches, fruits)
@@ -454,7 +454,7 @@ Date: {datetime.now().strftime("%Y-%m-%d %H:%M")}
 
         st.text_area("📤 Shareable Recommendations", value=share_text, height=200, key=f"{self.component_id}_share_text")
 
-        st.success("✅ Recommendations ready to share! Copy the text above.")
+        st.success("[DONE] Recommendations ready to share! Copy the text above.")
 
     def _save_recommendations_to_notes(self, disease_name: str, confidence: float) -> None:
         """Save recommendations to personal notes."""

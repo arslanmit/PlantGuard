@@ -175,10 +175,10 @@ def create_improved_dummy_dataset(
             img_path = val_class_dir / f"{class_name}_{i:04d}.jpg"
             img.save(img_path, "JPEG", quality=85)
 
-        print(f"  ✅ Created {train_samples} train + {val_samples} val images")
+        print(f"  [DONE] Created {train_samples} train + {val_samples} val images")
 
-    print(f"✅ Improved dummy dataset created successfully at {output_dir}")
-    print("🎯 This dataset has learnable patterns and should achieve >80% accuracy")
+    print(f"[DONE] Improved dummy dataset created successfully at {output_dir}")
+    print("[PROGRESS] This dataset has learnable patterns and should achieve >80% accuracy")
 
 
 def main() -> None:
@@ -211,7 +211,7 @@ def main() -> None:
             args.random_seed,
         )
     except (OSError, ValueError) as e:
-        print(f"❌ Error creating improved dummy dataset: {e}")
+        print(f"[TODO] Error creating improved dummy dataset: {e}")
         sys.exit(1)
 
 

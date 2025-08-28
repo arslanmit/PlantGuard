@@ -286,7 +286,7 @@ def _print_detailed_results(detailed: list[dict[str, Any]]) -> None:
         pred = result["prediction"]
         eval_result = result["evaluation"]
 
-        "✅" if eval_result["class_correct"] else "❌"
+        "[DONE]" if eval_result["class_correct"] else "[TODO]"
         pred["confidence"]
 
 

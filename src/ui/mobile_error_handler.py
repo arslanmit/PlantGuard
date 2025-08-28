@@ -191,7 +191,7 @@ class MobileErrorHandler:
 
         # Display error to user
         st.error(error_config["message"])
-        st.info(f"💡 {error_config['recovery_suggestion']}")
+        st.info(f"[TIP] {error_config['recovery_suggestion']}")
 
         # Log the analysis error
         MobileErrorHandler._log_error(error_info)
@@ -332,10 +332,10 @@ class MobileErrorHandler:
             st.error(f"🚨 Critical Error: {base_message}")
             st.error("Please refresh the page or contact support.")
         elif severity == "high":
-            st.error(f"⚠️ {base_message}")
+            st.error(f"[WARNING] {base_message}")
             st.info("Please try again or use a different approach.")
         elif severity == "medium":
-            st.warning(f"⚠️ {base_message}")
+            st.warning(f"[WARNING] {base_message}")
             st.info("Please try again.")
         else:
             st.info(f"i {base_message}")
@@ -519,7 +519,7 @@ class MobileErrorHandler:
             border-radius: 12px;
             margin: 8px 0;
         ">
-            <h4 style="color: #d63031; margin: 0 0 8px 0;">⚠️ Component Unavailable</h4>
+            <h4 style="color: #d63031; margin: 0 0 8px 0;">[WARNING] Component Unavailable</h4>
             <p style="margin: 0 0 8px 0; color: #636e72;">
                 The {component_id.replace("_", " ").title()} component is temporarily unavailable.
             </p>

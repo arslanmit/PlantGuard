@@ -94,12 +94,12 @@ def test_performance_optimizer():
 
         # Test memory manager
         memory_stats = mobile_performance_optimizer.memory_manager.get_memory_usage()
-        print("✅ Memory statistics available")
+        print("[DONE] Memory statistics available")
 
         return True
 
     except Exception as e:
-        print(f"❌ Performance optimizer test failed: {e}")
+        print(f"[TODO] Performance optimizer test failed: {e}")
         return False
 
 
@@ -117,25 +117,25 @@ def test_core_adapters():
         audio = AudioAdapter()
         text = TextAdapter()
 
-        print("✅ All core adapters created successfully")
+        print("[DONE] All core adapters created successfully")
 
         # Test basic methods exist
         assert hasattr(vision, "predict"), "Vision adapter missing predict method"
         assert hasattr(audio, "transcribe"), "Audio adapter missing transcribe method"
         assert hasattr(text, "generate_response"), "Text adapter missing generate_response method"
 
-        print("✅ All required methods exist")
+        print("[DONE] All required methods exist")
 
         return True
 
     except Exception as e:
-        print(f"❌ Core adapters test failed: {e}")
+        print(f"[TODO] Core adapters test failed: {e}")
         return False
 
 
 def main():
     """Run all tests."""
-    print("🚀 Starting mobile app optimization tests...\n")
+    print("[LAUNCH] Starting mobile app optimization tests...\n")
 
     tests = [test_mobile_app_imports, test_mobile_app_class, test_performance_optimizer, test_core_adapters]
 
@@ -146,13 +146,13 @@ def main():
         if test():
             passed += 1
 
-    print(f"\n📊 Test Results: {passed}/{total} tests passed")
+    print(f"\n[SUMMARY] Test Results: {passed}/{total} tests passed")
 
     if passed == total:
-        print("🎉 All tests passed! Mobile app optimization is working correctly.")
+        print("[SUCCESS] All tests passed! Mobile app optimization is working correctly.")
         return True
     else:
-        print("❌ Some tests failed. Please check the implementation.")
+        print("[TODO] Some tests failed. Please check the implementation.")
         return False
 
 

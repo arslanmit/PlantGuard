@@ -125,10 +125,10 @@ class MobileErrorRecoveryIntegration:
                 queue_info = offline_status["queue_info"]
 
                 if queue_info["total_operations"] > 0:
-                    st.info(f"📋 {queue_info['total_operations']} operations queued")
+                    st.info(f"[DETAILS] {queue_info['total_operations']} operations queued")
 
         with col2:
-            st.markdown("### ⚠️ Error Status")
+            st.markdown("### [WARNING] Error Status")
             error_summary = MobileErrorHandler.get_error_summary()
 
             if error_summary["total_errors"] > 0:
@@ -139,7 +139,7 @@ class MobileErrorRecoveryIntegration:
                     severity_text = ", ".join([f"{count} {severity}" for severity, count in error_summary["error_by_severity"].items()])
                     st.caption(f"Breakdown: {severity_text}")
             else:
-                st.success("✅ No recent errors")
+                st.success("[DONE] No recent errors")
 
         # Show recovery actions if needed
         MobileErrorRecoveryIntegration._display_recovery_actions()
@@ -232,11 +232,11 @@ class MobileErrorRecoveryIntegration:
             if cache_key:
                 cached_result = MobileOfflineManager.get_cached_resource(cache_key)
                 if cached_result:
-                    st.info("⚠️ Using cached data due to limited connectivity")
+                    st.info("[WARNING] Using cached data due to limited connectivity")
                     return cached_result
 
             if fallback_func:
-                st.info("⚠️ Using fallback due to limited connectivity")
+                st.info("[WARNING] Using fallback due to limited connectivity")
                 return fallback_func()
 
             # Queue for later if no fallback available
@@ -253,12 +253,12 @@ class MobileErrorRecoveryIntegration:
         if cache_key:
             cached_result = MobileOfflineManager.get_cached_resource(cache_key)
             if cached_result:
-                st.info("📱 Using cached data (offline mode)")
+                st.info("[MOBILE] Using cached data (offline mode)")
                 return cached_result
 
         # Try fallback function
         if fallback_func:
-            st.info("📱 Using offline functionality")
+            st.info("[MOBILE] Using offline functionality")
             return fallback_func()
 
         # Queue for later execution
@@ -266,7 +266,7 @@ class MobileErrorRecoveryIntegration:
             f"{component_id}_{operation_name}_{datetime.now().timestamp()}", operation_name, {"component_id": component_id}
         )
 
-        st.warning("📱 Operation queued for when connection returns")
+        st.warning("[MOBILE] Operation queued for when connection returns")
         return None
 
     @staticmethod
@@ -291,12 +291,12 @@ class MobileErrorRecoveryIntegration:
         if cache_key:
             cached_result = MobileOfflineManager.get_cached_resource(cache_key)
             if cached_result:
-                st.info("🔄 Using cached data due to error")
+                st.info("[PARTIAL] Using cached data due to error")
                 return cached_result
 
         if fallback_func:
             try:
-                st.info("🔄 Using fallback due to error")
+                st.info("[PARTIAL] Using fallback due to error")
                 return fallback_func()
             except Exception as fallback_error:
                 logger.error(f"Fallback also failed: {fallback_error}")
@@ -308,7 +308,7 @@ class MobileErrorRecoveryIntegration:
                 operation_name,
                 {"component_id": component_id, "retry_after_error": True},
             )
-            st.info("🔄 Operation queued for retry")
+            st.info("[PARTIAL] Operation queued for retry")
 
         return None
 
@@ -339,7 +339,7 @@ class MobileErrorRecoveryIntegration:
             margin: 8px 0;
             text-align: center;
         ">
-            <h4 style="color: #f57c00; margin: 0 0 8px 0;">📱 Offline Mode</h4>
+            <h4 style="color: #f57c00; margin: 0 0 8px 0;">[MOBILE] Offline Mode</h4>
             <p style="margin: 0 0 8px 0; color: #ef6c00;">
                 {component_id.replace("_", " ").title()} requires internet connection
             </p>
@@ -371,7 +371,7 @@ class MobileErrorRecoveryIntegration:
             border-radius: 12px;
             margin: 8px 0;
         ">
-            <h4 style="color: #1976d2; margin: 0 0 8px 0;">📱 {component_id.replace("_", " ").title()}</h4>
+            <h4 style="color: #1976d2; margin: 0 0 8px 0;">[MOBILE] {component_id.replace("_", " ").title()}</h4>
             <p style="margin: 0; color: #1565c0;">
                 {message}
             </p>
@@ -392,7 +392,7 @@ class MobileErrorRecoveryIntegration:
             border-radius: 12px;
             margin: 8px 0;
         ">
-            <h4 style="color: #d32f2f; margin: 0 0 8px 0;">⚠️ Component Error</h4>
+            <h4 style="color: #d32f2f; margin: 0 0 8px 0;">[WARNING] Component Error</h4>
             <p style="margin: 0 0 8px 0; color: #c62828;">
                 {component_id.replace("_", " ").title()} encountered an error
             </p>
@@ -428,7 +428,7 @@ class MobileErrorRecoveryIntegration:
             recovery_actions.append("Clean expired cache")
 
         if recovery_actions:
-            st.markdown("### 🔧 Recovery Actions")
+            st.markdown("### [TOOL] Recovery Actions")
 
             col1, col2, col3 = st.columns(3)
 
@@ -438,7 +438,7 @@ class MobileErrorRecoveryIntegration:
                     st.success(f"Cleaned {maintenance_results['errors_cleared']} errors, {maintenance_results['cache_cleaned']} cache entries")
 
             with col2:
-                if st.button("🔄 Retry Failed", help="Retry failed operations"):
+                if st.button("[PARTIAL] Retry Failed", help="Retry failed operations"):
                     if MobileOfflineManager.is_online():
                         queue_results = MobileOfflineManager.process_offline_queue()
                         st.success(f"Processed {queue_results['processed']} operations")
@@ -446,7 +446,7 @@ class MobileErrorRecoveryIntegration:
                         st.warning("Cannot retry while offline")
 
             with col3:
-                if st.button("📊 View Details", help="View detailed status"):
+                if st.button("[SUMMARY] View Details", help="View detailed status"):
                     with st.expander("System Details"):
                         st.json({"error_summary": error_summary, "offline_status": offline_status})
 

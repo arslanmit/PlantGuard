@@ -450,7 +450,7 @@ def run_mobile_display_tests():
         test_analysis.test_component_initialization()
         test_analysis.test_empty_state_rendering()
         test_analysis.test_confidence_level_calculation()
-        print("✅ MobileAnalysisDisplay tests passed")
+        print("[DONE] MobileAnalysisDisplay tests passed")
 
         # Test MobileRecommendations
         print("Testing MobileRecommendations...")
@@ -459,7 +459,7 @@ def run_mobile_display_tests():
         test_recommendations.test_component_initialization()
         test_recommendations.test_no_analysis_state()
         test_recommendations.test_confidence_warning_levels()
-        print("✅ MobileRecommendations tests passed")
+        print("[DONE] MobileRecommendations tests passed")
 
         # Test MobileChatInterface
         print("Testing MobileChatInterface...")
@@ -469,7 +469,7 @@ def run_mobile_display_tests():
         test_chat.test_message_addition()
         test_chat.test_typing_indicator()
         test_chat.test_fallback_responses()
-        print("✅ MobileChatInterface tests passed")
+        print("[DONE] MobileChatInterface tests passed")
 
         # Test Integration
         print("Testing Integration...")
@@ -477,13 +477,13 @@ def run_mobile_display_tests():
         test_integration.setup_method()
         test_integration.test_components_integration()
         test_integration.test_css_class_generation()
-        print("✅ Integration tests passed")
+        print("[DONE] Integration tests passed")
 
-        print("🎉 All Mobile Display Components tests passed!")
+        print("[SUCCESS] All Mobile Display Components tests passed!")
         return True
 
     except Exception as e:
-        print(f"❌ Tests failed: {e}")
+        print(f"[TODO] Tests failed: {e}")
         return False
 
 

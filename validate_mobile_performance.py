@@ -145,10 +145,10 @@ def validate_performance_improvements():
 
     print(f"\n{'=' * 50}")
     if validation_passed:
-        print("🎉 MOBILE PERFORMANCE VALIDATION: PASSED")
+        print("[SUCCESS] MOBILE PERFORMANCE VALIDATION: PASSED")
         print("The mobile-only PlantGuard application is ready for use!")
     else:
-        print("❌ MOBILE PERFORMANCE VALIDATION: FAILED")
+        print("[TODO] MOBILE PERFORMANCE VALIDATION: FAILED")
         print("Additional optimization is required before deployment.")
 
     return validation_passed
@@ -156,20 +156,20 @@ def validate_performance_improvements():
 
 def test_mobile_functionality():
     """Test basic mobile functionality."""
-    print("\n🔧 MOBILE FUNCTIONALITY TEST:")
+    print("\n[TOOL] MOBILE FUNCTIONALITY TEST:")
     print("-" * 30)
 
     try:
         # Test core imports
-        print("✅ Mobile components import successfully")
+        print("[DONE] Mobile components import successfully")
 
         # Test core adapters
-        print("✅ Core adapters import successfully")
+        print("[DONE] Core adapters import successfully")
 
         return True
 
     except Exception as e:
-        print(f"❌ Mobile functionality test failed: {e}")
+        print(f"[TODO] Mobile functionality test failed: {e}")
         return False
 
 
@@ -184,10 +184,10 @@ if __name__ == "__main__":
 
     # Overall result
     if perf_passed and func_passed:
-        print("\n🎉 ALL VALIDATIONS PASSED!")
+        print("\n[SUCCESS] ALL VALIDATIONS PASSED!")
         print("Mobile-only PlantGuard is optimized and ready!")
         sys.exit(0)
     else:
-        print("\n❌ VALIDATION FAILED!")
+        print("\n[TODO] VALIDATION FAILED!")
         print("Please address the issues above before proceeding.")
         sys.exit(1)

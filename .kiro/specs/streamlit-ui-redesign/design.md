@@ -13,12 +13,12 @@ The design follows modern UI/UX principles with a focus on cognitive accessibili
 ## Critical Architecture Constraints
 
 **NEVER violate these rules when implementing**:
-- ❌ No external ML APIs (OpenAI, Replicate, cloud vision services)
-- ❌ No user data sent to external services  
-- ❌ No internet-dependent inference
-- ✅ All processing must work offline after model downloads
-- ✅ Use required adapter interfaces: `VisionAdapter`, `AudioAdapter`, `TextAdapter`
-- ✅ Graceful degradation when components fail
+- [TODO] No external ML APIs (OpenAI, Replicate, cloud vision services)
+- [TODO] No user data sent to external services  
+- [TODO] No internet-dependent inference
+- [DONE] All processing must work offline after model downloads
+- [DONE] Use required adapter interfaces: `VisionAdapter`, `AudioAdapter`, `TextAdapter`
+- [DONE] Graceful degradation when components fail
 
 **Required Technology Stack**:
 - **Vision**: ResNet50 fine-tuned on PlantVillage dataset
@@ -656,7 +656,7 @@ class CompareView:
     def perform_comparison(self, image_a, image_b):
         """Perform detailed comparison analysis"""
         st.markdown("---")
-        st.markdown("### 📊 Comparison Results")
+        st.markdown("### [SUMMARY] Comparison Results")
         
         # Analyze both images
         with st.spinner("Analyzing images..."):
@@ -731,7 +731,7 @@ class HistoryManager:
         col1, col2, col3 = st.columns([1, 1, 1])
         
         with col1:
-            if st.button("📊 Export CSV"):
+            if st.button("[SUMMARY] Export CSV"):
                 self.export_csv()
         
         with col2:
@@ -780,7 +780,7 @@ class HistoryManager:
                 if st.button("👁️ View", key=f"view_{analysis['id']}"):
                     self.view_analysis_details(analysis)
             with col2:
-                if st.button("🔄 Reanalyze", key=f"reanalyze_{analysis['id']}"):
+                if st.button("[PARTIAL] Reanalyze", key=f"reanalyze_{analysis['id']}"):
                     self.reanalyze_image(analysis)
 ```
 
@@ -951,7 +951,7 @@ class ErrorHandler:
         for option in recovery_options:
             st.markdown(f"• {option}")
         
-        if st.button("🔄 Retry"):
+        if st.button("[PARTIAL] Retry"):
             st.rerun()
 ```
 

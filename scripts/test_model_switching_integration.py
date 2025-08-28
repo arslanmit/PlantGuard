@@ -90,34 +90,34 @@ def test_model_switching_integration() -> bool:
             # Test loading first model
             try:
                 adapter.load_from_registry(model_ids[0])
-                logger.info(f"✅ Successfully loaded model from registry: {model_ids[0]}")
+                logger.info(f"[DONE] Successfully loaded model from registry: {model_ids[0]}")
 
                 # Verify model properties
                 if not adapter.is_loaded:
-                    logger.error("❌ Model not marked as loaded")
+                    logger.error("[TODO] Model not marked as loaded")
                     return False
 
                 if len(adapter.class_names) != 38:
-                    logger.error(f"❌ Expected 38 classes, got {len(adapter.class_names)}")
+                    logger.error(f"[TODO] Expected 38 classes, got {len(adapter.class_names)}")
                     return False
 
             except Exception as e:
-                logger.error(f"❌ Failed to load model from registry: {e}")
+                logger.error(f"[TODO] Failed to load model from registry: {e}")
                 return False
 
             # 3. Test model switching
             try:
                 # Switch to second model
                 adapter.load_from_registry(model_ids[1])
-                logger.info(f"✅ Successfully switched to model: {model_ids[1]}")
+                logger.info(f"[DONE] Successfully switched to model: {model_ids[1]}")
 
                 # Verify switch worked
                 if not adapter.is_loaded:
-                    logger.error("❌ Model not loaded after switch")
+                    logger.error("[TODO] Model not loaded after switch")
                     return False
 
             except Exception as e:
-                logger.error(f"❌ Failed to switch models: {e}")
+                logger.error(f"[TODO] Failed to switch models: {e}")
                 return False
 
             # 4. Test model manager integration
@@ -160,10 +160,10 @@ def test_model_switching_integration() -> bool:
             # Test listing models
             models = manager.list_available_models()
             if len(models) != 2:
-                logger.error(f"❌ Expected 2 models in manager, got {len(models)}")
+                logger.error(f"[TODO] Expected 2 models in manager, got {len(models)}")
                 return False
 
-            logger.info(f"✅ Model manager loaded {len(models)} registry models")
+            logger.info(f"[DONE] Model manager loaded {len(models)} registry models")
 
             # 5. Test prediction with registry models
             test_image = Image.new("RGB", (224, 224), color="green")
@@ -178,25 +178,25 @@ def test_model_switching_integration() -> bool:
                 predicted_class, confidence = adapter.predict(test_image)
 
                 if predicted_class != "test_class" or confidence != 0.95:
-                    logger.error("❌ Prediction test failed")
+                    logger.error("[TODO] Prediction test failed")
                     return False
 
-                logger.info("✅ Prediction test successful")
+                logger.info("[DONE] Prediction test successful")
 
             # 6. Test model comparison
             comparison = registry.compare_models(model_ids)
 
             if len(comparison.models) != 2:
-                logger.error(f"❌ Expected 2 models in comparison, got {len(comparison.models)}")
+                logger.error(f"[TODO] Expected 2 models in comparison, got {len(comparison.models)}")
                 return False
 
             # Get best model by accuracy
             best_model = comparison.get_best_model("accuracy")
             if best_model.metadata.model_id != model_ids[1]:  # Second model has higher accuracy
-                logger.error("❌ Best model selection failed")
+                logger.error("[TODO] Best model selection failed")
                 return False
 
-            logger.info("✅ Model comparison successful")
+            logger.info("[DONE] Model comparison successful")
 
             # 7. Test backward compatibility
             legacy_path = temp_path / "legacy_model.pt"
@@ -215,7 +215,7 @@ def test_model_switching_integration() -> bool:
             # Test compatibility detection
             is_compatible = adapter.is_compatible_with_registry_format(str(legacy_path))
             if is_compatible:
-                logger.error("❌ Legacy model incorrectly detected as registry format")
+                logger.error("[TODO] Legacy model incorrectly detected as registry format")
                 return False
 
             # Test migration
@@ -225,31 +225,31 @@ def test_model_switching_integration() -> bool:
             # Verify migration
             is_migrated_compatible = adapter.is_compatible_with_registry_format(str(migrated_path))
             if not is_migrated_compatible:
-                logger.error("❌ Model migration failed")
+                logger.error("[TODO] Model migration failed")
                 return False
 
-            logger.info("✅ Backward compatibility test successful")
+            logger.info("[DONE] Backward compatibility test successful")
 
-            logger.info("🎉 All model switching integration tests passed!")
+            logger.info("[SUCCESS] All model switching integration tests passed!")
             return True
 
         except Exception as e:
-            logger.error(f"❌ Model switching integration test failed: {e}")
+            logger.error(f"[TODO] Model switching integration test failed: {e}")
             return False
 
 
 def main() -> int:
     """Main test function."""
-    logger.info("🚀 Starting model switching integration tests...")
+    logger.info("[LAUNCH] Starting model switching integration tests...")
 
     try:
         success = test_model_switching_integration()
 
         if success:
-            logger.info("✅ Model switching integration tests completed successfully!")
+            logger.info("[DONE] Model switching integration tests completed successfully!")
             return 0
         else:
-            logger.error("❌ Model switching integration tests failed!")
+            logger.error("[TODO] Model switching integration tests failed!")
             return 1
 
     except KeyboardInterrupt:

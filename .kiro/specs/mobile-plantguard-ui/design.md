@@ -414,7 +414,7 @@ class MobileAnalysisDisplay:
         
         st.markdown("""
         <div class="mobile-card mobile-recommendations">
-            <h4>💡 Treatment Recommendations</h4>
+            <h4>[TIP] Treatment Recommendations</h4>
         </div>
         """, unsafe_allow_html=True)
         
@@ -527,7 +527,7 @@ class MobileErrorHandler:
         st.error(error_message)
         
         # Provide recovery suggestions
-        st.info("💡 Try: Upload a different image or restart the application.")
+        st.info("[TIP] Try: Upload a different image or restart the application.")
 ```
 
 ## Testing Strategy

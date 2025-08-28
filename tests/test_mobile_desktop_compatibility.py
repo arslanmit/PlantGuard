@@ -66,7 +66,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         self.assertNotIn('@media (min-width:', fallback_css)  # No responsive breakpoints
         self.assertIn('428px', fallback_css)  # Fixed width
         
-        print("✅ Layout Manager: Fixed 428px design verified")
+        print("[DONE] Layout Manager: Fixed 428px design verified")
     
     def test_header_responsive_design(self):
         """Test header component responsive design."""
@@ -82,7 +82,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         css_classes = metadata.css_classes
         self.assertIn('mobile-header-always-visible', css_classes)
         
-        print("✅ Mobile Header: Responsive design verified")
+        print("[DONE] Mobile Header: Responsive design verified")
     
     def test_input_ribbon_desktop_layout(self):
         """Test input ribbon works on desktop."""
@@ -111,7 +111,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         for method in expected_methods:
             self.assertIn(method, available_methods)
         
-        print("✅ Input Ribbon: Desktop layout compatibility verified")
+        print("[DONE] Input Ribbon: Desktop layout compatibility verified")
     
     def test_content_tabs_desktop_behavior(self):
         """Test content tabs behavior on desktop."""
@@ -137,7 +137,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         enabled_tabs = [t for t in tabs if t.get('enabled', True)]
         self.assertEqual(len(enabled_tabs), len(tabs))
         
-        print("✅ Content Tabs: Desktop behavior verified")
+        print("[DONE] Content Tabs: Desktop behavior verified")
     
     def test_desktop_responsive_css_features(self):
         """Test CSS maintains fixed 428px design on desktop."""
@@ -159,7 +159,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         self.assertNotIn('--desktop-max-width', fallback_css)
         self.assertNotIn('--desktop-large-width', fallback_css)
         
-        print("✅ CSS Framework: Fixed 428px design verified")
+        print("[DONE] CSS Framework: Fixed 428px design verified")
     
     def test_mobile_app_desktop_session_state(self):
         """Test mobile app maintains fixed design session state."""
@@ -173,7 +173,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         self.assertTrue(self.mock_session_state.get('fixed_mobile_design'))
         self.assertEqual(self.mock_session_state.get('mobile_viewport_width'), 428)
         
-        print("✅ Session State: Fixed 428px design verified")
+        print("[DONE] Session State: Fixed 428px design verified")
     
     def test_always_visible_design_principles(self):
         """Test that always-visible design works on desktop."""
@@ -199,7 +199,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         for element in tabs_metadata.interactive_elements:
             self.assertTrue(element.get('always_visible', False))
         
-        print("✅ Always-Visible Design: Desktop compatibility verified")
+        print("[DONE] Always-Visible Design: Desktop compatibility verified")
 
 
 def run_desktop_compatibility_tests():
@@ -227,18 +227,18 @@ if __name__ == '__main__':
     results = run_desktop_compatibility_tests()
     
     print("\n" + "=" * 60)
-    print("📊 Desktop Compatibility Test Results:")
+    print("[SUMMARY] Desktop Compatibility Test Results:")
     print(f"Tests Run: {results['tests_run']}")
     print(f"Failures: {results['failures']}")
     print(f"Errors: {results['errors']}")
-    print(f"Success: {'✅ PASSED' if results['success'] else '❌ FAILED'}")
+    print(f"Success: {'[DONE] PASSED' if results['success'] else '[TODO] FAILED'}")
     
     if not results['success']:
         print("\n🔍 Issues Found:")
         for failure in results['details']['failures']:
-            print(f"  ❌ {failure}")
+            print(f"  [TODO] {failure}")
         for error in results['details']['errors']:
-            print(f"  💥 {error}")
+            print(f"  [ERROR] {error}")
     else:
-        print("\n🎉 All desktop compatibility tests passed!")
+        print("\n[SUCCESS] All desktop compatibility tests passed!")
         print("💻 Mobile PlantGuard is ready for desktop use!")

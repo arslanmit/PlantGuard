@@ -784,13 +784,13 @@ class AIAgentTestingFramework:
 
         # Overall status
         if results["tests_failed"] == 0 and results["tests_passed"] > 0:
-            recommendations.append("✅ All components are healthy and functioning properly")
+            recommendations.append("[DONE] All components are healthy and functioning properly")
         elif results["tests_failed"] > 0:
-            recommendations.append(f"⚠️ {results['tests_failed']} test(s) failed - immediate attention required")
+            recommendations.append(f"[WARNING] {results['tests_failed']} test(s) failed - immediate attention required")
 
         # Auto-fix results
         if results["tests_fixed"] > 0:
-            recommendations.append(f"🔧 Successfully auto-fixed {results['tests_fixed']} issue(s)")
+            recommendations.append(f"[TOOL] Successfully auto-fixed {results['tests_fixed']} issue(s)")
 
         # Performance analysis
         if results["performance_metrics"]:
@@ -830,7 +830,7 @@ class AIAgentTestingFramework:
                 * 100
             )
             if test_coverage < 80:
-                recommendations.append(f"📊 Test coverage is {test_coverage:.1f}% - consider improving test reliability")
+                recommendations.append(f"[SUMMARY] Test coverage is {test_coverage:.1f}% - consider improving test reliability")
 
         return recommendations or ["i No specific recommendations at this time"]
 

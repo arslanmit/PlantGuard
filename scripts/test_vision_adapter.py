@@ -108,7 +108,7 @@ def main() -> None:
         test_class_mapping()
         test_image_preprocessing()
 
-        logger.info("🎉 All tests passed!")
+        logger.info("[SUCCESS] All tests passed!")
 
     except Exception:
         logger.exception("Test failed")

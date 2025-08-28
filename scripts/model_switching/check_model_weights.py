@@ -16,7 +16,7 @@ def check_model_training_status(model_path: str) -> bool:
 
     checkpoint = torch.load(model_path, map_location="cpu", weights_only=False)
 
-    print("📊 Model Information:")
+    print("[SUMMARY] Model Information:")
     print(f"   Classes: {checkpoint.get('num_classes', 'Unknown')}")
     print(f"   Epoch: {checkpoint.get('epoch', 'Unknown')}")
     print(f"   Training Loss: {checkpoint.get('train_loss', 'Unknown')}")
@@ -27,7 +27,7 @@ def check_model_training_status(model_path: str) -> bool:
     state_dict = checkpoint.get("model_state_dict", {})
 
     if not state_dict:
-        print("❌ No model state dict found - this appears to be an empty/dummy model")
+        print("[TODO] No model state dict found - this appears to be an empty/dummy model")
         return False
 
     # Check final layer weights (should not be random if trained)
@@ -45,19 +45,19 @@ def check_model_training_status(model_path: str) -> bool:
 
         # Random weights typically have std around 0.02-0.1 for ResNet
         if weight_std < 0.001:
-            print("⚠️  Weights appear to be zeros - model not trained")
+            print("[WARNING]  Weights appear to be zeros - model not trained")
             return False
         elif 0.001 < weight_std < 0.01:
-            print("⚠️  Weights appear very small - possibly undertrained")
+            print("[WARNING]  Weights appear very small - possibly undertrained")
             return False
         elif weight_std > 0.5:
-            print("⚠️  Weights appear very large - possibly random initialization")
+            print("[WARNING]  Weights appear very large - possibly random initialization")
             return False
         else:
-            print("✅ Weights appear reasonable for a trained model")
+            print("[DONE] Weights appear reasonable for a trained model")
             return True
     else:
-        print("❌ Could not find final layer weights")
+        print("[TODO] Could not find final layer weights")
         return False
 
 
@@ -65,12 +65,12 @@ def main() -> None:
     model_path = "data/models/vision_resnet50.pt"
 
     if not Path(model_path).exists():
-        print(f"❌ Model file not found: {model_path}")
+        print(f"[TODO] Model file not found: {model_path}")
         return
 
     check_model_training_status(model_path)
 
-    print("\n🎯 Recommendation:")
+    print("\n[PROGRESS] Recommendation:")
     print("   Based on the analysis above:")
     print("   - If weights appear untrained, run: python scripts/train_vision_model.py")
     print("   - If weights appear trained but performance is poor, consider:")

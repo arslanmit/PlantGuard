@@ -69,7 +69,7 @@ def migrate_model(
         Model ID if successful, None if failed
     """
     try:
-        print(f"🔄 Migrating: {model_path}")
+        print(f"[PARTIAL] Migrating: {model_path}")
 
         # Create VisionAdapter for migration
         adapter = VisionAdapter()
@@ -107,11 +107,11 @@ def migrate_model(
             tags=["migrated", "legacy"],
         )
 
-        print(f"✅ Successfully migrated: {model_path} -> {model_id}")
+        print(f"[DONE] Successfully migrated: {model_path} -> {model_id}")
         return model_id
 
     except Exception as e:
-        print(f"❌ Failed to migrate {model_path}: {e}")
+        print(f"[TODO] Failed to migrate {model_path}: {e}")
         return None
 
 
@@ -128,12 +128,12 @@ def update_model_manager_config(migrated_models: list[str]) -> None:
 
         # Sync with registry to pick up new models
         if manager.sync_with_registry():
-            print("✅ Updated model manager configuration")
+            print("[DONE] Updated model manager configuration")
         else:
-            print("⚠️  Could not update model manager configuration")
+            print("[WARNING]  Could not update model manager configuration")
 
     except Exception as e:
-        print(f"⚠️  Could not update model manager: {e}")
+        print(f"[WARNING]  Could not update model manager: {e}")
 
 
 def create_migration_report(
@@ -174,7 +174,7 @@ def create_migration_report(
     with report_path.open("w") as f:
         json.dump(report, f, indent=2)
 
-    print("\n📋 Migration Report:")
+    print("\n[DETAILS] Migration Report:")
     print(f"   Total models found: {len(legacy_models)}")
     print(f"   Successfully migrated: {len(migrated_models)}")
     print(f"   Failed migrations: {len(failed_models)}")
@@ -199,7 +199,7 @@ def main() -> None:
     try:
         registry = ModelRegistry()
     except Exception as e:
-        print(f"❌ Failed to initialize model registry: {e}")
+        print(f"[TODO] Failed to initialize model registry: {e}")
         return
 
     if args.scan or args.migrate_all:
@@ -208,10 +208,10 @@ def main() -> None:
         legacy_models = scan_for_legacy_models()
 
         if not legacy_models:
-            print("✅ No legacy models found - all models are already in registry format")
+            print("[DONE] No legacy models found - all models are already in registry format")
             return
 
-        print(f"📋 Found {len(legacy_models)} legacy models:")
+        print(f"[DETAILS] Found {len(legacy_models)} legacy models:")
         for model_path in legacy_models:
             print(f"   - {model_path}")
 
@@ -225,7 +225,7 @@ def main() -> None:
             return
 
         # Migrate all found models
-        print(f"\n🚀 Starting migration of {len(legacy_models)} models...")
+        print(f"\n[LAUNCH] Starting migration of {len(legacy_models)} models...")
         migrated_models = []
         failed_models = []
 
@@ -254,7 +254,7 @@ def main() -> None:
         model_path = Path(args.migrate)
 
         if not model_path.exists():
-            print(f"❌ Model file not found: {model_path}")
+            print(f"[TODO] Model file not found: {model_path}")
             return
 
         if args.dry_run:
@@ -272,33 +272,33 @@ def main() -> None:
 
         if model_id:
             update_model_manager_config([model_id])
-            print("\n✅ Migration completed successfully!")
+            print("\n[DONE] Migration completed successfully!")
             print(f"   Model ID: {model_id}")
             print(f"   Test with: python scripts/model_switching/model_switcher.py --switch {model_id}")
         else:
-            print("❌ Migration failed")
+            print("[TODO] Migration failed")
 
     else:
         # Show help and current status
         parser.print_help()
 
         print("\n" + "=" * 60)
-        print("🔧 PlantGuard Model Migration Utility")
+        print("[TOOL] PlantGuard Model Migration Utility")
         print("=" * 60)
 
         # Show registry status
         models = registry.list_models()
-        print(f"📊 Current registry status: {len(models)} models")
+        print(f"[SUMMARY] Current registry status: {len(models)} models")
 
         # Quick scan
         legacy_models = scan_for_legacy_models()
         if legacy_models:
-            print(f"⚠️  Found {len(legacy_models)} legacy models that need migration")
+            print(f"[WARNING]  Found {len(legacy_models)} legacy models that need migration")
             print("   Run with --migrate-all to migrate them")
         else:
-            print("✅ No legacy models found")
+            print("[DONE] No legacy models found")
 
-        print("\n💡 Quick Commands:")
+        print("\n[TIP] Quick Commands:")
         print("  python scripts/migrate_models.py --scan                    # Scan for legacy models")
         print("  python scripts/migrate_models.py --migrate-all             # Migrate all legacy models")
         print("  python scripts/migrate_models.py --migrate MODEL.pt       # Migrate specific model")

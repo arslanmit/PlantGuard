@@ -1034,7 +1034,7 @@ class MobilePlantGuardApp:
 
         with col2:
             # Enhanced app preferences
-            st.markdown("**📱 Preferences**")
+            st.markdown("**[MOBILE] Preferences**")
 
             # Performance mode selection
             perf_mode = st.selectbox(
@@ -1068,7 +1068,7 @@ class MobilePlantGuardApp:
             optimize_images = st.checkbox("Optimize images for mobile", value=True, key="mobile_optimize_images")
 
         # Enhanced app information
-        st.markdown("### 📋 App Information")
+        st.markdown("### [DETAILS] App Information")
 
         col1, col2, col3 = st.columns(3)
 
@@ -1099,7 +1099,7 @@ class MobilePlantGuardApp:
             st.metric("Performance", perf_mode.title())
 
         # System status
-        st.markdown("**🔧 System Status:**")
+        st.markdown("**[TOOL] System Status:**")
 
         status_items = []
 
@@ -1273,7 +1273,7 @@ class MobilePlantGuardApp:
                 st.write(f"- Content Tabs: {'[OK]' if self.content_tabs else '[FAIL]'}")
 
             # Show minimal functionality
-            st.markdown("#### 🔧 Emergency Mode")
+            st.markdown("#### [TOOL] Emergency Mode")
             st.info("Basic plant analysis is available below while the full app loads.")
 
             # Basic image upload for emergency use
@@ -1356,7 +1356,7 @@ class MobilePlantGuardApp:
     def render_app_info_inline(self) -> None:
         """Render app info and component status inline in main content."""
         # App info in expandable section
-        with st.expander("📱 PlantGuard Mobile Info", expanded=False):
+        with st.expander("[MOBILE] PlantGuard Mobile Info", expanded=False):
             st.markdown("**Version:** 1.0.0-mobile")
             st.markdown("[MOBILE] **Mobile:** Chrome & Safari Optimized")
             st.markdown("[DESKTOP] **All Devices:** Fixed 428px Mobile View")
@@ -1367,7 +1367,7 @@ class MobilePlantGuardApp:
             st.info("📐 **Fixed Width:** 428px on all screens")
 
         # Component status in expandable section
-        with st.expander("🔧 Component Status", expanded=False):
+        with st.expander("[TOOL] Component Status", expanded=False):
             components_status = {
                 "Layout Manager": self.layout_manager.get_layout_status().get("status", "unknown") if self.layout_manager else "not_loaded",
                 "Header": "ready" if self.header else "not_loaded",
@@ -1415,7 +1415,7 @@ def main():
     except Exception as e:
         logger.error(f"Application error: {e}")
         st.error(f"Application Error: {e}")
-        st.markdown("### 🔧 Troubleshooting")
+        st.markdown("### [TOOL] Troubleshooting")
         st.markdown("""
         1. **Refresh the page** - Sometimes a simple reload fixes issues
         2. **Check browser compatibility** - Use Chrome or Safari mobile

@@ -109,7 +109,7 @@ class DatasetDownloader:
                 size_bytes = sum(f.stat().st_size for f in dataset_path.rglob("*") if f.is_file())
                 result["file_size_mb"] = size_bytes / (1024 * 1024)
 
-            logger.info(f"✅ Download completed in {result['download_time_seconds']:.1f} seconds")
+            logger.info(f"[DONE] Download completed in {result['download_time_seconds']:.1f} seconds")
 
         except Exception as e:
             result["error"] = str(e)
@@ -161,7 +161,7 @@ class DatasetDownloader:
             result["success"] = True
             result["message"] = "Dataset downloaded successfully via direct URL"
 
-            logger.info(f"✅ Download completed in {result['download_time_seconds']:.1f} seconds")
+            logger.info(f"[DONE] Download completed in {result['download_time_seconds']:.1f} seconds")
 
         except Exception as e:
             result["error"] = str(e)
@@ -272,7 +272,7 @@ class DatasetDownloader:
             result["success"] = True
             result["message"] = "Dataset prepared successfully"
 
-            logger.info(f"✅ Dataset prepared: {result['processed_structure']}")
+            logger.info(f"[DONE] Dataset prepared: {result['processed_structure']}")
 
         except Exception as e:
             result["error"] = str(e)
@@ -341,7 +341,7 @@ class DatasetDownloader:
                 "splits": preparation_result["processed_structure"],
             }
 
-            logger.info(f"🎉 Complete workflow finished in {workflow_result['total_time_seconds']:.1f} seconds")
+            logger.info(f"[SUCCESS] Complete workflow finished in {workflow_result['total_time_seconds']:.1f} seconds")
 
         except Exception as e:
             workflow_result["error"] = str(e)
@@ -377,13 +377,13 @@ def main():
         print(json.dumps(result, indent=2))
     else:
         if result["success"]:
-            print("✅ Dataset download and preparation completed successfully!")
+            print("[DONE] Dataset download and preparation completed successfully!")
             print(f"📁 Location: {result['final_dataset_info'].get('location', 'Unknown')}")
-            print(f"📊 Classes: {result['final_dataset_info'].get('classes', 0)}")
+            print(f"[SUMMARY] Classes: {result['final_dataset_info'].get('classes', 0)}")
             print(f"🖼️  Total files: {result['final_dataset_info'].get('total_files', 0)}")
             print(f"⏱️  Total time: {result['total_time_seconds']:.1f} seconds")
         else:
-            print(f"❌ Download failed: {result['error']}")
+            print(f"[TODO] Download failed: {result['error']}")
             sys.exit(1)
 
 

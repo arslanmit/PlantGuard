@@ -106,7 +106,7 @@ def render_accessibility_overview(accessibility_manager):
 
     with col1:
         st.markdown("""
-        ### 🎯 Core Accessibility Features
+        ### [PROGRESS] Core Accessibility Features
         
         - **ARIA Labels**: Comprehensive labeling for screen readers
         - **Semantic HTML**: Proper HTML structure and landmarks
@@ -116,7 +116,7 @@ def render_accessibility_overview(accessibility_manager):
         """)
 
         st.markdown("""
-        ### 📱 Mobile-Specific Features
+        ### [MOBILE] Mobile-Specific Features
         
         - **Touch Targets**: Minimum 44px touch targets
         - **Voice-Over Support**: iOS VoiceOver compatibility
@@ -147,7 +147,7 @@ def render_accessibility_overview(accessibility_manager):
         """)
 
     # Compliance information
-    compliance_heading = accessibility_manager.create_accessible_heading(text="📋 Compliance Standards", level=3, heading_id="compliance-heading")
+    compliance_heading = accessibility_manager.create_accessible_heading(text="[DETAILS] Compliance Standards", level=3, heading_id="compliance-heading")
     st.markdown(compliance_heading, unsafe_allow_html=True)
 
     st.info("""
@@ -226,7 +226,7 @@ def demo_camera_input(accessibility_manager):
     # Streamlit button for actual interaction
     if st.button("Demo Camera Activation", key="demo_camera_btn", help="Demonstrate camera activation"):
         accessibility_manager.announce_to_screen_reader("Camera activated for plant image capture", priority="polite")
-        st.success("✅ Camera activation announced to screen readers!")
+        st.success("[DONE] Camera activation announced to screen readers!")
 
 
 def demo_upload_input(accessibility_manager):
@@ -271,7 +271,7 @@ def demo_upload_input(accessibility_manager):
 
     if uploaded_file:
         accessibility_manager.announce_to_screen_reader(f"File {uploaded_file.name} uploaded successfully and ready for analysis", priority="polite")
-        st.success(f"✅ File upload announced: {uploaded_file.name}")
+        st.success(f"[DONE] File upload announced: {uploaded_file.name}")
 
 
 def demo_analysis_display(accessibility_manager):
@@ -338,7 +338,7 @@ def demo_analysis_display(accessibility_manager):
         accessibility_manager.announce_to_screen_reader(
             f"Analysis complete. {mock_results['disease_name']} detected with {confidence_percent:.1f}% confidence.", priority="polite"
         )
-        st.success("✅ Analysis results announced to screen readers!")
+        st.success("[DONE] Analysis results announced to screen readers!")
 
 
 def demo_settings_card(accessibility_manager):
@@ -388,7 +388,7 @@ def demo_settings_card(accessibility_manager):
             settings_summary += ", reduced motion enabled"
 
         accessibility_manager.announce_to_screen_reader(settings_summary, priority="polite")
-        st.success("✅ Settings changes announced to screen readers!")
+        st.success("[DONE] Settings changes announced to screen readers!")
 
 
 def render_accessibility_settings_demo(accessibility_manager):
@@ -437,7 +437,7 @@ def render_testing_validation_demo(accessibility_manager):
             with st.spinner("Running comprehensive accessibility tests..."):
                 test_results = run_accessibility_tests()
 
-            st.success(f"✅ Tests completed: {test_results['passed_tests']}/{test_results['total_tests']} passed")
+            st.success(f"[DONE] Tests completed: {test_results['passed_tests']}/{test_results['total_tests']} passed")
 
             # Show summary
             st.json(test_results)
@@ -453,14 +453,14 @@ def render_testing_validation_demo(accessibility_manager):
             with st.spinner(f"Testing {selected_component} accessibility..."):
                 component_results = validate_component_accessibility(selected_component)
 
-            st.success(f"✅ Component test completed: {component_results['status']}")
+            st.success(f"[DONE] Component test completed: {component_results['status']}")
             st.json(component_results)
 
     elif selected_test == "Validate Compliance Status":
         if st.button("Validate Compliance", key="validate_compliance_btn"):
             compliance_results = validate_accessibility_compliance()
 
-            st.success("✅ Compliance validation completed")
+            st.success("[DONE] Compliance validation completed")
             st.json(compliance_results)
 
     elif selected_test == "Generate Test Report":
@@ -468,13 +468,13 @@ def render_testing_validation_demo(accessibility_manager):
             with st.spinner("Generating accessibility compliance report..."):
                 report = generate_accessibility_report()
 
-            st.success("✅ Report generated successfully")
+            st.success("[DONE] Report generated successfully")
             st.markdown(report)
 
 
 def render_compliance_report_demo(accessibility_manager):
     """Render compliance report demonstration."""
-    report_heading = accessibility_manager.create_accessible_heading(text="📊 Accessibility Compliance Report", level=2, heading_id="report-heading")
+    report_heading = accessibility_manager.create_accessible_heading(text="[SUMMARY] Accessibility Compliance Report", level=2, heading_id="report-heading")
     st.markdown(report_heading, unsafe_allow_html=True)
 
     st.markdown(
@@ -494,7 +494,7 @@ def render_compliance_report_demo(accessibility_manager):
 
         accessibility_manager.announce_to_screen_reader("Accessibility compliance report generated successfully", priority="polite")
 
-        st.success("✅ Compliance report generated")
+        st.success("[DONE] Compliance report generated")
         st.markdown(report)
 
     # Show quick compliance status
@@ -507,16 +507,16 @@ def render_compliance_report_demo(accessibility_manager):
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric("ARIA Labels", "✅ Implemented")
+        st.metric("ARIA Labels", "[DONE] Implemented")
 
     with col2:
-        st.metric("Keyboard Navigation", "✅ Full Support")
+        st.metric("Keyboard Navigation", "[DONE] Full Support")
 
     with col3:
-        st.metric("Screen Reader", "✅ Compatible")
+        st.metric("Screen Reader", "[DONE] Compatible")
 
     with col4:
-        st.metric("WCAG Compliance", "✅ AA Level")
+        st.metric("WCAG Compliance", "[DONE] AA Level")
 
     # Detailed status
     st.json(test_results)

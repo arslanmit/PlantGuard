@@ -43,10 +43,10 @@ class ProductionPipelineValidator:
         """Log test result."""
         if passed:
             self.results["tests_passed"] += 1
-            logger.info(f"✅ {test_name}: PASSED - {message}")
+            logger.info(f"[DONE] {test_name}: PASSED - {message}")
         else:
             self.results["tests_failed"] += 1
-            logger.error(f"❌ {test_name}: FAILED - {message}")
+            logger.error(f"[TODO] {test_name}: FAILED - {message}")
             if error:
                 self.results["errors"].append(f"{test_name}: {error!s}")
 
@@ -484,7 +484,7 @@ class ProductionPipelineValidator:
 
     def run_validation(self) -> dict[str, Any]:
         """Run complete validation suite."""
-        logger.info("🚀 Starting production pipeline validation...")
+        logger.info("[LAUNCH] Starting production pipeline validation...")
 
         start_time = time.time()
 
@@ -544,9 +544,9 @@ class ProductionPipelineValidator:
         logger.info(f"Total time: {total_time:.2f}s")
 
         if self.results["overall_success"]:
-            logger.info("🎉 ALL TESTS PASSED - Production pipeline is ready!")
+            logger.info("[SUCCESS] ALL TESTS PASSED - Production pipeline is ready!")
         else:
-            logger.error("❌ SOME TESTS FAILED - Check errors above")
+            logger.error("[TODO] SOME TESTS FAILED - Check errors above")
             for error in self.results["errors"]:
                 logger.error(f"  - {error}")
 

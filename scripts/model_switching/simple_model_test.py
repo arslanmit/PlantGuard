@@ -23,13 +23,13 @@ def _load_model() -> VisionAdapter | None:
 
     try:
         vision_adapter.load_checkpoint(model_path)
-        logger.info("✅ Model loaded successfully")
+        logger.info("[DONE] Model loaded successfully")
         # Use explicit formatting to avoid logging-format interpretation issues
-        logger.info(f"📊 Model has {len(vision_adapter.class_names)} classes")
+        logger.info(f"[SUMMARY] Model has {len(vision_adapter.class_names)} classes")
         logger.info("")
         return vision_adapter
     except Exception as e:
-        logger.error("❌ Failed to load model: %s", e)
+        logger.error("[TODO] Failed to load model: %s", e)
         return None
 
 
@@ -70,7 +70,7 @@ def _print_results(
     vision_adapter: VisionAdapter,
 ) -> None:
     """Print test results summary."""
-    logger.info("📊 RESULTS SUMMARY")
+    logger.info("[SUMMARY] RESULTS SUMMARY")
     logger.info("=" * 50)
     logger.info(f"Total images tested: {total}")
     # Use f-strings with explicit float formatting and percent sign
@@ -153,9 +153,9 @@ def main() -> None:
             correct_status += 1
 
         # Status icons
-        plant_icon = "🌿" if plant_correct else "❌"
+        plant_icon = "🌿" if plant_correct else "[TODO]"
         status_icon = "💚" if status_correct else "💔"
-        exact_icon = "✅" if (exact_correct and plant_correct) else "❌"
+        exact_icon = "[DONE]" if (exact_correct and plant_correct) else "[TODO]"
 
         logger.info("%s %s", exact_icon, sample["filename"])
         logger.info("   GT: %s - %s (%s)", gt_plant, gt_disease, gt_status)

@@ -152,7 +152,7 @@ class CompareView:
             zoom_level = st.slider("Zoom", 0.5, 3.0, 1.0, 0.1, key="sync_zoom")
 
         with col3:
-            if st.button("🔄 Swap Images"):
+            if st.button("[PARTIAL] Swap Images"):
                 st.session_state.comparison_images.reverse()
                 st.session_state.comparison_results.reverse()
                 st.rerun()
@@ -181,7 +181,7 @@ class CompareView:
         if not all(st.session_state.comparison_images):
             return
 
-        st.subheader("📊 Image Difference Analysis")
+        st.subheader("[SUMMARY] Image Difference Analysis")
 
         try:
             image_a = st.session_state.comparison_images[0]
@@ -252,7 +252,7 @@ class CompareView:
                 result_b.timestamp.strftime("%H:%M:%S"),
             ],
             "Difference": [
-                "✅ Match" if result_a.prediction.lower() == result_b.prediction.lower() else "❌ Different",
+                "[DONE] Match" if result_a.prediction.lower() == result_b.prediction.lower() else "[TODO] Different",
                 f"{(result_b.confidence - result_a.confidence):+.1%}",
                 ComparisonResult(result_a, result_b).get_risk_change(),
                 f"{abs((result_b.timestamp - result_a.timestamp).total_seconds()):.1f}s apart",
@@ -263,7 +263,7 @@ class CompareView:
 
         # Style the dataframe
         styled_df = df.style.apply(
-            lambda x: ["background-color: #e8f5e8" if "✅" in str(val) else "background-color: #ffe8e8" if "❌" in str(val) else "" for val in x],
+            lambda x: ["background-color: #e8f5e8" if "[DONE]" in str(val) else "background-color: #ffe8e8" if "[TODO]" in str(val) else "" for val in x],
             subset=["Difference"],
         )
 
@@ -281,7 +281,7 @@ class CompareView:
             st.info("Detailed probability data not available for comparison")
             return
 
-        st.subheader("📊 Probability Comparison")
+        st.subheader("[SUMMARY] Probability Comparison")
 
         # Get all unique diseases
         all_diseases = set(result_a.probabilities.keys()) | set(result_b.probabilities.keys())
@@ -340,7 +340,7 @@ class CompareView:
         col1, col2 = st.columns(2)
 
         with col1:
-            if st.button("📊 Export as CSV"):
+            if st.button("[SUMMARY] Export as CSV"):
                 # Create comparison report
                 result_a = st.session_state.comparison_results[0]
                 result_b = st.session_state.comparison_results[1]
@@ -393,7 +393,7 @@ class CompareView:
             available_images: List of available images for comparison
             available_results: List of available analysis results
         """
-        st.header("🔄 Compare Analysis Results")
+        st.header("[PARTIAL] Compare Analysis Results")
 
         if not available_images or len(available_images) < 2:
             self.render_single_image_guidance()
@@ -413,7 +413,7 @@ class CompareView:
             st.markdown("---")
 
             # Tabs for different comparison views
-            tab1, tab2, tab3, tab4 = st.tabs(["🔍 Viewer", "📊 Metrics", "📈 Probabilities", "🔬 Difference"])
+            tab1, tab2, tab3, tab4 = st.tabs(["🔍 Viewer", "[SUMMARY] Metrics", "📈 Probabilities", "🔬 Difference"])
 
             with tab1:
                 self.render_synchronized_viewer()
@@ -444,7 +444,7 @@ def create_compare_view() -> CompareView:
 # Example usage and testing
 if __name__ == "__main__":
     # Test the compare view
-    st.title("🔄 PlantGuard Compare View Test")
+    st.title("[PARTIAL] PlantGuard Compare View Test")
 
     # Create compare view
     compare_view = create_compare_view()

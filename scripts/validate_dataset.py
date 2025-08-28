@@ -41,16 +41,16 @@ def main() -> None:
             print(f"🔍 Validating {dataset_name} at {dataset_path}...")
             result = dm.validate_dataset(Path(dataset_path))
 
-            print(f"📊 Results for {dataset_name}:")
+            print(f"[SUMMARY] Results for {dataset_name}:")
             print(f"  Total files: {result.total_files}")
             print(f"  Valid files: {result.valid_files}")
             print(f"  Corrupted files: {len(result.corrupted_files)}")
             print(f"  Classes found: {len(result.class_counts)}")
 
             if result.is_valid:
-                print("  ✅ Dataset is valid")
+                print("  [DONE] Dataset is valid")
             else:
-                print("  ❌ Dataset has issues")
+                print("  [TODO] Dataset has issues")
                 all_valid = False
 
             if result.errors:
@@ -59,7 +59,7 @@ def main() -> None:
                     print(f"    - {error}")
 
             if result.warnings:
-                print("  ⚠️  Warnings:")
+                print("  [WARNING]  Warnings:")
                 for warning in result.warnings:
                     print(f"    - {warning}")
 
@@ -67,15 +67,15 @@ def main() -> None:
             found_dataset = True
 
     if not found_dataset:
-        print("❌ No datasets found to validate")
-        print("💡 Run 'make dataset-download' first, then 'make dataset-prepare' if needed")
+        print("[TODO] No datasets found to validate")
+        print("[TIP] Run 'make dataset-download' first, then 'make dataset-prepare' if needed")
         sys.exit(1)
 
     if not all_valid:
-        print("❌ Some datasets have validation issues")
+        print("[TODO] Some datasets have validation issues")
         sys.exit(1)
     else:
-        print("✅ All datasets are valid")
+        print("[DONE] All datasets are valid")
 
 
 if __name__ == "__main__":

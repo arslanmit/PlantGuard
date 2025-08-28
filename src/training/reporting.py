@@ -370,15 +370,15 @@ class TrainingReportGenerator:
         # Generate HTML content
         # Precompute some strings that depend on optional ints to keep mypy happy
         conv_str = (
-            "✅ Converged at epoch " + str(curve_analysis.convergence_epoch + 1)
+            "[DONE] Converged at epoch " + str(curve_analysis.convergence_epoch + 1)
             if curve_analysis.convergence_epoch is not None
-            else "❌ No convergence detected"
+            else "[TODO] No convergence detected"
         )
 
         overfit_str = (
-            "⚠️ Detected at epoch " + str(curve_analysis.overfitting_epoch + 1)
+            "[WARNING] Detected at epoch " + str(curve_analysis.overfitting_epoch + 1)
             if curve_analysis.overfitting_detected and curve_analysis.overfitting_epoch is not None
-            else "✅ No overfitting detected"
+            else "[DONE] No overfitting detected"
         )
 
         html_content = f"""
@@ -406,7 +406,7 @@ class TrainingReportGenerator:
             </div>
 
             <div class="section">
-                <h3>📊 Training Summary</h3>
+                <h3>[SUMMARY] Training Summary</h3>
                 <div class="metric">
                     <strong>Best Validation Loss:</strong> {training_metrics.get("best_val_loss", "N/A"):.4f}
                 </div>

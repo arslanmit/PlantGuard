@@ -52,11 +52,11 @@ python_version = "3.11"
 ## Architecture Constraints
 
 **CRITICAL**: All ML inference must be local-only
-- ❌ No external APIs (OpenAI Vision, Replicate, cloud services)
-- ❌ No user data transmission to external services
-- ✅ Offline capability after initial model downloads
-- ✅ Graceful degradation when components fail
-- ✅ Use Apple Silicon MPS acceleration when available
+- [TODO] No external APIs (OpenAI Vision, Replicate, cloud services)
+- [TODO] No user data transmission to external services
+- [DONE] Offline capability after initial model downloads
+- [DONE] Graceful degradation when components fail
+- [DONE] Use Apple Silicon MPS acceleration when available
 
 ## Code Quality Standards
 

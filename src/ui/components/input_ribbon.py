@@ -101,7 +101,7 @@ class InputRibbon:
         st.markdown(
             """
             <div style='text-align: center; margin-bottom: 1rem;'>
-                <h3 style='color: #22C55E; margin: 0;'>🎯 Choose Your Input Method</h3>
+                <h3 style='color: #22C55E; margin: 0;'>[PROGRESS] Choose Your Input Method</h3>
                 <p style='color: #64748B; margin: 0.5rem 0;'>
                     Select one or more ways to interact with PlantGuard
                 </p>
@@ -190,7 +190,7 @@ class InputRibbon:
                         current_modes[other_mode] = False
                         self._clear_mode_data(other_mode)
                         with contextlib.suppress(Exception):
-                            st.toast(f"❌ {other_mode.title()} mode deactivated (single mode only)", icon="❌")
+                            st.toast(f"[TODO] {other_mode.title()} mode deactivated (single mode only)", icon="[TODO]")
 
             current_modes[mode_name] = True
             st.session_state["input_modes"] = current_modes
@@ -199,10 +199,10 @@ class InputRibbon:
 
             if settings.get("allow_multiple_modes", True) and sum(current_modes.values()) > 1:
                 with contextlib.suppress(Exception):
-                    st.toast(f"✅ {mode_name.title()} mode added (multimodal input)", icon="✅")
+                    st.toast(f"[DONE] {mode_name.title()} mode added (multimodal input)", icon="[DONE]")
             else:
                 with contextlib.suppress(Exception):
-                    st.toast(f"✅ {mode_name.title()} mode activated", icon="✅")
+                    st.toast(f"[DONE] {mode_name.title()} mode activated", icon="[DONE]")
 
             logger.info(f"Activated input mode: {mode_name}")
 
@@ -213,7 +213,7 @@ class InputRibbon:
             self._clear_mode_data(mode_name)
 
             with contextlib.suppress(Exception):
-                st.toast(f"❌ {mode_name.title()} mode deactivated", icon="❌")
+                st.toast(f"[TODO] {mode_name.title()} mode deactivated", icon="[TODO]")
             logger.info(f"Deactivated input mode: {mode_name}")
 
         if settings.get("auto_validate", True):
@@ -334,7 +334,7 @@ class InputRibbon:
         active_count = sum(1 for active in active_modes.values() if active)
 
         if active_count > 0:
-            st.markdown("### 📊 Active Input Modes")
+            st.markdown("### [SUMMARY] Active Input Modes")
 
             if st.session_state.get("mobile_view", False):
                 for mode_name, is_active in active_modes.items():
@@ -359,11 +359,11 @@ class InputRibbon:
 
         if validation_status == "valid":
             status_color = "#22C55E"
-            status_icon = "✅"
+            status_icon = "[DONE]"
             status_text = "Ready"
         elif validation_status == "missing_input":
             status_color = "#F59E0B"
-            status_icon = "⚠️"
+            status_icon = "[WARNING]"
             status_text = "Input Needed"
         else:
             status_color = "#64748B"
@@ -417,14 +417,14 @@ class InputRibbon:
         invalid_modes = [mode for mode, status in validation_results.items() if status != "valid"]
 
         if valid_modes and not invalid_modes:
-            st.success(f"✅ **Ready to analyze:** All {len(valid_modes)} input mode(s) have valid data")
+            st.success(f"[DONE] **Ready to analyze:** All {len(valid_modes)} input mode(s) have valid data")
         elif valid_modes and invalid_modes:
-            st.warning(f"⚠️ **Partial input:** {len(valid_modes)} ready, {len(invalid_modes)} need input")
+            st.warning(f"[WARNING] **Partial input:** {len(valid_modes)} ready, {len(invalid_modes)} need input")
         elif invalid_modes:
-            st.info(f"💡 **Input needed:** Please provide input for {', '.join(invalid_modes)}")
+            st.info(f"[TIP] **Input needed:** Please provide input for {', '.join(invalid_modes)}")
 
         if valid_modes:
-            if st.button("🚀 Analyze Now", key="analyze_from_ribbon", type="primary", use_container_width=True):
+            if st.button("[LAUNCH] Analyze Now", key="analyze_from_ribbon", type="primary", use_container_width=True):
                 self._trigger_analysis(valid_modes)
 
     def get_active_modes(self) -> list[str]:
@@ -517,7 +517,7 @@ class InputRibbon:
         active_modes = self.get_active_modes()
 
         if not active_modes:
-            st.info("💡 **Tip:** Select at least one input method above to get started!")
+            st.info("[TIP] **Tip:** Select at least one input method above to get started!")
             return validation_results
 
         for mode in active_modes:
@@ -527,10 +527,10 @@ class InputRibbon:
         invalid_modes = [mode for mode, status in validation_results.items() if status != "valid"]
 
         if invalid_modes:
-            st.warning(f"⚠️ **Input needed:** Please provide input for {', '.join(invalid_modes)}")
+            st.warning(f"[WARNING] **Input needed:** Please provide input for {', '.join(invalid_modes)}")
 
         if valid_modes:
-            st.success(f"✅ **Ready to analyze:** {', '.join(valid_modes)} input(s) available")
+            st.success(f"[DONE] **Ready to analyze:** {', '.join(valid_modes)} input(s) available")
 
         return validation_results
 
@@ -590,7 +590,7 @@ class InputRibbon:
 
         try:
             with contextlib.suppress(Exception):
-                st.toast(f"🚀 Starting analysis with {', '.join(valid_modes)} input(s)", icon="🚀")
+                st.toast(f"[LAUNCH] Starting analysis with {', '.join(valid_modes)} input(s)", icon="[LAUNCH]")
         except Exception:
             logger.exception("Unexpected error while showing toast")
         logger.info(f"Analysis triggered for modes: {valid_modes}")
@@ -663,7 +663,7 @@ class InputRibbon:
 
                 try:
                     with contextlib.suppress(Exception):
-                        st.toast(f"🔄 Multiple modes disabled. Kept {active_modes[0]} mode only.", icon="🔄")
+                        st.toast(f"[PARTIAL] Multiple modes disabled. Kept {active_modes[0]} mode only.", icon="[PARTIAL]")
                 except Exception:
                     logger.exception("Unexpected error while showing toast for multiple mode toggle")
 
@@ -705,7 +705,7 @@ class InputRibbon:
         st.markdown("### 🔗 Multimodal Input Preview")
 
         if summary["mode_count"] > 1:
-            st.info(f"🎯 **Multimodal Analysis Ready:** {summary['mode_count']} input modes active")
+            st.info(f"[PROGRESS] **Multimodal Analysis Ready:** {summary['mode_count']} input modes active")
 
         for mode in summary["active_modes"]:
             with st.expander(f"{self.input_modes[mode]['icon']} {self.input_modes[mode]['label']} Input", expanded=False):

@@ -146,13 +146,13 @@ class ModelSwitcher:
         # Update if changed
         if selected_id != current:
             self.set_model(model_type, selected_id)
-            st.success(f"✅ {model_type.title()} model updated to {selected_id}")
+            st.success(f"[DONE] {model_type.title()} model updated to {selected_id}")
 
         return selected_id
 
     def render_model_status(self) -> None:
         """Render current model status display."""
-        st.markdown("### 🚀 Current Model Configuration")
+        st.markdown("### [LAUNCH] Current Model Configuration")
 
         col1, col2, col3 = st.columns(3)
 
@@ -188,7 +188,7 @@ class ModelSwitcher:
 
     def render_model_comparison(self) -> None:
         """Render model comparison table."""
-        st.markdown("### 📊 Model Comparison")
+        st.markdown("### [SUMMARY] Model Comparison")
 
         for model_type, models in self.available_models.items():
             st.markdown(f"#### {model_type.title()} Models")
@@ -261,7 +261,7 @@ class ModelSwitcher:
             "audio": "whisper_tiny_local",
             "text": "distilbert_plant_qa_v1",
         }
-        st.success("🔄 Model selection reset to defaults")
+        st.success("[PARTIAL] Model selection reset to defaults")
 
     def export_configuration(self) -> dict[str, Any]:
         """Export current model configuration."""

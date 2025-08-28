@@ -247,7 +247,7 @@ class ComprehensiveMobileTestRunner:
         print(f"[STATS] Test Scripts Executed: {summary['total_test_scripts']}")
         print(f"⏰ Test Completed: {results['timestamp']}")
 
-        print("\n📋 REQUIREMENT COVERAGE:")
+        print("\n[DETAILS] REQUIREMENT COVERAGE:")
         print("-" * 50)
         for req_id, description in summary["requirement_coverage"].items():
             print(f"   {req_id}: {description}")
@@ -278,7 +278,7 @@ class ComprehensiveMobileTestRunner:
                 )
 
         print("\n" + "=" * 100)
-        print("📱 MOBILE-ONLY MIGRATION VALIDATION COMPLETE")
+        print("[MOBILE] MOBILE-ONLY MIGRATION VALIDATION COMPLETE")
         print("=" * 100)
 
 

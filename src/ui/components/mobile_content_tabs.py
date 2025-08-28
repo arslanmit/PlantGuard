@@ -187,7 +187,7 @@ class MobileContentTabs(MobileComponent):
                 "id": "history_settings",
                 "title": "History & Settings",
                 "short_title": "History",
-                "icon": "📊",
+                "icon": "[SUMMARY]",
                 "description": "View analysis history and app settings",
                 "enabled": True,
                 "primary": False,
@@ -233,7 +233,7 @@ class MobileContentTabs(MobileComponent):
                 tab_title = tab.get("short_title", tab["title"])
                 tab_label = f"{tab['icon']} {tab_title}"
                 if is_active:
-                    tab_label += " ✅"
+                    tab_label += " [DONE]"
 
                 button_type = "primary" if is_active else "secondary"
 
@@ -372,16 +372,16 @@ class MobileContentTabs(MobileComponent):
                 st.image(uploaded_file, caption="Uploaded Image", use_column_width=True)
             with col2:
                 st.markdown("**Analysis Results**")
-                st.info("🔄 Analysis feature will be integrated with VisionAdapter")
+                st.info("[PARTIAL] Analysis feature will be integrated with VisionAdapter")
         else:
-            st.markdown("📱 Upload an image or use the camera to analyze your plant")
+            st.markdown("[MOBILE] Upload an image or use the camera to analyze your plant")
 
     def _render_voice_assistant_placeholder(self) -> None:
         """Render placeholder for voice assistant tab."""
         st.markdown("#### 🎤 Voice Assistant")
 
         if st.button("🎙️ Start Recording", key=f"{self.component_id}_voice_record", use_container_width=True):
-            st.info("🔄 Voice recording will be integrated with AudioAdapter")
+            st.info("[PARTIAL] Voice recording will be integrated with AudioAdapter")
 
         st.markdown("**How to use:**")
         st.markdown("- Tap the record button")
@@ -401,11 +401,11 @@ class MobileContentTabs(MobileComponent):
             st.markdown("**Your Question:**")
             st.markdown(f"> {user_input}")
             st.markdown("**AI Response:**")
-            st.info("🔄 Chat responses will be integrated with TextAdapter")
+            st.info("[PARTIAL] Chat responses will be integrated with TextAdapter")
 
     def _render_history_settings_placeholder(self) -> None:
         """Render history and settings as inline expandable cards - always visible."""
-        st.markdown("#### 📊 History & Settings")
+        st.markdown("#### [SUMMARY] History & Settings")
         st.markdown("**All options always accessible - no hidden menus**")
 
         # History expandable card (always visible)
@@ -420,7 +420,7 @@ class MobileContentTabs(MobileComponent):
         # History content (always visible)
         st.markdown('<div class="mobile-expandable-card-content">', unsafe_allow_html=True)
         st.markdown("**Recent Plant Analyses:**")
-        st.info("🔄 Full history will be integrated with session state")
+        st.info("[PARTIAL] Full history will be integrated with session state")
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -468,7 +468,7 @@ class MobileContentTabs(MobileComponent):
                 st.image(img2, use_column_width=True)
 
         if st.button("Compare Images", key=f"{self.component_id}_compare_btn", use_container_width=True):
-            st.info("🔄 Image comparison will be implemented with analysis features")
+            st.info("[PARTIAL] Image comparison will be implemented with analysis features")
 
     def render(self, **kwargs) -> str:
         """Render the complete tabs component in SPA mode without page redirects.
@@ -480,7 +480,7 @@ class MobileContentTabs(MobileComponent):
         self.initialize_tabs_state()
 
         # SPA mode indicator
-        st.success("✅ Single Page Mode - No page navigation!")
+        st.success("[DONE] Single Page Mode - No page navigation!")
 
         # Register all content areas with SPA manager
         self._register_all_content_areas()

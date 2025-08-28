@@ -3,7 +3,7 @@
 # ============================================================================
 # This file configures the entire PlantGuard project
 #
-# 🚀 QUICK START:
+# [LAUNCH] QUICK START:
 #   make setup    - Install everything
 #   make run      - Launch the app
 #   make dev      - Development workflow
@@ -49,7 +49,7 @@ keywords = [
   "multimodal",
 ]
 
-# 📋 Package classifiers (for PyPI)
+# [DETAILS] Package classifiers (for PyPI)
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Science/Research",
@@ -70,7 +70,7 @@ classifiers = [
 # ============================================================================
 # 3️⃣ DEPENDENCIES - What libraries PlantGuard needs to work
 # ============================================================================
-# 💡 TIP: All versions are in requirements.txt - this is just the minimum needed
+# [TIP] TIP: All versions are in requirements.txt - this is just the minimum needed
 
 dependencies = [
   # 🧠 AI/ML Core - The brain of PlantGuard
@@ -79,7 +79,7 @@ dependencies = [
   "torchaudio>=2.8.0",   # Audio processing
   "torchmetrics>=1.8.1", # ML metrics and evaluation
 
-  # 📊 Data Processing - Handle numbers and data
+  # [SUMMARY] Data Processing - Handle numbers and data
   "numpy>=2.2.6",        # Fast arrays and math
   "pandas>=2.3.1",       # Data tables and analysis
   "scikit-learn>=1.7.1", # Traditional ML algorithms
@@ -111,7 +111,7 @@ dependencies = [
   "pyngrok>=7.3.0",               # Alternative tunneling
   "plotly>=5.24.1",               # Interactive plotting
 
-  # 🛠️ Utilities - Helper tools
+  # [TOOL] Utilities - Helper tools
   "python-dotenv>=1.1.1", # Environment variables (.env files)
   "tensorboard>=2.20.0",  # Training visualization
   "psutil>=6.1.1",        # System monitoring
@@ -119,16 +119,16 @@ dependencies = [
   "watchdog>=6.0.0",      # File system monitoring
 ]
 
-# 🚀 QUICK INSTALL: make setup (installs everything automatically)
+# [LAUNCH] QUICK INSTALL: make setup (installs everything automatically)
 
 [project.optional-dependencies]
 
-# 🛠️ Development Tools - For coding and maintaining PlantGuard
+# [TOOL] Development Tools - For coding and maintaining PlantGuard
 dev = [
   "ruff>=0.12.8",        # ⚡ Super fast Python linter & formatter
   "mypy>=1.17.1",        # 🔍 Type checking (catches bugs early)
   "pytest>=8.4.1",       # 🧪 Testing framework
-  "pytest-cov>=6.2.1",   # 📊 Test coverage reports
+  "pytest-cov>=6.2.1",   # [SUMMARY] Test coverage reports
   "pytest-mock>=3.14.1", # 🎭 Mock objects for testing
   "bandit>=1.8.6",       # 🔒 Security vulnerability scanner
   "safety>=3.6.0",       # 🛡️ Check for known security issues
@@ -148,16 +148,16 @@ jupyter = [
   "ipykernel>=6.30.1",  # 🐍 Python kernel for notebooks
   "matplotlib>=3.10.5", # 📈 Plotting and visualization
   "seaborn>=0.13.2",    # 🎨 Beautiful statistical plots
-  "plotly>=5.24.1",     # 📊 Interactive plots (also in main deps)
+  "plotly>=5.24.1",     # [SUMMARY] Interactive plots (also in main deps)
 ]
 
 # 🤖 ML Training & Experiments - Advanced ML features
 training = [
-  "wandb>=0.21.1", # 📊 Experiment tracking (Weights & Biases)
-  "optuna>=4.4.0", # 🎯 Hyperparameter optimization
+  "wandb>=0.21.1", # [SUMMARY] Experiment tracking (Weights & Biases)
+  "optuna>=4.4.0", # [PROGRESS] Hyperparameter optimization
 ]
 
-# 🎯 Quick Install Options
+# [PROGRESS] Quick Install Options
 all = ["plantguard[dev,docs,jupyter,training]"] # Everything
 basic = ["plantguard[jupyter]"]                 # Just notebooks
 full-dev = ["plantguard[dev,docs,jupyter]"]     # Development without ML extras
@@ -166,7 +166,7 @@ full-dev = ["plantguard[dev,docs,jupyter]"]     # Development without ML extras
 [project.urls]
 "🏠 Homepage" = "https://github.com/arslanmit/PlantGuard"
 "📂 Source Code" = "https://github.com/arslanmit/PlantGuard"
-"🚀 Try in Colab" = "https://colab.research.google.com/github/arslanmit/PlantGuard/blob/main/notebooks/PlantGuard.ipynb"
+"[LAUNCH] Try in Colab" = "https://colab.research.google.com/github/arslanmit/PlantGuard/blob/main/notebooks/PlantGuard.ipynb"
 
 # 🖥️ Command Line Tools - Run PlantGuard from terminal
 [project.scripts]
@@ -176,9 +176,9 @@ plantguard-train = "src.training.production_trainer:main" # Training CLI
 # ============================================================================
 # 4️⃣ CODE QUALITY - Keep code clean and consistent
 # ============================================================================
-# 🎯 GOAL: Make code readable, consistent, and bug-free
+# [PROGRESS] GOAL: Make code readable, consistent, and bug-free
 #
-# 🚀 QUICK COMMANDS:
+# [LAUNCH] QUICK COMMANDS:
 #   make format  - Auto-fix formatting
 #   make lint    - Check for issues
 #   make fix     - Auto-fix what we can
@@ -187,9 +187,9 @@ plantguard-train = "src.training.production_trainer:main" # Training CLI
 # ============================================================================
 # 4️⃣ CODE QUALITY - Keep code clean and consistent
 # ============================================================================
-# 🎯 GOAL: Make code readable, consistent, and bug-free
+# [PROGRESS] GOAL: Make code readable, consistent, and bug-free
 #
-# 🚀 QUICK COMMANDS:
+# [LAUNCH] QUICK COMMANDS:
 #   make format  - Auto-fix formatting
 #   make lint    - Check for issues
 #   make fix     - Auto-fix what we can
@@ -197,7 +197,7 @@ plantguard-train = "src.training.production_trainer:main" # Training CLI
 
 [tool.mypy]
 python_version = "3.10" # 🐍 Python version we're using
-strict = false          # 🎯 Gradual typing (not too strict while learning)
+strict = false          # [PROGRESS] Gradual typing (not too strict while learning)
 
 # External libraries - ignore missing type information
 ignore_missing_imports = true # Ignore missing imports from external packages
@@ -243,9 +243,9 @@ check_untyped_defs = false
 # ============================================================================
 # 6️⃣ TESTING - Make sure everything works correctly
 # ============================================================================
-# 🎯 GOAL: Catch bugs and ensure PlantGuard works as expected
+# [PROGRESS] GOAL: Catch bugs and ensure PlantGuard works as expected
 #
-# 🚀 QUICK COMMANDS:
+# [LAUNCH] QUICK COMMANDS:
 #   make test     - Run all tests
 #   make coverage - See test coverage report
 
@@ -253,7 +253,7 @@ check_untyped_defs = false
 [tool.pytest.ini_options]
 minversion = "7.0" # Minimum pytest version
 
-# 🔧 Test options (what pytest does when running)
+# [TOOL] Test options (what pytest does when running)
 addopts = [
   "-ra",                                    # Show summary of all test results
   "--strict-markers",                       # Only allow defined test markers
@@ -280,7 +280,7 @@ markers = [
   "model: marks tests that require trained models",
 ]
 
-# ⚠️ Warning filters (what warnings to show/hide)
+# [WARNING] Warning filters (what warnings to show/hide)
 filterwarnings = [
   #  "error",                            # Treat warnings as errors (strict)
   "ignore::UserWarning", # Ignore user warnings (common in ML)
@@ -288,7 +288,7 @@ filterwarnings = [
   #  "ignore::PendingDeprecationWarning", # Ignore pending deprecation warnings
 ]
 
-# 📊 Test Coverage - How much of our code is tested
+# [SUMMARY] Test Coverage - How much of our code is tested
 [tool.coverage.run]
 source = ["src"] # Measure coverage for src/ folder
 branch = true    # Track branch coverage (if/else paths)
@@ -326,9 +326,9 @@ directory = "htmlcov" # Where to put HTML coverage report
 # ============================================================================
 # 7️⃣ SECURITY - Keep PlantGuard safe from vulnerabilities
 # ============================================================================
-# 🎯 GOAL: Find potential security issues in code
+# [PROGRESS] GOAL: Find potential security issues in code
 #
-# 🚀 QUICK COMMANDS:
+# [LAUNCH] QUICK COMMANDS:
 #   make security - Run security scan
 
 # 🔒 Bandit - Security linter (finds potential security issues)
@@ -350,9 +350,9 @@ skips = [
 
 # 🪝 Pre-commit Configuration Reference
 # =====================================
-# 💡 Pre-commit runs checks automatically before each git commit
+# [TIP] Pre-commit runs checks automatically before each git commit
 #
-# 🚀 SETUP:
+# [LAUNCH] SETUP:
 #   make setup  (installs pre-commit hooks automatically)
 #
 # 📝 To create .pre-commit-config.yaml manually:
@@ -373,18 +373,18 @@ skips = [
 # ============================================================================
 # 9️⃣ PACKAGE BUILDING - How to create installable PlantGuard packages
 # ============================================================================
-# 🎯 GOAL: Configure how Python packages PlantGuard for distribution
+# [PROGRESS] GOAL: Configure how Python packages PlantGuard for distribution
 #
-# 🚀 QUICK COMMANDS:
+# [LAUNCH] QUICK COMMANDS:
 #   make build   - Build package for distribution
 #   pip install -e .  - Install PlantGuard in development mode
 
 [tool.ruff]
 line-length = 150         # 📏 Reasonable line length for readability
 target-version = "py310"  # 🐍 Python version we support
-fix = true                # 🔧 Auto-fix issues when possible
+fix = true                # [TOOL] Auto-fix issues when possible
 show-fixes = true         # 📝 Show what was fixed
-output-format = "grouped" # 📊 Group similar issues together
+output-format = "grouped" # [SUMMARY] Group similar issues together
 
 # 📁 Folders to completely exclude from all linting
 exclude = [
@@ -463,7 +463,7 @@ ignore = [
   "S506",   # Allow yaml.load() - ML config files need full YAML loading
 
   # ============================================================================
-  # 📊 Development Workflow Exceptions - Allow rapid prototyping
+  # [SUMMARY] Development Workflow Exceptions - Allow rapid prototyping
   # ============================================================================
   "B007",   # Allow unused loop variables - common in ML training epochs
   "SIM102", # Allow if/else over ternary - ML logic often clearer explicit
@@ -887,7 +887,7 @@ known-third-party = [
   "torchaudio",
   "torchmetrics",
 
-  # 📊 Data Science
+  # [SUMMARY] Data Science
   "numpy",
   "pandas",
   "sklearn",
@@ -1007,10 +1007,10 @@ exclude = [
 ]
 
 # ============================================================================
-# 🎉 END OF CONFIGURATION
+# [SUCCESS] END OF CONFIGURATION
 # ============================================================================
 #
-# 🚀 QUICK START REMINDER:
+# [LAUNCH] QUICK START REMINDER:
 #   make setup   - Install everything
 #   make run     - Launch PlantGuard
 #   make dev     - Development workflow

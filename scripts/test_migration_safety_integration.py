@@ -237,10 +237,10 @@ def main():
         success = framework.create_safety_checkpoint()
 
         if not success:
-            print("❌ Failed to create safety checkpoint")
+            print("[TODO] Failed to create safety checkpoint")
             return False
 
-        print("✅ Safety checkpoint created")
+        print("[DONE] Safety checkpoint created")
         status = framework.get_migration_status()
         print(f"Files backed up: {status['status']['files_backed_up']}")
 
@@ -262,7 +262,7 @@ def main():
             if test_name == "overall_summary":
                 continue
 
-            status_icon = {"passed": "✅", "warning": "⚠️", "failed": "❌"}.get(result["status"], "❓")
+            status_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(result["status"], "❓")
 
             print(f"  {status_icon} {test_name}: {result['status']}")
 
@@ -271,7 +271,7 @@ def main():
 
         # Overall summary
         summary = final_validation["overall_summary"]
-        summary_icon = {"passed": "✅", "warning": "⚠️", "failed": "❌"}.get(summary["status"], "❓")
+        summary_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(summary["status"], "❓")
 
         print(f"\n{summary_icon} Overall Status: {summary['status']}")
         print(f"  {summary['details']}")
@@ -289,7 +289,7 @@ def main():
         # 8. Test rollback capability
         print("\n8. Testing rollback capability...")
         if migration_status["rollback_available"]:
-            print("✅ Rollback is available")
+            print("[DONE] Rollback is available")
 
             # Demonstrate rollback (but don't actually do it)
             print("  Rollback would restore:")
@@ -299,7 +299,7 @@ def main():
                 print(f"    - {backup['total_files']} files")
                 print(f"    - From backup: {backup['backup_timestamp']}")
         else:
-            print("❌ Rollback not available")
+            print("[TODO] Rollback not available")
 
         # 9. Finalize migration
         print("\n9. Finalizing migration...")
@@ -308,11 +308,11 @@ def main():
             finalized = framework.finalize_migration()
 
             if finalized:
-                print("✅ Migration finalized successfully")
+                print("[DONE] Migration finalized successfully")
             else:
-                print("❌ Migration finalization failed")
+                print("[TODO] Migration finalization failed")
         else:
-            print("⚠️  Migration has validation failures - not finalizing")
+            print("[WARNING]  Migration has validation failures - not finalizing")
 
         print("\n=== Integration Test Complete ===")
         print(f"Test passed: {summary['status'] in ['passed', 'warning']}")
@@ -320,7 +320,7 @@ def main():
         return summary["status"] in ["passed", "warning"]
 
     except Exception as e:
-        print(f"❌ Integration test failed: {e}")
+        print(f"[TODO] Integration test failed: {e}")
         return False
 
     finally:

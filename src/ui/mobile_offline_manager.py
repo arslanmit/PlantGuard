@@ -185,7 +185,7 @@ class MobileOfflineManager:
         if status == NetworkStatus.OFFLINE:
             offline_queue = st.session_state[MobileOfflineManager.OFFLINE_QUEUE_KEY]
             if offline_queue:
-                st.info(f"📋 {len(offline_queue)} operations queued for when connection returns")
+                st.info(f"[DETAILS] {len(offline_queue)} operations queued for when connection returns")
 
     @staticmethod
     def cache_resource(key: str, data: Any, expiry_hours: int | None = None, metadata: dict | None = None) -> bool:
@@ -832,7 +832,7 @@ def ensure_offline_capability(component_id: str, required_resources: list[str] |
         required_resources: List of resources required for offline operation
     """
     if not MobileOfflineManager.can_function_offline(component_id):
-        st.warning(f"⚠️ {component_id.replace('_', ' ').title()} requires internet connection")
+        st.warning(f"[WARNING] {component_id.replace('_', ' ').title()} requires internet connection")
         return False
 
     if required_resources:
@@ -842,7 +842,7 @@ def ensure_offline_capability(component_id: str, required_resources: list[str] |
                 missing_resources.append(resource)
 
         if missing_resources:
-            st.warning(f"⚠️ Missing offline resources: {', '.join(missing_resources)}")
+            st.warning(f"[WARNING] Missing offline resources: {', '.join(missing_resources)}")
             return False
 
     return True

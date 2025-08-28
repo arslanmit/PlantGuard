@@ -37,7 +37,7 @@ def main() -> None:
 
     for dataset_path, dataset_name in datasets_to_check:
         if Path(dataset_path).exists():
-            print(f"📊 Analyzing {dataset_name} at {dataset_path}...")
+            print(f"[SUMMARY] Analyzing {dataset_name} at {dataset_path}...")
             info = dm.analyze_dataset(Path(dataset_path))
 
             print(f"📈 Dataset Analysis for {dataset_name}:")
@@ -50,7 +50,7 @@ def main() -> None:
                 print(f"  Train samples: {info.train_samples:,}")
                 print(f"  Validation samples: {info.val_samples:,}")
 
-            print("  📋 Class distribution:")
+            print("  [DETAILS] Class distribution:")
             if isinstance(info.class_distribution, dict):
                 # Check if this is a split dataset format (nested dict)
                 distribution_values = list(info.class_distribution.values())
@@ -71,7 +71,7 @@ def main() -> None:
                             print(f"    {class_name}: {count}")
 
             if info.corrupted_files:
-                print(f"  ⚠️  Corrupted files: {len(info.corrupted_files)}")
+                print(f"  [WARNING]  Corrupted files: {len(info.corrupted_files)}")
                 MAX_CORRUPTED_FILES_TO_SHOW = 10
                 if len(info.corrupted_files) <= MAX_CORRUPTED_FILES_TO_SHOW:
                     for corrupted_file in info.corrupted_files:
@@ -85,11 +85,11 @@ def main() -> None:
             found_dataset = True
 
     if not found_dataset:
-        print("❌ No datasets found to analyze")
-        print("💡 Run 'make dataset-download' first, then 'make dataset-prepare' if needed")
+        print("[TODO] No datasets found to analyze")
+        print("[TIP] Run 'make dataset-download' first, then 'make dataset-prepare' if needed")
         sys.exit(1)
 
-    print("✅ Dataset analysis complete")
+    print("[DONE] Dataset analysis complete")
 
 
 if __name__ == "__main__":

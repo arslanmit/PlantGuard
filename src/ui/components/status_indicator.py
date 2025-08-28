@@ -24,8 +24,8 @@ def render_status_indicator(status: object, label: str = "", size: str = "medium
         "loading": {"color": "#F59E0B", "icon": "🟡", "text": "Loading"},
         "error": {"color": "#EF4444", "icon": "🔴", "text": "Error"},
         "offline": {"color": "#64748B", "icon": "⚪", "text": "Offline"},
-        "ready": {"color": "#22C55E", "icon": "✅", "text": "Ready"},
-        "warning": {"color": "#F59E0B", "icon": "⚠️", "text": "Warning"},
+        "ready": {"color": "#22C55E", "icon": "[DONE]", "text": "Ready"},
+        "warning": {"color": "#F59E0B", "icon": "[WARNING]", "text": "Warning"},
         "info": {"color": "#3B82F6", "icon": "i", "text": "Info"},
     }
 
@@ -73,7 +73,7 @@ class StatusIndicator:
 
     def render_system_status(self) -> None:
         """Render overall system status dashboard."""
-        st.markdown("### 🚀 System Status")
+        st.markdown("### [LAUNCH] System Status")
 
         # Get model status
         model_status = st.session_state.get("model_load_status", {"vision": "loaded", "audio": "loaded", "text": "loaded", "fusion": "loaded"})
@@ -158,7 +158,7 @@ class StatusIndicator:
 
     def render_feature_status(self) -> None:
         """Render status of different features."""
-        st.markdown("### 🎯 Feature Status")
+        st.markdown("### [PROGRESS] Feature Status")
 
         features = {
             "Image Analysis": "ready",
@@ -265,10 +265,10 @@ class StatusIndicator:
     def render_status_badge(self, status: str, count: int = 0) -> None:
         """Render a status badge with optional count."""
         config = {
-            "ready": {"color": "#22C55E", "icon": "✅", "text": "Ready"},
+            "ready": {"color": "#22C55E", "icon": "[DONE]", "text": "Ready"},
             "loading": {"color": "#F59E0B", "icon": "⏳", "text": "Loading"},
-            "error": {"color": "#EF4444", "icon": "❌", "text": "Error"},
-            "warning": {"color": "#F59E0B", "icon": "⚠️", "text": "Warning"},
+            "error": {"color": "#EF4444", "icon": "[TODO]", "text": "Error"},
+            "warning": {"color": "#F59E0B", "icon": "[WARNING]", "text": "Warning"},
         }.get(status, {"color": "#64748B", "icon": "⚪", "text": "Unknown"})
 
         display_text = f"{config['text']}"

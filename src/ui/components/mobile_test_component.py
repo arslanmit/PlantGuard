@@ -91,11 +91,11 @@ class MobileTestComponent(MobileBaseComponent):
                 self._test_state_management()
 
         with col2:
-            if st.button("⚠️ Test Error", key=f"{self.component_id}_test_error"):
+            if st.button("[WARNING] Test Error", key=f"{self.component_id}_test_error"):
                 self._test_error_handling()
 
         with col3:
-            if st.button("🔄 Reset", key=f"{self.component_id}_reset"):
+            if st.button("[PARTIAL] Reset", key=f"{self.component_id}_reset"):
                 self._reset_component()
 
     def _render_state_display(self) -> None:
@@ -111,15 +111,15 @@ class MobileTestComponent(MobileBaseComponent):
             st.markdown("**UI State:**")
             ui_state = state.get("ui_state", {})
             for key, value in ui_state.items():
-                icon = "✅" if value else "❌"
+                icon = "[DONE]" if value else "[TODO]"
                 st.markdown(f"- {key}: {icon} {value}")
 
         with col2:
             st.markdown("**Component Info:**")
-            st.markdown(f"- Visible: {'✅' if self.is_visible() else '❌'}")
-            st.markdown(f"- Loading: {'✅' if self.is_loading() else '❌'}")
-            st.markdown(f"- Disabled: {'✅' if self.is_disabled() else '❌'}")
-            st.markdown(f"- Has Error: {'✅' if self.has_error() else '❌'}")
+            st.markdown(f"- Visible: {'[DONE]' if self.is_visible() else '[TODO]'}")
+            st.markdown(f"- Loading: {'[DONE]' if self.is_loading() else '[TODO]'}")
+            st.markdown(f"- Disabled: {'[DONE]' if self.is_disabled() else '[TODO]'}")
+            st.markdown(f"- Has Error: {'[DONE]' if self.has_error() else '[TODO]'}")
 
         # Display full state in expander
         with st.expander("Full State (for AI Agent Debugging)"):
@@ -141,7 +141,7 @@ class MobileTestComponent(MobileBaseComponent):
             # Store test timestamp in session state
             st.session_state["test_timestamp"] = test_data["test_timestamp"]
 
-            st.success(f"✅ State management test completed! Test #{test_data['test_timestamp']}")
+            st.success(f"[DONE] State management test completed! Test #{test_data['test_timestamp']}")
 
         except Exception as e:
             self.handle_error(e, ErrorCategory.COMPONENT, ErrorSeverity.MEDIUM, "State management test failed")
@@ -198,7 +198,7 @@ class MobileTestComponent(MobileBaseComponent):
             if "error_test_type" in st.session_state:
                 del st.session_state["error_test_type"]
 
-            st.success("✅ Component reset successfully!")
+            st.success("[DONE] Component reset successfully!")
 
             # Force rerun to show updated state
             st.experimental_rerun()

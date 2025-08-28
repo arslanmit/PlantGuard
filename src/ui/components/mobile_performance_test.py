@@ -436,7 +436,7 @@ class MobilePerformanceTest:
 
     def render_test_results(self, results: dict[str, Any]) -> None:
         """Render test results in Streamlit UI."""
-        st.markdown("## 📊 Performance Test Results")
+        st.markdown("## [SUMMARY] Performance Test Results")
 
         # Summary metrics
         summary = results["summary"]
@@ -461,7 +461,7 @@ class MobilePerformanceTest:
         for test_name, test_result in results["test_results"].items():
             with st.expander(f"{test_name} - {test_result.get('status', 'unknown').title()}"):
                 if test_result.get("status") == "passed":
-                    st.success("✅ Test Passed")
+                    st.success("[DONE] Test Passed")
 
                     metrics = test_result.get("metrics", {})
                     if metrics:
@@ -473,12 +473,12 @@ class MobilePerformanceTest:
                                 st.text(f"{metric_name.replace('_', ' ').title()}: {metric_value}")
 
                 else:
-                    st.error("❌ Test Failed")
+                    st.error("[TODO] Test Failed")
                     if "error" in test_result:
                         st.code(test_result["error"])
 
         # Recommendations
-        st.markdown("### 💡 Recommendations")
+        st.markdown("### [TIP] Recommendations")
         for i, recommendation in enumerate(results["recommendations"], 1):
             st.markdown(f"{i}. {recommendation}")
 
@@ -494,7 +494,7 @@ def run_mobile_performance_tests() -> dict[str, Any]:
 
 def render_mobile_performance_test_ui() -> None:
     """Render mobile performance test UI."""
-    st.markdown("# 🚀 Mobile Performance Test Suite")
+    st.markdown("# [LAUNCH] Mobile Performance Test Suite")
 
     if st.button("Run All Performance Tests", type="primary", use_container_width=True):
         with st.spinner("Running performance tests..."):

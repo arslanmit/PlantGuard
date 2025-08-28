@@ -15,11 +15,11 @@ show_migration_message() {
     local new_cmd="$2"
     local description="$3"
     
-    echo -e "${RED}❌ Command Deprecated: ${old_cmd}${NC}"
-    echo -e "${YELLOW}📱 PlantGuard is now mobile-only${NC}"
-    echo -e "${CYAN}📋 Migration: ${old_cmd} → ${new_cmd}${NC}"
+    echo -e "${RED}[TODO] Command Deprecated: ${old_cmd}${NC}"
+    echo -e "${YELLOW}[MOBILE] PlantGuard is now mobile-only${NC}"
+    echo -e "${CYAN}[DETAILS] Migration: ${old_cmd} → ${new_cmd}${NC}"
     echo -e "${CYAN}✨ ${description}${NC}"
-    echo -e "${GREEN}🚀 Running new command: ${new_cmd}${NC}"
+    echo -e "${GREEN}[LAUNCH] Running new command: ${new_cmd}${NC}"
     echo ""
 }
 

@@ -35,12 +35,12 @@ When implementing or modifying PlantGuard components, use these exact technologi
 ## Critical Constraints
 
 **NEVER violate these rules when working on PlantGuard**:
-- ❌ No external APIs (OpenAI, Replicate, cloud vision services)
-- ❌ No user data sent to external services
-- ❌ No internet-dependent inference
-- ✅ All processing must work offline
-- ✅ Use `tempfile` for temporary storage, clean up immediately
-- ✅ Graceful degradation when adapters fail
+- [TODO] No external APIs (OpenAI, Replicate, cloud vision services)
+- [TODO] No user data sent to external services
+- [TODO] No internet-dependent inference
+- [DONE] All processing must work offline
+- [DONE] Use `tempfile` for temporary storage, clean up immediately
+- [DONE] Graceful degradation when adapters fail
 
 ## Required Code Interfaces
 

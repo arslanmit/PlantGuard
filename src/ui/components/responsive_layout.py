@@ -150,7 +150,7 @@ class ResponsiveLayout:
         try:
             # Mobile: Input section first, then results, then chat
             if right_content:
-                st.markdown("### 📊 Analysis Results")
+                st.markdown("### [SUMMARY] Analysis Results")
                 self._render_content_with_error_handling(right_content, "Analysis Results")
 
             if left_content:

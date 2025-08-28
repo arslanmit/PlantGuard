@@ -30,7 +30,7 @@ def process_image(image: Image.Image, image_name: str, manager: "PlantGuardModel
             result = manager.get_readable_prediction(image)
 
         # Display results
-        st.markdown("### 📋 Prediction Results")
+        st.markdown("### [DETAILS] Prediction Results")
 
         col_a, col_b = st.columns(2)
 
@@ -39,15 +39,15 @@ def process_image(image: Image.Image, image_name: str, manager: "PlantGuardModel
             st.metric("🦠 Disease", result["disease"])
 
         with col_b:
-            st.metric("📊 Confidence", result["confidence_percentage"])
-            health_status = "Healthy ✅" if result["is_healthy"] else "Diseased ⚠️"
+            st.metric("[SUMMARY] Confidence", result["confidence_percentage"])
+            health_status = "Healthy [DONE]" if result["is_healthy"] else "Diseased [WARNING]"
             st.metric("💚 Health Status", health_status)
 
         # Additional info
-        st.info(f"💡 **Recommendation:** {result['recommendation']}")
+        st.info(f"[TIP] **Recommendation:** {result['recommendation']}")
 
         # Raw prediction details
-        with st.expander("🔧 Technical Details"):
+        with st.expander("[TOOL] Technical Details"):
             st.json(
                 {
                     "raw_prediction": result["raw_prediction"],
@@ -64,7 +64,7 @@ def process_image(image: Image.Image, image_name: str, manager: "PlantGuardModel
             st.write(f"**Description:** {current_model_info['description']}")
 
     else:
-        st.error(f"❌ Model Error: {current_model_info['error']}")
+        st.error(f"[TODO] Model Error: {current_model_info['error']}")
 
 
 def main() -> None:
@@ -115,17 +115,17 @@ def main() -> None:
     selected_model_id = model_options[selected_display]
 
     # Switch model button (sidebar)
-    if st.sidebar.button("🔄 Switch Model", type="primary"):
+    if st.sidebar.button("[PARTIAL] Switch Model", type="primary"):
         with st.spinner(f"Loading model: {selected_model_id}"):
             if manager.switch_model(selected_model_id):
-                st.sidebar.success(f"✅ Switched to: {selected_model_id}")
+                st.sidebar.success(f"[DONE] Switched to: {selected_model_id}")
                 st.rerun()
             else:
-                st.sidebar.error(f"❌ Failed to switch to: {selected_model_id}")
+                st.sidebar.error(f"[TODO] Failed to switch to: {selected_model_id}")
 
     # Current model info
     st.sidebar.markdown("---")
-    st.sidebar.subheader("📊 Current Model")
+    st.sidebar.subheader("[SUMMARY] Current Model")
 
     if "error" not in current_model_info:
         st.sidebar.info(f"""
@@ -149,13 +149,13 @@ def main() -> None:
         st.header("🔍 Test Current Model")
 
         # Central switch button mirrors sidebar for convenience
-        if st.button("🔄 Switch Model", help="Load the selected model from the sidebar"):
+        if st.button("[PARTIAL] Switch Model", help="Load the selected model from the sidebar"):
             with st.spinner(f"Loading model: {selected_model_id}"):
                 if manager.switch_model(selected_model_id):
-                    st.success(f"✅ Switched to: {selected_model_id}")
+                    st.success(f"[DONE] Switched to: {selected_model_id}")
                     st.rerun()
                 else:
-                    st.error(f"❌ Failed to switch to: {selected_model_id}")
+                    st.error(f"[TODO] Failed to switch to: {selected_model_id}")
 
         # Image upload
         uploaded_file = st.file_uploader(
@@ -181,7 +181,7 @@ def main() -> None:
                 st.error(f"Error processing image: {e}")
 
     with col2:
-        st.header("📊 Model Comparison")
+        st.header("[SUMMARY] Model Comparison")
 
         # Show all models in a table
         if models:

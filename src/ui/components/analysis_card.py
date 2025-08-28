@@ -294,7 +294,7 @@ class AnalysisCard:
             col1, col2 = st.columns(2)
 
             with col1:
-                st.write("**🎯 Treatment:**")
+                st.write("**[PROGRESS] Treatment:**")
                 st.info(disease_info["treatment"])
 
             with col2:
@@ -378,14 +378,14 @@ class AnalysisCard:
         else:
             actions = ["Consult expert", "Monitor closely", "Research treatment"]
 
-        st.write("**🎯 Recommended Actions:**")
+        st.write("**[PROGRESS] Recommended Actions:**")
 
         # Create action buttons
         cols = st.columns(min(len(actions), 3))
         for i, action in enumerate(actions):
             with cols[i % len(cols)]:
                 if st.button(action, key=f"action_{i}_{id(result)}"):
-                    st.toast(f"Action noted: {action}", icon="✅")
+                    st.toast(f"Action noted: {action}", icon="[DONE]")
 
     def render_metadata_info(self, result: AnalysisResult) -> None:
         """Render analysis metadata information.
@@ -396,7 +396,7 @@ class AnalysisCard:
         if not result.metadata:
             return
 
-        with st.expander("📊 Analysis Details", expanded=False):
+        with st.expander("[SUMMARY] Analysis Details", expanded=False):
             for key, value in result.metadata.items():
                 if key == "model_version":
                     st.write(f"**Model:** {value}")
@@ -435,7 +435,7 @@ class AnalysisCard:
         # Probability chart
         if show_chart:
             st.markdown("---")
-            st.subheader("📊 Prediction Confidence")
+            st.subheader("[SUMMARY] Prediction Confidence")
             self.render_probability_chart(result)
 
         # Action chips

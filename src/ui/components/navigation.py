@@ -243,7 +243,7 @@ class NavigationHeader:
                 # Always-visible button with icon + text + status
                 button_label = f"{page_info['icon']} {page_name}"
                 if page_name == current_page:
-                    button_label += " ✅"
+                    button_label += " [DONE]"
 
                 if st.button(
                     button_label,
@@ -489,7 +489,7 @@ class NavigationSidebar:
         state_manager = StateManager()
         stats = state_manager.get_session_stats()
 
-        with st.expander("📊 Session Info", expanded=False):
+        with st.expander("[SUMMARY] Session Info", expanded=False):
             st.metric("Session Duration", stats["session_duration"])
             st.metric("Pages Visited", stats["pages_visited"])
             st.metric("Analyses Done", stats["analyses_performed"])

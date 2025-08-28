@@ -187,7 +187,7 @@ class MobileImageAnalysis(MobileComponent):
             st.image(image, caption="Uploaded Plant Image", use_column_width=True)
 
         # Image info
-        with st.expander("📊 Image Information"):
+        with st.expander("[SUMMARY] Image Information"):
             st.markdown(f"**Size:** {image.size[0]} x {image.size[1]} pixels")
             st.markdown(f"**Format:** {image.format}")
             st.markdown(f"**Mode:** {image.mode}")
@@ -199,7 +199,7 @@ class MobileImageAnalysis(MobileComponent):
             bool: True if analysis was triggered
         """
         if not has_image:
-            st.info("📱 Upload an image to start analysis")
+            st.info("[MOBILE] Upload an image to start analysis")
             return False
 
         col1, col2 = st.columns(2)
@@ -315,11 +315,11 @@ class MobileImageAnalysis(MobileComponent):
 
         # Result styling based on health status
         if is_healthy:
-            result_icon = "✅"
+            result_icon = "[DONE]"
             result_color = "green"
             result_message = "Plant appears healthy!"
         else:
-            result_icon = "⚠️"
+            result_icon = "[WARNING]"
             result_color = "orange"
             result_message = "Potential issue detected"
 
@@ -343,7 +343,7 @@ class MobileImageAnalysis(MobileComponent):
         )
 
         # Detailed information in expandable sections
-        with st.expander("📊 Detailed Analysis"):
+        with st.expander("[SUMMARY] Detailed Analysis"):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -357,7 +357,7 @@ class MobileImageAnalysis(MobileComponent):
 
         # Recommendations based on results
         if not is_healthy:
-            with st.expander("💡 Recommendations"):
+            with st.expander("[TIP] Recommendations"):
                 st.markdown("""
                 **General Care Tips:**
                 - Ensure proper watering (not too much, not too little)
@@ -401,7 +401,7 @@ class MobileImageAnalysis(MobileComponent):
 
         # Check if VisionAdapter is available
         if not st.session_state.get("vision_adapter_loaded", False):
-            st.warning("⚠️ Vision analysis not available. Please check system configuration.")
+            st.warning("[WARNING] Vision analysis not available. Please check system configuration.")
             st.markdown("</div>", unsafe_allow_html=True)
             return {"error": "VisionAdapter not loaded", "success": False}
 

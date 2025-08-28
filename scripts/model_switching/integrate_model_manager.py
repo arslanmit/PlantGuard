@@ -433,7 +433,7 @@ Example configuration:
 }
 ```
 
-## 🔧 Integration in Your Code
+## [TOOL] Integration in Your Code
 
 ```python
 from src.core.model_manager import PlantGuardModelManager
@@ -451,7 +451,7 @@ print(f"Disease: {result['disease']}")
 print(f"Confidence: {result['confidence_percentage']}")
 ```
 
-## 📊 Performance Comparison
+## [SUMMARY] Performance Comparison
 
 | Model | Accuracy | Speed | Memory | Best For |
 |-------|----------|-------|---------|----------|
@@ -459,7 +459,7 @@ print(f"Confidence: {result['confidence_percentage']}")
 | MobileNet | 95% | Fast | Low | Mobile/Edge devices |
 | Local ResNet | 5% | Fast | Medium | Custom training |
 
-## 🎯 Recommendations
+## [PROGRESS] Recommendations
 
 ### For Production Use:
 - Use **Vision Transformer (vit_best)** for highest accuracy
@@ -473,7 +473,7 @@ print(f"Confidence: {result['confidence_percentage']}")
 - Enable **Local ResNet** after training on your data
 - Use PlantVillage dataset for training
 
-## 🔄 Switching Models During Runtime
+## [PARTIAL] Switching Models During Runtime
 
 The system supports hot-swapping models without restarting your application:
 
@@ -508,12 +508,12 @@ You should see 100% accuracy on the Vision Transformer model!
     with guide_path.open("w") as f:
         f.write(guide)
 
-    print(f"✅ Created quick start guide: {guide_path}")
+    print(f"[DONE] Created quick start guide: {guide_path}")
 
 
 def main() -> None:
     """Main integration function."""
-    print("🚀 Integrating Model Manager into PlantGuard")
+    print("[LAUNCH] Integrating Model Manager into PlantGuard")
     print("=" * 60)
 
     # Update main app
@@ -522,10 +522,10 @@ def main() -> None:
     # Create guide
     create_quick_start_guide()
 
-    print("\n🎉 INTEGRATION COMPLETE!")
+    print("\n[SUCCESS] INTEGRATION COMPLETE!")
     print("=" * 60)
 
-    print("\n📱 **Enhanced App**: scripts/model_switching/app_with_model_manager.py")
+    print("\n[MOBILE] **Enhanced App**: scripts/model_switching/app_with_model_manager.py")
     print("   - Full model switching in Streamlit UI")
     print("   - Auto-loading of best models")
     print("   - Batch analysis support")
@@ -535,7 +535,7 @@ def main() -> None:
     print("   - Performance comparisons")
     print("   - Configuration instructions")
 
-    print("\n🎯 **Quick Commands to Try**:")
+    print("\n[PROGRESS] **Quick Commands to Try**:")
     print("   python scripts/model_switching/model_switcher.py --list")
     print("   python scripts/model_switching/model_switcher.py --switch vit_best")
     print("   # For testing, run:\n   # python scripts/model_switching/model_switcher.py --test data/raw/<your_image>.jpg")
@@ -543,12 +543,12 @@ def main() -> None:
     print("   streamlit run scripts/model_switching/app_with_model_manager.py")
 
     print("\n✨ **Key Features**:")
-    print("   ✅ Switch models with single command")
-    print("   ✅ Compare model performance")
-    print("   ✅ Web UI for easy switching")
-    print("   ✅ Configuration-based setup")
-    print("   ✅ Hot-swapping in Streamlit")
-    print("   ✅ Batch analysis support")
+    print("   [DONE] Switch models with single command")
+    print("   [DONE] Compare model performance")
+    print("   [DONE] Web UI for easy switching")
+    print("   [DONE] Configuration-based setup")
+    print("   [DONE] Hot-swapping in Streamlit")
+    print("   [DONE] Batch analysis support")
 
     print("\n🏆 **Your Models**:")
     print("   🥇 Vision Transformer: 100% accuracy (BEST)")

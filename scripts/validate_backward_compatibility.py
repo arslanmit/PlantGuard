@@ -82,9 +82,9 @@ class BackwardCompatibilityValidator:
             results[f"{cmd}_guidance"] = has_guidance
 
             if has_target:
-                print(f"  ✅ {cmd}: Target exists with redirect")
+                print(f"  [DONE] {cmd}: Target exists with redirect")
             else:
-                print(f"  ❌ {cmd}: Target missing")
+                print(f"  [TODO] {cmd}: Target missing")
 
         return results
 
@@ -106,16 +106,16 @@ class BackwardCompatibilityValidator:
                 results[f"{cmd}_exists"] = command_exists
 
                 if command_exists:
-                    print(f"  ✅ {cmd}: Command exists")
+                    print(f"  [DONE] {cmd}: Command exists")
                 else:
-                    print(f"  ❌ {cmd}: Command missing or broken")
+                    print(f"  [TODO] {cmd}: Command missing or broken")
 
             except subprocess.TimeoutExpired:
                 results[f"{cmd}_exists"] = False
-                print(f"  ❌ {cmd}: Command timeout")
+                print(f"  [TODO] {cmd}: Command timeout")
             except Exception as e:
                 results[f"{cmd}_exists"] = False
-                print(f"  ❌ {cmd}: Error - {e}")
+                print(f"  [TODO] {cmd}: Error - {e}")
 
         return results
 
@@ -137,11 +137,11 @@ class BackwardCompatibilityValidator:
                 results[f"{file_path}_has_content"] = has_content
 
                 if has_content:
-                    print(f"  ✅ {file_path}: Exists with content ({size} bytes)")
+                    print(f"  [DONE] {file_path}: Exists with content ({size} bytes)")
                 else:
-                    print(f"  ⚠️  {file_path}: Exists but appears empty")
+                    print(f"  [WARNING]  {file_path}: Exists but appears empty")
             else:
-                print(f"  ❌ {file_path}: Missing")
+                print(f"  [TODO] {file_path}: Missing")
                 results[f"{file_path}_has_content"] = False
 
         return results
@@ -163,13 +163,13 @@ class BackwardCompatibilityValidator:
             results["migration_helper_command"] = command_help_works and has_guidance
 
             if command_help_works and has_guidance:
-                print("  ✅ Migration helper command function works")
+                print("  [DONE] Migration helper command function works")
             else:
-                print("  ❌ Migration helper command function broken")
+                print("  [TODO] Migration helper command function broken")
 
         except Exception as e:
             results["migration_helper_command"] = False
-            print(f"  ❌ Migration helper command test failed: {e}")
+            print(f"  [TODO] Migration helper command test failed: {e}")
 
         # Test feature migration
         try:
@@ -184,13 +184,13 @@ class BackwardCompatibilityValidator:
             results["migration_helper_feature"] = feature_help_works and has_feature_info
 
             if feature_help_works and has_feature_info:
-                print("  ✅ Migration helper feature function works")
+                print("  [DONE] Migration helper feature function works")
             else:
-                print("  ❌ Migration helper feature function broken")
+                print("  [TODO] Migration helper feature function broken")
 
         except Exception as e:
             results["migration_helper_feature"] = False
-            print(f"  ❌ Migration helper feature test failed: {e}")
+            print(f"  [TODO] Migration helper feature test failed: {e}")
 
         # Test summary generation
         try:
@@ -203,13 +203,13 @@ class BackwardCompatibilityValidator:
             results["migration_helper_summary"] = summary_works and has_json
 
             if summary_works and has_json:
-                print("  ✅ Migration helper summary function works")
+                print("  [DONE] Migration helper summary function works")
             else:
-                print("  ❌ Migration helper summary function broken")
+                print("  [TODO] Migration helper summary function broken")
 
         except Exception as e:
             results["migration_helper_summary"] = False
-            print(f"  ❌ Migration helper summary test failed: {e}")
+            print(f"  [TODO] Migration helper summary test failed: {e}")
 
         return results
 
@@ -235,23 +235,23 @@ class BackwardCompatibilityValidator:
             results["readme_feature_parity"] = has_feature_parity
 
             if has_mobile_only:
-                print("  ✅ README mentions mobile-only approach")
+                print("  [DONE] README mentions mobile-only approach")
             else:
-                print("  ❌ README missing mobile-only information")
+                print("  [TODO] README missing mobile-only information")
 
             if has_migration_info:
-                print("  ✅ README includes migration information")
+                print("  [DONE] README includes migration information")
             else:
-                print("  ❌ README missing migration information")
+                print("  [TODO] README missing migration information")
 
             if has_mobile_commands:
-                print("  ✅ README shows mobile commands")
+                print("  [DONE] README shows mobile commands")
             else:
-                print("  ❌ README missing mobile command examples")
+                print("  [TODO] README missing mobile command examples")
 
         except FileNotFoundError:
             results = {"readme_mobile_only": False, "readme_migration_info": False, "readme_mobile_commands": False, "readme_feature_parity": False}
-            print("  ❌ README.md not found")
+            print("  [TODO] README.md not found")
 
         return results
 
@@ -270,7 +270,7 @@ class BackwardCompatibilityValidator:
         }
 
         print()
-        print("📊 Validation Summary")
+        print("[SUMMARY] Validation Summary")
         print("=" * 30)
 
         total_tests = 0
@@ -283,19 +283,19 @@ class BackwardCompatibilityValidator:
             total_tests += category_total
             passed_tests += category_passed
 
-            status = "✅" if category_passed == category_total else "⚠️" if category_passed > 0 else "❌"
+            status = "[DONE]" if category_passed == category_total else "[WARNING]" if category_passed > 0 else "[TODO]"
             print(f"{status} {category}: {category_passed}/{category_total} tests passed")
 
         print()
-        overall_status = "✅ PASSED" if passed_tests == total_tests else "⚠️ PARTIAL" if passed_tests > 0 else "❌ FAILED"
+        overall_status = "[DONE] PASSED" if passed_tests == total_tests else "[WARNING] PARTIAL" if passed_tests > 0 else "[TODO] FAILED"
         print(f"Overall Status: {overall_status} ({passed_tests}/{total_tests} tests passed)")
 
         if passed_tests == total_tests:
-            print("🎉 All backward compatibility features are working correctly!")
+            print("[SUCCESS] All backward compatibility features are working correctly!")
         elif passed_tests > total_tests * 0.8:
-            print("⚠️ Most features working, some issues need attention")
+            print("[WARNING] Most features working, some issues need attention")
         else:
-            print("❌ Significant issues found, backward compatibility needs work")
+            print("[TODO] Significant issues found, backward compatibility needs work")
 
         return validation_results
 

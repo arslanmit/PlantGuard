@@ -58,7 +58,7 @@ class MobileNavigationManager:
             NavigationItem(id="image_analysis", title="Image Analysis", icon="📸", description="Analyze plant images for disease detection"),
             NavigationItem(id="voice_assistant", title="Voice Assistant", icon="🎤", description="Voice-powered plant care assistance"),
             NavigationItem(id="chat_interface", title="Chat", icon="💬", description="Text-based plant care chat"),
-            NavigationItem(id="history_settings", title="History & Settings", icon="📊", description="View analysis history and app settings"),
+            NavigationItem(id="history_settings", title="History & Settings", icon="[SUMMARY]", description="View analysis history and app settings"),
         ]
 
         for item in default_items:

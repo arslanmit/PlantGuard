@@ -147,7 +147,7 @@ class MobileInputRibbon(MobileComponent):
                 "enabled": True,
                 "primary": True,
                 "status": "ready",
-                "status_icon": "✅",
+                "status_icon": "[DONE]",
             },
             {
                 "id": "voice",
@@ -157,7 +157,7 @@ class MobileInputRibbon(MobileComponent):
                 "enabled": st.session_state.get("microphone_available", True),
                 "primary": True,
                 "status": "ready" if st.session_state.get("microphone_available", True) else "disabled",
-                "status_icon": "✅" if st.session_state.get("microphone_available", True) else "❌",
+                "status_icon": "[DONE]" if st.session_state.get("microphone_available", True) else "[TODO]",
             },
             {
                 "id": "camera",
@@ -167,7 +167,7 @@ class MobileInputRibbon(MobileComponent):
                 "enabled": st.session_state.get("camera_available", True),
                 "primary": True,
                 "status": "ready" if st.session_state.get("camera_available", True) else "disabled",
-                "status_icon": "✅" if st.session_state.get("camera_available", True) else "❌",
+                "status_icon": "[DONE]" if st.session_state.get("camera_available", True) else "[TODO]",
             },
             {
                 "id": "upload",
@@ -177,7 +177,7 @@ class MobileInputRibbon(MobileComponent):
                 "enabled": True,
                 "primary": False,
                 "status": "ready",
-                "status_icon": "✅",
+                "status_icon": "[DONE]",
             },
         ]
 
@@ -222,7 +222,7 @@ class MobileInputRibbon(MobileComponent):
         selected_method = None
 
         # Simple section header
-        st.markdown("## 📱 Plant Analysis Input")
+        st.markdown("## [MOBILE] Plant Analysis Input")
         st.markdown("Choose how you want to analyze your plant:")
 
         # Always-visible 2x2 grid for all input types

@@ -388,7 +388,7 @@ class TextAdapter:
         # Add medical disclaimer
         if treatment_parts:
             treatment_parts.append(
-                "\n**⚠️ Disclaimer:** This advice is for educational purposes only. Always follow product labels and consult with agricultural professionals for severe cases."
+                "\n**[WARNING] Disclaimer:** This advice is for educational purposes only. Always follow product labels and consult with agricultural professionals for severe cases."
             )
 
         return "\n".join(treatment_parts) if treatment_parts else ""

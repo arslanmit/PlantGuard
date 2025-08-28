@@ -22,11 +22,11 @@ The redesigned interface will provide intuitive navigation, responsive layouts, 
 - **Training**: TensorBoard logging to `./runs/experiment_{timestamp}`
 
 **Non-Negotiable Constraints**:
-- ❌ No external ML APIs (OpenAI, Replicate, cloud vision services)
-- ❌ No user data sent to external services
-- ❌ No internet-dependent inference
-- ✅ All processing must work offline after initial model downloads
-- ✅ Graceful degradation when components fail
+- [TODO] No external ML APIs (OpenAI, Replicate, cloud vision services)
+- [TODO] No user data sent to external services
+- [TODO] No internet-dependent inference
+- [DONE] All processing must work offline after initial model downloads
+- [DONE] Graceful degradation when components fail
 
 ## Requirements
 

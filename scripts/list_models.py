@@ -17,7 +17,7 @@ def main():
 
     if not models:
         print("No models registered yet")
-        print("💡 Register models using the ModelRegistry API or train new models")
+        print("[TIP] Register models using the ModelRegistry API or train new models")
     else:
         print(f"Found {len(models)} registered models:")
         print()
@@ -38,7 +38,7 @@ def main():
             if model.metadata.tags:
                 print(f"  Tags: {', '.join(model.metadata.tags)}")
 
-            print(f"  Valid: {'✅' if model.is_valid else '❌'}")
+            print(f"  Valid: {'[DONE]' if model.is_valid else '[TODO]'}")
             print()
 
 

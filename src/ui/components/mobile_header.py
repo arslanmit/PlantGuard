@@ -138,7 +138,7 @@ class MobileHeader(MobileComponent):
 
                 # Always-visible model button with visual indication
                 button_style = "primary" if is_current else "secondary"
-                button_icon = "✅" if is_current else "⚪"
+                button_icon = "[DONE]" if is_current else "⚪"
 
                 # Short model name for always-visible display
                 short_names = {"vit_best": "ViT", "resnet50_plantvillage_v1": "ResNet", "mobilenet_fast": "Mobile"}
@@ -169,17 +169,17 @@ class MobileHeader(MobileComponent):
 
         # Determine status display - always visible, prominent
         if is_loading:
-            status_icon = "🔄"
+            status_icon = "[PARTIAL]"
             status_text = "Loading"
             status_class = "mobile-status-loading"
             status_color = "#FFA500"  # Orange
         elif status == "ready":
-            status_icon = "✅"
+            status_icon = "[DONE]"
             status_text = "Ready"
             status_class = "mobile-status-ready"
             status_color = "#16A34A"  # Green
         elif status == "error":
-            status_icon = "❌"
+            status_icon = "[TODO]"
             status_text = "Error"
             status_class = "mobile-status-error"
             status_color = "#DC2626"  # Red
@@ -291,7 +291,7 @@ class MobileHeader(MobileComponent):
                 model_info = self._get_model_info(model_key)
                 is_current = model_key == st.session_state.current_vision_model
 
-                button_text = f"{'✅' if is_current else '⚪'} {model_info['name']}"
+                button_text = f"{'[DONE]' if is_current else '⚪'} {model_info['name']}"
 
                 if st.button(button_text, key=f"{self.component_id}_modal_{model_key}", use_container_width=True, disabled=is_current):
                     if not is_current:

@@ -71,7 +71,7 @@ def test_text_adapter():
     print(f"   Treatment advice length: {len(treatment_advice)} characters")
     print(f"   Contains disclaimer: {'Disclaimer' in treatment_advice}")
 
-    print("\n✅ All TextAdapter tests completed successfully!")
+    print("\n[DONE] All TextAdapter tests completed successfully!")
 
 
 def test_knowledge_base_coverage():
@@ -93,9 +93,9 @@ def test_knowledge_base_coverage():
             missing_diseases.append(disease_class)
 
     if missing_diseases:
-        print(f"   ❌ Missing diseases in knowledge base: {missing_diseases}")
+        print(f"   [TODO] Missing diseases in knowledge base: {missing_diseases}")
     else:
-        print(f"   ✅ All {len(class_data['classes'])} diseases covered in knowledge base")
+        print(f"   [DONE] All {len(class_data['classes'])} diseases covered in knowledge base")
 
 
 def main():
@@ -103,9 +103,9 @@ def main():
     try:
         test_text_adapter()
         test_knowledge_base_coverage()
-        print("\n🎉 All tests passed!")
+        print("\n[SUCCESS] All tests passed!")
     except Exception as e:
-        print(f"\n❌ Test failed with error: {e}")
+        print(f"\n[TODO] Test failed with error: {e}")
         import traceback
 
         traceback.print_exc()

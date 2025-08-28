@@ -24,7 +24,7 @@ class ErrorHandler:
             "network_error": {"icon": "🌐", "title": "Network Error", "color": "#8B5CF6"},
             "file_error": {"icon": "📁", "title": "File Error", "color": "#EF4444"},
             "system_error": {"icon": "⚙️", "title": "System Error", "color": "#64748B"},
-            "validation_error": {"icon": "✅", "title": "Validation Error", "color": "#F59E0B"},
+            "validation_error": {"icon": "[DONE]", "title": "Validation Error", "color": "#F59E0B"},
         }
 
     def handle_error(
@@ -158,13 +158,13 @@ class ErrorHandler:
 
     def _provide_recovery_options(self, error_type: str, error_info: dict[str, Any]):
         """Provide recovery options based on error type."""
-        st.markdown("### 🔧 Try These Solutions:")
+        st.markdown("### [TOOL] Try These Solutions:")
 
         if error_type == "model_error":
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                if st.button("🔄 Retry Analysis", key=f"retry_{error_info['id']}"):
+                if st.button("[PARTIAL] Retry Analysis", key=f"retry_{error_info['id']}"):
                     st.rerun()
 
             with col2:
@@ -173,7 +173,7 @@ class ErrorHandler:
                     st.success("Cache cleared! Please try again.")
 
             with col3:
-                if st.button("🔄 Restart Session", key=f"restart_{error_info['id']}"):
+                if st.button("[PARTIAL] Restart Session", key=f"restart_{error_info['id']}"):
                     self._restart_session()
 
         elif error_type == "input_error":
@@ -197,7 +197,7 @@ class ErrorHandler:
                     st.info("File inputs cleared. Please select a different file.")
 
             with col2:
-                if st.button("🔧 File Format Help", key=f"format_help_{error_info['id']}"):
+                if st.button("[TOOL] File Format Help", key=f"format_help_{error_info['id']}"):
                     self._show_file_format_help()
 
         else:
@@ -205,7 +205,7 @@ class ErrorHandler:
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("🔄 Try Again", key=f"retry_generic_{error_info['id']}"):
+                if st.button("[PARTIAL] Try Again", key=f"retry_generic_{error_info['id']}"):
                     st.rerun()
 
             with col2:
@@ -254,7 +254,7 @@ class ErrorHandler:
 
     def _show_input_guidelines(self):
         """Show input format guidelines."""
-        with st.expander("📋 Input Guidelines", expanded=True):
+        with st.expander("[DETAILS] Input Guidelines", expanded=True):
             st.markdown("""
             **Image Requirements:**
             - Formats: JPG, JPEG, PNG
@@ -281,19 +281,19 @@ class ErrorHandler:
             with col1:
                 st.markdown("""
                 **Image Formats:**
-                - ✅ JPEG (.jpg, .jpeg)
-                - ✅ PNG (.png)
-                - ❌ GIF, BMP, TIFF
-                - ❌ RAW formats
+                - [DONE] JPEG (.jpg, .jpeg)
+                - [DONE] PNG (.png)
+                - [TODO] GIF, BMP, TIFF
+                - [TODO] RAW formats
                 """)
 
             with col2:
                 st.markdown("""
                 **Audio Formats:**
-                - ✅ WAV (.wav)
-                - ✅ MP3 (.mp3)
-                - ❌ FLAC, OGG, M4A
-                - ❌ Video files
+                - [DONE] WAV (.wav)
+                - [DONE] MP3 (.mp3)
+                - [TODO] FLAC, OGG, M4A
+                - [TODO] Video files
                 """)
 
     def _generate_error_id(self) -> str:
@@ -332,11 +332,11 @@ class ErrorHandler:
                 st.success("Focused on Image Analysis - no page refresh!")
 
         with col2:
-            if st.button("🔄 Refresh Content", key="error_refresh_content"):
+            if st.button("[PARTIAL] Refresh Content", key="error_refresh_content"):
                 st.success("Content refreshed - staying on same page!")
 
         with col3:
-            if st.button("📊 Focus on History", key="error_focus_history"):
+            if st.button("[SUMMARY] Focus on History", key="error_focus_history"):
                 st.session_state.focused_content = "history_settings"
                 st.success("Focused on History - no page refresh!")
 

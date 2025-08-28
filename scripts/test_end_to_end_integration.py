@@ -31,10 +31,10 @@ class EndToEndIntegrationTest:
         """Log test result."""
         if passed:
             self.results["tests_passed"] += 1
-            logger.info(f"✅ {test_name}: PASSED - {message}")
+            logger.info(f"[DONE] {test_name}: PASSED - {message}")
         else:
             self.results["tests_failed"] += 1
-            logger.error(f"❌ {test_name}: FAILED - {message}")
+            logger.error(f"[TODO] {test_name}: FAILED - {message}")
             if error:
                 self.results["errors"].append(f"{test_name}: {error!s}")
 
@@ -394,7 +394,7 @@ class EndToEndIntegrationTest:
 
     def run_integration_tests(self) -> dict[str, Any]:
         """Run all integration tests."""
-        logger.info("🚀 Starting end-to-end integration tests...")
+        logger.info("[LAUNCH] Starting end-to-end integration tests...")
 
         start_time = time.time()
 
@@ -443,9 +443,9 @@ class EndToEndIntegrationTest:
         logger.info(f"Total time: {total_time:.2f}s")
 
         if self.results["overall_success"]:
-            logger.info("🎉 ALL INTEGRATION TESTS PASSED!")
+            logger.info("[SUCCESS] ALL INTEGRATION TESTS PASSED!")
         else:
-            logger.error("❌ SOME INTEGRATION TESTS FAILED")
+            logger.error("[TODO] SOME INTEGRATION TESTS FAILED")
             for error in self.results["errors"]:
                 logger.error(f"  - {error}")
 

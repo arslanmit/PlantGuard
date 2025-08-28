@@ -124,20 +124,20 @@ class MigrationHelper:
         print()
 
         if migration["status"] == "migrated":
-            print(f"❌ Command Removed: {migration['old_command']}")
-            print(f"✅ New Command: {migration['new_command']}")
+            print(f"[TODO] Command Removed: {migration['old_command']}")
+            print(f"[DONE] New Command: {migration['new_command']}")
             print()
-            print("📱 PlantGuard is now mobile-only for simplified maintenance")
+            print("[MOBILE] PlantGuard is now mobile-only for simplified maintenance")
             print("✨ All desktop functionality is preserved in the mobile interface")
             print()
-            print(f"🚀 Quick Fix: {migration['suggestion']}")
+            print(f"[LAUNCH] Quick Fix: {migration['suggestion']}")
         else:
             print(f"❓ {migration['message']}")
-            print(f"💡 {migration['suggestion']}")
+            print(f"[TIP] {migration['suggestion']}")
 
         print()
         print("📚 For complete migration guide: cat MOBILE_MIGRATION_GUIDE.md")
-        print("🎯 For feature parity info: cat MOBILE_FEATURE_PARITY.md")
+        print("[PROGRESS] For feature parity info: cat MOBILE_FEATURE_PARITY.md")
 
     def show_feature_help(self, feature: str) -> None:
         """Show help for a specific feature migration."""
@@ -148,15 +148,15 @@ class MigrationHelper:
         print()
 
         if migration["status"] == "preserved":
-            print("✅ Feature Status: Preserved and Enhanced")
+            print("[DONE] Feature Status: Preserved and Enhanced")
             print(f"📍 Old Location: {migration['old_location']}")
-            print(f"📱 New Location: {migration['new_location']}")
-            print(f"🎯 Migration Status: {migration['migration_status']}")
+            print(f"[MOBILE] New Location: {migration['new_location']}")
+            print(f"[PROGRESS] Migration Status: {migration['migration_status']}")
         else:
             print(f"❓ {migration['message']}")
 
         print()
-        print("🚀 Access via: make mobile")
+        print("[LAUNCH] Access via: make mobile")
 
     def create_migration_report(self, output_file: str = "migration_report.json") -> None:
         """Create a detailed migration report."""
@@ -170,7 +170,7 @@ class MigrationHelper:
         with open(output_file, "w") as f:
             json.dump(report, f, indent=2)
 
-        print(f"📊 Migration report saved to: {output_file}")
+        print(f"[SUMMARY] Migration report saved to: {output_file}")
 
 
 def main():
@@ -204,7 +204,7 @@ def main():
         helper.create_migration_report()
 
     else:
-        print("❌ Invalid action. Use: command, feature, summary, or report")
+        print("[TODO] Invalid action. Use: command, feature, summary, or report")
 
 
 if __name__ == "__main__":

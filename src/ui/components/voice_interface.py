@@ -132,7 +132,7 @@ class VoiceInterface:
                 # Validate duration
                 is_valid, error_msg = self.validate_audio_duration(audio_data, sr_int)
                 if not is_valid:
-                    st.toast(error_msg, icon="⚠️")
+                    st.toast(error_msg, icon="[WARNING]")
                     return None, 0
 
                 logger.info(f"Loaded audio file: {audio_file.name}, duration: {len(audio_data) / sr_int:.2f}s")
@@ -144,7 +144,7 @@ class VoiceInterface:
 
         except Exception as e:
             logger.warning(f"Failed to load audio file: {e}")
-            st.toast("Failed to load audio file", icon="⚠️")
+            st.toast("Failed to load audio file", icon="[WARNING]")
             return None, 0
 
     def process_audio_frame(self, frame: av.AudioFrame) -> np.ndarray:
@@ -294,7 +294,7 @@ class VoiceInterface:
                     # Validate duration
                     is_valid, error_msg = self.validate_audio_duration(full_audio, self.sample_rate)
                     if is_valid:
-                        st.success(f"✅ Recording complete! Duration: {len(full_audio) / self.sample_rate:.1f}s")
+                        st.success(f"[DONE] Recording complete! Duration: {len(full_audio) / self.sample_rate:.1f}s")
                         st.session_state.recorded_audio = full_audio
                         return full_audio
                     else:
@@ -335,19 +335,19 @@ class VoiceInterface:
                 audio_data, sample_rate = self.load_audio_file(uploaded_file)
 
                 if audio_data is not None:
-                    st.write("✅ Audio file loaded successfully")
-                    status.update(label="✅ Audio processing complete!", state="complete")
+                    st.write("[DONE] Audio file loaded successfully")
+                    status.update(label="[DONE] Audio processing complete!", state="complete")
 
                     # Show audio info
                     duration = len(audio_data) / sample_rate
-                    st.info(f"📊 **File:** {uploaded_file.name} | **Duration:** {duration:.1f}s | **Sample Rate:** {sample_rate} Hz")
+                    st.info(f"[SUMMARY] **File:** {uploaded_file.name} | **Duration:** {duration:.1f}s | **Sample Rate:** {sample_rate} Hz")
 
                     # Render waveform
                     self.render_audio_waveform(audio_data, sample_rate)
 
                     return audio_data
                 else:
-                    status.update(label="❌ Audio processing failed", state="error")
+                    status.update(label="[TODO] Audio processing failed", state="error")
 
         return None
 
@@ -366,20 +366,20 @@ class VoiceInterface:
         st.subheader("📝 Audio Transcription")
 
         # Transcription button
-        if st.button("🎯 Transcribe Audio", type="primary"):
+        if st.button("[PROGRESS] Transcribe Audio", type="primary"):
             with st.status("🎤 Transcribing audio...", expanded=True) as status:
                 st.write("Using local Whisper model...")
                 transcription = self.transcribe_audio_local(audio_data)
 
                 if transcription and transcription != "Transcription failed. Please try again.":
                     st.session_state.audio_transcription = transcription
-                    status.update(label="✅ Transcription complete!", state="complete")
+                    status.update(label="[DONE] Transcription complete!", state="complete")
                 else:
-                    status.update(label="❌ Transcription failed", state="error")
+                    status.update(label="[TODO] Transcription failed", state="error")
 
         # Display transcription
         if st.session_state.audio_transcription:
-            st.success("🎯 Transcription Result:")
+            st.success("[PROGRESS] Transcription Result:")
             st.text_area(
                 "Transcribed Text",
                 value=st.session_state.audio_transcription,

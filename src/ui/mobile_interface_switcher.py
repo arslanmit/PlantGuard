@@ -100,12 +100,12 @@ class MobileInterfaceSwitcher:
         """Render interface toggle controls."""
         current_preference = self.get_interface_preference()
 
-        st.markdown("### 📱 Interface Selection")
+        st.markdown("### [MOBILE] Interface Selection")
 
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("📱 Mobile", type="primary" if current_preference == "mobile" else "secondary", use_container_width=True):
+            if st.button("[MOBILE] Mobile", type="primary" if current_preference == "mobile" else "secondary", use_container_width=True):
                 self.set_interface_preference("mobile")
                 return "mobile"
 
@@ -115,7 +115,7 @@ class MobileInterfaceSwitcher:
                 return "desktop"
 
         with col3:
-            if st.button("🔄 Auto", type="primary" if current_preference == "auto" else "secondary", use_container_width=True):
+            if st.button("[PARTIAL] Auto", type="primary" if current_preference == "auto" else "secondary", use_container_width=True):
                 self.set_interface_preference("auto")
                 return "auto"
 
@@ -256,14 +256,14 @@ class MobileInterfaceSwitcher:
         """Render information about current interface."""
         config = self.get_interface_config()
 
-        with st.expander("📱 Interface Information", expanded=False):
+        with st.expander("[MOBILE] Interface Information", expanded=False):
             st.markdown(f"**Current Interface:** {config['interface_type'].title()}")
             st.markdown(f"**Layout:** {config['layout']}")
             st.markdown(f"**Max Width:** {config['max_width']}")
             st.markdown(f"**Touch Optimized:** {'Yes' if config['touch_optimized'] else 'No'}")
 
             if st.session_state.get("is_mobile_device"):
-                st.success("📱 Mobile device detected")
+                st.success("[MOBILE] Mobile device detected")
             else:
                 st.info("💻 Desktop device detected")
 

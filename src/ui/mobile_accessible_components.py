@@ -221,7 +221,7 @@ class AccessibleMobileUploadInput(MobileComponent):
             )
 
             # Process file (placeholder)
-            st.success(f"✅ Successfully uploaded: {uploaded_file.name}")
+            st.success(f"[DONE] Successfully uploaded: {uploaded_file.name}")
 
             # Announce success
             self.accessibility_manager.announce_to_screen_reader(
@@ -392,7 +392,7 @@ class AccessibleMobileAnalysisDisplay(MobileComponent):
              role="region" 
              aria-labelledby="{self.component_id}-recommendations-heading">
             <h4 id="{self.component_id}-recommendations-heading" class="mobile-heading-4">
-                💡 Treatment Recommendations
+                [TIP] Treatment Recommendations
             </h4>
             
             <div role="list" aria-labelledby="{self.component_id}-recommendations-heading">
@@ -528,7 +528,7 @@ class AccessibleMobileSettingsCard(MobileComponent):
         st.session_state.gpu_enabled = gpu_enabled
         st.session_state.caching_enabled = caching_enabled
 
-        st.success("✅ Settings saved successfully!")
+        st.success("[DONE] Settings saved successfully!")
 
         # Announce to screen readers
         self.accessibility_manager.announce_to_screen_reader("Settings saved successfully", priority="polite")

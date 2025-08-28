@@ -60,7 +60,7 @@ def convert_model(input_path, output_path):
         model = CustomResNet(num_classes=checkpoint["num_classes"])
         model.load_state_dict(converted_checkpoint["model_state_dict"])
         model.eval()
-        print("✅ Model loaded successfully!")
+        print("[DONE] Model loaded successfully!")
         print(f"Model architecture: {model}")
 
         # Test a forward pass with a dummy input
@@ -72,7 +72,7 @@ def convert_model(input_path, output_path):
             print(f"Sample output: {output[0][:5].tolist()}...")  # First 5 logits
 
     except Exception as e:
-        print(f"❌ Failed to load model: {e}")
+        print(f"[TODO] Failed to load model: {e}")
         import traceback
 
         traceback.print_exc()

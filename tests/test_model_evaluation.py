@@ -99,4 +99,4 @@ if __name__ == "__main__":
     test_evaluator_imports()
     test_validation_config()
     test_model_metrics_structure()
-    print("✅ All basic tests passed!")
+    print("[DONE] All basic tests passed!")

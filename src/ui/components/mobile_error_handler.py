@@ -336,10 +336,10 @@ class MobileErrorHandler:
             ErrorSeverity.CRITICAL: "#FCA5A5",
         }
 
-        severity_icons = {ErrorSeverity.LOW: "i", ErrorSeverity.MEDIUM: "⚠️", ErrorSeverity.HIGH: "❌", ErrorSeverity.CRITICAL: "🚨"}
+        severity_icons = {ErrorSeverity.LOW: "i", ErrorSeverity.MEDIUM: "[WARNING]", ErrorSeverity.HIGH: "[TODO]", ErrorSeverity.CRITICAL: "🚨"}
 
         color = severity_colors.get(error_info.severity, "#FEF3C7")
-        icon = severity_icons.get(error_info.severity, "⚠️")
+        icon = severity_icons.get(error_info.severity, "[WARNING]")
 
         st.markdown(
             f"""
@@ -379,7 +379,7 @@ class MobileErrorHandler:
         """Display critical error when error handler itself fails."""
         st.error("🚨 Critical system error. Please refresh the page.")
 
-        if st.button("🔄 Refresh Page", key="critical_error_refresh"):
+        if st.button("[PARTIAL] Refresh Page", key="critical_error_refresh"):
             st.experimental_rerun()
 
     def _get_recovery_suggestions(self, category: ErrorCategory, error: Exception) -> list[str]:
@@ -522,7 +522,7 @@ class MobileErrorHandler:
         st.markdown(
             """
         <div class="mobile-card mobile-fallback">
-            <h4>📊 Display Unavailable</h4>
+            <h4>[SUMMARY] Display Unavailable</h4>
             <p>Content cannot be displayed at the moment. Please try refreshing.</p>
         </div>
         """,
@@ -534,7 +534,7 @@ class MobileErrorHandler:
         st.markdown(
             """
         <div class="mobile-card mobile-fallback">
-            <h4>🔧 Interface Unavailable</h4>
+            <h4>[TOOL] Interface Unavailable</h4>
             <p>This interface is temporarily unavailable. Basic functionality may still work.</p>
         </div>
         """,
@@ -546,7 +546,7 @@ class MobileErrorHandler:
         st.markdown(
             """
         <div class="mobile-card mobile-fallback">
-            <h4>📱 Layout Issue</h4>
+            <h4>[MOBILE] Layout Issue</h4>
             <p>Layout rendering failed. Content may appear differently than expected.</p>
         </div>
         """,
@@ -558,10 +558,10 @@ class MobileErrorHandler:
         st.markdown(
             f"""
         <div class="mobile-card mobile-fallback">
-            <h4>⚠️ Component Unavailable</h4>
+            <h4>[WARNING] Component Unavailable</h4>
             <p>Component "{component_id}" is temporarily unavailable.</p>
             <button onclick="window.location.reload()" class="mobile-button mobile-button-secondary">
-                🔄 Refresh Page
+                [PARTIAL] Refresh Page
             </button>
         </div>
         """,

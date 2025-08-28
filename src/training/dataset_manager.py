@@ -93,21 +93,21 @@ class DatasetManager:
         # Check if dataset already exists
         if target_dir.exists() and self._is_valid_plantvillage_dataset(target_dir):
             logger.info("PlantVillage dataset already exists at %s", target_dir)
-            logger.info("✅ PlantVillage dataset already exists at %s", target_dir)
-            logger.info("📊 Validating existing dataset...")
+            logger.info("[DONE] PlantVillage dataset already exists at %s", target_dir)
+            logger.info("[SUMMARY] Validating existing dataset...")
 
             # Quick validation
             validation_result = self.validate_dataset(target_dir)
             if validation_result.is_valid:
                 logger.info(
-                    "✅ Dataset is valid: %s files, %s total",
+                    "[DONE] Dataset is valid: %s files, %s total",
                     validation_result.valid_files,
                     validation_result.total_files,
                 )
-                logger.info("🔄 Skipping download. Use --force to re-download.")
+                logger.info("[PARTIAL] Skipping download. Use --force to re-download.")
                 return True
             else:
-                logger.warning("⚠️  Existing dataset appears corrupted. Proceeding with download...")
+                logger.warning("[WARNING]  Existing dataset appears corrupted. Proceeding with download...")
 
         try:
             # Check if kaggle is available

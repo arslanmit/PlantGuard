@@ -173,11 +173,11 @@ class MobileCameraInput(MobileBaseComponent):
                     self._capture_image(webrtc_ctx)
 
             with col2:
-                if st.button("🔄 Flip Camera", key=f"{self.component_id}_flip"):
+                if st.button("[PARTIAL] Flip Camera", key=f"{self.component_id}_flip"):
                     self._flip_camera()
 
             with col3:
-                if st.button("❌ Close", key=f"{self.component_id}_close"):
+                if st.button("[TODO] Close", key=f"{self.component_id}_close"):
                     self._handle_camera_toggle()
 
             # Display camera status
@@ -189,7 +189,7 @@ class MobileCameraInput(MobileBaseComponent):
         except Exception as e:
             logger.error("Camera interface rendering failed: %s", e)
             self.handle_error(e, ErrorCategory.INTEGRATION, ErrorSeverity.HIGH)
-            st.error("❌ Camera access failed. Please check permissions and try again.")
+            st.error("[TODO] Camera access failed. Please check permissions and try again.")
 
     def _process_video_frame(self, frame) -> None:
         """Process video frame from camera stream."""
@@ -213,7 +213,7 @@ class MobileCameraInput(MobileBaseComponent):
             # Get current frame
             current_frame = camera_data.get("current_frame")
             if current_frame is None:
-                st.warning("⚠️ No camera frame available. Please wait for camera to initialize.")
+                st.warning("[WARNING] No camera frame available. Please wait for camera to initialize.")
                 return
 
             # Convert frame to PIL Image
@@ -238,7 +238,7 @@ class MobileCameraInput(MobileBaseComponent):
                 st.success("📸 Image captured successfully!")
 
             else:
-                st.error("❌ Failed to capture image. Please try again.")
+                st.error("[TODO] Failed to capture image. Please try again.")
 
         except Exception as e:
             logger.error("Image capture failed: %s", e)
@@ -284,7 +284,7 @@ class MobileCameraInput(MobileBaseComponent):
             state["data"]["camera_data"] = camera_data
             self.set_state(state)
 
-            st.info(f"🔄 Switched to {'front' if new_facing == 'user' else 'back'} camera")
+            st.info(f"[PARTIAL] Switched to {'front' if new_facing == 'user' else 'back'} camera")
 
         except Exception as e:
             logger.error("Camera flip failed: %s", e)
@@ -342,7 +342,7 @@ class MobileCameraInput(MobileBaseComponent):
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            if st.button("🔄 Retake", key=f"{self.component_id}_retake"):
+            if st.button("[PARTIAL] Retake", key=f"{self.component_id}_retake"):
                 self._clear_capture()
 
         with col2:
@@ -354,7 +354,7 @@ class MobileCameraInput(MobileBaseComponent):
                 self._trigger_analysis(capture_data["image"])
 
         with col4:
-            if st.button("❌ Delete", key=f"{self.component_id}_delete"):
+            if st.button("[TODO] Delete", key=f"{self.component_id}_delete"):
                 self._clear_capture()
 
     def _clear_capture(self) -> None:
@@ -384,7 +384,7 @@ class MobileCameraInput(MobileBaseComponent):
 
         except Exception as e:
             logger.error("Image save failed: %s", e)
-            st.error("❌ Failed to save image")
+            st.error("[TODO] Failed to save image")
 
     def _trigger_analysis(self, image: Image.Image) -> None:
         """Trigger plant disease analysis for captured image."""
@@ -402,18 +402,18 @@ class MobileCameraInput(MobileBaseComponent):
 
                 # Check for errors
                 if "error" in analysis_result:
-                    st.error(f"❌ Analysis failed: {analysis_result['error']}")
+                    st.error(f"[TODO] Analysis failed: {analysis_result['error']}")
                     return
 
                 # Display result with mobile-optimized feedback
                 if confidence > 0.7:
                     st.success(f"🌿 Analysis Complete: {disease_name} ({confidence:.1%} confidence)")
                 elif confidence > 0.4:
-                    st.warning(f"⚠️ Moderate confidence: {disease_name} ({confidence:.1%} confidence)")
-                    st.info("💡 Try taking another photo with better lighting or closer to the affected area.")
+                    st.warning(f"[WARNING] Moderate confidence: {disease_name} ({confidence:.1%} confidence)")
+                    st.info("[TIP] Try taking another photo with better lighting or closer to the affected area.")
                 else:
-                    st.warning(f"⚠️ Low confidence result: {disease_name} ({confidence:.1%} confidence)")
-                    st.info("💡 For better results:\n- Ensure good lighting\n- Focus on affected plant parts\n- Hold camera steady")
+                    st.warning(f"[WARNING] Low confidence result: {disease_name} ({confidence:.1%} confidence)")
+                    st.info("[TIP] For better results:\n- Ensure good lighting\n- Focus on affected plant parts\n- Hold camera steady")
 
                 # Show disease information if available
                 disease_info = analysis_result.get("disease_info", {})
@@ -431,7 +431,7 @@ class MobileCameraInput(MobileBaseComponent):
         except Exception as e:
             logger.error("Analysis failed: %s", e)
             self.handle_error(e, ErrorCategory.INTEGRATION, ErrorSeverity.MEDIUM)
-            st.error("❌ Analysis failed. Please try again or upload the image manually.")
+            st.error("[TODO] Analysis failed. Please try again or upload the image manually.")
 
     def get_captured_image(self) -> Image.Image | None:
         """Get the last captured image."""

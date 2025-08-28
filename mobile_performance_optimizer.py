@@ -53,7 +53,7 @@ class MobilePerformanceOptimizer:
 
     def measure_startup_time(self) -> dict[str, float]:
         """Measure application startup time and component loading times."""
-        logger.info("📊 Measuring application startup performance...")
+        logger.info("[SUMMARY] Measuring application startup performance...")
 
         startup_times = {}
 
@@ -67,12 +67,12 @@ class MobilePerformanceOptimizer:
                 mobile_spa_app = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(mobile_spa_app)
                 startup_times["mobile_app_import"] = time.time() - start_time
-                logger.info(f"✅ Mobile app import: {startup_times['mobile_app_import']:.3f}s")
+                logger.info(f"[DONE] Mobile app import: {startup_times['mobile_app_import']:.3f}s")
             else:
-                logger.error("❌ Mobile app module not found")
+                logger.error("[TODO] Mobile app module not found")
                 startup_times["mobile_app_import"] = -1
         except ImportError as e:
-            logger.error(f"❌ Failed to import mobile app: {e}")
+            logger.error(f"[TODO] Failed to import mobile app: {e}")
             startup_times["mobile_app_import"] = -1
 
         # Measure core adapter loading times
@@ -85,9 +85,9 @@ class MobilePerformanceOptimizer:
 
             vision_adapter = VisionAdapter(lazy_load=True)
             adapter_times["vision_adapter"] = time.time() - start_time
-            logger.info(f"✅ Vision adapter: {adapter_times['vision_adapter']:.3f}s")
+            logger.info(f"[DONE] Vision adapter: {adapter_times['vision_adapter']:.3f}s")
         except Exception as e:
-            logger.warning(f"⚠️ Vision adapter failed: {e}")
+            logger.warning(f"[WARNING] Vision adapter failed: {e}")
             adapter_times["vision_adapter"] = -1
 
         # Audio adapter
@@ -97,9 +97,9 @@ class MobilePerformanceOptimizer:
 
             audio_adapter = AudioAdapter()
             adapter_times["audio_adapter"] = time.time() - start_time
-            logger.info(f"✅ Audio adapter: {adapter_times['audio_adapter']:.3f}s")
+            logger.info(f"[DONE] Audio adapter: {adapter_times['audio_adapter']:.3f}s")
         except Exception as e:
-            logger.warning(f"⚠️ Audio adapter failed: {e}")
+            logger.warning(f"[WARNING] Audio adapter failed: {e}")
             adapter_times["audio_adapter"] = -1
 
         # Text adapter
@@ -109,9 +109,9 @@ class MobilePerformanceOptimizer:
 
             text_adapter = TextAdapter()
             adapter_times["text_adapter"] = time.time() - start_time
-            logger.info(f"✅ Text adapter: {adapter_times['text_adapter']:.3f}s")
+            logger.info(f"[DONE] Text adapter: {adapter_times['text_adapter']:.3f}s")
         except Exception as e:
-            logger.warning(f"⚠️ Text adapter failed: {e}")
+            logger.warning(f"[WARNING] Text adapter failed: {e}")
             adapter_times["text_adapter"] = -1
 
         startup_times["adapters"] = adapter_times
@@ -134,9 +134,9 @@ class MobilePerformanceOptimizer:
                 module_name = f"ui.components.{component}"
                 importlib.import_module(module_name)
                 component_times[component] = time.time() - start_time
-                logger.info(f"✅ {component}: {component_times[component]:.3f}s")
+                logger.info(f"[DONE] {component}: {component_times[component]:.3f}s")
             except Exception as e:
-                logger.warning(f"⚠️ {component} failed: {e}")
+                logger.warning(f"[WARNING] {component} failed: {e}")
                 component_times[component] = -1
 
         startup_times["components"] = component_times
@@ -182,7 +182,7 @@ class MobilePerformanceOptimizer:
         gc.collect()  # Force garbage collection
         memory_data["python_objects"] = len(gc.get_objects())
 
-        logger.info(f"📊 Memory usage: {memory_data['rss_mb']:.1f}MB RSS, {memory_data['percent']:.1f}%")
+        logger.info(f"[SUMMARY] Memory usage: {memory_data['rss_mb']:.1f}MB RSS, {memory_data['percent']:.1f}%")
 
         self.performance_data["memory"] = memory_data
         return memory_data
@@ -224,7 +224,7 @@ class MobilePerformanceOptimizer:
                     if line.startswith("import ") or line.startswith("from "):
                         import_patterns.add(line)
             except Exception as e:
-                logger.warning(f"⚠️ Could not read {py_file}: {e}")
+                logger.warning(f"[WARNING] Could not read {py_file}: {e}")
 
         # Map imports to packages
         package_mapping = {
@@ -383,7 +383,7 @@ class MobilePerformanceOptimizer:
 
         optimization_results["css_file"] = str(css_file)
 
-        logger.info("✅ Mobile caching optimization complete")
+        logger.info("[DONE] Mobile caching optimization complete")
 
         self.optimization_results["caching"] = optimization_results
         return optimization_results
@@ -418,7 +418,7 @@ class MobilePerformanceOptimizer:
                     logger.info(f"🗑️ Removed unused file: {file_path}")
                 except Exception as e:
                     cleanup_results["errors"].append(f"Failed to remove {file_path}: {e}")
-                    logger.warning(f"⚠️ Could not remove {file_path}: {e}")
+                    logger.warning(f"[WARNING] Could not remove {file_path}: {e}")
 
         # Check and remove empty directories
         for dir_path in potentially_empty_dirs:
@@ -432,7 +432,7 @@ class MobilePerformanceOptimizer:
                         logger.info(f"📁 Removed empty directory: {dir_path}")
                 except Exception as e:
                     cleanup_results["errors"].append(f"Failed to remove directory {dir_path}: {e}")
-                    logger.warning(f"⚠️ Could not remove directory {dir_path}: {e}")
+                    logger.warning(f"[WARNING] Could not remove directory {dir_path}: {e}")
 
         # Clean up Python cache files
         cache_dirs = list(self.project_root.glob("**/__pycache__"))
@@ -457,7 +457,7 @@ class MobilePerformanceOptimizer:
             except Exception as e:
                 cleanup_results["errors"].append(f"Failed to remove {pyc_file}: {e}")
 
-        logger.info(f"✅ Cleanup complete: {len(cleanup_results['removed_files'])} files, {cleanup_results['space_saved_mb']:.2f}MB saved")
+        logger.info(f"[DONE] Cleanup complete: {len(cleanup_results['removed_files'])} files, {cleanup_results['space_saved_mb']:.2f}MB saved")
 
         self.optimization_results["cleanup"] = cleanup_results
         return cleanup_results
@@ -520,18 +520,18 @@ class MobilePerformanceOptimizer:
                     optimization_results["files_processed"].append(str(file_path))
                     optimization_results["imports_removed"].extend(removed_imports)
 
-                    logger.info(f"✅ Optimized imports in {file_path}: removed {len(removed_imports)} imports")
+                    logger.info(f"[DONE] Optimized imports in {file_path}: removed {len(removed_imports)} imports")
 
             except Exception as e:
                 optimization_results["errors"].append(f"Failed to optimize {file_path}: {e}")
-                logger.warning(f"⚠️ Could not optimize {file_path}: {e}")
+                logger.warning(f"[WARNING] Could not optimize {file_path}: {e}")
 
         self.optimization_results["imports"] = optimization_results
         return optimization_results
 
     def create_performance_report(self) -> dict[str, Any]:
         """Create comprehensive performance report."""
-        logger.info("📊 Creating performance report...")
+        logger.info("[SUMMARY] Creating performance report...")
 
         report = {
             "timestamp": time.time(),
@@ -632,14 +632,14 @@ class MobilePerformanceOptimizer:
         with open(report_file, "w") as f:
             json.dump(report, f, indent=2)
 
-        logger.info(f"📊 Performance report saved: {report_file}")
-        logger.info(f"🎯 Performance score: {report['performance_score']}/100")
+        logger.info(f"[SUMMARY] Performance report saved: {report_file}")
+        logger.info(f"[PROGRESS] Performance score: {report['performance_score']}/100")
 
         return report
 
     def run_streamlit_performance_test(self) -> dict[str, Any]:
         """Run a performance test of the mobile Streamlit application."""
-        logger.info("🚀 Running Streamlit performance test...")
+        logger.info("[LAUNCH] Running Streamlit performance test...")
 
         test_results = {"startup_successful": False, "startup_time": -1, "memory_usage": -1, "errors": []}
 
@@ -686,11 +686,11 @@ print("SUCCESS:True")
                             test_results["startup_successful"] = line.split(":")[1] == "True"
 
                     logger.info(
-                        f"✅ Streamlit test successful: {test_results['startup_time']:.3f}s startup, {test_results['memory_usage']:.1f}MB memory"
+                        f"[DONE] Streamlit test successful: {test_results['startup_time']:.3f}s startup, {test_results['memory_usage']:.1f}MB memory"
                     )
                 else:
                     test_results["errors"].append(f"Test script failed: {result.stderr}")
-                    logger.error(f"❌ Test script failed: {result.stderr}")
+                    logger.error(f"[TODO] Test script failed: {result.stderr}")
 
             finally:
                 # Clean up test file
@@ -699,7 +699,7 @@ print("SUCCESS:True")
 
         except Exception as e:
             test_results["errors"].append(f"Performance test failed: {e}")
-            logger.error(f"❌ Performance test failed: {e}")
+            logger.error(f"[TODO] Performance test failed: {e}")
 
         return test_results
 
@@ -724,7 +724,7 @@ def main():
     print("=" * 50)
 
     if args.measure or args.all:
-        print("\n📊 MEASURING PERFORMANCE")
+        print("\n[SUMMARY] MEASURING PERFORMANCE")
         print("-" * 30)
 
         # Measure startup time
@@ -743,7 +743,7 @@ def main():
         print(f"  • Total startup time: {startup_times.get('total_estimated', -1):.3f}s")
         print(f"  • Memory usage: {memory_data.get('rss_mb', -1):.1f}MB")
         print(f"  • Unused packages: {len(dep_analysis.get('unused_packages', []))}")
-        print(f"  • Streamlit test: {'✅ PASS' if streamlit_test.get('startup_successful') else '❌ FAIL'}")
+        print(f"  • Streamlit test: {'[DONE] PASS' if streamlit_test.get('startup_successful') else '[TODO] FAIL'}")
 
     if args.optimize or args.all:
         print("\n⚡ OPTIMIZING PERFORMANCE")
@@ -755,8 +755,8 @@ def main():
         # Optimize imports
         import_results = optimizer.optimize_imports()
 
-        print("\n🎯 OPTIMIZATION SUMMARY:")
-        print("  • Cache configuration: ✅ Created")
+        print("\n[PROGRESS] OPTIMIZATION SUMMARY:")
+        print("  • Cache configuration: [DONE] Created")
         print(f"  • Import optimization: {len(import_results.get('files_processed', []))} files processed")
         print(f"  • Removed imports: {len(import_results.get('imports_removed', []))}")
 
@@ -773,24 +773,24 @@ def main():
         print(f"  • Space saved: {cleanup_results.get('space_saved_mb', 0):.2f}MB")
 
     if args.report or args.all:
-        print("\n📊 GENERATING REPORT")
+        print("\n[SUMMARY] GENERATING REPORT")
         print("-" * 30)
 
         # Create performance report
         report = optimizer.create_performance_report()
 
-        print(f"\n🎯 FINAL PERFORMANCE SCORE: {report['performance_score']}/100")
+        print(f"\n[PROGRESS] FINAL PERFORMANCE SCORE: {report['performance_score']}/100")
 
         if report["recommendations"]:
-            print("\n💡 RECOMMENDATIONS:")
+            print("\n[TIP] RECOMMENDATIONS:")
             for i, rec in enumerate(report["recommendations"], 1):
                 priority_emoji = "🔴" if rec["priority"] == "high" else "🟡" if rec["priority"] == "medium" else "🟢"
                 print(f"  {i}. {priority_emoji} {rec['message']}")
                 print(f"     Action: {rec['action']}")
         else:
-            print("\n✅ No performance issues detected!")
+            print("\n[DONE] No performance issues detected!")
 
-    print("\n🎉 Performance optimization complete!")
+    print("\n[SUCCESS] Performance optimization complete!")
     print("Run 'make mobile' to test the optimized application.")
 
 

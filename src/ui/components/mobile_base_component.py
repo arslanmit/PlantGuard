@@ -346,10 +346,10 @@ class MobileBaseComponent(ABC):
             f"""
         <div class="{css_classes}">
             <div class="mobile-error">
-                <div class="mobile-error-title">⚠️ {self.title} Error</div>
+                <div class="mobile-error-title">[WARNING] {self.title} Error</div>
                 <p>{error_message}</p>
                 <button onclick="window.location.reload()" class="mobile-button mobile-button-secondary">
-                    🔄 Retry
+                    [PARTIAL] Retry
                 </button>
             </div>
         </div>
@@ -365,10 +365,10 @@ class MobileBaseComponent(ABC):
             f"""
         <div class="{css_classes}">
             <div class="mobile-card mobile-fallback">
-                <h4>⚠️ {self.title} Unavailable</h4>
+                <h4>[WARNING] {self.title} Unavailable</h4>
                 <p>This component is temporarily unavailable. Please try refreshing the page.</p>
                 <button onclick="window.location.reload()" class="mobile-button mobile-button-primary">
-                    🔄 Refresh Page
+                    [PARTIAL] Refresh Page
                 </button>
             </div>
         </div>

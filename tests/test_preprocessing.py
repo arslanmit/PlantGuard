@@ -25,7 +25,7 @@ def test_different_preprocessing() -> None:
     # Test image - replace with an available image path or skip if absent
     test_image_path = "data/raw/<your_image>.jpg"
     if not Path(test_image_path).exists():
-        print(f"⚠️  Test image not found: {test_image_path} - skipping preprocessing test")
+        print(f"[WARNING]  Test image not found: {test_image_path} - skipping preprocessing test")
         return
     image = Image.open(test_image_path)
 
@@ -81,13 +81,13 @@ def test_different_preprocessing() -> None:
                 predicted_class = vision_adapter.class_names[int(predicted_idx.item())]
                 confidence_score = float(confidence.item())
 
-            print(f"📊 {method_name}:")
+            print(f"[SUMMARY] {method_name}:")
             print(f"   Prediction: {predicted_class}")
             print(f"   Confidence: {confidence_score:.4f}")
             print()
 
         except Exception as e:
-            print(f"❌ {method_name}: Failed - {e}")
+            print(f"[TODO] {method_name}: Failed - {e}")
             print()
 
 
@@ -98,7 +98,7 @@ def show_top_predictions() -> None:
 
     test_image_path = "data/raw/<your_image>.jpg"
     if not Path(test_image_path).exists():
-        print(f"⚠️  Test image not found: {test_image_path} - skipping top predictions")
+        print(f"[WARNING]  Test image not found: {test_image_path} - skipping top predictions")
         return
     image = Image.open(test_image_path)
 

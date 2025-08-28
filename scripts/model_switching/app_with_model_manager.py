@@ -129,10 +129,10 @@ def main() -> None:
     # Proceed with main content in main_col
     with main_col:
         # Main content area
-        tab1, tab2, tab3 = st.tabs(["🔍 Detection", "📊 Batch Analysis", "⚙️ Settings"])
+        tab1, tab2, tab3 = st.tabs(["🔍 Detection", "[SUMMARY] Batch Analysis", "⚙️ Settings"])
 
     # Main content area
-    tab1, tab2, tab3 = st.tabs(["🔍 Detection", "📊 Batch Analysis", "⚙️ Settings"])
+    tab1, tab2, tab3 = st.tabs(["🔍 Detection", "[SUMMARY] Batch Analysis", "⚙️ Settings"])
 
     with tab1:
         st.header("🔍 Plant Disease Detection")
@@ -150,7 +150,7 @@ def main() -> None:
             )
 
         with col2:
-            st.subheader("📋 Results")
+            st.subheader("[DETAILS] Results")
 
             if uploaded_file is not None:
                 try:
@@ -171,27 +171,27 @@ def main() -> None:
                             result = manager.get_readable_prediction(image)
 
                         # Display results with styling
-                        st.markdown("### 🎯 Detection Results")
+                        st.markdown("### [PROGRESS] Detection Results")
 
                         # Main results
                         st.metric("🌿 Plant Type", result["plant_type"])
                         st.metric("🦠 Disease", result["disease"])
-                        st.metric("📊 Confidence", result["confidence_percentage"])
+                        st.metric("[SUMMARY] Confidence", result["confidence_percentage"])
 
                         # Health status with color coding
                         if result["is_healthy"]:
                             st.success("💚 Plant is Healthy!")
                         else:
-                            st.warning("⚠️ Disease Detected")
+                            st.warning("[WARNING] Disease Detected")
 
                         # Recommendation
-                        st.info(f"💡 {result['recommendation']}")
+                        st.info(f"[TIP] {result['recommendation']}")
 
                         # Model info
                         st.caption(f"🤖 Analyzed by: {result['model_info']['model_name']}")
 
                         # Detailed results in expander
-                        with st.expander("🔧 Technical Details"):
+                        with st.expander("[TOOL] Technical Details"):
                             st.json(
                                 {
                                     "raw_prediction": result["raw_prediction"],
@@ -201,7 +201,7 @@ def main() -> None:
                             )
 
                     else:
-                        st.error("❌ No model loaded")
+                        st.error("[TODO] No model loaded")
 
                 except Exception as e:
                     st.error(f"Error analyzing image: {e}")
@@ -210,7 +210,7 @@ def main() -> None:
                 st.info("👆 Upload an image or select a sample to start detection")
 
     with tab2:
-        st.header("📊 Batch Analysis")
+        st.header("[SUMMARY] Batch Analysis")
         st.markdown("Analyze multiple images at once")
 
         # Multiple file upload
@@ -222,7 +222,7 @@ def main() -> None:
         )
 
         if uploaded_files:
-            st.subheader(f"📋 Analyzing {len(uploaded_files)} images")
+            st.subheader(f"[DETAILS] Analyzing {len(uploaded_files)} images")
 
             if "error" not in current_model_info:
                 progress_bar = st.progress(0)
@@ -275,7 +275,7 @@ def main() -> None:
                         st.metric("Diseased Plants", diseased_count)
 
             else:
-                st.error("❌ No model loaded for batch analysis")
+                st.error("[TODO] No model loaded for batch analysis")
 
     with tab3:
         st.header("⚙️ Settings & Configuration")

@@ -474,9 +474,9 @@ make monitor-stop       # Stop monitoring
 ## Cross-Platform Compatibility
 | Feature | Bash | Zsh | Sh | Fish |
 |---------|------|-----|----|------|
-| Variable assignment | ✅ | ✅ | ✅ | ⚠️ |
-| Process substitution | ✅ | ✅ | ❌ | ⚠️ |
-| Color output | ✅ | ✅ | ⚠️ | ✅ |
+| Variable assignment | [DONE] | [DONE] | [DONE] | [WARNING] |
+| Process substitution | [DONE] | [DONE] | [TODO] | [WARNING] |
+| Color output | [DONE] | [DONE] | [WARNING] | [DONE] |
 
 ### Platform-Specific Optimizations
 - **macOS**: MPS acceleration, Homebrew integration, codesigning

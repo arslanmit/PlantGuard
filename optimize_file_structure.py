@@ -285,21 +285,21 @@ def main():
 
     print(f"\n📁 Empty Directories Removed: {results['empty_directories']['total_removed']}")
     print(f"🎨 Mobile Assets Organized: {results['mobile_assets']['total_kept']} kept, {results['mobile_assets']['total_removed']} removed")
-    print(f"📱 Mobile Apps Found: {results['mobile_structure']['mobile_apps_found']}")
+    print(f"[MOBILE] Mobile Apps Found: {results['mobile_structure']['mobile_apps_found']}")
     print(f"🧪 Mobile Tests Found: {results['mobile_structure']['mobile_tests_found']}")
     print(f"🧹 Cache Directories Cleaned: {results['cache_cleanup']['total_cleaned']}")
 
-    print("\n✅ Structure Validation:")
+    print("\n[DONE] Structure Validation:")
     validation = results["validation"]
-    print(f"   Mobile App Present: {'✅' if validation['mobile_app_present'] else '❌'}")
-    print(f"   Mobile Assets Present: {'✅' if validation['mobile_assets_present'] else '❌'}")
-    print(f"   Removed Files Absent: {'✅' if validation['removed_files_absent'] else '❌'}")
-    print(f"   Overall Structure Valid: {'✅' if validation['structure_valid'] else '❌'}")
+    print(f"   Mobile App Present: {'[DONE]' if validation['mobile_app_present'] else '[TODO]'}")
+    print(f"   Mobile Assets Present: {'[DONE]' if validation['mobile_assets_present'] else '[TODO]'}")
+    print(f"   Removed Files Absent: {'[DONE]' if validation['removed_files_absent'] else '[TODO]'}")
+    print(f"   Overall Structure Valid: {'[DONE]' if validation['structure_valid'] else '[TODO]'}")
 
     if validation["structure_valid"]:
-        print("\n🎉 File structure optimization completed successfully!")
+        print("\n[SUCCESS] File structure optimization completed successfully!")
     else:
-        print("\n⚠️  File structure optimization completed with warnings. Check the report for details.")
+        print("\n[WARNING]  File structure optimization completed with warnings. Check the report for details.")
 
     return results
 

@@ -30,11 +30,11 @@ def main():
     success = framework.create_safety_checkpoint()
 
     if success:
-        print("   ✅ Safety checkpoint created successfully")
+        print("   [DONE] Safety checkpoint created successfully")
         status = framework.get_migration_status()
         print(f"   Files backed up: {status['status']['files_backed_up']}")
     else:
-        print("   ❌ Failed to create safety checkpoint")
+        print("   [TODO] Failed to create safety checkpoint")
         return
 
     # 3. Simulate migration changes
@@ -80,7 +80,7 @@ def main():
         if test_name == "overall_summary":
             continue
 
-        status_icon = {"passed": "✅", "warning": "⚠️", "failed": "❌"}.get(result["status"], "❓")
+        status_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(result["status"], "❓")
 
         print(f"   {status_icon} {test_name}: {result['status']}")
 
@@ -89,7 +89,7 @@ def main():
 
     # Overall summary
     summary = validation_results["overall_summary"]
-    summary_icon = {"passed": "✅", "warning": "⚠️", "failed": "❌"}.get(summary["status"], "❓")
+    summary_icon = {"passed": "[DONE]", "warning": "[WARNING]", "failed": "[TODO]"}.get(summary["status"], "❓")
 
     print(f"\n   {summary_icon} Overall Status: {summary['status']}")
     print(f"   {summary['details']}")
@@ -110,10 +110,10 @@ def main():
     # 6. Demonstrate rollback capability (optional)
     print("\n6. Rollback capability:")
     if migration_status["rollback_available"]:
-        print("   ✅ Rollback is available if needed")
+        print("   [DONE] Rollback is available if needed")
         print("   Use: framework.rollback_migration() to restore previous state")
     else:
-        print("   ❌ No rollback available")
+        print("   [TODO] No rollback available")
 
     # 7. Finalize migration (when ready)
     print("\n7. Migration finalization:")
@@ -121,7 +121,7 @@ def main():
         print("   Ready to finalize migration")
         print("   Use: framework.finalize_migration() when all tasks complete")
     else:
-        print("   ⚠️  Migration validation failed - address issues before finalizing")
+        print("   [WARNING]  Migration validation failed - address issues before finalizing")
 
     print("\n=== Example Complete ===")
     print(f"Migration tracking log: {framework.tracker.log_file}")

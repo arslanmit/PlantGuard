@@ -111,7 +111,7 @@ class PlantGuardPageUtils:
         new_model_key = model_keys[model_options.index(selected_model)]
         if new_model_key != current_model:
             st.session_state.current_models[model_type] = new_model_key
-            st.success(f"✅ Updated to {self.models_config[model_type][new_model_key]['name']}")
+            st.success(f"[DONE] Updated to {self.models_config[model_type][new_model_key]['name']}")
 
     def render_tips_card(self, tips: list):
         """Render a tips card with helpful information."""
@@ -119,7 +119,7 @@ class PlantGuardPageUtils:
         st.markdown(
             f"""
             <div style='background: #f8f9fa; padding: 1rem; border-radius: 10px; border-left: 4px solid #4CAF50;'>
-                <h4 style='margin: 0; color: #4CAF50;'>💡 Tips for Best Results</h4>
+                <h4 style='margin: 0; color: #4CAF50;'>[TIP] Tips for Best Results</h4>
                 <ul style='margin: 0.5rem 0; padding-left: 1rem;'>
                     {tips_html}
                 </ul>

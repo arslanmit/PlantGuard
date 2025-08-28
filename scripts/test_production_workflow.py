@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def test_production_workflow() -> bool:
     """Test the production training workflow."""
-    logger.info("🚀 Testing production training workflow...")
+    logger.info("[LAUNCH] Testing production training workflow...")
 
     try:
         # Import required components
@@ -36,13 +36,13 @@ def test_production_workflow() -> bool:
                 dataset_path = c
                 break
         if dataset_path is None:
-            logger.error("❌ No dataset found. Run 'make dataset-download' and then 'make dataset-prepare' first.")
+            logger.error("[TODO] No dataset found. Run 'make dataset-download' and then 'make dataset-prepare' first.")
             return False
 
         # Infer number of classes from dataset structure
         val_dir = dataset_path / "val"
         if not val_dir.exists():
-            logger.error(f"❌ Validation directory not found at {val_dir}")
+            logger.error(f"[TODO] Validation directory not found at {val_dir}")
             return False
         class_dirs = [p for p in val_dir.iterdir() if p.is_dir()]
         num_classes = len(class_dirs) if class_dirs else 38
@@ -72,22 +72,22 @@ def test_production_workflow() -> bool:
         logger.info("Validating dataset...")
         validation_result = dataset_manager.validate_dataset(dataset_path)
         if not validation_result.is_valid:
-            logger.error(f"❌ Dataset validation failed: {validation_result.errors}")
+            logger.error(f"[TODO] Dataset validation failed: {validation_result.errors}")
             return False
 
-        logger.info(f"✅ Dataset validated: {validation_result.valid_files} files")
+        logger.info(f"[DONE] Dataset validated: {validation_result.valid_files} files")
 
         # Initialize trainer
         trainer = ProductionTrainer(config=config, dataset_manager=dataset_manager, output_dir=Path("runs") / "test_production_workflow")
 
-        logger.info("✅ ProductionTrainer initialized successfully")
+        logger.info("[DONE] ProductionTrainer initialized successfully")
 
         # Test setup (without actual training)
         logger.info("Testing trainer setup...")
 
         # For testing, we'll just verify the trainer can be initialized
         # and skip the full setup which requires more memory
-        logger.info("✅ Trainer setup test completed (initialization successful)")
+        logger.info("[DONE] Trainer setup test completed (initialization successful)")
 
         # Test that we can create a model registry entry (simulate training completion)
         logger.info("Testing model registry integration...")
@@ -122,15 +122,15 @@ def test_production_workflow() -> bool:
             tags=["test", "production", "workflow"],
         )
 
-        logger.info(f"✅ Model registered in registry: {model_id}")
+        logger.info(f"[DONE] Model registered in registry: {model_id}")
 
         # Test model retrieval
         model_info = registry.get_model(model_id)
         if not model_info or not model_info.is_valid:
-            logger.error("❌ Failed to retrieve registered model")
+            logger.error("[TODO] Failed to retrieve registered model")
             return False
 
-        logger.info("✅ Model retrieval successful")
+        logger.info("[DONE] Model retrieval successful")
 
         # Test VisionAdapter compatibility
         from src.core.vision import VisionAdapter
@@ -139,10 +139,10 @@ def test_production_workflow() -> bool:
         is_compatible = adapter.is_compatible_with_registry_format(str(model_info.model_path))
 
         if not is_compatible:
-            logger.error("❌ Model not compatible with registry format")
+            logger.error("[TODO] Model not compatible with registry format")
             return False
 
-        logger.info("✅ Model is compatible with registry format")
+        logger.info("[DONE] Model is compatible with registry format")
 
         # Test model manager integration
         # Create a temporary config for testing
@@ -177,20 +177,20 @@ def test_production_workflow() -> bool:
             # Should have our test model plus any defaults
             registry_models = [m for m in models if "registry" in m.get("model_id", "")]
             if len(registry_models) == 0:
-                logger.error("❌ No registry models found in model manager")
+                logger.error("[TODO] No registry models found in model manager")
                 return False
 
-            logger.info(f"✅ Model manager integration successful: {len(registry_models)} registry models")
+            logger.info(f"[DONE] Model manager integration successful: {len(registry_models)} registry models")
 
         finally:
             # Clean up temp config
             Path(temp_config_path).unlink(missing_ok=True)
 
-        logger.info("🎉 Production workflow test completed successfully!")
+        logger.info("[SUCCESS] Production workflow test completed successfully!")
         return True
 
     except Exception as e:
-        logger.error(f"❌ Production workflow test failed: {e}")
+        logger.error(f"[TODO] Production workflow test failed: {e}")
         import traceback
 
         traceback.print_exc()
@@ -203,10 +203,10 @@ def main() -> int:
         success = test_production_workflow()
 
         if success:
-            logger.info("✅ Production workflow test PASSED!")
+            logger.info("[DONE] Production workflow test PASSED!")
             return 0
         else:
-            logger.error("❌ Production workflow test FAILED!")
+            logger.error("[TODO] Production workflow test FAILED!")
             return 1
 
     except KeyboardInterrupt:

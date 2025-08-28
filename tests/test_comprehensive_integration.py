@@ -191,7 +191,7 @@ class TestComprehensiveIntegration:
             assert confidence == 0.95
             assert "model_name" in metadata
 
-        logger.info("✅ Complete training to deployment workflow test passed")
+        logger.info("[DONE] Complete training to deployment workflow test passed")
 
     def test_model_registry_vision_adapter_integration(self, temp_workspace):
         """Test deep integration between ModelRegistry and VisionAdapter."""
@@ -286,7 +286,7 @@ class TestComprehensiveIntegration:
             metadata_2 = adapter.get_model_metadata()
             assert metadata_2["accuracy"] == 0.95
 
-        logger.info("✅ ModelRegistry-VisionAdapter integration test passed")
+        logger.info("[DONE] ModelRegistry-VisionAdapter integration test passed")
 
     def test_model_switching_with_registry_models(self, temp_workspace):
         """Test comprehensive model switching functionality with registry models."""
@@ -407,7 +407,7 @@ class TestComprehensiveIntegration:
         best_accuracy_model = comparison.get_best_model("accuracy")
         assert best_accuracy_model.metadata.performance_metrics["accuracy"] == 0.95
 
-        logger.info("✅ Model switching with registry models test passed")
+        logger.info("[DONE] Model switching with registry models test passed")
 
     def test_end_to_end_ui_deployment_integration(self, temp_workspace):
         """Test end-to-end integration from training to UI deployment."""
@@ -542,7 +542,7 @@ class TestComprehensiveIntegration:
                 predicted_class, confidence, metadata = manager.predict(test_images[0])
                 assert confidence == 0.96, "New model should have higher confidence"
 
-        logger.info("✅ End-to-end UI deployment integration test passed")
+        logger.info("[DONE] End-to-end UI deployment integration test passed")
 
     def test_performance_regression_detection(self, temp_workspace):
         """Test performance regression detection in training pipeline."""
@@ -613,7 +613,7 @@ class TestComprehensiveIntegration:
         assert "accuracy" in regression_report["regressions"]
         assert "training_time" in regression_report["regressions"]
 
-        logger.info("✅ Performance regression detection test passed")
+        logger.info("[DONE] Performance regression detection test passed")
 
     def test_cross_platform_compatibility(self, temp_workspace):
         """Test cross-platform compatibility of training pipeline."""
@@ -669,7 +669,7 @@ class TestComprehensiveIntegration:
         is_compatible = adapter.is_compatible_with_registry_format(str(model_info.model_path))
         assert is_compatible, "Cross-platform model compatibility check failed"
 
-        logger.info("✅ Cross-platform compatibility test passed")
+        logger.info("[DONE] Cross-platform compatibility test passed")
 
     def test_concurrent_training_integration(self, temp_workspace):
         """Test integration with concurrent training scenarios."""
@@ -746,7 +746,7 @@ class TestComprehensiveIntegration:
             assert model_info is not None
             assert model_info.is_valid
 
-        logger.info("✅ Concurrent training integration test passed")
+        logger.info("[DONE] Concurrent training integration test passed")
 
     def test_memory_and_resource_management(self, temp_workspace):
         """Test memory and resource management in integration scenarios."""
@@ -850,7 +850,7 @@ class TestComprehensiveIntegration:
         assert memory_recovered > -50, "Significant memory not recovered after cleanup"
 
         logger.info(f"Memory usage - Baseline: {baseline_memory:.1f}MB, Peak: {registry_memory:.1f}MB, Recovered: {memory_recovered:.1f}MB")
-        logger.info("✅ Memory and resource management test passed")
+        logger.info("[DONE] Memory and resource management test passed")
 
 
 if __name__ == "__main__":

@@ -500,7 +500,7 @@ class MobileSettingsCard:
             )
 
             if st.button(
-                "✅ Selected" if is_selected else "Select",
+                "[DONE] Selected" if is_selected else "Select",
                 key=f"{self.component_id}_vision_{model_id}",
                 disabled=is_selected,
                 use_container_width=True,
@@ -537,7 +537,7 @@ class MobileSettingsCard:
             )
 
             if st.button(
-                "✅ Selected" if is_selected else "Select",
+                "[DONE] Selected" if is_selected else "Select",
                 key=f"{self.component_id}_audio_{model_id}",
                 disabled=is_selected,
                 use_container_width=True,
@@ -574,7 +574,7 @@ class MobileSettingsCard:
             )
 
             if st.button(
-                "✅ Selected" if is_selected else "Select", key=f"{self.component_id}_text_{model_id}", disabled=is_selected, use_container_width=True
+                "[DONE] Selected" if is_selected else "Select", key=f"{self.component_id}_text_{model_id}", disabled=is_selected, use_container_width=True
             ):
                 self.model_switcher.set_model("text", model_id)
                 st.session_state.user_preferences["preferred_text_model"] = model_id
@@ -658,7 +658,7 @@ class MobileSettingsCard:
 
     def render_advanced_section(self) -> None:
         """Render advanced settings section."""
-        st.markdown("### 🔧 Advanced")
+        st.markdown("### [TOOL] Advanced")
 
         # Performance mode
         self.render_select_setting(
@@ -711,7 +711,7 @@ class MobileSettingsCard:
 
         except Exception as e:
             logger.error(f"Failed to save settings: {e}")
-            st.toast("Failed to save settings", icon="❌")
+            st.toast("Failed to save settings", icon="[TODO]")
 
     def _reset_settings(self) -> None:
         """Reset settings to defaults."""
@@ -729,12 +729,12 @@ class MobileSettingsCard:
             # Mark as changed
             self._mark_settings_changed()
 
-            st.toast("Settings reset to defaults!", icon="🔄")
+            st.toast("Settings reset to defaults!", icon="[PARTIAL]")
             st.rerun()
 
         except Exception as e:
             logger.error(f"Failed to reset settings: {e}")
-            st.toast("Failed to reset settings", icon="❌")
+            st.toast("Failed to reset settings", icon="[TODO]")
 
     def _export_settings(self) -> str:
         """Export settings as JSON."""
@@ -838,7 +838,7 @@ class MobileSettingsCard:
                         self.render_functionality_section()
 
                 # Advanced section
-                if self.render_section_header("advanced", "Advanced", "🔧", "advanced" in settings_data["expanded_sections"]):
+                if self.render_section_header("advanced", "Advanced", "[TOOL]", "advanced" in settings_data["expanded_sections"]):
                     with st.container():
                         self.render_advanced_section()
 
@@ -854,7 +854,7 @@ class MobileSettingsCard:
                         self._save_settings()
 
                 with col2:
-                    if st.button("🔄 Reset", key=f"{self.component_id}_reset", use_container_width=True):
+                    if st.button("[PARTIAL] Reset", key=f"{self.component_id}_reset", use_container_width=True):
                         self._reset_settings()
 
                 with col3, st.expander("📤 Export/Import"):
@@ -890,7 +890,7 @@ class MobileSettingsCard:
                     st.markdown(
                         """
                     <div class="mobile-settings-status warning">
-                        ⚠️ You have unsaved changes. Don't forget to save your settings!
+                        [WARNING] You have unsaved changes. Don't forget to save your settings!
                     </div>
                     """,
                         unsafe_allow_html=True,
@@ -902,7 +902,7 @@ class MobileSettingsCard:
                         st.markdown(
                             f"""
                         <div class="mobile-settings-status">
-                            ✅ Settings saved at {time_str}
+                            [DONE] Settings saved at {time_str}
                         </div>
                         """,
                             unsafe_allow_html=True,

@@ -83,7 +83,7 @@ class ProductionWorkflow:
         legacy_val = Path("data/PlantVillage/val")
 
         if processed_train.exists() and processed_val.exists():
-            self.logger.info("✅ Found processed PlantVillage dataset")
+            self.logger.info("[DONE] Found processed PlantVillage dataset")
             # Validate dataset integrity
             try:
                 validation_result = self.dataset_manager.validate_dataset(Path("data/processed/plantvillage"))
@@ -93,7 +93,7 @@ class ProductionWorkflow:
                 errors.append(f"Dataset validation error: {e}")
 
         elif legacy_train.exists() and legacy_val.exists():
-            self.logger.info("✅ Found legacy PlantVillage dataset")
+            self.logger.info("[DONE] Found legacy PlantVillage dataset")
 
         else:
             errors.append("No suitable dataset found. Please run:\n  - make dataset-download && make dataset-prepare (recommended)")
@@ -109,17 +109,17 @@ class ProductionWorkflow:
         if memory_gb < self.min_memory_gb:
             errors.append(f"Insufficient memory: {memory_gb:.1f}GB < {self.min_memory_gb}GB required")
         elif memory_gb < self.recommended_memory_gb:
-            self.logger.warning(f"⚠️  Low memory: {memory_gb:.1f}GB < {self.recommended_memory_gb}GB recommended")
+            self.logger.warning(f"[WARNING]  Low memory: {memory_gb:.1f}GB < {self.recommended_memory_gb}GB recommended")
 
         # Check GPU availability
         if torch.cuda.is_available():
             gpu_count = torch.cuda.device_count()
             gpu_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)
-            self.logger.info(f"✅ Found {gpu_count} GPU(s) with {gpu_memory:.1f}GB memory")
+            self.logger.info(f"[DONE] Found {gpu_count} GPU(s) with {gpu_memory:.1f}GB memory")
         elif torch.backends.mps.is_available():
-            self.logger.info("✅ Found Apple Silicon GPU (MPS)")
+            self.logger.info("[DONE] Found Apple Silicon GPU (MPS)")
         else:
-            self.logger.warning("⚠️  No GPU found - training will use CPU (slower)")
+            self.logger.warning("[WARNING]  No GPU found - training will use CPU (slower)")
 
         return len(errors) == 0, errors
 
@@ -137,7 +137,7 @@ class ProductionWorkflow:
         if free_gb < self.min_disk_space_gb:
             errors.append(f"Insufficient disk space: {free_gb:.1f}GB < {self.min_disk_space_gb}GB required")
         else:
-            self.logger.info(f"✅ Available disk space: {free_gb:.1f}GB")
+            self.logger.info(f"[DONE] Available disk space: {free_gb:.1f}GB")
 
         return len(errors) == 0, errors
 
@@ -192,7 +192,7 @@ class ProductionWorkflow:
                 config.num_workers = 8
                 config.mixed_precision = True
                 config.epochs = 100
-                self.logger.info("🚀 Using high-performance configuration")
+                self.logger.info("[LAUNCH] Using high-performance configuration")
 
             elif has_gpu and memory_gb >= 8:
                 # Medium configuration
@@ -290,7 +290,7 @@ class ProductionWorkflow:
 
         # If the expected path already exists, we're good
         if expected_path.exists() and (expected_path / "train").exists() and (expected_path / "val").exists():
-            self.logger.info(f"✅ Dataset already available at {expected_path}")
+            self.logger.info(f"[DONE] Dataset already available at {expected_path}")
             return
 
         # Find the best available dataset
@@ -306,10 +306,10 @@ class ProductionWorkflow:
                 expected_path.unlink()  # Remove existing symlink/directory
 
             expected_path.symlink_to(actual_dataset_path.resolve())
-            self.logger.info(f"✅ Created symlink: {expected_path} -> {actual_dataset_path}")
+            self.logger.info(f"[DONE] Created symlink: {expected_path} -> {actual_dataset_path}")
 
         except Exception as e:
-            self.logger.error(f"❌ Failed to prepare dataset: {e}")
+            self.logger.error(f"[TODO] Failed to prepare dataset: {e}")
             # Preserve original exception context for easier debugging
             raise RuntimeError(f"Could not prepare dataset for training: {e}") from e
 
@@ -323,7 +323,7 @@ class ProductionWorkflow:
             True if training succeeded, False otherwise
         """
         try:
-            self.logger.info("🚀 Starting production training pipeline...")
+            self.logger.info("[LAUNCH] Starting production training pipeline...")
 
             # Ensure dataset is available at expected location
             self._prepare_dataset_for_training()
@@ -336,15 +336,15 @@ class ProductionWorkflow:
             # Setup training
             self.logger.info("⚙️  Setting up training environment...")
             if not trainer.setup_training():
-                self.logger.error("❌ Training setup failed")
+                self.logger.error("[TODO] Training setup failed")
                 return False
 
             # Start training
-            self.logger.info("🎯 Starting model training...")
+            self.logger.info("[PROGRESS] Starting model training...")
             training_result = trainer.train()
 
             if training_result.success:
-                self.logger.info("✅ Training completed successfully!")
+                self.logger.info("[DONE] Training completed successfully!")
 
                 # Register model
                 model_metadata = {
@@ -361,16 +361,16 @@ class ProductionWorkflow:
 
                 # Generate training report
                 report_path = monitor.save_training_report(training_result)
-                self.logger.info(f"📊 Training report saved to: {report_path}")
+                self.logger.info(f"[SUMMARY] Training report saved to: {report_path}")
 
                 return True
 
             else:
-                self.logger.error(f"❌ Training failed: {training_result.error_message}")
+                self.logger.error(f"[TODO] Training failed: {training_result.error_message}")
                 return False
 
         except Exception as e:
-            self.logger.error(f"❌ Production training failed: {e}")
+            self.logger.error(f"[TODO] Production training failed: {e}")
             # Preserve original exception context when returning failure
             logger_exc = getattr(self, "logger", None)
             if logger_exc:
@@ -379,7 +379,7 @@ class ProductionWorkflow:
 
     def send_notification(self, success: bool, message: str) -> None:
         """Send training completion notification."""
-        status = "✅ SUCCESS" if success else "❌ FAILED"
+        status = "[DONE] SUCCESS" if success else "[TODO] FAILED"
         self.logger.info(f"🔔 NOTIFICATION: {status} - {message}")
 
         # In a real production environment, you might send:
@@ -403,13 +403,13 @@ class ProductionWorkflow:
             is_valid, errors = self.validate_prerequisites()
 
             if not is_valid:
-                self.logger.error("❌ Prerequisites validation failed:")
+                self.logger.error("[TODO] Prerequisites validation failed:")
                 for error in errors:
                     self.logger.error(f"   • {error}")
                 self.send_notification(False, "Prerequisites validation failed")
                 return 1
 
-            self.logger.info("✅ All prerequisites validated")
+            self.logger.info("[DONE] All prerequisites validated")
 
             # Step 2: Load/select configuration
             self.logger.info("2️⃣  Selecting configuration...")
@@ -429,7 +429,7 @@ class ProductionWorkflow:
             else:
                 self.logger.info("🧠 Auto-selecting optimal configuration based on resources...")
                 config = self.select_optimal_config()
-            self.logger.info(f"📋 Configuration: {config.batch_size} batch size, {config.epochs} epochs")
+            self.logger.info(f"[DETAILS] Configuration: {config.batch_size} batch size, {config.epochs} epochs")
 
             # Step 3: Run production training
             self.logger.info("3️⃣  Running production training...")
@@ -437,15 +437,15 @@ class ProductionWorkflow:
 
             if success:
                 self.send_notification(True, f"Training completed successfully: {config.experiment_name}")
-                self.logger.info("🎉 Production training workflow completed successfully!")
+                self.logger.info("[SUCCESS] Production training workflow completed successfully!")
                 return 0
             else:
                 self.send_notification(False, f"Training failed: {config.experiment_name}")
-                self.logger.error("💥 Production training workflow failed!")
+                self.logger.error("[ERROR] Production training workflow failed!")
                 return 1
 
         except Exception as e:
-            self.logger.error(f"💥 Workflow error: {e}")
+            self.logger.error(f"[ERROR] Workflow error: {e}")
             self.send_notification(False, f"Workflow error: {e}")
             return 1
 

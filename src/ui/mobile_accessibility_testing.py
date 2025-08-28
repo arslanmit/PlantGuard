@@ -748,7 +748,7 @@ class AccessibilityTestSuite:
             report += f"**Description:** {results['description']}\n\n"
 
             for test in results.get("tests", []):
-                status_icon = "✅" if test["status"] == "passed" else "❌"
+                status_icon = "[DONE]" if test["status"] == "passed" else "[TODO]"
                 report += f"- {status_icon} **{test['test_name']}:** {test['description']}\n"
 
             report += "\n"
@@ -757,7 +757,7 @@ class AccessibilityTestSuite:
         report += "## Component Accessibility Tests\n\n"
 
         for component, results in test_results["component_tests"].items():
-            status_icon = "✅" if results["status"] == "passed" else "❌"
+            status_icon = "[DONE]" if results["status"] == "passed" else "[TODO]"
             report += f"### {status_icon} {results['component']}\n"
 
             if results["status"] == "passed":

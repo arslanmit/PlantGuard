@@ -1,0 +1,49 @@
+{
+  "task_completion_date": "2025-08-28T16:59:47.848280",
+  "files_processed": 370,
+  "files_changed": 122,
+  "total_replacements": 1649,
+  "emoji_mappings": {
+    "📊": "[SUMMARY]",
+    "✅": "[DONE]",
+    "🔄": "[PARTIAL]",
+    "❌": "[TODO]",
+    "💥": "[ERROR]",
+    "🎯": "[PROGRESS]",
+    "📋": "[DETAILS]",
+    "🚀": "[LAUNCH]",
+    "🎉": "[SUCCESS]",
+    "🔧": "[TOOL]",
+    "🛠️": "[TOOL]",
+    "📱": "[MOBILE]",
+    "💡": "[TIP]",
+    "⚠️": "[WARNING]",
+    "🎊": "[CELEBRATION]"
+  },
+  "replacement_counts": {
+    "⚠️ -> [WARNING]": 131,
+    "✅ -> [DONE]": 615,
+    "❌ -> [TODO]": 318,
+    "🎉 -> [SUCCESS]": 31,
+    "🎊 -> [CELEBRATION]": 2,
+    "🎯 -> [PROGRESS]": 60,
+    "💡 -> [TIP]": 59,
+    "💥 -> [ERROR]": 7,
+    "📊 -> [SUMMARY]": 115,
+    "📋 -> [DETAILS]": 40,
+    "📱 -> [MOBILE]": 31,
+    "🔄 -> [PARTIAL]": 87,
+    "🔧 -> [TOOL]": 35,
+    "🚀 -> [LAUNCH]": 55,
+    "🛠️ -> [TOOL]": 7
+  },
+  "most_changed_files": [
+    "README.md (166 replacements)",
+    ".kiro/specs/streamlit-ui-redesign/tasks.md (143 replacements)",
+    "src/ui/app_streamlit.py (50 replacements)",
+    "scripts/model_switching/model_switcher.py (36 replacements)",
+    "mobile_performance_optimizer.py (36 replacements)"
+  ],
+  "backup_created": true,
+  "backup_cleanup_script": "cleanup_backups.py"
+}

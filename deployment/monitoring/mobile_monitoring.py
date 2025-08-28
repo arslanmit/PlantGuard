@@ -300,7 +300,7 @@ class MobileAnalyticsDashboard:
 
     def render_dashboard(self) -> None:
         """Render the analytics dashboard in Streamlit."""
-        st.subheader("📊 Mobile Analytics Dashboard")
+        st.subheader("[SUMMARY] Mobile Analytics Dashboard")
 
         # Session summary
         summary = self.monitoring.get_session_summary()

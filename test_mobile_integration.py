@@ -56,7 +56,7 @@ def test_component_initialization():
         st.success("[PASS] Components initialized successfully")
         return True
     except Exception as e:
-        st.error(f"❌ Initialization error: {e}")
+        st.error(f"[TODO] Initialization error: {e}")
         return False
 
 
@@ -74,14 +74,14 @@ def test_state_management():
         retrieved_state = state_manager.get_component_state("test_component")
 
         if retrieved_state["test_key"] == "test_value":
-            st.success("✅ State management working correctly")
+            st.success("[DONE] State management working correctly")
             return True
         else:
-            st.error("❌ State management failed: values don't match")
+            st.error("[TODO] State management failed: values don't match")
             return False
 
     except Exception as e:
-        st.error(f"❌ State management error: {e}")
+        st.error(f"[TODO] State management error: {e}")
         return False
 
 
@@ -98,14 +98,14 @@ def test_model_switcher_integration():
         text_models = model_switcher.get_available_models("text")
 
         if vision_models and audio_models and text_models:
-            st.success("✅ Model switcher integration working")
+            st.success("[DONE] Model switcher integration working")
             return True
         else:
-            st.error("❌ Model switcher missing model definitions")
+            st.error("[TODO] Model switcher missing model definitions")
             return False
 
     except Exception as e:
-        st.error(f"❌ Model switcher error: {e}")
+        st.error(f"[TODO] Model switcher error: {e}")
         return False
 
 
@@ -125,14 +125,14 @@ def test_history_functionality():
         history = history_view.get_analysis_history()
 
         if len(history) == 1 and history[0]["prediction"] == "Test Disease":
-            st.success("✅ History functionality working")
+            st.success("[DONE] History functionality working")
             return True
         else:
-            st.error("❌ History functionality failed")
+            st.error("[TODO] History functionality failed")
             return False
 
     except Exception as e:
-        st.error(f"❌ History functionality error: {e}")
+        st.error(f"[TODO] History functionality error: {e}")
         return False
 
 
@@ -151,14 +151,14 @@ def test_settings_functionality():
         updated_preferences = settings_card.get_current_preferences()
 
         if updated_preferences.get("test_setting") == "test_value":
-            st.success("✅ Settings functionality working")
+            st.success("[DONE] Settings functionality working")
             return True
         else:
-            st.error("❌ Settings functionality failed")
+            st.error("[TODO] Settings functionality failed")
             return False
 
     except Exception as e:
-        st.error(f"❌ Settings functionality error: {e}")
+        st.error(f"[TODO] Settings functionality error: {e}")
         return False
 
 
@@ -176,14 +176,14 @@ def test_css_compatibility():
         settings_css = settings_card.get_mobile_css()
 
         if history_css and settings_css:
-            st.success("✅ CSS generation working")
+            st.success("[DONE] CSS generation working")
             return True
         else:
-            st.error("❌ CSS generation failed")
+            st.error("[TODO] CSS generation failed")
             return False
 
     except Exception as e:
-        st.error(f"❌ CSS compatibility error: {e}")
+        st.error(f"[TODO] CSS compatibility error: {e}")
         return False
 
 
@@ -217,12 +217,12 @@ def main():
                 result = test_func()
                 results[test_name] = result
             except Exception as e:
-                st.error(f"❌ Test failed with exception: {e}")
+                st.error(f"[TODO] Test failed with exception: {e}")
                 results[test_name] = False
 
     # Summary
     st.markdown("---")
-    st.markdown("## 📊 Test Results Summary")
+    st.markdown("## [SUMMARY] Test Results Summary")
 
     passed = sum(results.values())
     total = len(results)
@@ -242,19 +242,19 @@ def main():
     st.markdown("### Detailed Results")
 
     for test_name, result in results.items():
-        status = "✅ PASS" if result else "❌ FAIL"
+        status = "[DONE] PASS" if result else "[TODO] FAIL"
         st.markdown(f"- **{test_name}**: {status}")
 
     # Overall status
     if passed == total:
-        st.success("🎉 All integration tests passed! Components are ready for use.")
+        st.success("[SUCCESS] All integration tests passed! Components are ready for use.")
     else:
-        st.warning(f"⚠️ {total - passed} test(s) failed. Please check the issues above.")
+        st.warning(f"[WARNING] {total - passed} test(s) failed. Please check the issues above.")
 
     # Component demonstration
     if passed >= total * 0.8:  # If at least 80% of tests pass
         st.markdown("---")
-        st.markdown("## 🎯 Component Demonstration")
+        st.markdown("## [PROGRESS] Component Demonstration")
 
         demo_tab1, demo_tab2 = st.tabs(["📚 History Demo", "⚙️ Settings Demo"])
 

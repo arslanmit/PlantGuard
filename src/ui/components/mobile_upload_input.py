@@ -130,7 +130,7 @@ class MobileUploadInput(MobileBaseComponent):
         )
 
         # Upload tips
-        with st.expander("📋 Upload Tips", expanded=False):
+        with st.expander("[DETAILS] Upload Tips", expanded=False):
             st.markdown("""
             **For best results:**
             - Use clear, well-lit photos
@@ -194,13 +194,13 @@ class MobileUploadInput(MobileBaseComponent):
             # Trigger analysis
             self._trigger_analysis(image, uploaded_file.name)
 
-            st.success(f"✅ File uploaded successfully: {uploaded_file.name}")
+            st.success(f"[DONE] File uploaded successfully: {uploaded_file.name}")
 
         except Exception as e:
             logger.error("File upload processing failed: %s", e)
             self.handle_error(e, ErrorCategory.INTEGRATION, ErrorSeverity.MEDIUM)
             self._update_processing_status("error")
-            st.error("❌ Failed to process uploaded file. Please try again.")
+            st.error("[TODO] Failed to process uploaded file. Please try again.")
 
     def _validate_uploaded_file(self, uploaded_file) -> dict[str, Any]:
         """Validate uploaded file."""
@@ -253,7 +253,7 @@ class MobileUploadInput(MobileBaseComponent):
     def _show_validation_errors(self, errors: list[str]) -> None:
         """Display validation errors to user."""
         for error in errors:
-            st.error(f"❌ {error}")
+            st.error(f"[TODO] {error}")
 
     def _update_processing_status(self, status: str) -> None:
         """Update processing status."""
@@ -292,14 +292,14 @@ class MobileUploadInput(MobileBaseComponent):
                     # Validation info
                     if file_info.get("validation", {}).get("warnings"):
                         for warning in file_info["validation"]["warnings"]:
-                            st.warning(f"⚠️ {warning}")
+                            st.warning(f"[WARNING] {warning}")
 
                 with col2:
                     # Action buttons
                     if st.button("🔍 Analyze", key=f"{self.component_id}_analyze_{i}"):
                         self._trigger_analysis(file_info["image"], file_info["filename"])
 
-                    if st.button("❌ Remove", key=f"{self.component_id}_remove_{i}"):
+                    if st.button("[TODO] Remove", key=f"{self.component_id}_remove_{i}"):
                         self._remove_uploaded_file(file_info["filename"])
 
     def _render_current_file(self, file_info: dict[str, Any]) -> None:
@@ -334,11 +334,11 @@ class MobileUploadInput(MobileBaseComponent):
                 self._save_image(file_info)
 
         with col3:
-            if st.button("🔄 Replace", key=f"{self.component_id}_replace"):
+            if st.button("[PARTIAL] Replace", key=f"{self.component_id}_replace"):
                 self._clear_current_file()
 
         with col4:
-            if st.button("❌ Clear", key=f"{self.component_id}_clear_current"):
+            if st.button("[TODO] Clear", key=f"{self.component_id}_clear_current"):
                 self._clear_current_file()
 
     def _format_file_size(self, size_bytes: int) -> str:
@@ -396,7 +396,7 @@ class MobileUploadInput(MobileBaseComponent):
 
         except Exception as e:
             logger.error("Image save failed: %s", e)
-            st.error("❌ Failed to save image")
+            st.error("[TODO] Failed to save image")
 
     def _trigger_analysis(self, image: Image.Image, filename: str) -> None:
         """Trigger plant disease analysis for uploaded image."""
@@ -414,17 +414,17 @@ class MobileUploadInput(MobileBaseComponent):
 
                 # Check for errors
                 if "error" in analysis_result:
-                    st.error(f"❌ Analysis failed: {analysis_result['error']}")
+                    st.error(f"[TODO] Analysis failed: {analysis_result['error']}")
                     return
 
                 # Display result with enhanced information
                 if confidence > 0.7:
                     st.success(f"🌿 Analysis Complete: {disease_name} ({confidence:.1%} confidence)")
                 elif confidence > 0.4:
-                    st.warning(f"⚠️ Moderate confidence: {disease_name} ({confidence:.1%} confidence)")
+                    st.warning(f"[WARNING] Moderate confidence: {disease_name} ({confidence:.1%} confidence)")
                 else:
-                    st.warning(f"⚠️ Low confidence result: {disease_name} ({confidence:.1%} confidence)")
-                    st.info("💡 Try uploading a clearer image with better lighting for more accurate results.")
+                    st.warning(f"[WARNING] Low confidence result: {disease_name} ({confidence:.1%} confidence)")
+                    st.info("[TIP] Try uploading a clearer image with better lighting for more accurate results.")
 
                 # Show disease information if available
                 disease_info = analysis_result.get("disease_info", {})
@@ -442,7 +442,7 @@ class MobileUploadInput(MobileBaseComponent):
         except Exception as e:
             logger.error("Analysis failed: %s", e)
             self.handle_error(e, ErrorCategory.INTEGRATION, ErrorSeverity.MEDIUM)
-            st.error("❌ Analysis failed. Please try again or check the image quality.")
+            st.error("[TODO] Analysis failed. Please try again or check the image quality.")
 
     def get_current_image(self) -> Image.Image | None:
         """Get the currently selected image."""

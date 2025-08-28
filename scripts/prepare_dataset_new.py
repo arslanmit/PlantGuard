@@ -39,7 +39,7 @@ def main() -> None:
     if args.source_dir:
         source_dir = Path(args.source_dir)
         if not source_dir.exists():
-            print(f"❌ Source directory not found: {source_dir}")
+            print(f"[TODO] Source directory not found: {source_dir}")
             sys.exit(1)
     else:
         # Look for raw dataset in multiple locations
@@ -49,15 +49,15 @@ def main() -> None:
         for location in raw_locations:
             if Path(location).exists():
                 source_dir = Path(location)
-                print(f"✅ Found raw dataset at {location}")
+                print(f"[DONE] Found raw dataset at {location}")
                 break
 
         if source_dir is None:
-            print("❌ Raw PlantVillage dataset not found")
+            print("[TODO] Raw PlantVillage dataset not found")
             print("🔍 Checked locations:")
             for location in raw_locations:
                 print(f"  - {location}")
-            print("💡 Please run 'make download-dataset' or download manually")
+            print("[TIP] Please run 'make download-dataset' or download manually")
             sys.exit(1)
 
     # Prepare dataset with configuration
@@ -69,7 +69,7 @@ def main() -> None:
         min_samples_per_class=10,
     )
 
-    print(f"📊 Preparing dataset from {source_dir} to {output_dir}...")
+    print(f"[SUMMARY] Preparing dataset from {source_dir} to {output_dir}...")
     print("⚙️  Configuration:")
     print(f"  Train ratio: {config.train_ratio}")
     print(f"  Validation ratio: {config.val_ratio}")
@@ -77,17 +77,17 @@ def main() -> None:
     print(f"  Min samples per class: {config.min_samples_per_class}")
 
     if source_dir is None:
-        print("❌ No source directory available")
+        print("[TODO] No source directory available")
         sys.exit(1)
 
     success = dm.prepare_dataset(source_dir, output_dir, config)
 
     if success:
-        print("✅ Dataset preparation completed")
+        print("[DONE] Dataset preparation completed")
         print(f"📁 Dataset prepared at {output_dir}")
-        print("💡 Run 'make analyze-dataset' to see statistics")
+        print("[TIP] Run 'make analyze-dataset' to see statistics")
     else:
-        print("❌ Dataset preparation failed")
+        print("[TODO] Dataset preparation failed")
         sys.exit(1)
 
 

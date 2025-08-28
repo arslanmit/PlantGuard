@@ -93,7 +93,7 @@ class InterfaceToggle:
                     "Choose your interface:",
                     options=["simple", "expert"],
                     index=0 if current_mode == "simple" else 1,
-                    format_func=lambda x: "🎯 Simple Mode" if x == "simple" else "⚙️ Expert Mode",
+                    format_func=lambda x: "[PROGRESS] Simple Mode" if x == "simple" else "⚙️ Expert Mode",
                     key="interface_mode_radio",
                 )
 
@@ -110,7 +110,7 @@ class InterfaceToggle:
 
                 with col1:
                     if st.button(
-                        "🎯 Simple",
+                        "[PROGRESS] Simple",
                         key="simple_mode_btn",
                         help="Simplified interface with reduced cognitive load",
                         use_container_width=True,
@@ -129,7 +129,7 @@ class InterfaceToggle:
                         st.rerun()
 
                 # Current mode indicator
-                mode_emoji = "🎯" if current_mode == "simple" else "⚙️"
+                mode_emoji = "[PROGRESS]" if current_mode == "simple" else "⚙️"
                 mode_name = "Simple" if current_mode == "simple" else "Expert"
                 st.info(f"{mode_emoji} Current Mode: **{mode_name}**")
 
@@ -139,7 +139,7 @@ class InterfaceToggle:
 
             with col1:
                 if st.button(
-                    "🎯 Simple",
+                    "[PROGRESS] Simple",
                     key="inline_simple_btn",
                     type="primary" if current_mode == "simple" else "secondary",
                     help="Reduced complexity, focused on essentials",
@@ -159,7 +159,7 @@ class InterfaceToggle:
 
             with col3:
                 if current_mode == "simple":
-                    st.success("🎯 **Simple Mode Active** - Streamlined interface")
+                    st.success("[PROGRESS] **Simple Mode Active** - Streamlined interface")
                 else:
                     st.info("⚙️ **Expert Mode Active** - Full functionality")
 
@@ -171,21 +171,21 @@ class InterfaceToggle:
         current_mode = self.get_current_mode()
 
         if current_mode == "simple":
-            with st.expander("🎯 **Simple Mode Features**", expanded=False):
+            with st.expander("[PROGRESS] **Simple Mode Features**", expanded=False):
                 st.markdown("""
                 **Perfect for quick analysis and reduced cognitive load:**
 
-                ✅ **Streamlined Interface**
+                [DONE] **Streamlined Interface**
                 - Larger buttons and clearer labels
                 - Essential features only
                 - Reduced visual clutter
 
-                ✅ **Simplified Workflow**
+                [DONE] **Simplified Workflow**
                 - Step-by-step guidance
                 - Automatic best settings
                 - Clear progress indicators
 
-                ✅ **ADHD-Friendly Design**
+                [DONE] **ADHD-Friendly Design**
                 - Big headings with emojis
                 - Color-coded status indicators
                 - Focused attention areas
@@ -275,7 +275,7 @@ class InterfaceToggle:
             unsafe_allow_html=True,
         )
 
-    def render_section_heading(self, text: str, emoji: str = "📊") -> None:
+    def render_section_heading(self, text: str, emoji: str = "[SUMMARY]") -> None:
         """Render section heading with emoji.
 
         Args:
@@ -362,7 +362,7 @@ if __name__ == "__main__":
 
     # Test ADHD-friendly headings
     toggle.render_adhd_heading("Plant Disease Detection", "🌱", "primary")
-    toggle.render_section_heading("Analysis Results", "📊")
+    toggle.render_section_heading("Analysis Results", "[SUMMARY]")
 
     # Test progress steps
     if toggle.should_show_feature("basic"):
@@ -370,7 +370,7 @@ if __name__ == "__main__":
             [
                 ("📷", "Upload", "completed"),
                 ("🔍", "Analyze", "active"),
-                ("📋", "Results", "pending"),
+                ("[DETAILS]", "Results", "pending"),
                 ("💾", "Save", "pending"),
             ]
         )
@@ -380,7 +380,7 @@ if __name__ == "__main__":
         st.info("⚙️ This is an expert-only feature!")
 
     if toggle.should_show_feature("simple-only"):
-        st.success("🎯 This is a simple-mode feature!")
+        st.success("[PROGRESS] This is a simple-mode feature!")
 
     # Test cognitive load wrapper
     def complex_content():

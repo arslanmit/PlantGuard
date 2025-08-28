@@ -31,11 +31,11 @@ def load_mobile_display_styles():
 
             st.markdown(f"<style>{css_content}</style>", unsafe_allow_html=True)
         else:
-            st.warning("⚠️ Mobile display styles not found. Components may not display correctly.")
+            st.warning("[WARNING] Mobile display styles not found. Components may not display correctly.")
 
     except Exception as e:
         logger.error("Failed to load mobile display styles: %s", e)
-        st.error(f"❌ Failed to load styles: {e}")
+        st.error(f"[TODO] Failed to load styles: {e}")
 
 
 def create_sample_analysis_results():
@@ -86,12 +86,12 @@ def demo_mobile_analysis_display():
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if st.button("📊 Add Sample Results", key="add_sample_results"):
+        if st.button("[SUMMARY] Add Sample Results", key="add_sample_results"):
             sample_results = create_sample_analysis_results()
             if "analysis_results" not in st.session_state:
                 st.session_state.analysis_results = []
             st.session_state.analysis_results.extend(sample_results)
-            st.success("✅ Sample analysis results added!")
+            st.success("[DONE] Sample analysis results added!")
 
     with col2:
         if st.button("🧹 Clear Results", key="clear_analysis_results"):
@@ -108,7 +108,7 @@ def demo_mobile_analysis_display():
     analysis_display.render()
 
     # Component info
-    with st.expander("📋 Component Information", expanded=False):
+    with st.expander("[DETAILS] Component Information", expanded=False):
         st.write(f"**Component ID:** {analysis_display.component_id}")
         st.write(f"**Component Type:** {analysis_display.component_type}")
         st.write(f"**Has Results:** {analysis_display.has_results()}")
@@ -121,7 +121,7 @@ def demo_mobile_analysis_display():
 
 def demo_mobile_recommendations():
     """Demonstrate MobileRecommendations component."""
-    st.markdown("## 💡 Mobile Recommendations Demo")
+    st.markdown("## [TIP] Mobile Recommendations Demo")
 
     # Create component
     recommendations = MobileRecommendations(component_id="demo_recommendations", title="Treatment Recommendations")
@@ -145,7 +145,7 @@ def demo_mobile_recommendations():
             if "analysis_results" not in st.session_state:
                 st.session_state.analysis_results = []
             st.session_state.analysis_results.append(disease_result)
-            st.success("✅ Disease context added!")
+            st.success("[DONE] Disease context added!")
 
     with col2:
         if st.button("🧹 Clear Context", key="clear_recommendations_context"):
@@ -162,7 +162,7 @@ def demo_mobile_recommendations():
     recommendations.render()
 
     # Component info
-    with st.expander("📋 Component Information", expanded=False):
+    with st.expander("[DETAILS] Component Information", expanded=False):
         st.write(f"**Component ID:** {recommendations.component_id}")
         st.write(f"**Component Type:** {recommendations.component_type}")
         st.write(f"**Current Disease:** {recommendations.get_current_disease()}")
@@ -224,7 +224,7 @@ def demo_mobile_chat_interface():
             state["data"]["chat_data"] = chat_data
             chat_interface.set_state(state)
 
-            st.success("✅ Sample messages added!")
+            st.success("[DONE] Sample messages added!")
 
     with col2:
         if st.button("🧹 Clear Chat", key="clear_chat_demo"):
@@ -240,7 +240,7 @@ def demo_mobile_chat_interface():
     chat_interface.render()
 
     # Component info
-    with st.expander("📋 Component Information", expanded=False):
+    with st.expander("[DETAILS] Component Information", expanded=False):
         st.write(f"**Component ID:** {chat_interface.component_id}")
         st.write(f"**Component Type:** {chat_interface.component_type}")
         st.write(f"**Message Count:** {chat_interface.get_message_count()}")
@@ -269,7 +269,7 @@ def demo_components_integration():
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("🚀 Setup Full Integration", key="setup_integration"):
+        if st.button("[LAUNCH] Setup Full Integration", key="setup_integration"):
             # Create comprehensive analysis result
             sample_image = Image.new("RGB", (300, 200), color="#FFB6C1")
 
@@ -285,7 +285,7 @@ def demo_components_integration():
             # Set analysis results
             st.session_state.analysis_results = [integration_result]
 
-            st.success("✅ Integration context setup complete!")
+            st.success("[DONE] Integration context setup complete!")
             st.info("Now all components will share this analysis context.")
 
     with col2:
@@ -298,7 +298,7 @@ def demo_components_integration():
     has_context = "analysis_results" in st.session_state and len(st.session_state.analysis_results) > 0
 
     if has_context:
-        st.success("✅ **Integration Active** - All components share analysis context")
+        st.success("[DONE] **Integration Active** - All components share analysis context")
 
         latest_result = st.session_state.analysis_results[0]
         disease_name, confidence = latest_result.get("prediction", ("Unknown", 0.0))
@@ -311,7 +311,7 @@ def demo_components_integration():
         with col3:
             st.metric("Source", latest_result.get("source", "Unknown").title())
     else:
-        st.warning("⚠️ **No Integration Context** - Click 'Setup Full Integration' to connect components")
+        st.warning("[WARNING] **No Integration Context** - Click 'Setup Full Integration' to connect components")
 
 
 def main():
@@ -331,7 +331,7 @@ def main():
 
     # Navigation
     demo_option = st.selectbox(
-        "Choose Demo Section:", ["🔬 Analysis Display", "💡 Recommendations", "💬 Chat Interface", "🔗 Integration Demo", "📊 All Components"]
+        "Choose Demo Section:", ["🔬 Analysis Display", "[TIP] Recommendations", "💬 Chat Interface", "🔗 Integration Demo", "[SUMMARY] All Components"]
     )
 
     st.markdown("---")
@@ -340,7 +340,7 @@ def main():
     if demo_option == "🔬 Analysis Display":
         demo_mobile_analysis_display()
 
-    elif demo_option == "💡 Recommendations":
+    elif demo_option == "[TIP] Recommendations":
         demo_mobile_recommendations()
 
     elif demo_option == "💬 Chat Interface":
@@ -349,15 +349,15 @@ def main():
     elif demo_option == "🔗 Integration Demo":
         demo_components_integration()
 
-    elif demo_option == "📊 All Components":
-        st.markdown("## 📊 All Components Demo")
+    elif demo_option == "[SUMMARY] All Components":
+        st.markdown("## [SUMMARY] All Components Demo")
         st.info("This section shows all components together in a unified interface.")
 
         # Setup integration context
-        if st.button("🚀 Setup Demo Context", key="setup_all_demo"):
+        if st.button("[LAUNCH] Setup Demo Context", key="setup_all_demo"):
             sample_results = create_sample_analysis_results()
             st.session_state.analysis_results = sample_results
-            st.success("✅ Demo context setup for all components!")
+            st.success("[DONE] Demo context setup for all components!")
 
         # Render all components
         col1, col2 = st.columns(2)
@@ -367,7 +367,7 @@ def main():
             analysis_display = MobileAnalysisDisplay("all_demo_analysis")
             analysis_display.render()
 
-            st.markdown("### 💡 Recommendations")
+            st.markdown("### [TIP] Recommendations")
             recommendations = MobileRecommendations("all_demo_recommendations")
             recommendations.render()
 

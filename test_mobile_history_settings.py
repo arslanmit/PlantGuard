@@ -101,7 +101,7 @@ def main():
         history_view.render()
 
         # Test controls
-        st.markdown("### 🔧 Test Controls")
+        st.markdown("### [TOOL] Test Controls")
 
         col1, col2, col3 = st.columns(3)
 
@@ -115,7 +115,7 @@ def main():
                     "metadata": {"test": True},
                 }
                 st.session_state.analysis_history.append(new_analysis)
-                st.toast("Sample analysis added!", icon="✅")
+                st.toast("Sample analysis added!", icon="[DONE]")
                 st.rerun()
 
         with col2:
@@ -136,7 +136,7 @@ def main():
         settings_card.render()
 
         # Test controls
-        st.markdown("### 🔧 Test Controls")
+        st.markdown("### [TOOL] Test Controls")
 
         col1, col2 = st.columns(2)
 
@@ -151,7 +151,7 @@ def main():
                 st.json(summary)
 
     else:  # Both Components
-        st.markdown("## 🔄 Testing Both Components")
+        st.markdown("## [PARTIAL] Testing Both Components")
 
         # Tab interface for both components
         tab1, tab2 = st.tabs(["📚 History", "⚙️ Settings"])
@@ -166,7 +166,7 @@ def main():
 
     # Component status
     st.markdown("---")
-    st.markdown("### 📊 Component Status")
+    st.markdown("### [SUMMARY] Component Status")
 
     col1, col2 = st.columns(2)
 

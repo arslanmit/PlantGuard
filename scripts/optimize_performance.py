@@ -482,14 +482,14 @@ def main():
         summary = results["summary"]
         system_info = results["system_info"]
 
-        print("🚀 PlantGuard Performance Analysis Results")
+        print("[LAUNCH] PlantGuard Performance Analysis Results")
         print("=" * 50)
 
         print(f"\n💻 System Classification: {summary['system_classification'].replace('_', ' ').title()}")
-        print(f"📊 Expected Performance: {summary['expected_performance'].replace('_', ' ').title()}")
+        print(f"[SUMMARY] Expected Performance: {summary['expected_performance'].replace('_', ' ').title()}")
         print(f"⚡ Optimization Potential: {summary['optimization_potential'].title()}")
 
-        print("\n🔧 System Specs:")
+        print("\n[TOOL] System Specs:")
         print(f"  Memory: {system_info['memory']['total_gb']:.1f} GB")
         print(f"  CPU Cores: {system_info['cpu']['physical_cores']} physical / {system_info['cpu']['logical_cores']} logical")
         print(f"  Platform: {system_info['platform']['system']} {system_info['platform']['machine']}")
@@ -511,7 +511,7 @@ def main():
         batch_size = results["config_recommendations"]["training_config"]["batch_size"]
         num_workers = results["config_recommendations"]["training_config"]["num_workers"]
 
-        print("\n🎯 Optimal Configuration:")
+        print("\n[PROGRESS] Optimal Configuration:")
         print(f"  Training Batch Size: {batch_size}")
         print(f"  Data Loader Workers: {num_workers}")
         print(f"  Recommended Model: {results['model_analysis']['model_selection']['primary_model']}")

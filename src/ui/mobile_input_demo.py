@@ -153,7 +153,7 @@ def render_demo_header():
 
 def render_input_grid():
     """Render the main input grid with all components."""
-    st.markdown("### 📱 Choose Your Input Method")
+    st.markdown("### [MOBILE] Choose Your Input Method")
 
     # Create 2x2 grid for input methods
     col1, col2 = st.columns(2)
@@ -309,7 +309,7 @@ def render_demo_footer():
         """)
 
     # Component status
-    with st.expander("🔧 Component Status", expanded=False):
+    with st.expander("[TOOL] Component Status", expanded=False):
         if "mobile_components" in st.session_state:
             components = st.session_state.mobile_components
 

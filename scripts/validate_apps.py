@@ -78,16 +78,16 @@ def main() -> None:
 
     print()
     if main_ok and switcher_ok:
-        print("🎉 All applications validated successfully!")
-        print("✅ Ready to run: make run")
-        print("✅ Ready to run: make switcher")
-        print("✅ Ready to run: make run-all")
+        print("[SUCCESS] All applications validated successfully!")
+        print("[DONE] Ready to run: make run")
+        print("[DONE] Ready to run: make switcher")
+        print("[DONE] Ready to run: make run-all")
     else:
-        print("⚠️  Some applications have import issues")
+        print("[WARNING]  Some applications have import issues")
         if not main_ok:
-            print("❌ Main app needs attention")
+            print("[TODO] Main app needs attention")
         if not switcher_ok:
-            print("❌ Switcher app needs attention")
+            print("[TODO] Switcher app needs attention")
         sys.exit(1)
 
 

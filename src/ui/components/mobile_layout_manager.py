@@ -435,10 +435,10 @@ class MobileLayoutManager:
         st.markdown(
             """
         <div class="mobile-error">
-            <div class="mobile-error-title">⚠️ Interface Error</div>
+            <div class="mobile-error-title">[WARNING] Interface Error</div>
             <p>The mobile interface encountered an error. Please refresh the page.</p>
             <button onclick="window.location.reload()" class="mobile-button mobile-button-primary">
-                🔄 Refresh Page
+                [PARTIAL] Refresh Page
             </button>
         </div>
         """,
@@ -517,7 +517,7 @@ class MobileLayoutManager:
                 logger.warning("Critical memory pressure detected - performed cleanup")
 
                 # Show user notification
-                st.warning("⚠️ Low memory detected. Some features may be limited.")
+                st.warning("[WARNING] Low memory detected. Some features may be limited.")
 
             elif memory_pressure == "warning":
                 # Gentle cleanup
@@ -548,7 +548,7 @@ class MobileLayoutManager:
     def _render_performance_stats(self) -> None:
         """Render performance statistics for debugging."""
         try:
-            with st.expander("📊 Performance Stats", expanded=False):
+            with st.expander("[SUMMARY] Performance Stats", expanded=False):
                 # Get performance report
                 perf_report = self.performance_optimizer.get_performance_report() if self.performance_optimizer else {}
 

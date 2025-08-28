@@ -178,7 +178,7 @@ class TestEndToEndDeployment:
                 result = trainer.train()
                 assert result.success, f"Training failed: {result.error_message}"
 
-        print(f"✅ Training completed with accuracy: {0.85:.3f}")
+        print(f"[DONE] Training completed with accuracy: {0.85:.3f}")
 
         # Phase 2: Model Registration
         print("\n=== Phase 2: Model Registration ===")
@@ -201,7 +201,7 @@ class TestEndToEndDeployment:
         )
 
         assert model_id is not None
-        print(f"✅ Model registered with ID: {model_id}")
+        print(f"[DONE] Model registered with ID: {model_id}")
 
         # Verify model in registry
         model_info = registry.get_model(model_id)
@@ -227,7 +227,7 @@ class TestEndToEndDeployment:
             assert adapter.current_model_id == model_id
             assert len(adapter.class_names) == 14
 
-        print("✅ VisionAdapter successfully loaded model from registry")
+        print("[DONE] VisionAdapter successfully loaded model from registry")
 
         # Phase 4: Model Manager Integration
         print("\n=== Phase 4: Model Manager Integration ===")
@@ -272,7 +272,7 @@ class TestEndToEndDeployment:
                 break
 
         assert deployment_model is not None, "Deployment model not found in manager"
-        print(f"✅ Model available in manager: {deployment_model['name']}")
+        print(f"[DONE] Model available in manager: {deployment_model['name']}")
 
         # Phase 5: UI Deployment Simulation
         print("\n=== Phase 5: UI Deployment Simulation ===")
@@ -335,7 +335,7 @@ class TestEndToEndDeployment:
         for result in ui_results:
             print(f"  {result['scenario']}: {result['predicted_class']} ({result['confidence']:.2f})")
 
-        print("✅ UI deployment simulation successful")
+        print("[DONE] UI deployment simulation successful")
 
         # Phase 6: Model Export and Deployment Package
         print("\n=== Phase 6: Model Export and Deployment ===")
@@ -346,7 +346,7 @@ class TestEndToEndDeployment:
 
         assert exported_path is not None
         assert exported_path.exists()
-        print(f"✅ Model exported to: {exported_path}")
+        print(f"[DONE] Model exported to: {exported_path}")
 
         # Create deployment package
         package_path = registry.create_deployment_package(model_id=model_id, package_dir=deployment_workspace / "exports" / "deployment_package")
@@ -357,7 +357,7 @@ class TestEndToEndDeployment:
         assert (package_path / "config.json").exists()
         assert (package_path / "deployment.json").exists()
 
-        print(f"✅ Deployment package created at: {package_path}")
+        print(f"[DONE] Deployment package created at: {package_path}")
 
         # Phase 7: Validation and Testing
         print("\n=== Phase 7: Validation and Testing ===")
@@ -391,7 +391,7 @@ class TestEndToEndDeployment:
             test_adapter.load_checkpoint(str(package_model_path))
             assert test_adapter.is_loaded
 
-        print("✅ Deployment package validation successful")
+        print("[DONE] Deployment package validation successful")
 
         # Final Summary
         print("\n=== Deployment Summary ===")
@@ -401,7 +401,7 @@ class TestEndToEndDeployment:
         print(f"Dataset Samples: {analysis.total_samples}")
         print(f"Export Path: {exported_path}")
         print(f"Package Path: {package_path}")
-        print("🎉 End-to-end deployment test completed successfully!")
+        print("[SUCCESS] End-to-end deployment test completed successfully!")
 
     def test_multi_model_deployment_scenario(self, deployment_workspace, production_dataset):
         """Test deployment scenario with multiple models."""
@@ -475,7 +475,7 @@ class TestEndToEndDeployment:
             )
             model_ids.append(model_id)
 
-        print(f"✅ Created {len(model_ids)} models for deployment")
+        print(f"[DONE] Created {len(model_ids)} models for deployment")
 
         # Test model manager with multiple models
         config_path = deployment_workspace / "config" / "multi_model_config.json"
@@ -537,7 +537,7 @@ class TestEndToEndDeployment:
             if recommended_model:
                 print(f"  {use_case['name']}: {recommended_model['name']}")
 
-        print("✅ Multi-model deployment scenario completed")
+        print("[DONE] Multi-model deployment scenario completed")
 
     def test_deployment_rollback_scenario(self, deployment_workspace):
         """Test deployment rollback scenario."""
@@ -608,7 +608,7 @@ class TestEndToEndDeployment:
             success = manager.load_model(stable_models[0]["id"])
             assert success
 
-        print("✅ Stable model deployed")
+        print("[DONE] Stable model deployed")
 
         # Attempt to deploy experimental model
         with patch.object(manager, "_load_local_model") as mock_load:
@@ -623,7 +623,7 @@ class TestEndToEndDeployment:
                 # Should handle failure gracefully
                 assert True  # Either fails gracefully or succeeds
 
-        print("✅ Experimental model deployment handled")
+        print("[DONE] Experimental model deployment handled")
 
         # Test rollback to stable model
         with patch.object(manager, "_load_local_model") as mock_load:
@@ -639,7 +639,7 @@ class TestEndToEndDeployment:
 
             assert success
 
-        print("✅ Rollback to stable model successful")
+        print("[DONE] Rollback to stable model successful")
 
     def test_deployment_monitoring_and_health_checks(self, deployment_workspace):
         """Test deployment monitoring and health check capabilities."""
@@ -714,7 +714,7 @@ class TestEndToEndDeployment:
             # If metrics are available, verify they're reasonable
             assert isinstance(performance_metrics, dict)
 
-        print("✅ Deployment monitoring test completed")
+        print("[DONE] Deployment monitoring test completed")
 
     def test_deployment_configuration_management(self, deployment_workspace):
         """Test deployment configuration management."""
@@ -760,7 +760,7 @@ class TestEndToEndDeployment:
                 for key, value in config_template.items():
                     assert current_config.get(key) == value or True
 
-        print("✅ Deployment configuration management test completed")
+        print("[DONE] Deployment configuration management test completed")
 
 
 if __name__ == "__main__":

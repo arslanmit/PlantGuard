@@ -11,7 +11,7 @@ def add_huggingface_model(model_id: str, name: str | None = None, description: s
     config_path = Path("config/models.json")
 
     if not config_path.exists():
-        print("❌ Configuration file not found. Run model_switcher.py first to create it.")
+        print("[TODO] Configuration file not found. Run model_switcher.py first to create it.")
         return False
 
     # Load current config
@@ -23,7 +23,7 @@ def add_huggingface_model(model_id: str, name: str | None = None, description: s
 
     # Check if model already exists
     if model_key in config["models"]:
-        print(f"⚠️  Model {model_key} already exists in configuration")
+        print(f"[WARNING]  Model {model_key} already exists in configuration")
         return False
 
     # Create model configuration
@@ -45,7 +45,7 @@ def add_huggingface_model(model_id: str, name: str | None = None, description: s
     with config_path.open("w") as f:
         json.dump(config, f, indent=2)
 
-    print(f"✅ Added model: {model_key}")
+    print(f"[DONE] Added model: {model_key}")
     print(f"   Name: {model_config['name']}")
     print(f"   Model ID: {model_id}")
     print("   Status: Enabled")
@@ -87,7 +87,7 @@ def list_huggingface_plant_models() -> None:
     print("=" * 60)
 
     for model in models:
-        print(f"\n📋 {model['id']}")
+        print(f"\n[DETAILS] {model['id']}")
         print(f"   Name: {model['name']}")
         print(f"   Description: {model['description']}")
         print(f"   Add with: python add_new_model.py --add {model['id']}")
@@ -98,7 +98,7 @@ def remove_model(model_key: str) -> bool:
     config_path = Path("config/models.json")
 
     if not config_path.exists():
-        print("❌ Configuration file not found")
+        print("[TODO] Configuration file not found")
         return False
 
     # Load current config
@@ -106,7 +106,7 @@ def remove_model(model_key: str) -> bool:
         config = json.load(f)
 
     if model_key not in config["models"]:
-        print(f"❌ Model {model_key} not found in configuration")
+        print(f"[TODO] Model {model_key} not found in configuration")
         return False
 
     # Remove model
@@ -117,16 +117,16 @@ def remove_model(model_key: str) -> bool:
         remaining_models = [k for k, v in config["models"].items() if v.get("enabled", True)]
         if remaining_models:
             config["default_model"] = remaining_models[0]
-            print(f"🔄 Updated default model to: {remaining_models[0]}")
+            print(f"[PARTIAL] Updated default model to: {remaining_models[0]}")
         else:
             config["default_model"] = None
-            print("⚠️  No default model set (no enabled models remaining)")
+            print("[WARNING]  No default model set (no enabled models remaining)")
 
     # Save updated config
     with config_path.open("w") as f:
         json.dump(config, f, indent=2)
 
-    print(f"✅ Removed model: {model_key}")
+    print(f"[DONE] Removed model: {model_key}")
     print(f"   Name: {removed_model['name']}")
 
     return True
@@ -137,7 +137,7 @@ def enable_disable_model(model_key: str, enable: bool) -> bool:
     config_path = Path("config/models.json")
 
     if not config_path.exists():
-        print("❌ Configuration file not found")
+        print("[TODO] Configuration file not found")
         return False
 
     # Load current config
@@ -145,7 +145,7 @@ def enable_disable_model(model_key: str, enable: bool) -> bool:
         config = json.load(f)
 
     if model_key not in config["models"]:
-        print(f"❌ Model {model_key} not found in configuration")
+        print(f"[TODO] Model {model_key} not found in configuration")
         return False
 
     # Update enabled status
@@ -156,7 +156,7 @@ def enable_disable_model(model_key: str, enable: bool) -> bool:
         json.dump(config, f, indent=2)
 
     status = "enabled" if enable else "disabled"
-    print(f"✅ Model {model_key} {status}")
+    print(f"[DONE] Model {model_key} {status}")
 
     return True
 
@@ -166,7 +166,7 @@ def set_default_model(model_key: str) -> bool:
     config_path = Path("config/models.json")
 
     if not config_path.exists():
-        print("❌ Configuration file not found")
+        print("[TODO] Configuration file not found")
         return False
 
     # Load current config
@@ -174,11 +174,11 @@ def set_default_model(model_key: str) -> bool:
         config = json.load(f)
 
     if model_key not in config["models"]:
-        print(f"❌ Model {model_key} not found in configuration")
+        print(f"[TODO] Model {model_key} not found in configuration")
         return False
 
     if not config["models"][model_key].get("enabled", True):
-        print(f"⚠️  Model {model_key} is disabled. Enable it first.")
+        print(f"[WARNING]  Model {model_key} is disabled. Enable it first.")
         return False
 
     # Set as default
@@ -188,7 +188,7 @@ def set_default_model(model_key: str) -> bool:
     with config_path.open("w") as f:
         json.dump(config, f, indent=2)
 
-    print(f"✅ Set default model to: {model_key}")
+    print(f"[DONE] Set default model to: {model_key}")
     print(f"   Name: {config['models'][model_key]['name']}")
 
     return True
@@ -199,7 +199,7 @@ def show_config() -> None:
     config_path = Path("config/models.json")
 
     if not config_path.exists():
-        print("❌ Configuration file not found")
+        print("[TODO] Configuration file not found")
         return
 
     with config_path.open() as f:
@@ -211,7 +211,7 @@ def show_config() -> None:
     print(f"Default Model: {config.get('default_model', 'None')}")
     print(f"Total Models: {len(config.get('models', {}))}")
 
-    print("\n📋 Models:")
+    print("\n[DETAILS] Models:")
     for model_key, model_config in config.get("models", {}).items():
         status = "🟢 Enabled" if model_config.get("enabled", True) else "🔴 Disabled"
         default = " (DEFAULT)" if model_key == config.get("default_model") else ""
@@ -263,7 +263,7 @@ def main() -> None:
     else:
         parser.print_help()
         print("\n" + "=" * 50)
-        print("💡 Quick Examples:")
+        print("[TIP] Quick Examples:")
         print("  python add_new_model.py --show-config")
         print("  python add_new_model.py --list-popular")
         print("  python add_new_model.py --add Abhiram4/PlantDiseaseDetectorVit2")

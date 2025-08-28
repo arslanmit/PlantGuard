@@ -147,13 +147,13 @@ class MobileTextInput(MobileBaseComponent):
         with col1:
             # Character count display
             if char_count > self.text_config["character_limit_warning"]:
-                st.warning(f"⚠️ {char_count}/{char_limit} characters")
+                st.warning(f"[WARNING] {char_count}/{char_limit} characters")
             else:
                 st.info(f"📝 {char_count}/{char_limit} characters")
 
         with col2:
             # Suggestions toggle
-            if st.button("💡 Suggestions", key=f"{self.component_id}_suggestions_toggle"):
+            if st.button("[TIP] Suggestions", key=f"{self.component_id}_suggestions_toggle"):
                 self._toggle_suggestions()
 
         with col3:
@@ -191,15 +191,15 @@ class MobileTextInput(MobileBaseComponent):
         validation_status = self._validate_text_input(current_text)
         if validation_status["warnings"]:
             for warning in validation_status["warnings"]:
-                st.warning(f"⚠️ {warning}")
+                st.warning(f"[WARNING] {warning}")
 
         if validation_status["errors"]:
             for error in validation_status["errors"]:
-                st.error(f"❌ {error}")
+                st.error(f"[TODO] {error}")
 
     def _render_suggestions(self) -> None:
         """Render text input suggestions."""
-        st.markdown("### 💡 Suggested Questions")
+        st.markdown("### [TIP] Suggested Questions")
 
         # Category tabs
         categories = list(self.suggestion_categories.keys())
@@ -217,11 +217,11 @@ class MobileTextInput(MobileBaseComponent):
         col1, col2 = st.columns(2)
 
         with col1:
-            if st.button("❌ Hide Suggestions", key=f"{self.component_id}_hide_suggestions"):
+            if st.button("[TODO] Hide Suggestions", key=f"{self.component_id}_hide_suggestions"):
                 self._toggle_suggestions()
 
         with col2:
-            if st.button("🔄 More Ideas", key=f"{self.component_id}_more_suggestions"):
+            if st.button("[PARTIAL] More Ideas", key=f"{self.component_id}_more_suggestions"):
                 self._generate_more_suggestions()
 
     def _render_text_history(self, text_history: list[dict[str, Any]]) -> None:
@@ -244,10 +244,10 @@ class MobileTextInput(MobileBaseComponent):
 
                 with col2:
                     # Action buttons
-                    if st.button("🔄 Ask Again", key=f"{self.component_id}_reask_{i}"):
+                    if st.button("[PARTIAL] Ask Again", key=f"{self.component_id}_reask_{i}"):
                         self._reuse_text(entry["text"])
 
-                    if st.button("❌ Remove", key=f"{self.component_id}_remove_{i}"):
+                    if st.button("[TODO] Remove", key=f"{self.component_id}_remove_{i}"):
                         self._remove_from_history(entry["text"])
 
     def _render_text_settings(self) -> None:
@@ -329,7 +329,7 @@ class MobileTextInput(MobileBaseComponent):
         """Handle text submission and processing."""
         try:
             if not self._is_text_valid(text):
-                st.error("❌ Please enter a valid question")
+                st.error("[TODO] Please enter a valid question")
                 return
 
             # Add to text history
@@ -402,7 +402,7 @@ class MobileTextInput(MobileBaseComponent):
                 # Check for errors
                 if "error" in processing_result:
                     logger.error("Text processing error: %s", processing_result["error"])
-                    st.warning("⚠️ Response generation had issues, but here's what I can tell you:")
+                    st.warning("[WARNING] Response generation had issues, but here's what I can tell you:")
 
                 # Update history entry with response
                 if response:
@@ -417,16 +417,16 @@ class MobileTextInput(MobileBaseComponent):
                         confidence_context = processing_result.get("confidence_context", 0.0)
 
                         if disease_context and confidence_context > 0:
-                            st.info(f"💡 This response is based on your recent analysis: {disease_context} ({confidence_context:.1%} confidence)")
+                            st.info(f"[TIP] This response is based on your recent analysis: {disease_context} ({confidence_context:.1%} confidence)")
 
                     st.success("🤖 Response generated!")
                 else:
-                    st.warning("⚠️ No response generated. Please try rephrasing your question.")
+                    st.warning("[WARNING] No response generated. Please try rephrasing your question.")
 
         except Exception as e:
             logger.error("Text processing failed: %s", e)
             self.handle_error(e, ErrorCategory.INTEGRATION, ErrorSeverity.MEDIUM)
-            st.error("❌ Failed to process your question. Please try again.")
+            st.error("[TODO] Failed to process your question. Please try again.")
 
     def _update_history_with_response(self, text: str, response: str) -> None:
         """Update history entry with generated response."""
@@ -454,7 +454,7 @@ class MobileTextInput(MobileBaseComponent):
         # Hide suggestions
         self._toggle_suggestions()
 
-        st.success(f"💡 Using suggestion: {suggestion[:50]}...")
+        st.success(f"[TIP] Using suggestion: {suggestion[:50]}...")
 
     def _reuse_text(self, text: str) -> None:
         """Reuse text from history."""
@@ -464,7 +464,7 @@ class MobileTextInput(MobileBaseComponent):
         state["data"]["text_data"] = text_data
         self.set_state(state)
 
-        st.success("🔄 Text restored from history")
+        st.success("[PARTIAL] Text restored from history")
 
     def _remove_from_history(self, text: str) -> None:
         """Remove entry from text history."""
@@ -507,7 +507,7 @@ class MobileTextInput(MobileBaseComponent):
 
     def _generate_more_suggestions(self) -> None:
         """Generate additional suggestions (placeholder for future enhancement)."""
-        st.info("💡 More suggestions feature coming soon!")
+        st.info("[TIP] More suggestions feature coming soon!")
 
     def get_current_text(self) -> str:
         """Get current text input."""

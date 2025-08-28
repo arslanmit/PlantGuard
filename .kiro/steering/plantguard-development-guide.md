@@ -9,11 +9,11 @@ inclusion: always
 **Pipeline**: `User Input → [Vision/Audio/Text Adapter] → Fusion Model → Response`
 
 **CRITICAL CONSTRAINT**: All ML inference must be **local-only**
-- ❌ No external APIs (OpenAI, Replicate, cloud ML services)
-- ❌ No user data sent to external services
-- ❌ No internet-dependent inference
-- ✅ Offline capability after model downloads
-- ✅ Graceful degradation when adapters fail
+- [TODO] No external APIs (OpenAI, Replicate, cloud ML services)
+- [TODO] No user data sent to external services
+- [TODO] No internet-dependent inference
+- [DONE] Offline capability after model downloads
+- [DONE] Graceful degradation when adapters fail
 
 ## Required Tech Stack
 
@@ -112,8 +112,8 @@ device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 - Use `torch.compile()` for performance optimization
 
 **MCP Integration**:
-- ❌ Never use external APIs for core PlantGuard functionality
-- ✅ Use MCP for: GitHub operations, documentation lookup, file management
+- [TODO] Never use external APIs for core PlantGuard functionality
+- [DONE] Use MCP for: GitHub operations, documentation lookup, file management
 - Always test MCP tools before integration
 
 ## Project Structure

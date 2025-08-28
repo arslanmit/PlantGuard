@@ -102,7 +102,7 @@ class ImageInterface:
 
         except Exception as e:
             logger.warning(f"Failed to load image: {e}")
-            st.toast("Failed to load image", icon="⚠️")
+            st.toast("Failed to load image", icon="[WARNING]")
             return None
 
     def correct_image_orientation(self, image: Image.Image) -> Image.Image:
@@ -249,7 +249,7 @@ class ImageInterface:
                     # Validate file
                     is_valid, error_msg = self.validate_image_file(uploaded_file)
                     if not is_valid:
-                        st.error(f"❌ {uploaded_file.name}: {error_msg}")
+                        st.error(f"[TODO] {uploaded_file.name}: {error_msg}")
                         continue
 
                     # Load image
@@ -257,13 +257,13 @@ class ImageInterface:
                     if image:
                         images.append(image)
                         valid_images += 1
-                        st.write(f"✅ {uploaded_file.name} loaded successfully")
+                        st.write(f"[DONE] {uploaded_file.name} loaded successfully")
 
                 if valid_images > 0:
-                    status.update(label=f"✅ Processed {valid_images} image(s) successfully!", state="complete")
+                    status.update(label=f"[DONE] Processed {valid_images} image(s) successfully!", state="complete")
                     st.session_state.uploaded_images = images
                 else:
-                    status.update(label="❌ No valid images processed", state="error")
+                    status.update(label="[TODO] No valid images processed", state="error")
 
         return images
 
@@ -317,7 +317,7 @@ class ImageInterface:
             st.checkbox("Create thumbnails", value=True, help="Create thumbnail previews")
 
         with col3:
-            if st.button("🚀 Process All", type="primary"):
+            if st.button("[LAUNCH] Process All", type="primary"):
                 processed_images = []
 
                 # Use a progress bar only when available
@@ -342,7 +342,7 @@ class ImageInterface:
                             processed_images.append(image)
 
                 st.session_state.processed_images = processed_images
-                st.success(f"✅ Processed {len(processed_images)} images")
+                st.success(f"[DONE] Processed {len(processed_images)} images")
                 return processed_images
 
         return st.session_state.processed_images or images

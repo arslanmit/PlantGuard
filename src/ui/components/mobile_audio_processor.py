@@ -120,7 +120,7 @@ class MobileAudioProcessor(MobileBaseComponent):
             self._handle_audio_upload(uploaded_audio)
 
         # Audio processing options
-        with st.expander("🔧 Processing Options", expanded=False):
+        with st.expander("[TOOL] Processing Options", expanded=False):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -149,12 +149,12 @@ class MobileAudioProcessor(MobileBaseComponent):
 
             if not validation_result["is_valid"]:
                 for error in validation_result["errors"]:
-                    st.error(f"❌ {error}")
+                    st.error(f"[TODO] {error}")
                 return
 
             # Show warnings if any
             for warning in validation_result.get("warnings", []):
-                st.warning(f"⚠️ {warning}")
+                st.warning(f"[WARNING] {warning}")
 
             # Update processing status
             self._update_processing_status("processing")
@@ -253,7 +253,7 @@ class MobileAudioProcessor(MobileBaseComponent):
                 quality_score = self._analyze_audio_quality(audio_file_path)
 
                 if quality_score < self.audio_config["quality_threshold"]:
-                    st.warning(f"⚠️ Audio quality is low (score: {quality_score:.2f}). Results may be poor.")
+                    st.warning(f"[WARNING] Audio quality is low (score: {quality_score:.2f}). Results may be poor.")
 
             # Enhance audio if requested and quality is low
             processed_audio_path = audio_file_path
@@ -288,7 +288,7 @@ class MobileAudioProcessor(MobileBaseComponent):
                 self.set_state(state)
 
                 # Display success
-                st.success(f"✅ Transcription completed in {processing_time:.1f}s")
+                st.success(f"[DONE] Transcription completed in {processing_time:.1f}s")
                 st.info(f"📝 **Transcribed Text:** {transcription}")
 
                 # Process the transcribed text for plant-related queries
@@ -296,7 +296,7 @@ class MobileAudioProcessor(MobileBaseComponent):
 
             else:
                 error_msg = transcription_result.get("error", "Unknown error")
-                st.error(f"❌ Transcription failed: {error_msg}")
+                st.error(f"[TODO] Transcription failed: {error_msg}")
 
             # Clean up temporary files
             Path(audio_file_path).unlink(missing_ok=True)
@@ -481,13 +481,13 @@ class MobileAudioProcessor(MobileBaseComponent):
                     st.write(f"**Quality:** {entry['quality_score']:.2f}")
                     st.write(f"**Time:** {entry['processing_time']:.1f}s")
                     if entry.get("enhanced", False):
-                        st.write("**Enhanced:** ✅")
+                        st.write("**Enhanced:** [DONE]")
 
                 # Action buttons
                 col1, col2, col3 = st.columns(3)
 
                 with col1:
-                    if st.button("🔄 Reprocess", key=f"{self.component_id}_reprocess_{i}"):
+                    if st.button("[PARTIAL] Reprocess", key=f"{self.component_id}_reprocess_{i}"):
                         st.info("Please upload the audio file again to reprocess.")
 
                 with col2:
@@ -495,7 +495,7 @@ class MobileAudioProcessor(MobileBaseComponent):
                         self._process_transcribed_text(entry["transcription"])
 
                 with col3:
-                    if st.button("❌ Remove", key=f"{self.component_id}_remove_{i}"):
+                    if st.button("[TODO] Remove", key=f"{self.component_id}_remove_{i}"):
                         self._remove_history_entry(entry["timestamp"])
 
     def _update_processing_status(self, status: str) -> None:

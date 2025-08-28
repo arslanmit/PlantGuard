@@ -48,7 +48,7 @@ def list_models_legacy(manager: PlantGuardModelManager) -> None:
         status = "🟢 CURRENT" if model["is_current"] else "⚪ Available" if model["enabled"] else "🔴 Disabled"
         accuracy = f"{model['accuracy']:.1%}" if model["accuracy"] > 0 else "Unknown"
 
-        print(f"\n📋 {model['id']}")
+        print(f"\n[DETAILS] {model['id']}")
         print(f"   Name: {model['name']}")
         print(f"   Type: {model['type']}")
         print(f"   Accuracy: {accuracy}")
@@ -71,7 +71,7 @@ def list_models_registry() -> None:
     for model in models:
         accuracy = f"{model.metadata.performance_metrics.get('accuracy', 0):.1%}" if model.metadata.performance_metrics else "Unknown"
 
-        print(f"\n📋 {model.metadata.model_id}")
+        print(f"\n[DETAILS] {model.metadata.model_id}")
         print(f"   Version: {model.metadata.version}")
         print(f"   Architecture: {model.metadata.architecture}")
         print(f"   Training Date: {model.metadata.training_date.strftime('%Y-%m-%d %H:%M')}")
@@ -90,43 +90,43 @@ def list_models(manager=None) -> None:
 
 def switch_model_legacy(manager: PlantGuardModelManager, model_id: str) -> None:
     """Switch to a specific model (legacy mode)."""
-    print(f"🔄 Switching to model: {model_id}")
+    print(f"[PARTIAL] Switching to model: {model_id}")
 
     if manager.switch_model(model_id):
-        print(f"✅ Successfully switched to: {model_id}")
+        print(f"[DONE] Successfully switched to: {model_id}")
 
         # Show current model info
         info = manager.get_current_model_info()
-        print("\n📊 Current Model Info:")
+        print("\n[SUMMARY] Current Model Info:")
         print(f"   Name: {info['name']}")
         print(f"   Type: {info['type']}")
         print(f"   Classes: {info['num_classes']}")
         print(f"   Device: {info['device']}")
         print(f"   Accuracy: {info['accuracy']:.1%}")
     else:
-        print(f"❌ Failed to switch to model: {model_id}")
+        print(f"[TODO] Failed to switch to model: {model_id}")
 
 
 def switch_model_registry(model_id: str) -> VisionAdapter | None:
     """Switch to a specific model (registry mode)."""
-    print(f"🔄 Loading model from registry: {model_id}")
+    print(f"[PARTIAL] Loading model from registry: {model_id}")
 
     try:
         registry = ModelRegistry()
         model_info = registry.get_model(model_id)
 
         if not model_info:
-            print(f"❌ Model not found in registry: {model_id}")
+            print(f"[TODO] Model not found in registry: {model_id}")
             return None
 
         # Create vision adapter and load model
         adapter = VisionAdapter()
         adapter.load_from_registry(model_id)
 
-        print(f"✅ Successfully loaded model: {model_id}")
+        print(f"[DONE] Successfully loaded model: {model_id}")
 
         # Show model info
-        print("\n📊 Model Info:")
+        print("\n[SUMMARY] Model Info:")
         print(f"   Version: {getattr(model_info.metadata, 'version', 'unknown')}")
         print(f"   Architecture: {getattr(model_info.metadata, 'architecture', 'unknown')}")
         print(f"   Classes: {len(adapter.get_class_names())}")
@@ -146,7 +146,7 @@ def switch_model_registry(model_id: str) -> VisionAdapter | None:
         return adapter
 
     except Exception as e:
-        print(f"❌ Failed to load model: {e}")
+        print(f"[TODO] Failed to load model: {e}")
         return None
 
 
@@ -161,7 +161,7 @@ def switch_model(manager, model_id: str) -> VisionAdapter | None:
 def test_model_legacy(manager: PlantGuardModelManager, image_path: str) -> None:
     """Test current model on an image (legacy mode)."""
     if not Path(image_path).exists():
-        print(f"❌ Image not found: {image_path}")
+        print(f"[TODO] Image not found: {image_path}")
         return
 
     try:
@@ -173,18 +173,18 @@ def test_model_legacy(manager: PlantGuardModelManager, image_path: str) -> None:
         print(f"🌿 Plant Type: {result['plant_type']}")
         print(f"🦠 Disease: {result['disease']}")
         print(f"💚 Healthy: {'Yes' if result['is_healthy'] else 'No'}")
-        print(f"📊 Confidence: {result['confidence_percentage']}")
-        print(f"💡 Recommendation: {result['recommendation']}")
+        print(f"[SUMMARY] Confidence: {result['confidence_percentage']}")
+        print(f"[TIP] Recommendation: {result['recommendation']}")
         print(f"🤖 Model: {result['model_info']['model_name']}")
 
     except Exception as e:
-        print(f"❌ Failed to test image: {e}")
+        print(f"[TODO] Failed to test image: {e}")
 
 
 def test_model_registry(adapter: VisionAdapter, image_path: str) -> None:
     """Test model on an image (registry mode)."""
     if not Path(image_path).exists():
-        print(f"❌ Image not found: {image_path}")
+        print(f"[TODO] Image not found: {image_path}")
         return
 
     try:
@@ -196,18 +196,18 @@ def test_model_registry(adapter: VisionAdapter, image_path: str) -> None:
         print(f"🌿 Plant Type: {plant_type}")
         print(f"🦠 Disease: {readable_name}")
         print(f"💚 Healthy: {'Yes' if adapter.is_healthy(raw_class) else 'No'}")
-        print(f"📊 Confidence: {confidence:.1%}")
+        print(f"[SUMMARY] Confidence: {confidence:.1%}")
         print(f"🤖 Raw Class: {raw_class}")
 
     except Exception as e:
-        print(f"❌ Failed to test image: {e}")
+        print(f"[TODO] Failed to test image: {e}")
 
 
 def run_test_model(manager, image_path: str, adapter: VisionAdapter = None) -> None:
     """Test current model on an image."""
     if LEGACY_MODE:
         if adapter is None:
-            print("❌ No model loaded. Use --switch to load a model first.")
+            print("[TODO] No model loaded. Use --switch to load a model first.")
             return
         test_model_registry(adapter, image_path)
     else:
@@ -221,7 +221,7 @@ def quick_test(manager: PlantGuardModelManager) -> None:
     policy. Use --test IMAGE_PATH to test with your own images placed under
     data/raw/ or provide a custom path.
     """
-    print("❌ Quick test on sample images is disabled in this repository.")
+    print("[TODO] Quick test on sample images is disabled in this repository.")
 
 
 def benchmark_models(manager: PlantGuardModelManager) -> None:
@@ -230,11 +230,11 @@ def benchmark_models(manager: PlantGuardModelManager) -> None:
     enabled_models = [m for m in models if m["enabled"]]
 
     if not enabled_models:
-        print("❌ No enabled models found")
+        print("[TODO] No enabled models found")
         return
 
     # Benchmark disabled for sample-based dataset
-    print("❌ Benchmarking on bundled sample images is disabled in this repository.")
+    print("[TODO] Benchmarking on bundled sample images is disabled in this repository.")
     print("Use your own validation dataset and the evaluator APIs to benchmark models.")
 
 
@@ -260,7 +260,7 @@ def main() -> None:
         try:
             manager = PlantGuardModelManager()
         except Exception as e:
-            print(f"❌ Failed to initialize model manager: {e}")
+            print(f"[TODO] Failed to initialize model manager: {e}")
             return
 
     # Execute commands
@@ -279,14 +279,14 @@ def main() -> None:
         # Migrate legacy model to registry format
         legacy_path = args.migrate
         if not Path(legacy_path).exists():
-            print(f"❌ Legacy model not found: {legacy_path}")
+            print(f"[TODO] Legacy model not found: {legacy_path}")
             return
 
         try:
             adapter = VisionAdapter()
             output_path = f"data/models/migrated_{Path(legacy_path).stem}.pt"
             adapter.migrate_legacy_model(legacy_path, output_path)
-            print(f"✅ Model migrated successfully: {output_path}")
+            print(f"[DONE] Model migrated successfully: {output_path}")
 
             # Register in registry
             registry = ModelRegistry()
@@ -299,36 +299,36 @@ def main() -> None:
             print(f"📝 Model registered with ID: {model_id}")
 
         except Exception as e:
-            print(f"❌ Migration failed: {e}")
+            print(f"[TODO] Migration failed: {e}")
 
     elif args.sync:
         # Sync configuration with registry
         if not LEGACY_MODE:
             if manager.sync_with_registry():
-                print("✅ Successfully synced configuration with registry")
+                print("[DONE] Successfully synced configuration with registry")
             else:
-                print("❌ Failed to sync with registry")
+                print("[TODO] Failed to sync with registry")
         else:
-            print("❌ Sync only available with model manager")
+            print("[TODO] Sync only available with model manager")
 
     elif args.migrate_all:
         # Migrate all legacy models
         if not LEGACY_MODE:
             migrated = manager.migrate_legacy_models()
             if migrated:
-                print(f"✅ Successfully migrated {len(migrated)} models:")
+                print(f"[DONE] Successfully migrated {len(migrated)} models:")
                 for model_id in migrated:
                     print(f"  - {model_id}")
             else:
                 print("No legacy models found to migrate")
         else:
-            print("❌ Bulk migration only available with model manager")
+            print("[TODO] Bulk migration only available with model manager")
 
     # --quick-test flag removed: sample-based quick tests disabled per project policy
 
     elif args.benchmark:
         if LEGACY_MODE:
-            print("❌ Benchmark not available in registry mode yet.")
+            print("[TODO] Benchmark not available in registry mode yet.")
         else:
             benchmark_models(manager)
 
@@ -342,7 +342,7 @@ def main() -> None:
                 print(f"Device: {info['device']}")
                 print(f"Model Path: {info['model_path']}")
             else:
-                print("❌ No model currently loaded")
+                print("[TODO] No model currently loaded")
         else:
             info = manager.get_current_model_info()
             if "error" not in info:
@@ -355,7 +355,7 @@ def main() -> None:
                 print(f"Classes: {info['num_classes']}")
                 print(f"Device: {info['device']}")
             else:
-                print("❌ No model currently loaded")
+                print("[TODO] No model currently loaded")
 
     else:
         # Default: show help and current status
@@ -363,7 +363,7 @@ def main() -> None:
         print("\n" + "=" * 50)
 
         mode_str = "Registry Mode" if LEGACY_MODE else "Legacy Mode"
-        print(f"🔧 Running in: {mode_str}")
+        print(f"[TOOL] Running in: {mode_str}")
 
         if not LEGACY_MODE and manager:
             # Show current model if any
@@ -373,7 +373,7 @@ def main() -> None:
             else:
                 print("🤖 No model currently loaded")
 
-        print("\n💡 Quick Commands:")
+        print("\n[TIP] Quick Commands:")
         print("  python scripts/model_switching/model_switcher.py --list              # List all models")
         print("  python scripts/model_switching/model_switcher.py --switch MODEL_ID   # Switch to model")
         print("  python scripts/model_switching/model_switcher.py --test IMAGE_PATH   # Test model")

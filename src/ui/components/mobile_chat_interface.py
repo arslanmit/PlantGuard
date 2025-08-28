@@ -320,7 +320,7 @@ class MobileChatInterface(MobileBaseComponent):
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            if st.button("📋 History", key=f"{self.component_id}_history", use_container_width=True):
+            if st.button("[DETAILS] History", key=f"{self.component_id}_history", use_container_width=True):
                 self._show_chat_history()
 
         with col2:
@@ -486,7 +486,7 @@ class MobileChatInterface(MobileBaseComponent):
         error_msg = {
             "id": f"msg_{datetime.now().strftime('%Y%m%d_%H%M%S')}_error",
             "type": "bot",
-            "content": f"❌ {error_text}",
+            "content": f"[TODO] {error_text}",
             "timestamp": datetime.now().isoformat(),
             "context": None,
         }
@@ -549,7 +549,7 @@ class MobileChatInterface(MobileBaseComponent):
         chat_data = state["data"]["chat_data"]
         messages = chat_data.get("messages", [])
 
-        with st.expander("📋 Chat History", expanded=True):
+        with st.expander("[DETAILS] Chat History", expanded=True):
             if not messages:
                 st.info("No chat history available.")
             else:
@@ -581,7 +581,7 @@ class MobileChatInterface(MobileBaseComponent):
 
         st.text_area("📤 Chat Export", value=export_text, height=200, key=f"{self.component_id}_export_text")
 
-        st.success("✅ Chat history ready to export! Copy the text above.")
+        st.success("[DONE] Chat history ready to export! Copy the text above.")
 
     def _show_chat_settings(self) -> None:
         """Show chat settings."""
@@ -601,7 +601,7 @@ class MobileChatInterface(MobileBaseComponent):
             🌿 **Ask Questions:** Type any plant care question
             📷 **Use Context:** Chat knows about your recent plant analysis
             🎤 **Voice Input:** Use the voice button (coming soon)
-            📋 **Quick Actions:** Use preset question buttons
+            [DETAILS] **Quick Actions:** Use preset question buttons
             
             **Example Questions:**
             • "How often should I water my plant?"

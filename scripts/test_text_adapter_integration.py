@@ -63,7 +63,7 @@ def test_integration_scenarios():
     print(f"   Response preview: {response[:100]}...")
     assert "prevention" in response.lower()
 
-    print("\n✅ All integration scenarios tested successfully!")
+    print("\n[DONE] All integration scenarios tested successfully!")
 
 
 def test_knowledge_base_consistency():
@@ -94,9 +94,9 @@ def test_knowledge_base_consistency():
             pass
 
     if inconsistencies:
-        print(f"   ⚠️  Found inconsistencies: {inconsistencies}")
+        print(f"   [WARNING]  Found inconsistencies: {inconsistencies}")
     else:
-        print("   ✅ Knowledge base is consistent with class mappings")
+        print("   [DONE] Knowledge base is consistent with class mappings")
 
 
 def main():
@@ -104,9 +104,9 @@ def main():
     try:
         test_integration_scenarios()
         test_knowledge_base_consistency()
-        print("\n🎉 All integration tests passed!")
+        print("\n[SUCCESS] All integration tests passed!")
     except Exception as e:
-        print(f"\n❌ Integration test failed: {e}")
+        print(f"\n[TODO] Integration test failed: {e}")
         import traceback
 
         traceback.print_exc()

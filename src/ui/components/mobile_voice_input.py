@@ -177,7 +177,7 @@ class MobileVoiceInput(MobileBaseComponent):
                     self._pause_recording()
 
             with col3:
-                if st.button("❌ Cancel", key=f"{self.component_id}_cancel_rec"):
+                if st.button("[TODO] Cancel", key=f"{self.component_id}_cancel_rec"):
                     self._cancel_recording()
 
             # Display recording status
@@ -189,7 +189,7 @@ class MobileVoiceInput(MobileBaseComponent):
         except Exception as e:
             logger.error("Recording interface failed: %s", e)
             self.handle_error(e, ErrorCategory.INTEGRATION, ErrorSeverity.HIGH)
-            st.error("❌ Microphone access failed. Please check permissions.")
+            st.error("[TODO] Microphone access failed. Please check permissions.")
 
     def _start_recording(self) -> None:
         """Start voice recording."""
@@ -228,7 +228,7 @@ class MobileVoiceInput(MobileBaseComponent):
 
             # Check minimum duration
             if duration < self.voice_config["min_recording_duration"]:
-                st.warning(f"⚠️ Recording too short. Minimum: {self.voice_config['min_recording_duration']}s")
+                st.warning(f"[WARNING] Recording too short. Minimum: {self.voice_config['min_recording_duration']}s")
                 self._cancel_recording()
                 return
 
@@ -304,7 +304,7 @@ class MobileVoiceInput(MobileBaseComponent):
             # Get audio data
             audio_data = voice_data.get("audio_data")
             if not audio_data:
-                st.error("❌ No audio data recorded")
+                st.error("[TODO] No audio data recorded")
                 return
 
             # Save audio to temporary file
@@ -335,7 +335,7 @@ class MobileVoiceInput(MobileBaseComponent):
                     self._process_transcribed_text(transcription)
 
                 else:
-                    st.error("❌ Speech-to-text failed. Please try again.")
+                    st.error("[TODO] Speech-to-text failed. Please try again.")
                     voice_data["processing_status"] = "error"
 
         except Exception as e:
@@ -436,7 +436,7 @@ class MobileVoiceInput(MobileBaseComponent):
                 # Check for errors
                 if "error" in processing_result:
                     logger.error("Text processing error: %s", processing_result["error"])
-                    st.warning("⚠️ Response generation had issues, but here's what I can tell you:")
+                    st.warning("[WARNING] Response generation had issues, but here's what I can tell you:")
 
                 # Display response
                 response = processing_result.get("response", "")
@@ -447,7 +447,7 @@ class MobileVoiceInput(MobileBaseComponent):
                     with st.expander("🤖 AI Response", expanded=True):
                         st.write(response)
                 else:
-                    st.warning("⚠️ No response generated. Please try rephrasing your question.")
+                    st.warning("[WARNING] No response generated. Please try rephrasing your question.")
 
         except Exception as e:
             logger.error("Text processing failed: %s", e)
@@ -500,16 +500,16 @@ class MobileVoiceInput(MobileBaseComponent):
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("✅ Use Text", key=f"{self.component_id}_use_transcription"):
+            if st.button("[DONE] Use Text", key=f"{self.component_id}_use_transcription"):
                 if edited_transcription.strip():
                     self._process_transcribed_text(edited_transcription.strip())
 
         with col2:
-            if st.button("🔄 Re-record", key=f"{self.component_id}_rerecord"):
+            if st.button("[PARTIAL] Re-record", key=f"{self.component_id}_rerecord"):
                 self._clear_transcription()
 
         with col3:
-            if st.button("❌ Clear", key=f"{self.component_id}_clear_transcription"):
+            if st.button("[TODO] Clear", key=f"{self.component_id}_clear_transcription"):
                 self._clear_transcription()
 
     def _render_last_recording(self, recording_data: dict[str, Any]) -> None:
@@ -524,10 +524,10 @@ class MobileVoiceInput(MobileBaseComponent):
 
         with col2:
             # Action buttons
-            if st.button("🔄 Record Again", key=f"{self.component_id}_record_again"):
+            if st.button("[PARTIAL] Record Again", key=f"{self.component_id}_record_again"):
                 self._clear_voice_state()
 
-            if st.button("❌ Clear", key=f"{self.component_id}_clear_last"):
+            if st.button("[TODO] Clear", key=f"{self.component_id}_clear_last"):
                 self._clear_last_recording()
 
     def _render_voice_settings(self) -> None:
