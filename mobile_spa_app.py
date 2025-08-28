@@ -54,7 +54,7 @@ try:
     from ui.components.mobile_testing_framework import MobileTestingFramework
 except ImportError:
     # Fallback if testing framework is not available
-    class MobileTestingFramework:
+    class MobileTestingFramework:  # type: ignore[no-redef]
         def test_all_components(self):
             return {"components_tested": 0, "status": "testing_framework_unavailable"}
 
@@ -64,11 +64,14 @@ try:
 except ImportError:
     # Fallback if performance optimizer is not available
     class MockPerformanceOptimizer:
-        def set_optimization_level(self, level): ...
+        def set_optimization_level(self, level):
+            pass
 
-        def enable_offline_mode(self): ...
+        def enable_offline_mode(self):
+            pass
 
-        def preload_critical_components(self, components): ...
+        def preload_critical_components(self, components):
+            pass
 
         def optimize_images(self, data):
             return data
@@ -85,7 +88,8 @@ except ImportError:
         @property
         def cache(self):
             class MockCache:
-                def clear(self): ...
+                def clear(self):
+                    pass
 
                 def get_stats(self):
                     return {}
@@ -526,8 +530,8 @@ class MobilePlantGuardApp:
             disease_class, confidence = self.vision_adapter.predict(image)
 
             # Get detailed information using text adapter
-            disease_info = {}
-            recommendations = []
+            disease_info: dict[str, Any] = {}
+            recommendations: list[str] = []
 
             if self.text_adapter:
                 disease_info = self.text_adapter.get_disease_info(disease_class)
