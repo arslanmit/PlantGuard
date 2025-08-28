@@ -802,7 +802,7 @@ def render_mobile_layout():
     
     with mobile_container.render():
         # 2. Header - AI Agent: App identification
-        MobileSectionHeader('main', '🌿 PlantGuard Mobile').render()
+        MobileSectionHeader('main', '[LEAF] PlantGuard Mobile').render()
         
         # 3. Input section - AI Agent: User input controls
         MobileSectionHeader('input', 'Capture Plant Image').render()
