@@ -1009,7 +1009,7 @@ class MobilePlantGuardApp:
             else:
                 st.error("[ERROR] Adapters not loaded")
 
-                if st.button("🔄 Reload Adapters", use_container_width=True):
+                if st.button("[RELOAD] Reload Adapters", use_container_width=True):
                     with st.spinner("Reloading adapters..."):
                         self._load_core_adapters()
                         st.rerun()
@@ -1105,9 +1105,9 @@ class MobilePlantGuardApp:
 
         # Adapter status
         if st.session_state.get("mobile_adapters_loaded", False):
-            status_items.append("✅ Core Adapters: Ready")
+            status_items.append("[READY] Core Adapters: Ready")
         else:
-            status_items.append("❌ Core Adapters: Not Loaded")
+            status_items.append("[ERROR] Core Adapters: Not Loaded")
 
         # Performance optimization status
         try:
@@ -1115,13 +1115,13 @@ class MobilePlantGuardApp:
             memory_pressure = perf_report.get("memory_pressure", "unknown")
 
             if memory_pressure == "normal":
-                status_items.append("✅ Memory: Normal")
+                status_items.append("[OK] Memory: Normal")
             elif memory_pressure == "warning":
-                status_items.append("⚠️ Memory: Warning")
+                status_items.append("[WARN] Memory: Warning")
             else:
-                status_items.append("❌ Memory: Critical")
+                status_items.append("[CRITICAL] Memory: Critical")
         except Exception:
-            status_items.append("❓ Memory: Unknown")
+            status_items.append("[UNKNOWN] Memory: Unknown")
 
         # Cache status
         try:
@@ -1129,22 +1129,22 @@ class MobilePlantGuardApp:
             hit_rate = cache_stats.get("hit_rate", 0)
 
             if hit_rate > 80:
-                status_items.append("✅ Cache: Excellent")
+                status_items.append("[EXCELLENT] Cache: Excellent")
             elif hit_rate > 60:
-                status_items.append("✅ Cache: Good")
+                status_items.append("[GOOD] Cache: Good")
             else:
-                status_items.append("⚠️ Cache: Poor")
+                status_items.append("[POOR] Cache: Poor")
         except Exception:
-            status_items.append("❓ Cache: Unknown")
+            status_items.append("[UNKNOWN] Cache: Unknown")
 
         for status in status_items:
             st.write(status)
 
     def render_comparison_tab(self) -> None:
         """Render comparison tab content."""
-        st.markdown("### ⚖️ Plant Comparison")
+        st.markdown("### [COMPARE] Plant Comparison")
 
-        st.info("🚧 Advanced comparison features coming soon!")
+        st.info("[INFO] Advanced comparison features coming soon!")
 
         # Placeholder comparison interface
         col1, col2 = st.columns(2)
@@ -1227,21 +1227,21 @@ class MobilePlantGuardApp:
 
         # Initialize components if not done
         if not st.session_state.get("mobile_app_initialized", False):
-            with st.spinner("🚀 Initializing PlantGuard Mobile..."):
+            with st.spinner("[INIT] Initializing PlantGuard Mobile..."):
                 self.initialize_components()
 
         # Check initialization status with detailed feedback
         if not st.session_state.get("mobile_app_initialized", False):
-            st.error("❌ Application failed to initialize properly")
+            st.error("[ERROR] Application failed to initialize properly")
 
             # Show enhanced troubleshooting
-            st.markdown("### 🌿 PlantGuard Mobile - Initialization Error")
+            st.markdown("### [ERROR] PlantGuard Mobile - Initialization Error")
             st.markdown("The mobile app components failed to initialize. Please try the options below.")
 
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("🔄 Reinitialize App", use_container_width=True, key="spa_reinitialize"):
+                if st.button("[RESTART] Reinitialize App", use_container_width=True, key="spa_reinitialize"):
                     st.session_state.mobile_app_initialized = False
                     st.success("Reinitializing - page will refresh")
                     st.rerun()
@@ -1261,16 +1261,16 @@ class MobilePlantGuardApp:
                     st.rerun()
 
             # Show system status for debugging
-            with st.expander("🔍 System Status", expanded=False):
+            with st.expander("[DEBUG] System Status", expanded=False):
                 st.write("**Adapter Status:**")
                 adapters_loaded = st.session_state.get("mobile_adapters_loaded", False)
-                st.write(f"- Core Adapters: {'✅ Loaded' if adapters_loaded else '❌ Not Loaded'}")
+                st.write(f"- Core Adapters: {'[LOADED]' if adapters_loaded else '[NOT LOADED]'}")
 
                 st.write("**Component Status:**")
-                st.write(f"- Layout Manager: {'✅' if self.layout_manager else '❌'}")
-                st.write(f"- Header: {'✅' if self.header else '❌'}")
-                st.write(f"- Input Ribbon: {'✅' if self.input_ribbon else '❌'}")
-                st.write(f"- Content Tabs: {'✅' if self.content_tabs else '❌'}")
+                st.write(f"- Layout Manager: {'[OK]' if self.layout_manager else '[FAIL]'}")
+                st.write(f"- Header: {'[OK]' if self.header else '[FAIL]'}")
+                st.write(f"- Input Ribbon: {'[OK]' if self.input_ribbon else '[FAIL]'}")
+                st.write(f"- Content Tabs: {'[OK]' if self.content_tabs else '[FAIL]'}")
 
             # Show minimal functionality
             st.markdown("#### 🔧 Emergency Mode")
@@ -1310,7 +1310,7 @@ class MobilePlantGuardApp:
             if self.header:
                 self.header.render()
             else:
-                st.markdown("### 🌿 PlantGuard Mobile")
+                st.markdown("### [MOBILE] PlantGuard Mobile")
 
             # Input ribbon with tab integration
             if self.input_ribbon:
@@ -1335,14 +1335,14 @@ class MobilePlantGuardApp:
                     st.info("Full analysis features will be available when all components are loaded.")
 
         except Exception as e:
-            st.error(f"❌ Error rendering app content: {e}")
+            st.error(f"[ERROR] Error rendering app content: {e}")
             logger.error(f"App content rendering error: {e}")
 
             # Show emergency fallback
-            st.markdown("### 🌿 PlantGuard Mobile - Emergency Mode")
+            st.markdown("### [EMERGENCY] PlantGuard Mobile - Emergency Mode")
             st.markdown("The app is running in emergency mode. Some features may not be available.")
 
-            if st.button("🔄 Try Full Restart", use_container_width=True, key="spa_full_restart"):
+            if st.button("[RESTART] Try Full Restart", use_container_width=True, key="spa_full_restart"):
                 # Clear all mobile app state
                 keys_to_clear = [k for k in st.session_state if k.startswith("mobile_")]
                 for key in keys_to_clear:
@@ -1358,9 +1358,9 @@ class MobilePlantGuardApp:
         # App info in expandable section
         with st.expander("📱 PlantGuard Mobile Info", expanded=False):
             st.markdown("**Version:** 1.0.0-mobile")
-            st.markdown("📱 **Mobile:** Chrome & Safari Optimized")
-            st.markdown("💻 **All Devices:** Fixed 428px Mobile View")
-            st.markdown("🎯 **Design:** Always 428px width (mobile-first)")
+            st.markdown("[MOBILE] **Mobile:** Chrome & Safari Optimized")
+            st.markdown("[DESKTOP] **All Devices:** Fixed 428px Mobile View")
+            st.markdown("[DESIGN] **Design:** Always 428px width (mobile-first)")
 
             # Fixed mobile design indicator
             st.success("✨ **Always-Visible Design** - No hidden menus!")
@@ -1377,32 +1377,32 @@ class MobilePlantGuardApp:
 
             for component, status in components_status.items():
                 if status == "ready":
-                    st.success(f"✅ {component}")
+                    st.success(f"[READY] {component}")
                 elif status == "initializing":
-                    st.warning(f"🔄 {component}")
+                    st.warning(f"[INIT] {component}")
                 else:
-                    st.error(f"❌ {component}")
+                    st.error(f"[ERROR] {component}")
 
         # Quick actions in expandable section
         with st.expander("⚡ Quick Actions", expanded=False):
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("🔄 Refresh Components", use_container_width=True, key="spa_refresh_components"):
+                if st.button("[REFRESH] Refresh Components", use_container_width=True, key="spa_refresh_components"):
                     st.session_state.mobile_app_initialized = False
                     st.success("Refreshing components - page will reload once")
                     st.rerun()
 
             with col2:
-                if st.button("🧪 Run AI Tests", use_container_width=True, key="spa_run_tests"):
+                if st.button("[TEST] Run AI Tests", use_container_width=True, key="spa_run_tests"):
                     with st.spinner("Testing all components..."):
                         test_results = get_ai_testing_framework().test_all_components()
                         if test_results.get("components_tested", 0) > 0:
-                            st.success(f"✅ Tested {test_results['components_tested']} components")
+                            st.success(f"[PASS] Tested {test_results['components_tested']} components")
                             if test_results.get("tests_failed", 0) > 0:
-                                st.warning(f"⚠️ {test_results['tests_failed']} tests failed")
+                                st.warning(f"[WARN] {test_results['tests_failed']} tests failed")
                         else:
-                            st.error("❌ No components found to test")
+                            st.error("[ERROR] No components found to test")
 
 
 def main():

@@ -33,13 +33,13 @@ def test_component_imports():
         for component_name in components:
             spec = importlib.util.find_spec(component_name)
             if spec is None:
-                st.error(f"❌ Component not found: {component_name}")
+                st.error(f"[ERROR] Component not found: {component_name}")
                 return False
 
-        st.success("✅ All components found successfully")
+        st.success("[PASS] All components found successfully")
         return True
     except ImportError as e:
-        st.error(f"❌ Import error: {e}")
+        st.error(f"[ERROR] Import error: {e}")
         return False
 
 
@@ -53,7 +53,7 @@ def test_component_initialization():
         history_view = MobileHistoryView("test_history", "Test History")
         settings_card = MobileSettingsCard("test_settings", "Test Settings")
 
-        st.success("✅ Components initialized successfully")
+        st.success("[PASS] Components initialized successfully")
         return True
     except Exception as e:
         st.error(f"❌ Initialization error: {e}")

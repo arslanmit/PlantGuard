@@ -548,7 +548,7 @@ class TaskChecker:
 def print_results(results: dict[str, Any]):
     """Print formatted results with colors."""
     pass
-    print(f"\n{Colors.BOLD}{Colors.CYAN}🔍 PlantGuard Task Checker Results{Colors.END}")
+    print(f"\n{Colors.BOLD}{Colors.CYAN}[INFO] PlantGuard Task Checker Results{Colors.END}")
     print("=" * 60)
 
     # Summary
@@ -558,29 +558,29 @@ def print_results(results: dict[str, Any]):
     not_started = results["not_started_count"]
     errors = results["error_count"]
 
-    print(f"\n{Colors.BOLD}📊 Summary:{Colors.END}")
-    print(f"  {Colors.GREEN}✅ Completed: {completed}/{total}{Colors.END}")
-    print(f"  {Colors.YELLOW}🔄 Partial: {partial}/{total}{Colors.END}")
-    print(f"  {Colors.RED}❌ Not Started: {not_started}/{total}{Colors.END}")
+    print(f"\n{Colors.BOLD}[SUMMARY] Summary:{Colors.END}")
+    print(f"  {Colors.GREEN}[DONE] Completed: {completed}/{total}{Colors.END}")
+    print(f"  {Colors.YELLOW}[PARTIAL] Partial: {partial}/{total}{Colors.END}")
+    print(f"  {Colors.RED}[TODO] Not Started: {not_started}/{total}{Colors.END}")
     if errors > 0:
-        print(f"  {Colors.RED}💥 Errors: {errors}/{total}{Colors.END}")
+        print(f"  {Colors.RED}[ERROR] Errors: {errors}/{total}{Colors.END}")
 
     completion_percentage = (completed / total) * 100 if total > 0 else 0
-    print(f"\n{Colors.BOLD}🎯 Overall Completion: {completion_percentage:.1f}%{Colors.END}")
+    print(f"\n{Colors.BOLD}[PROGRESS] Overall Completion: {completion_percentage:.1f}%{Colors.END}")
 
     # Detailed results
-    print(f"\n{Colors.BOLD}📋 Detailed Results:{Colors.END}")
+    print(f"\n{Colors.BOLD}[DETAILS] Detailed Results:{Colors.END}")
     print("-" * 60)
 
     for task in results["tasks"]:
         if task["status"] == "completed":
-            status_icon = f"{Colors.GREEN}✅{Colors.END}"
+            status_icon = f"{Colors.GREEN}[DONE]{Colors.END}"
         elif task["status"] == "partial":
-            status_icon = f"{Colors.YELLOW}🔄{Colors.END}"
+            status_icon = f"{Colors.YELLOW}[PARTIAL]{Colors.END}"
         elif task["status"] == "error":
-            status_icon = f"{Colors.RED}💥{Colors.END}"
+            status_icon = f"{Colors.RED}[ERROR]{Colors.END}"
         else:
-            status_icon = f"{Colors.RED}❌{Colors.END}"
+            status_icon = f"{Colors.RED}[TODO]{Colors.END}"
 
         print(f"\n{status_icon} {Colors.BOLD}{task['name']}{Colors.END}")
 
@@ -608,7 +608,7 @@ def print_results(results: dict[str, Any]):
                     print(f"      ... and {len(failed_checks) - 3} more")
 
     # Next steps
-    print(f"\n{Colors.BOLD}{Colors.BLUE}🚀 Next Steps:{Colors.END}")
+    print(f"\n{Colors.BOLD}{Colors.BLUE}[NEXT] Next Steps:{Colors.END}")
     if not_started > 0:
         print(f"  1. Focus on {not_started} not started tasks")
         print("  2. Prioritize Task 17 (Integration Testing) and Task 18 (Model Adapter Integration)")
@@ -617,7 +617,7 @@ def print_results(results: dict[str, Any]):
     if errors > 0:
         print(f"  4. Fix {errors} tasks with errors")
 
-    print(f"\n{Colors.GREEN}🎉 Great progress! {completed} out of {total} tasks completed!{Colors.END}")
+    print(f"\n{Colors.GREEN}[SUCCESS] Great progress! {completed} out of {total} tasks completed!{Colors.END}")
 
 
 def main():
@@ -625,7 +625,7 @@ def main():
     pass
     project_root = Path(__file__).parent
 
-    print(f"{Colors.CYAN}🔍 Checking PlantGuard Streamlit UI Redesign Tasks...{Colors.END}")
+    print(f"{Colors.CYAN}[INFO] Checking PlantGuard Streamlit UI Redesign Tasks...{Colors.END}")
     print(f"Project root: {project_root}")
     print("Starting task checker...")
 
@@ -645,7 +645,7 @@ def main():
     with open(output_file, "w") as f:
         json.dump(results, f, indent=2, default=str)
 
-    print(f"\n{Colors.CYAN}📄 Detailed results saved to: {output_file}{Colors.END}")
+    print(f"\n{Colors.CYAN}[FILE] Detailed results saved to: {output_file}{Colors.END}")
 
     # Exit code based on completion status
     if results["error_count"] > 0:

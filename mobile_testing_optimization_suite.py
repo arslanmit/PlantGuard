@@ -1331,7 +1331,7 @@ class MobileTestingOptimizationSuite:
 
 def main():
     """Main execution function."""
-    print("🧪 Mobile PlantGuard Testing & Optimization Suite")
+    print("[TEST] Mobile PlantGuard Testing & Optimization Suite")
     print("=" * 50)
 
     suite = MobileTestingOptimizationSuite()
@@ -1348,12 +1348,12 @@ def main():
     print(f"   Overall Status: {summary.get('overall_status', 'unknown').upper()}")
 
     if summary.get("recommendations"):
-        print("\n💡 Key Recommendations:")
+        print("\n[RECOMMENDATIONS] Key Recommendations:")
         for rec in summary["recommendations"][:3]:  # Show top 3
-            print(f"   • {rec}")
+            print(f"   - {rec}")
 
-    print("\n📄 Detailed results saved to: mobile_testing_optimization_results.json")
-    print("📄 Summary report saved to: mobile_testing_summary.md")
+    print("\n[FILE] Detailed results saved to: mobile_testing_optimization_results.json")
+    print("[FILE] Summary report saved to: mobile_testing_summary.md")
 
     return results
 

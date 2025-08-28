@@ -909,38 +909,33 @@ class MobileComprehensiveTestingSuite:
 
     def check_streamlit_cache_data(self) -> bool:
         """Check Streamlit cache_data usage."""
-        try:
+        with contextlib.suppress(Exception):
             return True  # Based on implementation patterns
-        except Exception:
-            return False
+        return False
 
     def check_component_level_caching(self) -> bool:
         """Check component-level caching."""
-        try:
+        with contextlib.suppress(Exception):
             return True  # Based on state management implementation
-        except Exception:
-            return False
+        return False
 
     def check_component_lazy_init(self) -> bool:
         """Check component lazy initialization."""
-        try:
+        with contextlib.suppress(Exception):
             return True  # Based on component registry pattern
-        except Exception:
-            return False
+        return False
 
     def check_image_lazy_loading(self) -> bool:
         """Check image lazy loading."""
-        try:
+        with contextlib.suppress(Exception):
             return True  # Based on mobile optimization patterns
-        except Exception:
-            return False
+        return False
 
     def check_content_lazy_rendering(self) -> bool:
         """Check content lazy rendering."""
-        try:
+        with contextlib.suppress(Exception):
             return True  # Based on tab content system
-        except Exception:
-            return False
+        return False
 
     def get_performance_grade(self, score: float) -> str:
         """Get performance grade based on score."""

@@ -244,7 +244,7 @@ class ComprehensiveMobileTestRunner:
         status_symbols = {"passed": "[PASS]", "failed": "[FAIL]", "warning": "[WARN]"}
 
         print(f"\n[STATUS] OVERALL STATUS: {status_symbols.get(overall_status, '[UNKNOWN]')} {overall_status.upper()}")
-        print(f"📊 Test Scripts Executed: {summary['total_test_scripts']}")
+        print(f"[STATS] Test Scripts Executed: {summary['total_test_scripts']}")
         print(f"⏰ Test Completed: {results['timestamp']}")
 
         print("\n📋 REQUIREMENT COVERAGE:")
@@ -252,17 +252,17 @@ class ComprehensiveMobileTestRunner:
         for req_id, description in summary["requirement_coverage"].items():
             print(f"   {req_id}: {description}")
 
-        print("\n🔍 KEY FINDINGS:")
+        print("\n[FINDINGS] KEY FINDINGS:")
         print("-" * 50)
         for finding in summary["key_findings"]:
             print(f"   {finding}")
 
-        print("\n💡 RECOMMENDATIONS:")
+        print("\n[RECOMMENDATIONS] RECOMMENDATIONS:")
         print("-" * 50)
         for recommendation in summary["recommendations"]:
             print(f"   {recommendation}")
 
-        print("\n📊 DETAILED SCRIPT RESULTS:")
+        print("\n[DETAILS] DETAILED SCRIPT RESULTS:")
         print("-" * 50)
         for script_name, script_result in summary["script_results"].items():
             status = script_result["status"]
@@ -286,7 +286,7 @@ def main():
     """Main function to run comprehensive mobile tests."""
     runner = ComprehensiveMobileTestRunner()
 
-    print("🚀 Starting Comprehensive Mobile-Only Migration Test Suite")
+    print("[START] Starting Comprehensive Mobile-Only Migration Test Suite")
     print("This will run all migration validation tests and generate a comprehensive report.")
     print()
 

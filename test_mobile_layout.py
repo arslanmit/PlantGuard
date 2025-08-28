@@ -165,7 +165,7 @@ def test_css_classes():
 
 def main():
     """Run all tests."""
-    print("🧪 Testing Mobile Layout and Design System Implementation")
+    print("[TEST] Testing Mobile Layout and Design System Implementation")
     print("=" * 60)
 
     tests = [test_mobile_imports, test_mobile_layout_manager, test_mobile_design_system, test_mobile_component_registry, test_css_classes]
