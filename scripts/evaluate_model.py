@@ -216,7 +216,7 @@ def main() -> None:
             if result.critical_issues:
                 print("Critical issues:")
                 for issue in result.critical_issues:
-                    print(f"  • {issue}")
+                    print(f"  - {issue}")
             sys.exit(1)
 
     except Exception as e:

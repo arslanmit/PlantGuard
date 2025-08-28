@@ -64,14 +64,11 @@ try:
 except ImportError:
     # Fallback if performance optimizer is not available
     class MockPerformanceOptimizer:
-        def set_optimization_level(self, level):
-            pass
+        def set_optimization_level(self, level): ...
 
-        def enable_offline_mode(self):
-            pass
+        def enable_offline_mode(self): ...
 
-        def preload_critical_components(self, components):
-            pass
+        def preload_critical_components(self, components): ...
 
         def optimize_images(self, data):
             return data
@@ -88,8 +85,7 @@ except ImportError:
         @property
         def cache(self):
             class MockCache:
-                def clear(self):
-                    pass
+                def clear(self): ...
 
                 def get_stats(self):
                     return {}
@@ -714,7 +710,7 @@ class MobilePlantGuardApp:
                                         st.markdown("**Recommendations:**")
                                         for recommendation in result["recommendations"][:3]:
                                             if recommendation.strip():
-                                                st.write(f"• {recommendation.strip()}")
+                                                st.write(f"- {recommendation.strip()}")
                                 else:
                                     st.error(f"[ERROR] Analysis failed: {result['error']}")
 
@@ -941,7 +937,7 @@ class MobilePlantGuardApp:
                             st.markdown("**Key Recommendations:**")
                             for recommendation in recommendations[:3]:
                                 if recommendation.strip():
-                                    st.write(f"• {recommendation.strip()}")
+                                    st.write(f"- {recommendation.strip()}")
                     else:
                         # Regular analysis display
                         st.json(analysis)

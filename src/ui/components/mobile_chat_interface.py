@@ -587,10 +587,10 @@ class MobileChatInterface(MobileBaseComponent):
         """Show chat settings."""
         with st.expander("[SETTINGS] Chat Settings", expanded=True):
             st.write("**Current Settings:**")
-            st.write(f"• Max message length: {self.chat_config['max_message_length']} characters")
-            st.write(f"• Max history: {self.chat_config['max_history_length']} messages")
-            st.write(f"• Voice input: {'Enabled' if self.chat_config['enable_voice_input'] else 'Disabled'}")
-            st.write(f"• Image context: {'Enabled' if self.chat_config['enable_image_context'] else 'Disabled'}")
+            st.write(f"- Max message length: {self.chat_config['max_message_length']} characters")
+            st.write(f"- Max history: {self.chat_config['max_history_length']} messages")
+            st.write(f"- Voice input: {'Enabled' if self.chat_config['enable_voice_input'] else 'Disabled'}")
+            st.write(f"- Image context: {'Enabled' if self.chat_config['enable_image_context'] else 'Disabled'}")
 
     def _show_chat_help(self) -> None:
         """Show chat help information."""
@@ -604,15 +604,15 @@ class MobileChatInterface(MobileBaseComponent):
             [DETAILS] **Quick Actions:** Use preset question buttons
             
             **Example Questions:**
-            • "How often should I water my plant?"
-            • "What does this disease mean?"
-            • "How do I treat leaf spots?"
-            • "Is my plant getting enough light?"
+            - "How often should I water my plant?"
+            - "What does this disease mean?"
+            - "How do I treat leaf spots?"
+            - "Is my plant getting enough light?"
             
             **Tips:**
-            • Be specific about your plant type and symptoms
-            • Mention recent analysis results for better context
-            • Ask follow-up questions for more details
+            - Be specific about your plant type and symptoms
+            - Mention recent analysis results for better context
+            - Ask follow-up questions for more details
             """)
 
     def get_message_count(self) -> int:

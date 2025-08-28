@@ -306,10 +306,10 @@ class MobileAnalysisDisplay(MobileBaseComponent):
 
         with col1:
             st.markdown("**Analysis Details:**")
-            st.write(f"• Disease: {disease_name}")
-            st.write(f"• Confidence: {confidence:.1%}")
-            st.write(f"• Source: {result.get('source', 'unknown').title()}")
-            st.write(f"• Timestamp: {self._format_timestamp(result.get('timestamp', ''))}")
+            st.write(f"- Disease: {disease_name}")
+            st.write(f"- Confidence: {confidence:.1%}")
+            st.write(f"- Source: {result.get('source', 'unknown').title()}")
+            st.write(f"- Timestamp: {self._format_timestamp(result.get('timestamp', ''))}")
 
         with col2:
             confidence_level = self._get_confidence_level(confidence)
@@ -351,19 +351,19 @@ class MobileAnalysisDisplay(MobileBaseComponent):
             if "immediate" in treatment:
                 st.markdown("**[ALERT] Immediate Actions:**")
                 for action in treatment["immediate"]:
-                    st.write(f"• {action}")
+                    st.write(f"- {action}")
 
             # Preventive measures
             if "preventive" in treatment:
                 st.markdown("**[SHIELD] Prevention:**")
                 for prevention in treatment["preventive"]:
-                    st.write(f"• {prevention}")
+                    st.write(f"- {prevention}")
 
             # Organic options
             if "organic" in treatment:
                 st.markdown("**[PLANT] Organic Options:**")
                 for organic in treatment["organic"]:
-                    st.write(f"• {organic}")
+                    st.write(f"- {organic}")
         else:
             # Generic recommendations based on confidence
             if confidence_level == "high":
@@ -375,10 +375,10 @@ class MobileAnalysisDisplay(MobileBaseComponent):
 
             # Generic advice
             st.markdown("**General Plant Care:**")
-            st.write("• Ensure proper watering and drainage")
-            st.write("• Maintain good air circulation")
-            st.write("• Remove affected plant parts")
-            st.write("• Monitor plant regularly")
+            st.write("- Ensure proper watering and drainage")
+            st.write("- Maintain good air circulation")
+            st.write("- Remove affected plant parts")
+            st.write("- Monitor plant regularly")
 
     def _render_disease_information(self, disease_info: dict[str, Any]) -> None:
         """Render detailed disease information."""
@@ -398,7 +398,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
             if "symptoms" in disease_info:
                 st.markdown("**Common Symptoms:**")
                 for symptom in disease_info["symptoms"]:
-                    st.write(f"• {symptom}")
+                    st.write(f"- {symptom}")
 
     def _render_result_actions(self, result: dict[str, Any]) -> None:
         """Render action buttons for analysis result."""

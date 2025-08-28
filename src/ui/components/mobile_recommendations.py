@@ -263,7 +263,7 @@ class MobileRecommendations(MobileBaseComponent):
             col1, col2 = st.columns([4, 1])
 
             with col1:
-                st.write(f"• {treatment}")
+                st.write(f"- {treatment}")
 
             with col2:
                 if st.button("✓", key=f"{self.component_id}_{section_type}_{i}", help="Mark as done"):
@@ -279,17 +279,17 @@ class MobileRecommendations(MobileBaseComponent):
                 st.markdown("**To prevent this disease in the future:**")
 
                 for tip in prevention:
-                    st.write(f"• {tip}")
+                    st.write(f"- {tip}")
         else:
             # Generic prevention tips
             with st.expander("[SECURE] General Prevention Tips", expanded=False):
                 st.markdown("""
                 **General disease prevention:**
-                • Maintain proper plant spacing for air circulation
-                • Water at soil level, avoid wetting leaves
-                • Remove infected plant debris promptly
-                • Rotate crops if applicable
-                • Use disease-resistant plant varieties when possible
+                - Maintain proper plant spacing for air circulation
+                - Water at soil level, avoid wetting leaves
+                - Remove infected plant debris promptly
+                - Rotate crops if applicable
+                - Use disease-resistant plant varieties when possible
                 """)
 
     def _render_disease_details(self, disease_info: dict[str, Any]) -> None:
@@ -312,13 +312,13 @@ class MobileRecommendations(MobileBaseComponent):
             if "symptoms" in disease_info:
                 st.markdown("**Common Symptoms:**")
                 for symptom in disease_info["symptoms"]:
-                    st.write(f"• {symptom}")
+                    st.write(f"- {symptom}")
 
             # Additional information
             if "causes" in disease_info:
                 st.markdown("**Common Causes:**")
                 for cause in disease_info["causes"]:
-                    st.write(f"• {cause}")
+                    st.write(f"- {cause}")
 
     def _render_generic_recommendations(self, disease_name: str, confidence: float) -> None:
         """Render generic recommendations when specific info is not available."""
@@ -344,20 +344,20 @@ class MobileRecommendations(MobileBaseComponent):
         with st.expander("[TOOL] General Treatment Steps", expanded=True):
             st.markdown("""
             **Immediate Actions:**
-            • Remove affected plant parts (leaves, branches, fruits)
-            • Isolate the plant if possible to prevent spread
-            • Improve air circulation around the plant
-            • Adjust watering practices (avoid overwatering)
+            - Remove affected plant parts (leaves, branches, fruits)
+            - Isolate the plant if possible to prevent spread
+            - Improve air circulation around the plant
+            - Adjust watering practices (avoid overwatering)
             
             **Monitoring:**
-            • Check the plant daily for changes
-            • Take photos to track progress
-            • Note any new symptoms that develop
+            - Check the plant daily for changes
+            - Take photos to track progress
+            - Note any new symptoms that develop
             
             **When to Seek Help:**
-            • If symptoms worsen despite treatment
-            • If the disease spreads to other plants
-            • If you're unsure about the diagnosis
+            - If symptoms worsen despite treatment
+            - If the disease spreads to other plants
+            - If you're unsure about the diagnosis
             """)
 
     def _render_generic_treatment_advice(self, confidence: float) -> None:
@@ -373,18 +373,18 @@ class MobileRecommendations(MobileBaseComponent):
         with st.expander("[PLANT] General Plant Care", expanded=True):
             st.markdown("""
             **Basic Plant Health Measures:**
-            • Ensure proper drainage to prevent root rot
-            • Provide appropriate lighting for your plant type
-            • Maintain consistent watering schedule
-            • Remove dead or diseased plant material
-            • Consider applying a balanced fertilizer
-            • Monitor for pests and other issues
+            - Ensure proper drainage to prevent root rot
+            - Provide appropriate lighting for your plant type
+            - Maintain consistent watering schedule
+            - Remove dead or diseased plant material
+            - Consider applying a balanced fertilizer
+            - Monitor for pests and other issues
             
             **Recommended Next Steps:**
-            • Consult a local plant expert or extension service
-            • Research the specific disease online
-            • Consider taking the plant to a garden center
-            • Monitor the plant closely for changes
+            - Consult a local plant expert or extension service
+            - Research the specific disease online
+            - Consider taking the plant to a garden center
+            - Monitor the plant closely for changes
             """)
 
     def _render_sharing_section(self, disease_name: str, confidence: float) -> None:
@@ -435,19 +435,19 @@ Date: {datetime.now().strftime("%Y-%m-%d %H:%M")}
             if "immediate" in treatment:
                 share_text += "[ALERT] IMMEDIATE ACTIONS:\n"
                 for action in treatment["immediate"]:
-                    share_text += f"• {action}\n"
+                    share_text += f"- {action}\n"
                 share_text += "\n"
 
             if "preventive" in treatment:
                 share_text += "[SHIELD] PREVENTION:\n"
                 for prevention in treatment["preventive"]:
-                    share_text += f"• {prevention}\n"
+                    share_text += f"- {prevention}\n"
                 share_text += "\n"
 
             if "organic" in treatment:
                 share_text += "[PLANT] ORGANIC OPTIONS:\n"
                 for organic in treatment["organic"]:
-                    share_text += f"• {organic}\n"
+                    share_text += f"- {organic}\n"
                 share_text += "\n"
 
         share_text += "Generated by PlantGuard AI Plant Disease Detection"

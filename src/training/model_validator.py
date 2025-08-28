@@ -835,7 +835,7 @@ class AutomatedModelValidator:
                 ]
             )
             for issue in result.critical_issues:
-                lines.append(f"• {issue}")
+                lines.append(f"- {issue}")
             lines.append("")
 
         if result.warnings:
@@ -846,7 +846,7 @@ class AutomatedModelValidator:
                 ]
             )
             for warning in result.warnings:
-                lines.append(f"• {warning}")
+                lines.append(f"- {warning}")
             lines.append("")
 
         if result.recommendations:
@@ -857,7 +857,7 @@ class AutomatedModelValidator:
                 ]
             )
             for rec in result.recommendations:
-                lines.append(f"• {rec}")
+                lines.append(f"- {rec}")
             lines.append("")
 
         return "\n".join(lines)

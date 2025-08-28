@@ -837,7 +837,7 @@ class EnhancedGestureHandler:
             ">
                 <div style="margin-bottom: 12px;">
                     <span style="color: #6B7280; font-weight: 600;">
-                        Swipe ← → to navigate • Image {current_idx + 1} of {len(images)}
+                        Swipe ← → to navigate - Image {current_idx + 1} of {len(images)}
                     </span>
                 </div>
             </div>

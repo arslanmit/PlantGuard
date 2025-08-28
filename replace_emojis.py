@@ -145,6 +145,7 @@ EMOJI_MAPPINGS = {
     "⚙️": "[SETTINGS]",
     "❓": "[UNKNOWN]",
     "⏰": "[TIME]",
+    "•": "-",
 }
 
 # File extensions to process

@@ -41,7 +41,7 @@ def cleanup_backups(root_path: str, dry_run: bool = False):
         except (OSError, PermissionError) as e:
             print(f"Error deleting {backup_file}: {e}")
 
-    print(f"\n✅ Successfully deleted {deleted_count} backup files!")
+    print(f"\n[SUCCESS] Successfully deleted {deleted_count} backup files!")
 
 
 def main():

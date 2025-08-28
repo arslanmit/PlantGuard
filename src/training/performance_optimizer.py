@@ -494,7 +494,7 @@ class PerformanceOptimizer:
             f.write("Recommendations:\n")
             f.write("-" * 15 + "\n")
             for rec in result.recommendations:
-                f.write(f"• {rec}\n")
+                f.write(f"- {rec}\n")
 
         logger.info(f"Optimization report saved to {report_file}")
 

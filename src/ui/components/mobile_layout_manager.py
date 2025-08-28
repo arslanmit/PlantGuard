@@ -421,7 +421,7 @@ class MobileLayoutManager:
                 text-align: center;
                 z-index: 1000;
             ">
-                <span id="mobile-connection-status">Connected</span> • 
+                <span id="mobile-connection-status">Connected</span> - 
                 <span id="mobile-last-update">Updated: {}</span>
             </div>
             """.format(datetime.now().strftime("%H:%M")),

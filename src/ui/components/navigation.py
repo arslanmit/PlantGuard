@@ -497,6 +497,6 @@ class NavigationSidebar:
             if stats["active_modes"]:
                 st.write("**Active Input Modes:**")
                 for mode in stats["active_modes"]:
-                    st.write(f"• {mode.title()}")
+                    st.write(f"- {mode.title()}")
 
             st.caption(f"Session ID: {stats['session_id']}")

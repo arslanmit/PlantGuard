@@ -756,9 +756,9 @@ def main():
         import_results = optimizer.optimize_imports()
 
         print("\n[PROGRESS] OPTIMIZATION SUMMARY:")
-        print("  • Cache configuration: [DONE] Created")
-        print(f"  • Import optimization: {len(import_results.get('files_processed', []))} files processed")
-        print(f"  • Removed imports: {len(import_results.get('imports_removed', []))}")
+        print("  - Cache configuration: [DONE] Created")
+        print(f"  - Import optimization: {len(import_results.get('files_processed', []))} files processed")
+        print(f"  - Removed imports: {len(import_results.get('imports_removed', []))}")
 
     if args.cleanup or args.all:
         print("\n[CLEAN] CLEANING UP RESOURCES")
@@ -768,9 +768,9 @@ def main():
         cleanup_results = optimizer.cleanup_unused_files()
 
         print("\n[DELETE] CLEANUP SUMMARY:")
-        print(f"  • Files removed: {len(cleanup_results.get('removed_files', []))}")
-        print(f"  • Directories removed: {len(cleanup_results.get('removed_directories', []))}")
-        print(f"  • Space saved: {cleanup_results.get('space_saved_mb', 0):.2f}MB")
+        print(f"  - Files removed: {len(cleanup_results.get('removed_files', []))}")
+        print(f"  - Directories removed: {len(cleanup_results.get('removed_directories', []))}")
+        print(f"  - Space saved: {cleanup_results.get('space_saved_mb', 0):.2f}MB")
 
     if args.report or args.all:
         print("\n[SUMMARY] GENERATING REPORT")

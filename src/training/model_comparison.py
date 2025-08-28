@@ -695,7 +695,7 @@ class ModelComparator:
                     ]
                 )
                 for rec in regression_analysis.recommendations[:3]:
-                    lines.append(f"  • {rec}")
+                    lines.append(f"  - {rec}")
 
             lines.append("")
 

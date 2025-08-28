@@ -506,7 +506,7 @@ def main():
 
         print("\n[ACTIONS] Primary Recommendations:")
         for rec in summary["primary_recommendations"]:
-            print(f"  • {rec}")
+            print(f"  - {rec}")
 
         batch_size = results["config_recommendations"]["training_config"]["batch_size"]
         num_workers = results["config_recommendations"]["training_config"]["num_workers"]

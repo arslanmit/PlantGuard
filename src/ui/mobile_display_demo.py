@@ -382,7 +382,7 @@ def main():
         """
     <div style='text-align: center; color: #666; font-size: 0.9rem;'>
         [LEAF] PlantGuard Mobile Display Components Demo<br>
-        Built with Streamlit • Optimized for Mobile • AI-Powered Plant Care
+        Built with Streamlit - Optimized for Mobile - AI-Powered Plant Care
     </div>
     """,
         unsafe_allow_html=True,

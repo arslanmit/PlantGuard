@@ -212,8 +212,9 @@ class FileStructureOptimizer:
                         legacy_pyc_files = list(cache_path.glob("*spa_app*.pyc")) + list(cache_path.glob("*app*.pyc"))
                         for pyc_file in legacy_pyc_files:
                             if "mobile" not in pyc_file.name:
-                                pyc_file.unlink()
-                                self.log_action("remove_legacy_cache", str(pyc_file.name))
+                                with contextlib.suppress(FileNotFoundError, OSError):
+                                    pyc_file.unlink()
+                                    self.log_action("remove_legacy_cache", str(pyc_file.name))
 
                     cleaned_caches.append(cache_dir)
 

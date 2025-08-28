@@ -401,7 +401,7 @@ class AccessibleMobileAnalysisDisplay(MobileComponent):
         for i, rec in enumerate(recommendations):
             recommendations_html += f"""
                 <div role="listitem" class="recommendation-item">
-                    <span aria-hidden="true">•</span>
+                    <span aria-hidden="true">-</span>
                     <span>{rec}</span>
                 </div>
             """

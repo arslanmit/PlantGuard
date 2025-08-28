@@ -452,12 +452,12 @@ class InputRibbon:
             st.markdown("**Input Mode Shortcuts:**")
 
             for mode_info in self.input_modes.values():
-                st.markdown(f"• **{mode_info['shortcut']}** - {mode_info['icon']} {mode_info['label']}")
+                st.markdown(f"- **{mode_info['shortcut']}** - {mode_info['icon']} {mode_info['label']}")
 
             st.markdown("**Other Shortcuts:**")
-            st.markdown("• **Ctrl + K** - Clear all inputs")
-            st.markdown("• **Ctrl + Enter** - Analyze (when inputs are ready)")
-            st.markdown("• **Esc** - Cancel current operation")
+            st.markdown("- **Ctrl + K** - Clear all inputs")
+            st.markdown("- **Ctrl + Enter** - Analyze (when inputs are ready)")
+            st.markdown("- **Esc** - Cancel current operation")
 
     def render_input_mode_settings(self):
         """Render input mode settings and configuration options."""
