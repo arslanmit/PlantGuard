@@ -26,22 +26,22 @@ from pathlib import Path
 
 # Emoji to text mappings
 EMOJI_MAPPINGS = {
-    "[SUMMARY]": "[SUMMARY]",
-    "[DONE]": "[DONE]",
-    "[PARTIAL]": "[PARTIAL]",
-    "[TODO]": "[TODO]",
-    "[ERROR]": "[ERROR]",
-    "[PROGRESS]": "[PROGRESS]",
-    "[DETAILS]": "[DETAILS]",
+    "📊": "[SUMMARY]",
+    "✅": "[DONE]",
+    "🔄": "[PARTIAL]",
+    "❌": "[TODO]",
+    "💥": "[ERROR]",
+    "🎯": "[PROGRESS]",
+    "📋": "[DETAILS]",
     # Additional common emojis that might be in the codebase
-    "[LAUNCH]": "[LAUNCH]",
-    "[SUCCESS]": "[SUCCESS]",
-    "[TOOL]": "[TOOL]",
-    "[TOOL]": "[TOOL]",
-    "[MOBILE]": "[MOBILE]",
-    "[TIP]": "[TIP]",
-    "[WARNING]": "[WARNING]",
-    "[CELEBRATION]": "[CELEBRATION]",
+    "🚀": "[LAUNCH]",
+    "🎉": "[SUCCESS]",
+    "🔧": "[TOOL]",
+    "🛠️": "[TOOL]",
+    "📱": "[MOBILE]",
+    "💡": "[TIP]",
+    "⚠️": "[WARNING]",
+    "🎊": "[CELEBRATION]",
 }
 
 # File extensions to process
@@ -85,6 +85,15 @@ SKIP_DIRECTORIES = {
     ".ruff_cache",
 }
 
+# Files to skip (emoji-related scripts and reports)
+SKIP_FILES = {
+    "replace_emojis.py",
+    "cleanup_backups.py",
+    "generate_emoji_report.py",
+    "emoji_replacement_stats.json",
+    "emoji_replacement_report.md",
+}
+
 
 class EmojiReplacer:
     def __init__(self, root_path: str, backup: bool = True, dry_run: bool = False):
@@ -101,6 +110,10 @@ class EmojiReplacer:
         for part in file_path.parts:
             if part in SKIP_DIRECTORIES:
                 return False
+
+        # Skip emoji-related scripts and reports
+        if file_path.name in SKIP_FILES:
+            return False
 
         # Check extension
         return file_path.suffix.lower() in SUPPORTED_EXTENSIONS
