@@ -30,6 +30,9 @@ from typing import Any
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
+# Configure logger for this module
+logger = logging.getLogger(__name__)
+
 # Third-party imports
 import streamlit as st  # noqa: E402
 from PIL import Image as PILImage  # noqa: E402
@@ -49,35 +52,34 @@ from ui.components.mobile_input_ribbon import MobileInputRibbon  # noqa: E402
 from ui.components.mobile_layout_manager import MobileLayoutManager  # noqa: E402
 from ui.components.mobile_voice_interface import MobileVoiceInterface  # noqa: E402
 
-# Conditional imports with fallbacks
-try:
-    from ui.components.mobile_testing_framework import MobileTestingFramework
-except ImportError:
-    # Fallback if testing framework is not available
-    class MobileTestingFramework:  # type: ignore[no-redef]
-        def test_all_components(self):
-            return {"components_tested": 0, "status": "testing_framework_unavailable"}
+# Import error recovery utilities
+from utils.error_recovery import ImportErrorRecovery  # noqa: E402
 
+# Conditional imports with proper error handling and logging
+MobileTestingFramework = ImportErrorRecovery.safe_import_from(
+    "ui.components.mobile_testing_framework", 
+    "MobileTestingFramework",
+    fallback=type("MobileTestingFramework", (), {
+        "test_all_components": lambda self: {
+            "components_tested": 0, 
+            "status": "testing_framework_unavailable"
+        }
+    }),
+    logger_name="mobile_spa_app"
+)
 
-try:
-    from ui.components.mobile_performance_optimizer import mobile_performance_optimizer
-except ImportError:
-    # Fallback if performance optimizer is not available
-    class MockPerformanceOptimizer:
-        def set_optimization_level(self, level):
-            pass
-
-        def enable_offline_mode(self):
-            pass
-
-        def preload_critical_components(self, components):
-            pass
-
-        def optimize_images(self, data):
-            return data
-
-        def get_performance_report(self):
-            return {}
+mobile_performance_optimizer = ImportErrorRecovery.safe_import_from(
+    "ui.components.mobile_performance_optimizer",
+    "mobile_performance_optimizer", 
+    fallback=type("MockPerformanceOptimizer", (), {
+        "set_optimization_level": lambda self, level: None,
+        "enable_offline_mode": lambda self: None,
+        "preload_critical_components": lambda self, components: None,
+        "optimize_images": lambda self, data: data,
+        "get_performance_report": lambda self: {}
+    })(),
+    logger_name="mobile_spa_app"
+)
 
         def optimize_component_render(self, component_id):
             def decorator(func):

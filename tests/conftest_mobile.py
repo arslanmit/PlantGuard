@@ -5,6 +5,7 @@ This module provides comprehensive test configuration for mobile components
 including fixtures, mocks, and test utilities specifically for mobile testing.
 """
 
+import logging
 import tempfile
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +16,8 @@ import pytest
 import streamlit as st
 from PIL import Image
 
+from src.utils.error_recovery import (ExceptionRecovery, FileCleanupRecovery,
+                                      SessionStateRecovery)
 from tests.fixtures.mobile_test_fixtures import (MockAudioAdapter,
                                                  MockChatModel,
                                                  MockStreamlitComponents,
@@ -22,6 +25,9 @@ from tests.fixtures.mobile_test_fixtures import (MockAudioAdapter,
                                                  MockTextAdapter,
                                                  MockVisionAdapter,
                                                  TestDataFactory)
+
+# Configure logger for this module
+logger = logging.getLogger(__name__)
 
 
 # Global test configuration
@@ -472,18 +478,20 @@ def cleanup_after_test(mobile_test_config):
     """Cleanup after each test."""
     yield
     
-    # Clear any remaining session state
-    try:
-        if hasattr(st, 'session_state'):
-            st.session_state.clear()
-    except:
-        pass
+    # Clear any remaining session state with proper error handling
+    SessionStateRecovery.safe_session_clear(logger_name="conftest_mobile")
     
-    # Clean up any temporary files created during test
+    # Clean up any temporary files created during test with proper error handling
     temp_dir = mobile_test_config["temp_dir"]
     if temp_dir.exists():
-        for temp_file in temp_dir.glob("test_*"):
-            try:
-                temp_file.unlink()
-            except:
-                pass
+        temp_files = list(temp_dir.glob("test_*"))
+        if temp_files:
+            cleanup_results = FileCleanupRecovery.safe_file_cleanup(
+                temp_files, 
+                logger_name="conftest_mobile"
+            )
+            failed_cleanups = [path for path, success in cleanup_results.items() if not success]
+            if failed_cleanups:
+                logger.warning(f"Failed to clean up {len(failed_cleanups)} temporary files")
+        else:
+            logger.debug("No temporary files to clean up")

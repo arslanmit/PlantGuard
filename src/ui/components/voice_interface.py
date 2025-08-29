@@ -15,33 +15,23 @@ import numpy as np
 import soundfile as sf
 import streamlit as st
 
-try:
-    from streamlit_webrtc import RTCConfiguration, WebRtcMode, webrtc_streamer
-except Exception:
-    # Fallback stubs for test environments where streamlit_webrtc isn't available
-    class RTCConfigurationStub(dict):
-        pass
+from utils.error_recovery import ImportErrorRecovery
 
-    RTCConfiguration = RTCConfigurationStub  # type: ignore[misc,assignment]
+# Configure logger for this module
+logger = logging.getLogger(__name__)
 
-    class WebRtcModeStub:
-        SENDONLY = "sendonly"
+# Safe import of streamlit_webrtc with proper fallbacks
+RTCConfiguration = ImportErrorRecovery.safe_import_from(
+    "streamlit_webrtc", "RTCConfiguration", fallback=type("RTCConfigurationStub", (dict,), {}), logger_name="voice_interface"
+)
 
-    WebRtcMode = WebRtcModeStub  # type: ignore[misc,assignment]
+WebRtcMode = ImportErrorRecovery.safe_import_from(
+    "streamlit_webrtc", "WebRtcMode", fallback=type("WebRtcModeStub", (), {"SENDONLY": "sendonly"}), logger_name="voice_interface"
+)
 
-    class _DummyState:
-        def __init__(self):
-            self.playing = False
-
-    class _DummyCtx:
-        def __init__(self):
-            self.state = _DummyState()
-
-    def webrtc_streamer_stub(*args, **kwargs):
-        # Return a simple object with a state attribute used by the code
-        return _DummyCtx()
-
-    webrtc_streamer = webrtc_streamer_stub  # type: ignore[misc,assignment]
+webrtc_streamer = ImportErrorRecovery.safe_import_from(
+    "streamlit_webrtc", "webrtc_streamer", fallback=lambda **kwargs: type("_DummyState", (), {"playing": False})(), logger_name="voice_interface"
+)
 
 
 logger = logging.getLogger(__name__)

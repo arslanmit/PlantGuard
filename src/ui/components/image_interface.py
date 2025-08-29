@@ -10,15 +10,16 @@ import logging
 from pathlib import Path
 from typing import Any, cast
 
-try:
-    import cv2
-except Exception:
-    # Provide a minimal fallback so tests can import this module without OpenCV installed
-    cv2 = None  # type: ignore[assignment]
 import streamlit as st
 from PIL import ExifTags, Image
 
+from utils.error_recovery import ImportErrorRecovery
+
+# Configure logger for this module
 logger = logging.getLogger(__name__)
+
+# Safe import of cv2 with proper fallback
+cv2 = ImportErrorRecovery.safe_import("cv2", logger_name="image_interface")
 
 
 class ImageInterface:

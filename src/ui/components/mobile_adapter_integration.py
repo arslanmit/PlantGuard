@@ -7,12 +7,20 @@ and mobile-optimized preprocessing.
 """
 
 import logging
+
+# Add parent directory to path for utils import
+import sys
 from contextlib import suppress
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 import streamlit as st
 from PIL import Image
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from utils.error_recovery import SafeTypeConverter
 
 logger = logging.getLogger(__name__)
 
@@ -455,32 +463,56 @@ class MobileAdapterIntegration:
             }
 
     def _preprocess_mobile_text(self, text: str) -> str:
-        """Preprocess text from mobile input."""
+        """Preprocess text from mobile input with safe type conversion and proper validation."""
         try:
-            config = self.mobile_config["text_preprocessing"]
+            # Safely convert input to string and get config
+            text = SafeTypeConverter.safe_str(text, default="", logger_name="mobile_adapter_integration")
+            config = self.mobile_config.get("text_preprocessing", {})
 
-            # Clean whitespace
-            if config["clean_whitespace"]:
+            # Get max length with safe conversion
+            max_length = SafeTypeConverter.safe_int(config.get("max_length", 1000), default=1000, logger_name="mobile_adapter_integration")
+
+            # Ensure max_length is within reasonable bounds
+            if max_length <= 0 or max_length > 10000:
+                logger.warning(f"Invalid max_length {max_length}, using default 1000")
+                max_length = 1000
+
+            # Clean whitespace if configured
+            if config.get("clean_whitespace", True):
                 text = " ".join(text.split())
 
-            # Truncate if too long
-            if len(text) > config["max_length"]:
+            # Validate and truncate if too long
+            text_length = len(text)
+            if text_length > max_length:
                 # Reserve 3 characters for "..."
-                max_content_length = config["max_length"] - 3
+                max_content_length = max_length - 3
+
+                # Ensure we don't have negative length
+                if max_content_length <= 0:
+                    logger.warning(f"Max length {max_length} too small, using minimum of 10")
+                    max_content_length = 7  # 10 - 3 for "..."
+
                 # Find the last space before max_content_length to avoid cutting words
                 truncated = text[:max_content_length]
                 last_space = truncated.rfind(" ")
-                if last_space > 0:
+
+                if last_space > 0 and last_space > max_content_length // 2:
+                    # Only use space if it's not too early in the text
                     text = truncated[:last_space] + "..."
                 else:
                     text = truncated + "..."
-                logger.warning("Text truncated to %s characters", config["max_length"])
+
+                logger.warning("Text truncated from %d to %d characters (limit: %d)", text_length, len(text), max_length)
 
             return text.strip()
 
         except Exception as e:
-            logger.warning("Text preprocessing failed: %s", e)
-            return text
+            logger.error("Text preprocessing failed with unexpected error: %s", e)
+            # Return safe fallback - just the original text truncated to 1000 chars
+            safe_text = SafeTypeConverter.safe_str(text, default="", logger_name="mobile_adapter_integration")
+            if len(safe_text) > 1000:
+                return safe_text[:997] + "..."
+            return safe_text
 
     def get_recent_analysis(self, limit: int = 1) -> list[dict[str, Any]]:
         """Get recent analysis results."""

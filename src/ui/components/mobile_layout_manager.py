@@ -547,36 +547,38 @@ class MobileLayoutManager:
         """Initialize performance optimization systems."""
         try:
             # Try to import optional performance modules
-            try:
-                from .mobile_performance_optimizer import MobilePerformanceOptimizer
-
+            # Initialize performance optimizer with proper error handling
+            MobilePerformanceOptimizer = ImportErrorRecovery.safe_import_from(
+                ".mobile_performance_optimizer", "MobilePerformanceOptimizer", logger_name="mobile_layout_manager"
+            )
+            if MobilePerformanceOptimizer:
                 self._performance_optimizer = MobilePerformanceOptimizer()
                 self._performance_optimizer.set_optimization_level("auto")
-            except ImportError:
+            else:
                 logger.debug("Mobile performance optimizer not available, using basic optimizations")
                 self._performance_optimizer = None
 
             # Try to enable offline mode if configured
             if self.config.get("offline_support", True):
-                try:
-                    from .mobile_offline_manager import MobileOfflineManager
-
+                MobileOfflineManager = ImportErrorRecovery.safe_import_from(
+                    ".mobile_offline_manager", "MobileOfflineManager", logger_name="mobile_layout_manager"
+                )
+                if MobileOfflineManager:
                     self.offline_manager = MobileOfflineManager()
                     self.offline_manager.enable_offline_mode()
-                except ImportError:
-                    logger.debug("Mobile offline manager not available")
+                else:
                     self.offline_manager = None
 
             # Try to create CSS bundle for mobile styles
             if self.config.get("resource_bundling", True):
-                try:
-                    from .mobile_bundle_optimizer import MobileBundleOptimizer
-
+                MobileBundleOptimizer = ImportErrorRecovery.safe_import_from(
+                    ".mobile_bundle_optimizer", "MobileBundleOptimizer", logger_name="mobile_layout_manager"
+                )
+                if MobileBundleOptimizer:
                     self.bundle_optimizer = MobileBundleOptimizer()
                     css_content = self._get_mobile_css()
                     self.bundle_optimizer.create_css_bundle({"mobile_layout": css_content}, "mobile_layout_styles")
-                except ImportError:
-                    logger.debug("Mobile bundle optimizer not available, using inline CSS")
+                else:
                     self.bundle_optimizer = None
             else:
                 self.bundle_optimizer = None

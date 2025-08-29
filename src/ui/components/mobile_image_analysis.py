@@ -5,23 +5,29 @@ Integrates VisionAdapter with mobile-optimized UI components.
 Provides touch-friendly image upload, analysis, and results display.
 """
 
+import logging
 import time
 from typing import Any
 
 import streamlit as st
 from PIL import Image
 
-# Import existing adapters
-try:
-    from core.model_manager import ModelManager
-    from core.vision import VisionAdapter
-except ImportError:
-    # Fallback for development/testing
-    from src.adapters_compat import VisionAdapter
-
-    ModelManager = None
+from utils.error_recovery import ImportErrorRecovery
 
 from .mobile_component_registry import ComponentMetadata, MobileComponent, register_mobile_component
+
+# Configure logger for this module
+logger = logging.getLogger(__name__)
+
+# Import existing adapters with proper error handling
+VisionAdapter = ImportErrorRecovery.safe_import_from(
+    "core.vision",
+    "VisionAdapter",
+    fallback=ImportErrorRecovery.safe_import_from("src.adapters_compat", "VisionAdapter", logger_name="mobile_image_analysis"),
+    logger_name="mobile_image_analysis",
+)
+
+ModelManager = ImportErrorRecovery.safe_import_from("core.model_manager", "ModelManager", logger_name="mobile_image_analysis")
 
 
 @register_mobile_component

@@ -249,12 +249,18 @@ def get_model_status() -> dict[str, str]:
 
 
 # Initialize adapters at module level so later code can reference them safely
-try:
-    vision_adapter, audio_adapter, text_adapter = load_adapters()
-except Exception:
-    vision_adapter = None  # type: ignore[assignment]
-    audio_adapter = None  # type: ignore[assignment]
-    text_adapter = None  # type: ignore[assignment]
+def _load_adapters_safely():
+    """Safely load adapters with proper error handling."""
+    try:
+        return load_adapters()
+    except Exception as e:
+        logger.error(f"Failed to load adapters: {e}")
+        return None, None, None
+
+
+vision_adapter, audio_adapter, text_adapter = ExceptionRecovery.safe_execute(
+    _load_adapters_safely, fallback=(None, None, None), logger_name="app_streamlit", operation_name="adapter initialization"
+)
 
 
 # Available models configuration
@@ -541,7 +547,9 @@ st.markdown("## [LEAF] Plant Analysis Tools")
 st.markdown("*Use the tools below to analyze your plants with AI-powered detection*")
 
 # Main content tabs with improved design
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["[IMAGE] Vision Analysis", "[VOICE] Audio Processing", "[CHAT] Text Q&A", "[LIBRARY] Training", "[TOOL] Model Management"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(
+    ["[IMAGE] Vision Analysis", "[VOICE] Audio Processing", "[CHAT] Text Q&A", "[LIBRARY] Training", "[TOOL] Model Management"]
+)
 
 # Vision Analysis Tab
 with tab1:

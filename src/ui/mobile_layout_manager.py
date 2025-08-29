@@ -457,24 +457,24 @@ class MobileLayoutManager:
     def _initialize_performance_optimizations(self) -> None:
         """Initialize performance optimization systems."""
         try:
-            # Try to initialize bundle optimizer
-            try:
-                from ui.components.mobile_bundle_optimizer import MobileBundleOptimizer
-
+            # Initialize bundle optimizer with proper error handling
+            MobileBundleOptimizer = ImportErrorRecovery.safe_import_from(
+                "ui.components.mobile_bundle_optimizer", "MobileBundleOptimizer", logger_name="mobile_layout_manager"
+            )
+            if MobileBundleOptimizer:
                 self._bundle_optimizer = MobileBundleOptimizer()
                 logger.debug("Bundle optimizer initialized")
-            except ImportError:
-                logger.debug("Bundle optimizer not available")
+            else:
                 self._bundle_optimizer = None
 
-            # Try to initialize performance optimizer
-            try:
-                from ui.components.mobile_performance_optimizer import MobilePerformanceOptimizer
-
+            # Initialize performance optimizer with proper error handling
+            MobilePerformanceOptimizer = ImportErrorRecovery.safe_import_from(
+                "ui.components.mobile_performance_optimizer", "MobilePerformanceOptimizer", logger_name="mobile_layout_manager"
+            )
+            if MobilePerformanceOptimizer:
                 self._performance_optimizer = MobilePerformanceOptimizer()
                 logger.debug("Performance optimizer initialized")
-            except ImportError:
-                logger.debug("Performance optimizer not available")
+            else:
                 self._performance_optimizer = None
 
         except Exception as e:

@@ -5,21 +5,34 @@ Integrates AudioAdapter with mobile-optimized voice recording UI.
 Provides touch-friendly voice recording, transcription, and audio file upload.
 """
 
+import logging
 import tempfile
 import time
 from typing import Any
 
 import streamlit as st
 
-# Import existing adapters
-try:
-    from core.audio import AudioAdapter
-    from core.nlp import TextAdapter
-except ImportError:
-    # Fallback for development/testing
-    from src.adapters_compat import AudioAdapter, TextAdapter
+from utils.error_recovery import ImportErrorRecovery
 
 from .mobile_component_registry import ComponentMetadata, MobileComponent, register_mobile_component
+
+# Configure logger for this module
+logger = logging.getLogger(__name__)
+
+# Import existing adapters with proper error handling
+AudioAdapter = ImportErrorRecovery.safe_import_from(
+    "core.audio",
+    "AudioAdapter",
+    fallback=ImportErrorRecovery.safe_import_from("src.adapters_compat", "AudioAdapter", logger_name="mobile_voice_interface"),
+    logger_name="mobile_voice_interface",
+)
+
+TextAdapter = ImportErrorRecovery.safe_import_from(
+    "core.nlp",
+    "TextAdapter",
+    fallback=ImportErrorRecovery.safe_import_from("src.adapters_compat", "TextAdapter", logger_name="mobile_voice_interface"),
+    logger_name="mobile_voice_interface",
+)
 
 
 @register_mobile_component
