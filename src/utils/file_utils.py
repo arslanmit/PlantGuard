@@ -105,6 +105,52 @@ class FileManager:
         dir_path.mkdir(parents=True, exist_ok=True)
         return dir_path
 
+    def check_model_file_availability(self, model_path: str) -> bool:
+        """Check if model file exists and is accessible.
+
+        Args:
+            model_path: Path to model file
+
+        Returns:
+            True if model file is available and accessible
+        """
+        try:
+            path = Path(model_path)
+            if not path.exists():
+                logger.warning(f"Model file not found: {model_path}")
+                return False
+
+            if not path.is_file():
+                logger.warning(f"Model path is not a file: {model_path}")
+                return False
+
+            # Try to read a small portion to check accessibility
+            try:
+                with open(path, "rb") as f:
+                    f.read(1024)  # Read first 1KB
+                return True
+            except (OSError, PermissionError) as e:
+                logger.warning(f"Model file not accessible: {model_path} - {e}")
+                return False
+
+        except Exception as e:
+            logger.warning(f"Error checking model file {model_path}: {e}")
+            return False
+
+    def get_fallback_model_config(self) -> dict:
+        """Get fallback configuration when model files are missing.
+
+        Returns:
+            Dictionary with fallback model configuration
+        """
+        return {
+            "vision_model": None,
+            "audio_model": None,
+            "text_model": None,
+            "fallback_mode": True,
+            "error_message": "Model files not available - using fallback mode",
+        }
+
     def __del__(self) -> None:
         """Cleanup temporary files on destruction."""
         self.cleanup_temp_files()
