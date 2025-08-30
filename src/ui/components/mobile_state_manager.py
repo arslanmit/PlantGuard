@@ -309,21 +309,28 @@ class MobileStateManager:
         """
         state = self.get_component_state(component_id)
 
-        validation_results = {"valid": True, "errors": [], "warnings": []}
+        validation_results: dict[str, Any] = {"valid": True, "errors": [], "warnings": []}
 
         # Check required fields
         required_fields = ["component_id", "initialized", "created_at", "last_updated"]
         for field in required_fields:
             if field not in state:
                 validation_results["valid"] = False
-                validation_results["errors"].append(f"Missing required field: {field}")
+                errors_list = validation_results.get("errors", [])
+                if isinstance(errors_list, list):
+                    errors_list.append(f"Missing required field: {field}")
+                    validation_results["errors"] = errors_list
 
         # Check data types
-        if "data" in state and not isinstance(state["data"], dict):
-            validation_results["warnings"].append("'data' field should be a dictionary")
+        warnings_list = validation_results.get("warnings", [])
+        if isinstance(warnings_list, list):
+            if "data" in state and not isinstance(state["data"], dict):
+                warnings_list.append("'data' field should be a dictionary")
 
-        if "ui_state" in state and not isinstance(state["ui_state"], dict):
-            validation_results["warnings"].append("'ui_state' field should be a dictionary")
+            if "ui_state" in state and not isinstance(state["ui_state"], dict):
+                warnings_list.append("'ui_state' field should be a dictionary")
+
+            validation_results["warnings"] = warnings_list
 
         return validation_results
 
@@ -404,7 +411,7 @@ class MobileStateManager:
         tracking_key = f"{self._state_prefix}_tracking"
 
         if tracking_key in st.session_state:
-            tracking_info = st.session_state[tracking_key]
+            tracking_info: dict[str, Any] = st.session_state[tracking_key]
 
             # Add to history
             history_entry = {
@@ -414,14 +421,30 @@ class MobileStateManager:
                 "state_keys": list(state.keys()) if state else [],
             }
 
-            tracking_info["state_history"].append(history_entry)
+            # Ensure state_history is a list
+            if "state_history" not in tracking_info:
+                tracking_info["state_history"] = []
 
-            # Keep only last 100 entries
-            if len(tracking_info["state_history"]) > 100:
-                tracking_info["state_history"] = tracking_info["state_history"][-100:]
+            # Safely get and update state history
+            state_history = tracking_info.get("state_history", [])
+            if isinstance(state_history, list):
+                state_history.append(history_entry)
+
+                # Keep only last 100 entries
+                if len(state_history) > 100:
+                    tracking_info["state_history"] = state_history[-100:]
+                else:
+                    tracking_info["state_history"] = state_history
 
             # Update component tracking
-            tracking_info["component_states"][component_id] = {"last_action": action, "last_update": datetime.now().isoformat()}
+            if "component_states" not in tracking_info:
+                tracking_info["component_states"] = {}
+
+            # Safely get and update component states
+            component_states = tracking_info.get("component_states", {})
+            if isinstance(component_states, dict):
+                component_states[component_id] = {"last_action": action, "last_update": datetime.now().isoformat()}
+                tracking_info["component_states"] = component_states
 
     def _deep_merge(self, target: dict[str, Any], source: dict[str, Any]) -> None:
         """

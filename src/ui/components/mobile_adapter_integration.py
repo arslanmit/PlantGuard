@@ -200,16 +200,16 @@ class MobileAdapterIntegration:
             # Apply different enhancements based on source
             if source == "camera":
                 # Camera images might need contrast/brightness adjustment
-                enhancer = ImageEnhance.Contrast(image)
-                image = enhancer.enhance(1.1)  # Slight contrast boost
+                contrast_enhancer = ImageEnhance.Contrast(image)
+                image = contrast_enhancer.enhance(1.1)  # Slight contrast boost
 
-                enhancer = ImageEnhance.Sharpness(image)
-                image = enhancer.enhance(1.05)  # Slight sharpness boost
+                sharpness_enhancer = ImageEnhance.Sharpness(image)
+                image = sharpness_enhancer.enhance(1.05)  # Slight sharpness boost
 
             elif source == "upload":
                 # Uploaded images might be from various sources
-                enhancer = ImageEnhance.Color(image)
-                image = enhancer.enhance(1.05)  # Slight color enhancement
+                color_enhancer = ImageEnhance.Color(image)
+                image = color_enhancer.enhance(1.05)  # Slight color enhancement
 
             return image
 
@@ -237,6 +237,8 @@ class MobileAdapterIntegration:
 
             # Perform vision analysis
             vision_adapter = self.vision_adapter
+            if vision_adapter is None:
+                raise RuntimeError("Vision adapter not available")
             prediction = vision_adapter.predict(processed_image)
 
             disease_name, confidence = prediction
@@ -263,8 +265,12 @@ class MobileAdapterIntegration:
 
             # Get disease information from text adapter
             try:
-                disease_info = self.text_adapter.get_disease_info(disease_name)
-                analysis_result["disease_info"] = disease_info
+                text_adapter = self.text_adapter
+                if text_adapter is not None:
+                    disease_info = text_adapter.get_disease_info(disease_name)
+                    analysis_result["disease_info"] = disease_info
+                else:
+                    analysis_result["disease_info"] = {}
             except Exception as e:
                 logger.warning("Failed to get disease info: %s", e)
                 analysis_result["disease_info"] = {}
@@ -309,6 +315,8 @@ class MobileAdapterIntegration:
 
             # Perform transcription
             audio_adapter = self.audio_adapter
+            if audio_adapter is None:
+                raise RuntimeError("Audio adapter not available")
             transcription = audio_adapter.transcribe(processed_audio_file)
 
             # Create transcription result
@@ -403,6 +411,8 @@ class MobileAdapterIntegration:
 
             # Generate response using text adapter
             text_adapter = self.text_adapter
+            if text_adapter is None:
+                raise RuntimeError("Text adapter not available")
             response = text_adapter.generate_response(disease_class=disease_class, user_query=processed_text, confidence=confidence)
 
             # Create processing result

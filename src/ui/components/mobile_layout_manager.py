@@ -15,6 +15,26 @@ import streamlit as st
 from .mobile_component_registry import MobileComponentRegistry
 from .mobile_state_manager import MobileStateManager
 
+# Import error recovery utility
+try:
+    from src.utils.error_recovery import ImportErrorRecovery
+except ImportError:
+    # Fallback implementation
+    class _ImportErrorRecoveryFallback:
+        @staticmethod
+        def safe_import_from(module: str, name: str, logger_name: str = "mobile_layout_manager") -> Any | None:
+            try:
+                import importlib
+
+                mod = importlib.import_module(module, package="src.ui.components")
+                return getattr(mod, name, None)
+            except (ImportError, AttributeError):
+                return None
+
+    # Use the fallback class directly
+    ImportErrorRecovery = _ImportErrorRecoveryFallback  # type: ignore[misc,assignment]
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,6 +62,11 @@ class MobileLayoutManager:
         self.component_registry = MobileComponentRegistry()
         self.state_manager = MobileStateManager()
         self._css_injected = False
+
+        # Initialize performance optimization attributes with proper types
+        self._performance_optimizer: Any | None = None
+        self.offline_manager: Any | None = None
+        self.bundle_optimizer: Any | None = None
 
         # Initialize performance optimizations
         self._initialize_performance_optimizations()
@@ -588,7 +613,7 @@ class MobileLayoutManager:
         except Exception as e:
             logger.warning(f"Failed to initialize performance optimizations: {e}")
 
-    def _check_memory_pressure(self) -> None:
+    def _check_memory_pressure(self) -> dict[str, str] | None:
         """Check and handle memory pressure."""
         try:
             if not self._performance_optimizer:
@@ -635,7 +660,7 @@ class MobileLayoutManager:
         try:
             with st.expander("[SUMMARY] Performance Stats", expanded=False):
                 # Get performance report
-                perf_report = self._performance_optimizer.get_performance_report() if self._performance_optimizer else {}
+                perf_report: dict[str, Any] = self._performance_optimizer.get_performance_report() if self._performance_optimizer else {}
 
                 col1, col2, col3 = st.columns(3)
 

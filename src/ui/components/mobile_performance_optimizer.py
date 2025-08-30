@@ -14,6 +14,7 @@ import gc
 import logging
 import time
 from collections.abc import Callable
+from contextlib import suppress
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import lru_cache, wraps
@@ -28,13 +29,13 @@ logger = logging.getLogger(__name__)
 class ComponentRenderOptimizer:
     """Context manager for optimized component rendering."""
 
-    def __init__(self, performance_optimizer, component_id: str):
+    def __init__(self, performance_optimizer: "MobilePerformanceOptimizer", component_id: str) -> None:
         """Initialize the context manager."""
         self.performance_optimizer = performance_optimizer
         self.component_id = component_id
-        self.start_time = None
+        self.start_time: float | None = None
 
-    def __enter__(self):
+    def __enter__(self) -> "ComponentRenderOptimizer":
         """Enter the context manager."""
         self.start_time = time.time()
 
@@ -52,7 +53,7 @@ class ComponentRenderOptimizer:
 
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: Any) -> None:
         """Exit the context manager."""
         if self.start_time:
             render_time = time.time() - self.start_time
@@ -62,7 +63,7 @@ class ComponentRenderOptimizer:
         if exc_type:
             logger.warning(f"Component {self.component_id} rendering failed: {exc_val}")
 
-        return False  # Don't suppress exceptions
+        # Don't suppress exceptions - return None
 
 
 @dataclass
@@ -422,7 +423,7 @@ class MobilePerformanceOptimizer:
                 "optimization_level": "auto",
             }
 
-    def optimize_component_render(self, component_id: str):
+    def optimize_component_render(self, component_id: str) -> ComponentRenderOptimizer:
         """
         Context manager to optimize component rendering.
 
@@ -532,7 +533,7 @@ class MobilePerformanceOptimizer:
             from PIL import Image
 
             # Load image
-            image = Image.open(io.BytesIO(image_data))
+            image: Image.Image = Image.open(io.BytesIO(image_data))
 
             # Resize if too large
             if image.width > max_width:
