@@ -502,6 +502,11 @@ class MobileAdapterIntegration:
                 else:
                     text = truncated + "..."
 
+                # Ensure the final result doesn't exceed max_length
+                if len(text) > max_length:
+                    # If somehow we exceeded the limit, truncate more aggressively
+                    text = text[: max_length - 3] + "..."
+
                 logger.warning("Text truncated from %d to %d characters (limit: %d)", text_length, len(text), max_length)
 
             return text.strip()
@@ -511,7 +516,9 @@ class MobileAdapterIntegration:
             # Return safe fallback - just the original text truncated to 1000 chars
             safe_text = SafeTypeConverter.safe_str(text, default="", logger_name="mobile_adapter_integration")
             if len(safe_text) > 1000:
-                return safe_text[:997] + "..."
+                truncated_text = safe_text[:997] + "..."
+                logger.warning("Text truncated in fallback from %d to %d characters (limit: 1000)", len(safe_text), len(truncated_text))
+                return truncated_text
             return safe_text
 
     def get_recent_analysis(self, limit: int = 1) -> list[dict[str, Any]]:
