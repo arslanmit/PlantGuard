@@ -1,3 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from collections.abc import Generator
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 """Feature modules for the PlantGuard application."""

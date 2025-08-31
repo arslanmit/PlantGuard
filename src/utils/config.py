@@ -10,8 +10,6 @@ class Config:
     """Configuration class for PlantGuard system."""
 
     # Model paths
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
     vision_model_path: str = "data/models/plant_disease_resnet50.pth"
     knowledge_base_path: str = "data/knowledge_base/disease_info.json"
     whisper_model_name: str = "openai/whisper-tiny"

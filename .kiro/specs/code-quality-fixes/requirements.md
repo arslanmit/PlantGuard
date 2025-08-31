@@ -2,7 +2,8 @@
 
 ## Introduction
 
-This spec addresses the comprehensive code quality issues identified by mypy type checking and ruff linting in the PlantGuard project. The issues include type annotation problems, import organization, security concerns, and code style violations that need systematic resolution to maintain code quality standards and ensure compliance with PlantGuard's local-only ML inference requirements.
+This spec addresses the comprehensive code quality issues identified by mypy type checking and ruff linting in the PlantGuard project. The issues include type annotation problems, import organization, security concerns, and code style violations that need systematic resolution to maintain code quality standards and ensure compliance with PlantGuard's local-only ML inference requirements. The goal is to achieve zero mypy strict mode errors (currently 535) and resolve all ruff linting issues (currently 187) while maintaining the project's offline-first architecture and avoiding Unicode characters that could cause compatibility issues with AI agent-based coding workflows.
+
 
 ## Requirements
 
@@ -31,7 +32,7 @@ This spec addresses the comprehensive code quality issues identified by mypy typ
 
 ### Requirement 3: Security and Best Practices
 
-**User Story:** As a developer, I want the code to follow security best practices so that the application is safe from common vulnerabilities.
+**User Story:** As a developer, I want the code to follow security best practices so that the application is safe from common vulnerabilities and maintains PlantGuard's local-only processing requirements.
 
 #### Acceptance Criteria
 
@@ -40,6 +41,7 @@ This spec addresses the comprehensive code quality issues identified by mypy typ
 3. WHEN network requests are made THEN they SHALL include appropriate timeouts
 4. WHEN exception handling is used THEN it SHALL log exceptions instead of silent continues
 5. WHEN temporary files are created THEN they SHALL use tempfile module and clean up immediately
+6. WHEN processing user data THEN it SHALL never be sent to external services to maintain offline-first architecture
 
 ### Requirement 4: Code Style and Formatting
 
@@ -48,10 +50,11 @@ This spec addresses the comprehensive code quality issues identified by mypy typ
 #### Acceptance Criteria
 
 1. WHEN examining variable names THEN they SHALL not use ambiguous single letters
-2. WHEN examining string literals THEN they SHALL not contain ambiguous Unicode characters like ℹ
+2. WHEN examining string literals THEN they SHALL not contain ambiguous Unicode characters like information symbols
 3. WHEN examining exception handling THEN it SHALL use contextlib.suppress for simple pass cases
 4. WHEN examining file paths THEN they SHALL use Path operations consistently
 5. WHEN examining line length THEN it SHALL not exceed 100 characters per PlantGuard standards
+6. WHEN running replace_emojis.py script THEN it SHALL resolve Unicode character issues automatically
 
 ### Requirement 5: Mobile Component Integration Fixes
 
@@ -86,3 +89,15 @@ This spec addresses the comprehensive code quality issues identified by mypy typ
 2. WHEN examining function definitions THEN they SHALL have complete return type annotations
 3. WHEN examining generic types THEN they SHALL have proper type parameters (dict[K, V] not dict)
 4. WHEN examining Any types THEN they SHALL be replaced with specific type annotations
+
+### Requirement 8: PlantGuard Architecture Compliance
+
+**User Story:** As a developer, I want all code quality fixes to maintain PlantGuard's core architecture principles so that the offline-first ML inference capabilities remain intact.
+
+#### Acceptance Criteria
+
+1. WHEN fixing code quality issues THEN the local-only ML inference pipeline SHALL remain unchanged
+2. WHEN updating imports THEN no external API dependencies SHALL be introduced
+3. WHEN fixing type annotations THEN the Vision, Audio, and Text adapter interfaces SHALL remain compatible
+4. WHEN resolving security issues THEN the offline capability SHALL be preserved
+5. WHEN updating code style THEN the Streamlit UI functionality SHALL not be affected

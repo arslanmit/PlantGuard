@@ -8,7 +8,6 @@ This script validates that the user's original issue has been completely resolve
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import sys
 from pathlib import Path

@@ -5,7 +5,6 @@ using pre-trained models from Hugging Face Hub.
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import logging
 

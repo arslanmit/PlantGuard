@@ -5,7 +5,6 @@ imports continue to work after reorganization.
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 from src.features.model_switching.huggingface_vision import (
     HuggingFaceVisionAdapter,

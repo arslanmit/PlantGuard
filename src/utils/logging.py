@@ -22,8 +22,6 @@ def setup_logger(
     Returns:
         Configured logger instance
     """
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
     if format_string is None:
         format_string = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 

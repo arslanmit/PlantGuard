@@ -4,7 +4,6 @@ This script creates a mapping between model class indices and human-readable nam
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import argparse
 import json

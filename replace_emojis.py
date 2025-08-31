@@ -19,7 +19,6 @@ Emoji mappings:
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import argparse
 import re

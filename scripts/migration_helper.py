@@ -7,7 +7,6 @@ This script can be called when users try to access removed desktop functionality
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import json
 import sys

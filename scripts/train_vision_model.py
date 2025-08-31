@@ -4,7 +4,6 @@ This script trains a ResNet50 model on the PlantVillage dataset for plant diseas
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import argparse
 import json

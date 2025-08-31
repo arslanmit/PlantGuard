@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 from __future__ import annotations
 

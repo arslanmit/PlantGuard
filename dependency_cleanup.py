@@ -6,7 +6,6 @@ Analyzes and removes unused dependencies to optimize mobile performance.
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 from pathlib import Path
 

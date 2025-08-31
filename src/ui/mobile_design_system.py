@@ -6,7 +6,6 @@ optimized for mobile interfaces and AI agent recognition.
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 from enum import Enum
 

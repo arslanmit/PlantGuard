@@ -12,7 +12,6 @@ PLANTGUARD_TRAIN_MEMORY_LIMIT_BYTES to opt-in without code changes.
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 from __future__ import annotations
 

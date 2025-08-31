@@ -11,7 +11,6 @@ to ensure consistent 4GB memory usage across all systems.
 
 # Memory limits in different units
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 MEMORY_LIMIT_GB = 4.0  # 4 GB maximum memory usage
 MEMORY_LIMIT_MB = MEMORY_LIMIT_GB * 1024  # 4096 MB

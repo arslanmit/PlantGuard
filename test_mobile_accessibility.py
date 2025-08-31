@@ -7,7 +7,6 @@ high contrast mode, and voice-over compatibility.
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import sys
 from pathlib import Path

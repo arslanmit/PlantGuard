@@ -4,7 +4,6 @@ This module contains the ResNet50 model architecture for plant disease classific
 """
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import logging
 

@@ -5,9 +5,9 @@ This package provides mobile-optimized components with AI agent support
 and comprehensive error handling for the PlantGuard plant disease detection system.
 """
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
 import logging
+from collections.abc import Generator
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # Core infrastructure components
 # Base component class
