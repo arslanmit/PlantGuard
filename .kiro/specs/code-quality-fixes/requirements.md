@@ -54,7 +54,7 @@ This spec addresses the comprehensive code quality issues identified by mypy typ
 3. WHEN examining exception handling THEN it SHALL use contextlib.suppress for simple pass cases
 4. WHEN examining file paths THEN they SHALL use Path operations consistently
 5. WHEN examining line length THEN it SHALL not exceed 100 characters per PlantGuard standards
-6. WHEN running replace_emojis.py script THEN it SHALL resolve Unicode character issues automatically
+6. WHEN running replace_emojis.py --no-backup script THEN it SHALL resolve Unicode character issues automatically
 
 ### Requirement 5: Mobile Component Integration Fixes
 

@@ -18,30 +18,32 @@
 - [x] 3. Fix Unicode Character Issues in Strings
   - Replace RUF001 ambiguous ℹ characters in fix_mobile_testing_annotations.py
   - Replace RUF001 ambiguous ℹ characters in fix_untyped_calls.py
+  - Run replace_emojis.py --no-backup script to automatically resolve Unicode character issues
   - Use standard ASCII characters for better compatibility
-  - _Requirements: 4.1, 4.2_
+  - _Requirements: 4.1, 4.2, 4.6_
 
-- [ ] 4. Fix Syntax Errors Preventing Mypy Analysis
+- [x] 4. Fix Syntax Errors Preventing Mypy Analysis
   - Fix syntax errors in files preventing mypy from running (currently blocking all type checking)
   - Ensure all Python files have valid syntax before proceeding with type annotation fixes
   - Validate that imports are properly placed and not causing indentation errors
   - _Requirements: 1.1, 7.1_
 
-- [ ] 5. Fix Missing Return Type Annotations
-  - Add return type annotations to functions missing them across the codebase
-  - Fix no-untyped-def errors in mobile_testing_optimization_suite.py and other files
+- [ ] 5. Fix Missing Type Parameters for Generic Types
+  - Fix type-arg errors for dict usage in src/core/memory_config.py (get_memory_config function should return dict[str, Any])
+  - Fix type-arg errors in generate_emoji_report.py and replace_emojis.py for generic dict usage
+  - Replace remaining generic dict with dict[str, Any] or specific key-value types throughout codebase
+  - Update Collection types to concrete list/dict types where appropriate
+  - _Requirements: 1.1, 1.3, 7.3_
+
+- [ ] 6. Fix Missing Return Type Annotations
+  - Add return type annotations to functions missing them in mobile_testing_optimization_suite.py
+  - Fix no-untyped-def errors for test_layout_manager, test_performance_optimizer, and other methods
   - Fix no-untyped-call errors by ensuring called functions have type annotations
   - Ensure all public API methods have complete type annotations
   - _Requirements: 1.1, 7.1, 7.2, 7.4_
 
-- [ ] 6. Fix Missing Type Parameters for Generic Types
-  - Replace generic Dict, List with dict[K, V], list[T] throughout codebase (85 instances)
-  - Fix type-arg errors for dict usage in src/core/memory_config.py and other files
-  - Update Collection types to concrete list/dict types where appropriate
-  - _Requirements: 1.1, 1.3, 7.3_
-
 - [ ] 7. Fix no-any-return Errors in Core Components
-  - Fix Any return type in run_all_type_fixes.py (should return bool)
+  - Fix Any return type in run_all_type_fixes.py main function (currently returns bool but should return None)
   - Review and fix any other functions returning Any when specific types expected
   - Ensure all public APIs have complete, specific type annotations
   - Replace Any types with proper specific type annotations throughout codebase
@@ -68,8 +70,8 @@
   - _Requirements: 6.1, 6.3, 6.4, 6.5_
 
 - [ ] 11. Validate All Fixes and Run Final Quality Checks
-  - Run mypy --strict to ensure zero type errors (currently blocked by syntax errors)
-  - Execute ruff check to verify all linting issues are resolved (currently 85+ import/typing issues)
+  - Run mypy --strict to ensure zero type errors (currently ~519 errors remaining, down from 535)
+  - Execute ruff check to verify all linting issues are resolved (import/typing issues already fixed)
   - Run pytest to confirm all tests pass with improved infrastructure
   - Generate final quality report with zero errors in both normal and strict modes
   - Verify compliance with PlantGuard's 100-character line length standard
