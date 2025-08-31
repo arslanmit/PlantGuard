@@ -592,7 +592,7 @@ class MobilePlantGuardApp:
         try:
             # Only show if performance optimization is enabled
             if st.session_state.get("mobile_performance_mode") != "minimal":
-                with st.expander(":zap: Performance Status", expanded=False):
+                with st.expander(":zap: Performance Status", expanded=True):
                     try:
                         perf_report = self.performance_optimizer.get_performance_report()
 
@@ -663,7 +663,7 @@ class MobilePlantGuardApp:
                     if st.session_state.mobile_analysis_history:
                         recent_analysis = st.session_state.mobile_analysis_history[-1]
 
-                        with st.expander(":bar_chart: Latest Analysis Results", expanded=False):
+                        with st.expander(":bar_chart: Latest Analysis Results", expanded=True):
                             col1, col2 = st.columns(2)
 
                             with col1:
@@ -896,7 +896,7 @@ class MobilePlantGuardApp:
                 else:
                     title = f":bar_chart: Analysis {analysis_num}"
 
-                with st.expander(title, expanded=False):
+                with st.expander(title, expanded=True):
                     if "disease" in analysis:
                         # Enhanced mobile analysis display
                         col1, col2 = st.columns(2)
@@ -1183,7 +1183,7 @@ class MobilePlantGuardApp:
     def render_ai_agent_status(self) -> None:
         """Render AI agent status indicator in main content without page redirects."""
         # Move AI agent status to main content instead of sidebar
-        with st.expander("[AI] AI Agent Status", expanded=False):
+        with st.expander("[AI] AI Agent Status", expanded=True):
             if st.session_state.get("ai_agent_active", False):
                 st.success("[AI] AI Agent Active")
 
@@ -1239,7 +1239,7 @@ class MobilePlantGuardApp:
                     st.rerun()
 
             # Show system status for debugging
-            with st.expander("[DEBUG] System Status", expanded=False):
+            with st.expander("[DEBUG] System Status", expanded=True):
                 st.write("**Adapter Status:**")
                 adapters_loaded = st.session_state.get("mobile_adapters_loaded", False)
                 st.write(f"- Core Adapters: {'[LOADED]' if adapters_loaded else '[NOT LOADED]'}")
@@ -1334,7 +1334,7 @@ class MobilePlantGuardApp:
     def render_app_info_inline(self) -> None:
         """Render app info and component status inline in main content."""
         # App info in expandable section
-        with st.expander("[MOBILE] PlantGuard Mobile Info", expanded=False):
+        with st.expander("[MOBILE] PlantGuard Mobile Info", expanded=True):
             st.markdown("**Version:** 1.0.0-mobile")
             st.markdown("[MOBILE] **Mobile:** Chrome & Safari Optimized")
             st.markdown("[DESKTOP] **All Devices:** Fixed 428px Mobile View")
@@ -1345,7 +1345,7 @@ class MobilePlantGuardApp:
             st.info("[GEOMETRY] **Fixed Width:** 428px on all screens")
 
         # Component status in expandable section
-        with st.expander("[TOOL] Component Status", expanded=False):
+        with st.expander("[TOOL] Component Status", expanded=True):
             components_status = {
                 "Layout Manager": self.layout_manager.get_layout_status().get("status", "unknown") if self.layout_manager else "not_loaded",
                 "Header": "ready" if self.header else "not_loaded",
@@ -1362,7 +1362,7 @@ class MobilePlantGuardApp:
                     st.error(f"[ERROR] {component}")
 
         # Quick actions in expandable section
-        with st.expander("[ACTIONS] Quick Actions", expanded=False):
+        with st.expander("[ACTIONS] Quick Actions", expanded=True):
             col1, col2 = st.columns(2)
 
             with col1:

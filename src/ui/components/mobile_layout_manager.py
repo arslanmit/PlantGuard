@@ -658,7 +658,7 @@ class MobileLayoutManager:
     def _render_performance_stats(self) -> None:
         """Render performance statistics for debugging."""
         try:
-            with st.expander("[SUMMARY] Performance Stats", expanded=False):
+            with st.expander("[SUMMARY] Performance Stats", expanded=True):
                 # Get performance report
                 perf_report: dict[str, Any] = self._performance_optimizer.get_performance_report() if self._performance_optimizer else {}
 

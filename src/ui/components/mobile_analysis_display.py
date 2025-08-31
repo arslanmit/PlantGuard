@@ -384,7 +384,7 @@ class MobileAnalysisDisplay(MobileBaseComponent):
         """Render detailed disease information."""
         st.markdown("### [LIBRARY] Disease Information")
 
-        with st.expander("[MICROSCOPE] Disease Details", expanded=False):
+        with st.expander("[MICROSCOPE] Disease Details", expanded=True):
             if "description" in disease_info:
                 st.write(f"**Description:** {disease_info['description']}")
 

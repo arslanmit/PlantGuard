@@ -109,7 +109,7 @@ def demo_mobile_analysis_display() -> None:
     analysis_display.render()
 
     # Component info
-    with st.expander("[DETAILS] Component Information", expanded=False):
+    with st.expander("[DETAILS] Component Information", expanded=True):
         st.write(f"**Component ID:** {analysis_display.component_id}")
         st.write(f"**Component Type:** {analysis_display.component_type}")
         st.write(f"**Has Results:** {analysis_display.has_results()}")
@@ -163,7 +163,7 @@ def demo_mobile_recommendations() -> None:
     recommendations.render()
 
     # Component info
-    with st.expander("[DETAILS] Component Information", expanded=False):
+    with st.expander("[DETAILS] Component Information", expanded=True):
         st.write(f"**Component ID:** {recommendations.component_id}")
         st.write(f"**Component Type:** {recommendations.component_type}")
         st.write(f"**Current Disease:** {recommendations.get_current_disease()}")
@@ -241,7 +241,7 @@ def demo_mobile_chat_interface() -> None:
     chat_interface.render()
 
     # Component info
-    with st.expander("[DETAILS] Component Information", expanded=False):
+    with st.expander("[DETAILS] Component Information", expanded=True):
         st.write(f"**Component ID:** {chat_interface.component_id}")
         st.write(f"**Component Type:** {chat_interface.component_type}")
         st.write(f"**Message Count:** {chat_interface.get_message_count()}")

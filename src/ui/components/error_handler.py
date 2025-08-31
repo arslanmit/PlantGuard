@@ -82,7 +82,7 @@ class ErrorHandler:
 
         # Error details in expander
         if show_details or st.session_state.get("debug_mode", False):
-            with st.expander("[SEARCH] Error Details", expanded=False):
+            with st.expander("[SEARCH] Error Details", expanded=True):
                 col1, col2 = st.columns(2)
 
                 with col1:
@@ -352,7 +352,7 @@ class ErrorHandler:
             error_count = st.session_state.get("error_count", 0)
 
             if recent_errors:
-                with st.expander(f"[BUG] Error Summary ({error_count} total)", expanded=False):
+                with st.expander(f"[BUG] Error Summary ({error_count} total)", expanded=True):
                     for error in recent_errors[-5:]:  # Show last 5 errors
                         st.markdown(f"**{error['timestamp']}** - {error['type']}: {error['user_message']}")
 

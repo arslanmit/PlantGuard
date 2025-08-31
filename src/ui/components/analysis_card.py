@@ -290,7 +290,7 @@ class AnalysisCard:
         """
         disease_info = self.get_disease_info(result.prediction)
 
-        with st.expander("[TREATMENT] Treatment & Prevention", expanded=False):
+        with st.expander("[TREATMENT] Treatment & Prevention", expanded=True):
             col1, col2 = st.columns(2)
 
             with col1:
@@ -396,7 +396,7 @@ class AnalysisCard:
         if not result.metadata:
             return
 
-        with st.expander("[SUMMARY] Analysis Details", expanded=False):
+        with st.expander("[SUMMARY] Analysis Details", expanded=True):
             for key, value in result.metadata.items():
                 if key == "model_version":
                     st.write(f"**Model:** {value}")

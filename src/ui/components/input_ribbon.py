@@ -448,7 +448,7 @@ class InputRibbon:
 
     def render_keyboard_shortcuts(self) -> None:
         """Render keyboard shortcuts help."""
-        with st.expander("⌨️ Keyboard Shortcuts", expanded=False):
+        with st.expander("⌨️ Keyboard Shortcuts", expanded=True):
             st.markdown("**Input Mode Shortcuts:**")
 
             for mode_info in self.input_modes.values():
@@ -461,7 +461,7 @@ class InputRibbon:
 
     def render_input_mode_settings(self) -> None:
         """Render input mode settings and configuration options."""
-        with st.expander("[SETTINGS] Input Mode Settings", expanded=False):
+        with st.expander("[SETTINGS] Input Mode Settings", expanded=True):
             settings = st.session_state.get("input_mode_settings", {})
 
             col1, col2 = st.columns(2)
@@ -708,7 +708,7 @@ class InputRibbon:
             st.info(f"[PROGRESS] **Multimodal Analysis Ready:** {summary['mode_count']} input modes active")
 
         for mode in summary["active_modes"]:
-            with st.expander(f"{self.input_modes[mode]['icon']} {self.input_modes[mode]['label']} Input", expanded=False):
+            with st.expander(f"{self.input_modes[mode]['icon']} {self.input_modes[mode]['label']} Input", expanded=True):
                 self._render_mode_input_preview(mode, summary["input_data"].get(mode, {}))
 
     def _render_mode_input_preview(self, mode_name: str, input_data: dict) -> Any:

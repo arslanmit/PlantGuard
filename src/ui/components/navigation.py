@@ -397,7 +397,7 @@ class NavigationHeader:
 
     def render_page_search(self) -> str | None:
         """Render page search functionality."""
-        with st.expander("[SEARCH] Search Pages", expanded=False):
+        with st.expander("[SEARCH] Search Pages", expanded=True):
             search_query = st.text_input("Search for a page:", placeholder="Type page name, description, or keyword...", key="page_search")
 
             if search_query:
@@ -491,7 +491,7 @@ class NavigationSidebar:
         state_manager = StateManager()
         stats = state_manager.get_session_stats()
 
-        with st.expander("[SUMMARY] Session Info", expanded=False):
+        with st.expander("[SUMMARY] Session Info", expanded=True):
             st.metric("Session Duration", stats["session_duration"])
             st.metric("Pages Visited", stats["pages_visited"])
             st.metric("Analyses Done", stats["analyses_performed"])

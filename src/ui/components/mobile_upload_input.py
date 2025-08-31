@@ -130,7 +130,7 @@ class MobileUploadInput(MobileBaseComponent):
         )
 
         # Upload tips
-        with st.expander("[DETAILS] Upload Tips", expanded=False):
+        with st.expander("[DETAILS] Upload Tips", expanded=True):
             st.markdown("""
             **For best results:**
             - Use clear, well-lit photos
@@ -429,7 +429,7 @@ class MobileUploadInput(MobileBaseComponent):
                 # Show disease information if available
                 disease_info = analysis_result.get("disease_info", {})
                 if disease_info and disease_info.get("description"):
-                    with st.expander("i Disease Information", expanded=False):
+                    with st.expander("i Disease Information", expanded=True):
                         st.write(f"**Description:** {disease_info['description']}")
 
                         # Show treatment if available

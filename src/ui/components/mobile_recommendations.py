@@ -282,7 +282,7 @@ class MobileRecommendations(MobileBaseComponent):
                     st.write(f"- {tip}")
         else:
             # Generic prevention tips
-            with st.expander("[SECURE] General Prevention Tips", expanded=False):
+            with st.expander("[SECURE] General Prevention Tips", expanded=True):
                 st.markdown("""
                 **General disease prevention:**
                 - Maintain proper plant spacing for air circulation
@@ -402,7 +402,7 @@ class MobileRecommendations(MobileBaseComponent):
                 self._save_recommendations_to_notes(disease_name, confidence)
 
         # Custom notes section
-        with st.expander("[WRITE] Personal Notes", expanded=False):
+        with st.expander("[WRITE] Personal Notes", expanded=True):
             state = self.get_state()
             current_notes = state["data"]["recommendations_data"].get("custom_notes", "")
 

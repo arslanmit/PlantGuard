@@ -120,7 +120,7 @@ class MobileAudioProcessor(MobileBaseComponent):
             self._handle_audio_upload(uploaded_audio)
 
         # Audio processing options
-        with st.expander("[TOOL] Processing Options", expanded=False):
+        with st.expander("[TOOL] Processing Options", expanded=True):
             col1, col2 = st.columns(2)
 
             with col1:

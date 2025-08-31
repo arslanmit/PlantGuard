@@ -135,7 +135,7 @@ class ChatInterface:
                     st.write(message.content)
 
                     # Show timestamp in expander
-                    with st.expander("[DATE] Message Details", expanded=False):
+                    with st.expander("[DATE] Message Details", expanded=True):
                         st.caption(f"Time: {message.timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
                         if message.metadata:
                             st.caption(f"Metadata: {message.metadata}")
@@ -369,7 +369,7 @@ class ChatInterface:
                     try:
                         message = ChatMessage.from_dict(message_data)
 
-                        with st.expander(f"{message.role.title()} - {message.timestamp.strftime('%H:%M:%S')}", expanded=False):
+                        with st.expander(f"{message.role.title()} - {message.timestamp.strftime('%H:%M:%S')}", expanded=True):
                             st.write(message.content)
 
                     except Exception as e:
@@ -398,7 +398,7 @@ class ChatInterface:
 
         # Search interface (in sidebar or collapsible section)
         if show_search and self.get_messages():
-            with st.expander("[SEARCH] Search & Manage", expanded=False):
+            with st.expander("[SEARCH] Search & Manage", expanded=True):
                 self.render_search_interface()
 
         # Chat input

@@ -288,7 +288,7 @@ def render_demo_footer() -> None:
     """Render demo footer with additional information."""
     st.markdown("---")
 
-    with st.expander("i About This Demo", expanded=False):
+    with st.expander("i About This Demo", expanded=True):
         st.markdown("""
         **PlantGuard Mobile Input Demo** showcases the mobile-optimized input components:
         
@@ -313,7 +313,7 @@ def render_demo_footer() -> None:
         """)
 
     # Component status
-    with st.expander("[TOOL] Component Status", expanded=False):
+    with st.expander("[TOOL] Component Status", expanded=True):
         if "mobile_components" in st.session_state:
             components = st.session_state.mobile_components
 

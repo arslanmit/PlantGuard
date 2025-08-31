@@ -252,7 +252,7 @@ class BreadcrumbNavigation:
         if not page_history:
             return
 
-        with st.expander("[LIBRARY] Page History", expanded=False):
+        with st.expander("[LIBRARY] Page History", expanded=True):
             # Show last 10 page visits
             recent_visits = page_history[-10:]
 

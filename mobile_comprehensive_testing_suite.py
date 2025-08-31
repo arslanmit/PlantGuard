@@ -2331,7 +2331,7 @@ def main() -> None:
                 )
 
         # Display optimization recommendations
-        with st.expander("[LAUNCH] Optimization Recommendations", expanded=False):
+        with st.expander("[LAUNCH] Optimization Recommendations", expanded=True):
             recommendations = results.get("optimization_recommendations", {})
 
             for category, recs in recommendations.items():
@@ -2340,7 +2340,7 @@ def main() -> None:
                     st.markdown(f"- {rec}")
 
         # Display full results
-        with st.expander("[DOCUMENT] Full Test Results (JSON)", expanded=False):
+        with st.expander("[DOCUMENT] Full Test Results (JSON)", expanded=True):
             st.json(results)
 
 

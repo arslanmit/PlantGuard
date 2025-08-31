@@ -39,7 +39,7 @@ class MockStreamlit:
     def container(self) -> Any:
         return Mock()
 
-    def expander(self, label, expanded=False) -> Any:
+    def expander(self, label, expanded=True) -> Any:
         return Mock()
 
     def tabs(self, labels) -> Any:

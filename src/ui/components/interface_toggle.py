@@ -171,7 +171,7 @@ class InterfaceToggle:
         current_mode = self.get_current_mode()
 
         if current_mode == "simple":
-            with st.expander("[PROGRESS] **Simple Mode Features**", expanded=False):
+            with st.expander("[PROGRESS] **Simple Mode Features**", expanded=True):
                 st.markdown("""
                 **Perfect for quick analysis and reduced cognitive load:**
 
@@ -191,7 +191,7 @@ class InterfaceToggle:
                 - Focused attention areas
                 """)
         else:
-            with st.expander("[SETTINGS] **Expert Mode Features**", expanded=False):
+            with st.expander("[SETTINGS] **Expert Mode Features**", expanded=True):
                 st.markdown("""
                 **Full functionality for power users:**
 

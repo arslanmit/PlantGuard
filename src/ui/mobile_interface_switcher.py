@@ -256,7 +256,7 @@ class MobileInterfaceSwitcher:
         """Render information about current interface."""
         config = self.get_interface_config()
 
-        with st.expander("[MOBILE] Interface Information", expanded=False):
+        with st.expander("[MOBILE] Interface Information", expanded=True):
             st.markdown(f"**Current Interface:** {config['interface_type'].title()}")
             st.markdown(f"**Layout:** {config['layout']}")
             st.markdown(f"**Max Width:** {config['max_width']}")
