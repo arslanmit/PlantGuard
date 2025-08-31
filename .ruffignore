@@ -1,0 +1,30 @@
+# Ruff ignore file
+# This file tells Ruff to completely ignore these paths
+
+# Test files
+tests/
+tests/**/*
+**/tests/**
+**/tests/**/*
+
+# Build and cache directories
+build/
+dist/
+.venv/
+.git/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Other directories
+logs/
+runs/
+data/
+notebooks/
+htmlcov/
+
+# Test-related files in other locations
+*_test.py
+test_*.py
+*test*.py

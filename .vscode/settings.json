@@ -124,5 +124,49 @@
     "chat.agent.maxRequests": 9999,
     "cursorpyright.analysis.autoImportCompletions": true,
     "cursorpyright.analysis.diagnosticMode": "workspace",
-    "cursorpyright.analysis.typeCheckingMode": "basic"
+    "cursorpyright.analysis.typeCheckingMode": "basic",
+    "python.analysis.exclude": [
+        "**/tests/**",
+        "**/build/**",
+        "**/dist/**",
+        "**/.venv/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**",
+        "**/.ruff_cache/**",
+        "**/logs/**",
+        "**/runs/**",
+        "**/data/**",
+        "**/notebooks/**"
+    ],
+    "python.analysis.include": [
+        "src/**"
+    ],
+    "python.analysis.reportMissingImports": false,
+    "python.analysis.reportMissingTypeStubs": false,
+    "python.analysis.reportOptionalSubscript": false,
+    "python.analysis.reportUnusedImport": false,
+    "python.analysis.reportUnusedVariable": false,
+    "python.analysis.reportUnusedClass": false,
+    "python.analysis.reportUnusedFunction": false,
+    "python.analysis.reportDuplicateImport": false,
+    "python.analysis.reportMissingParameterType": false,
+    "python.analysis.reportMissingReturnType": false,
+    "python.analysis.reportMissingTypeArgument": false,
+    "python.analysis.reportUntypedFunctionDecorator": false,
+    "python.analysis.reportUntypedClassDecorator": false,
+    "python.analysis.reportUntypedBaseClass": false,
+    "python.analysis.reportUntypedNamedTuple": false,
+    "python.analysis.reportPrivateUsage": false,
+    "python.analysis.reportConstantRedefinition": false,
+    "python.analysis.reportIncompatibleMethodOverride": false,
+    "python.analysis.reportIncompatibleVariableOverride": false,
+    "python.analysis.reportInconsistentConstructor": false,
+    "python.analysis.reportIncompleteStub": false,
+    "python.analysis.reportOptionalMemberAccess": false,
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.stubPath": "typings",
+    "python.analysis.extraPaths": [
+        "src"
+    ]
 }

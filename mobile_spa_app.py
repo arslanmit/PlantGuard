@@ -149,16 +149,16 @@ def _load_adapters_safely() -> None:
         logger.error(f"Failed to load adapters: {e}")
 
 
-# Page configuration for unified PlantGuard with responsive design
+# Page configuration
 st.set_page_config(
-    page_title="PlantGuard Unified",
+    page_title="PlantGuard",
     page_icon="🌿",
-    layout="wide",  # Will be constrained to 428px on mobile by CSS
-    initial_sidebar_state="collapsed",  # Start collapsed
+    layout="wide",
+    initial_sidebar_state="collapsed",
     menu_items={
         "Get Help": "https://github.com/arslanmit/PlantGuard",
         "Report a bug": "https://github.com/arslanmit/PlantGuard/issues",
-        "About": "PlantGuard Unified - AI-powered plant disease detection (Mobile-first with desktop capabilities)",
+        "About": "PlantGuard - AI-powered plant disease detection",
     },
 )
 
@@ -184,9 +184,9 @@ st.markdown(
 
 
 class MobilePlantGuardApp:
-    """Main mobile PlantGuard application class.
+    """Main PlantGuard application class.
 
-    Integrates all mobile components into a unified SPA experience.
+    Integrates all components into a unified SPA experience.
     Provides AI agent testing and autonomous development capabilities.
     """
 
@@ -1230,22 +1230,21 @@ class MobilePlantGuardApp:
 
     def render_ai_agent_status(self) -> None:
         """Render AI agent status indicator in main content without page redirects."""
-        # Move AI agent status to main content instead of sidebar
-        with st.expander("[AI] AI Agent Status", expanded=True):
+        with st.expander("AI Agent Status", expanded=True):
             if st.session_state.get("ai_agent_active", False):
-                st.success("[AI] AI Agent Active")
+                st.success("AI Agent Active")
 
                 if st.button("Run Tests", use_container_width=True, key="spa_ai_tests"):
-                    with st.spinner("AI Agent running tests..."):
+                    with st.spinner("Running tests..."):
                         results = get_ai_testing_framework().test_all_components()
                         st.json(results)
             else:
                 if st.button("Activate AI Agent", use_container_width=True, key="spa_activate_ai"):
                     st.session_state.ai_agent_active = True
-                    st.success("AI Agent activated - no page refresh needed!")
+                    st.success("AI Agent activated!")
 
     def run(self) -> None:
-        """Run the enhanced mobile PlantGuard application with performance optimizations."""
+        """Run the PlantGuard application with performance optimizations."""
         try:
             # Initialize page change prevention
             self._initialize_page_change_prevention()
@@ -1307,43 +1306,37 @@ class MobilePlantGuardApp:
 
         # Initialize components if not done
         if not st.session_state.get("mobile_app_initialized", False):
-            with st.spinner("[INIT] Initializing PlantGuard Unified..."):
+            with st.spinner("Initializing PlantGuard..."):
                 self.initialize_components()
 
-        # Check initialization status with detailed feedback
+        # Check initialization status
         if not st.session_state.get("mobile_app_initialized", False):
-            st.error("[ERROR] Application failed to initialize properly")
+            st.error("Application failed to initialize")
 
-            # Show enhanced troubleshooting
-            st.markdown("### [ERROR] PlantGuard Unified - Initialization Error")
-            st.markdown("The application components failed to initialize. Please try the options below.")
+            st.markdown("### Initialization Error")
+            st.markdown("Components failed to initialize. Try the options below.")
 
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("[RESTART] Reinitialize App", use_container_width=True, key="spa_reinitialize"):
+                if st.button("Reinitialize App", use_container_width=True, key="spa_reinitialize"):
                     st.session_state.mobile_app_initialized = False
-                    st.success("Reinitializing - no page refresh needed!")
-                    # Update state without page refresh
+                    st.success("Reinitializing...")
                     st.session_state.force_reinit = True
 
             with col2:
-                if st.button("[CLEAN] Clear Cache & Restart", use_container_width=True, key="spa_clear_restart"):
-                    # Clear performance cache
+                if st.button("Clear Cache & Restart", use_container_width=True, key="spa_clear_restart"):
                     with contextlib.suppress(builtins.BaseException):
                         self.performance_optimizer.cache.clear()
 
-                    # Clear session state
                     keys_to_clear = [key for key in st.session_state if key.startswith("mobile_")]
                     for key in keys_to_clear:
                         del st.session_state[key]
 
-                    st.success("Cache cleared - no page refresh needed!")
-                    # Update state without page refresh
+                    st.success("Cache cleared!")
                     st.session_state.cache_cleared = True
 
-            # Show system status for debugging
-            st.markdown("### [SYSTEM] System Status")
+            st.markdown("### System Status")
             st.json(
                 {
                     "components_loaded": st.session_state.get("mobile_app_initialized", False),
@@ -1356,188 +1349,125 @@ class MobilePlantGuardApp:
 
         # Main application content
         try:
-            # Unified PlantGuard Header
+            # Header
             st.markdown(
                 """
-            <div style="text-align: center; padding: 2rem 0; background: linear-gradient(90deg, #4CAF50, #45a049); color: white; border-radius: 15px; margin-bottom: 2rem;">
-                <h1 style="margin: 0; font-size: 2.5rem;">🌿 PlantGuard Unified</h1>
-                <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; opacity: 0.9;">
-                    [MOBILE] + [LEAF] - AI-Powered Plant Disease Detection
-                </p>
-                <p style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.8;">
-                    Mobile-first design with advanced desktop capabilities
-                </p>
+            <div style="text-align: center; padding: 1rem 0; background: linear-gradient(90deg, #4CAF50, #45a049); color: white; border-radius: 10px; margin-bottom: 1rem;">
+                <h1 style="margin: 0; font-size: 2rem;">PlantGuard</h1>
+                <p style="margin: 0.2rem 0 0 0; font-size: 1rem; opacity: 0.9;">AI Plant Disease Detection</p>
             </div>
             """,
                 unsafe_allow_html=True,
             )
 
-            # Advanced Model Selection
-            st.markdown("## [LAUNCH] Advanced Model Selection")
-            st.markdown("*Choose the optimal AI models for your plant analysis workflow*")
-            st.markdown("---")
+            # Model Selection
+            st.markdown("## Model Selection")
 
             # Model selection interface
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                st.markdown("### [PLANT] Vision Model")
-                vision_model = st.selectbox(
-                    "Select Vision Model", ["apple_vision_pro", "efficientnet_b0", "resnet50", "mobilenet_v2"], key="vision_model_select"
-                )
-                if st.button("Load Vision Model", key="load_vision"):
-                    with st.spinner("Loading vision model..."):
+                st.markdown("### Vision Model")
+                vision_model = st.selectbox("Select", ["apple_vision_pro", "efficientnet_b0", "resnet50", "mobilenet_v2"], key="vision_model_select")
+                if st.button("Load", key="load_vision"):
+                    with st.spinner("Loading..."):
                         try:
-                            # Update vision adapter
                             if hasattr(self, "vision_adapter") and self.vision_adapter:
                                 self.vision_adapter.model_name = vision_model
-                            st.success(f"Vision model {vision_model} loaded!")
+                            st.success(f"Loaded: {vision_model}")
                         except Exception as e:
-                            st.error(f"Failed to load vision model: {e}")
+                            st.error(f"Error: {e}")
 
             with col2:
-                st.markdown("### [VOICE] Audio Model")
-                audio_model = st.selectbox(
-                    "Select Audio Model", ["openai/whisper-tiny", "openai/whisper-base", "openai/whisper-small"], key="audio_model_select"
-                )
-                if st.button("Load Audio Model", key="load_audio"):
-                    with st.spinner("Loading audio model..."):
+                st.markdown("### Audio Model")
+                audio_model = st.selectbox("Select", ["openai/whisper-tiny", "openai/whisper-base", "openai/whisper-small"], key="audio_model_select")
+                if st.button("Load", key="load_audio"):
+                    with st.spinner("Loading..."):
                         try:
-                            # Update audio adapter
                             if hasattr(self, "audio_adapter") and self.audio_adapter:
                                 self.audio_adapter.model_name = audio_model
-                            st.success(f"Audio model {audio_model} loaded!")
+                            st.success(f"Loaded: {audio_model}")
                         except Exception as e:
-                            st.error(f"Failed to load audio model: {e}")
+                            st.error(f"Error: {e}")
 
             with col3:
-                st.markdown("### [CHAT] Text Model")
-                text_model = st.selectbox("Select Text Model", ["gpt-3.5-turbo", "gpt-4", "claude-3-sonnet"], key="text_model_select")
-                if st.button("Load Text Model", key="load_text"):
-                    with st.spinner("Loading text model..."):
+                st.markdown("### Text Model")
+                text_model = st.selectbox("Select", ["gpt-3.5-turbo", "gpt-4", "claude-3-sonnet"], key="text_model_select")
+                if st.button("Load", key="load_text"):
+                    with st.spinner("Loading..."):
                         try:
-                            # Update text adapter
                             if hasattr(self, "text_adapter") and self.text_adapter:
                                 self.text_adapter.model_name = text_model
-                            st.success(f"Text model {text_model} loaded!")
+                            st.success(f"Loaded: {text_model}")
                         except Exception as e:
-                            st.error(f"Failed to load text model: {e}")
+                            st.error(f"Error: {e}")
 
             st.markdown("---")
 
-            # Current Model Status
-            st.markdown("## [LAUNCH] Current Model Status & Quick Actions")
-            st.markdown("*Monitor your active models and perform quick actions*")
-            st.markdown("---")
-
+            # Model Status
+            st.markdown("## Model Status")
             current_models = get_model_status()
 
             col1, col2, col3 = st.columns(3)
 
             with col1:
-                st.markdown("### [PLANT] Vision Model")
-                st.info(f"**Active:** {current_models.get('vision', 'Unknown')}")
-                st.metric("Status", "[GREEN] Loaded", "Ready")
+                st.markdown("### Vision")
+                st.info(f"Active: {current_models.get('vision', 'Unknown')}")
 
             with col2:
-                st.markdown("### [VOICE] Audio Model")
-                st.info(f"**Active:** {current_models.get('audio', 'Unknown')}")
-                st.metric("Status", "[GREEN] Loaded", "Ready")
+                st.markdown("### Audio")
+                st.info(f"Active: {current_models.get('audio', 'Unknown')}")
 
             with col3:
-                st.markdown("### [CHAT] Text Model")
-                st.info(f"**Active:** {current_models.get('text', 'Unknown')}")
-                st.metric("Status", "[GREEN] Loaded", "Ready")
+                st.markdown("### Text")
+                st.info(f"Active: {current_models.get('text', 'Unknown')}")
 
-            st.markdown("---")
-            st.markdown("### [ACTIONS] Quick Actions")
-
-            action_col1, action_col2, action_col3, action_col4 = st.columns(4)
-
-            with action_col1:
-                if st.button("[PARTIAL] Reload Models", use_container_width=True, help="Reload all model adapters"):
+            # Quick Actions
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("Reload Models", use_container_width=True):
                     st.cache_resource.clear()
-                    st.success("[DONE] Models reloaded successfully!")
+                    st.success("Models reloaded!")
 
-            with action_col2:
-                if st.button("[SUMMARY] Quick Test", use_container_width=True, help="Test current models on sample data"):
-                    st.info("[TIP] Use the Model Management tab for comprehensive testing and benchmarking!")
-
-            with action_col3:
-                if st.button("[TOOL] Settings", use_container_width=True, help="Access advanced model settings"):
-                    st.info("[TIP] Model configuration is available in the Model Management tab!")
-
-            with action_col4:
-                if st.button("[CHART] Performance", use_container_width=True, help="View model performance metrics"):
-                    st.info("[TIP] Detailed performance analysis available in the Model Management tab!")
-
-            st.markdown("---")
+            with col2:
+                if st.button("Quick Test", use_container_width=True):
+                    st.info("Use Model Management tab for testing")
 
             # Plant Analysis Tools
-            st.markdown("## [LEAF] Plant Analysis Tools")
-            st.markdown("*Use the tools below to analyze your plants with AI-powered detection*")
-            st.markdown("---")
-
-            # Plant analysis tabs
-            tab1, tab2, tab3, tab4, tab5 = st.tabs(
-                ["🌿 Image Analysis", "🎤 Voice & Audio", "💬 Chat Interface", "📊 Model Management", "⚙️ Settings"]
-            )
+            st.markdown("## Plant Analysis Tools")
+            tab1, tab2, tab3, tab4, tab5 = st.tabs(["Image Analysis", "Voice & Audio", "Chat Interface", "Model Management", "Settings"])
 
             with tab1:
-                st.markdown("### [UPLOAD] Upload Plant Image")
-                img_file = st.file_uploader(
-                    "Choose a plant image...", type=["jpg", "jpeg", "png"], help="Upload a clear image of the plant you want to analyze"
-                )
+                st.markdown("### Upload Plant Image")
+                img_file = st.file_uploader("Choose image", type=["jpg", "jpeg", "png"])
 
                 if img_file is not None:
                     img = PILImage.open(img_file)
-                    img_name = img_file.name
-                    st.image(img, use_container_width=True, caption=f"Image: {img_name}")
+                    st.image(img, use_container_width=True)
 
-                    if st.button("[SEARCH] Analyze Plant", key="img", type="primary", use_container_width=True):
-                        with st.spinner("[AI] AI is analyzing your plant..."):
+                    if st.button("Analyze Plant", key="img", type="primary", use_container_width=True):
+                        with st.spinner("Analyzing..."):
                             try:
-                                # Use vision adapter for analysis
                                 if hasattr(self, "vision_adapter") and self.vision_adapter:
                                     result = self.vision_adapter.predict(img)
                                     disease_name, confidence = result
 
-                                    st.markdown(
-                                        f"""
-                                        <div class="result-card">
-                                            <h3>[AI] Analysis Complete!</h3>
-                                            <p><strong>Plant Type:</strong> {disease_name.split("___")[0] if "___" in disease_name else "Unknown"}</p>
-                                            <p><strong>Condition:</strong> {disease_name.split("___")[1] if "___" in disease_name else disease_name}</p>
-                                        </div>
-                                        """,
-                                        unsafe_allow_html=True,
-                                    )
+                                    st.markdown("### Analysis Results")
+                                    col1, col2, col3 = st.columns(3)
 
-                                    metric_col1, metric_col2, metric_col3 = st.columns(3)
-
-                                    with metric_col1:
-                                        st.metric("[PLANT] Plant Type", disease_name.split("___")[0] if "___" in disease_name else disease_name)
-
-                                    with metric_col2:
-                                        readable_name = disease_name.split("___")[1] if "___" in disease_name else disease_name
-                                        st.metric("[VIRUS] Condition", readable_name)
-
-                                    with metric_col3:
-                                        conf_class = (
-                                            "confidence-high" if confidence > 0.8 else "confidence-medium" if confidence > 0.5 else "confidence-low"
-                                        )
-                                        st.markdown(f'<p class="{conf_class}">[SUMMARY] Confidence: {confidence:.1%}</p>', unsafe_allow_html=True)
+                                    with col1:
+                                        st.metric("Plant Type", disease_name.split("___")[0] if "___" in disease_name else disease_name)
+                                    with col2:
+                                        st.metric("Condition", disease_name.split("___")[1] if "___" in disease_name else disease_name)
+                                    with col3:
+                                        st.metric("Confidence", f"{confidence:.1%}")
 
                                     if confidence > 0.8:
-                                        st.success("[DONE] Plant appears healthy!")
-                                        st.balloons()
+                                        st.success("Plant appears healthy!")
                                     else:
-                                        st.warning("[WARNING] Disease detected - consider treatment")
+                                        st.warning("Disease detected")
 
-                                        with st.expander("[TIP] Treatment Recommendations"):
-                                            st.info("Consult with agricultural experts for proper treatment plans.")
-
-                                    with st.expander("[TOOL] Technical Details"):
+                                    with st.expander("Technical Details"):
                                         st.json(
                                             {
                                                 "disease": disease_name,
@@ -1546,100 +1476,77 @@ class MobilePlantGuardApp:
                                                 "timestamp": time.time(),
                                             }
                                         )
-
                                 else:
-                                    st.error("[ERROR] Vision adapter not available")
-
+                                    st.error("Vision adapter not available")
                             except Exception as e:
-                                st.error(f"[TODO] Analysis failed: {e!s}")
+                                st.error(f"Analysis failed: {e}")
                 else:
-                    st.info("[POINTER] Upload an image or select a sample to begin analysis")
+                    st.info("Upload an image to begin analysis")
 
             with tab2:
-                st.markdown("### [VOICE] Voice & Audio Analysis")
-                st.info("[TIP] Ask questions about plant care or describe symptoms using voice or audio files")
-
+                st.markdown("### Voice & Audio Analysis")
                 audio_col1, audio_col2 = st.columns([1, 1])
 
                 with audio_col1:
-                    st.markdown("### [MICROPHONE] Live Recording")
-                    st.info("Voice recording functionality integrated into main Voice Assistant tab")
-                    st.markdown("**Features:** Real-time audio capture, speech-to-text, voice commands")
-
-                    if st.button("🎤 Test Voice Input", key="test_voice"):
-                        st.success("Voice input test - use the Voice Assistant tab for full functionality!")
+                    st.markdown("### Live Recording")
+                    st.info("Use Voice Assistant tab for full functionality")
+                    if st.button("Test Voice Input", key="test_voice"):
+                        st.success("Voice input test - use Voice Assistant tab")
 
                 with audio_col2:
-                    st.markdown("### [FOLDER] File Upload")
-                    audio_file = st.file_uploader("Upload audio file", ["wav", "mp3", "m4a"], help="Supported formats: WAV, MP3, M4A")
+                    st.markdown("### File Upload")
+                    audio_file = st.file_uploader("Upload audio", ["wav", "mp3", "m4a"])
 
                     if audio_file is not None:
                         st.audio(audio_file, format="audio/wav")
-
-                        if st.button("[PROGRESS] Process File", key="file_analyze", type="primary", use_container_width=True):
-                            with st.spinner("[AUDIO] Processing uploaded audio..."):
+                        if st.button("Process File", key="file_analyze", type="primary", use_container_width=True):
+                            with st.spinner("Processing..."):
                                 try:
-                                    # Use audio adapter for transcription
                                     if hasattr(self, "audio_adapter") and self.audio_adapter:
                                         text = self.audio_adapter.transcribe(audio_file)
+                                        st.markdown("### Transcription")
+                                        st.text_area("Text:", text, height=100, disabled=True)
 
-                                        st.markdown("### [WRITE] Transcription Results")
-                                        st.text_area("Transcribed text:", text, height=100, disabled=True)
-
-                                        # Get AI response using text adapter
                                         if hasattr(self, "text_adapter") and self.text_adapter:
                                             response = self.text_adapter.get_response(text)
-
-                                            st.markdown("### [AI] AI Response")
+                                            st.markdown("### AI Response")
                                             st.success(response)
                                     else:
-                                        st.error("[ERROR] Audio adapter not available")
-
+                                        st.error("Audio adapter not available")
                                 except Exception as e:
-                                    st.error(f"[TODO] Audio processing failed: {e!s}")
+                                    st.error(f"Processing failed: {e}")
 
             with tab3:
-                st.markdown("### [CHAT] Chat Interface")
-                st.info("Chat functionality integrated into main Chat Interface tab")
-                st.markdown("**Features:** Q&A, plant care advice, disease consultation")
-
-                if st.button("💬 Open Chat", key="open_chat"):
-                    st.success("Chat interface - use the Chat Interface tab for full functionality!")
+                st.markdown("### Chat Interface")
+                st.info("Use Chat Interface tab for full functionality")
+                if st.button("Open Chat", key="open_chat"):
+                    st.success("Use Chat Interface tab")
 
             with tab4:
-                st.markdown("### [📊] Model Management")
-                st.info("Comprehensive model testing and benchmarking")
-
-                if st.button("🧪 Run Model Tests", key="run_model_tests"):
-                    with st.spinner("Testing models..."):
+                st.markdown("### Model Management")
+                if st.button("Run Model Tests", key="run_model_tests"):
+                    with st.spinner("Testing..."):
                         try:
-                            # Test all models
                             test_results = {
                                 "vision": "Passed" if hasattr(self, "vision_adapter") and self.vision_adapter else "Failed",
                                 "audio": "Passed" if hasattr(self, "audio_adapter") and self.audio_adapter else "Failed",
                                 "text": "Passed" if hasattr(self, "text_adapter") and self.text_adapter else "Failed",
                             }
-                            st.success("Model tests completed!")
+                            st.success("Tests completed!")
                             st.json(test_results)
                         except Exception as e:
-                            st.error(f"Model testing failed: {e}")
+                            st.error(f"Testing failed: {e}")
 
             with tab5:
-                st.markdown("### [⚙️] Settings")
-                st.info("Application configuration and preferences")
-
-                # Performance settings
-                st.markdown("#### Performance Settings")
+                st.markdown("### Settings")
                 perf_mode = st.selectbox("Performance Mode", ["Auto", "Minimal", "Balanced", "Aggressive"], index=1, key="perf_mode_select")
-
-                if st.button("Apply Settings", key="apply_settings"):
-                    st.success(f"Performance mode set to {perf_mode}")
+                if st.button("Apply", key="apply_settings"):
+                    st.success(f"Mode: {perf_mode}")
 
             st.markdown("---")
 
-            # Mobile components (existing functionality)
-            st.markdown("## [MOBILE] Mobile Components")
-            st.markdown("*Touch-friendly mobile interface components*")
+            # Mobile Components
+            st.markdown("## Mobile Components")
             st.markdown("---")
 
             # Render mobile components
@@ -1683,19 +1590,13 @@ class MobilePlantGuardApp:
 
     def render_app_info_inline(self) -> None:
         """Render app info and component status inline in main content."""
-        # App info in expandable section
-        with st.expander("[UNIFIED] PlantGuard Unified Info", expanded=True):
-            st.markdown("**Version:** 2.0.0-unified")
-            st.markdown("[MOBILE] **Mobile:** Chrome & Safari Optimized")
-            st.markdown("[DESKTOP] **Desktop:** Full-featured with advanced model management")
-            st.markdown("[DESIGN] **Design:** Responsive - 428px mobile, full-width desktop")
+        with st.expander("App Info", expanded=True):
+            st.markdown("**Version:** 2.0.0")
+            st.markdown("**Mobile:** Chrome & Safari Optimized")
+            st.markdown("**Desktop:** Full-featured with model management")
+            st.markdown("**Design:** Responsive - 428px mobile, full-width desktop")
 
-            # Unified design indicator
-            st.success("[UNIFIED] **Best of Both Worlds** - Mobile-first with desktop power!")
-            st.info("[FEATURES] **Unified:** Complete PlantGuard capabilities in one application")
-
-        # Component status in expandable section
-        with st.expander("[TOOL] Component Status", expanded=True):
+        with st.expander("Component Status", expanded=True):
             components_status = {
                 "Layout Manager": self.layout_manager.get_layout_status().get("status", "unknown") if self.layout_manager else "not_loaded",
                 "Header": "ready" if self.header else "not_loaded",
@@ -1708,11 +1609,11 @@ class MobilePlantGuardApp:
 
             for component, status in components_status.items():
                 if status == "ready":
-                    st.success(f"[READY] {component}")
+                    st.success(f"✅ {component}")
                 elif status == "initializing":
-                    st.warning(f"[INIT] {component}")
+                    st.warning(f"⏳ {component}")
                 else:
-                    st.error(f"[ERROR] {component}")
+                    st.error(f"❌ {component}")
 
         # Quick actions in expandable section
         with st.expander("[ACTIONS] Quick Actions", expanded=True):

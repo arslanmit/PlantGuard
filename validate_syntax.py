@@ -5,6 +5,7 @@ import ast
 import sys
 from pathlib import Path
 
+
 def validate_file(file_path: Path) -> bool:
     """Validate Python syntax of a file."""
 

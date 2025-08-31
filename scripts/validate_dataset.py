@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.training.dataset_manager import DatasetManager
 
+
 def main() -> None:
     """Validate dataset integrity."""
 

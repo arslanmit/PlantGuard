@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from src.core.huggingface_vision import HuggingFaceVisionAdapter
 
+
 def comprehensive_test() -> None:
     """Run comprehensive test on all 21 images."""
 

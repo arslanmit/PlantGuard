@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from src.features.model_switching.model_manager import PlantGuardModelManager
 
+
 @st.cache_resource
 def get_model_manager() -> "PlantGuardModelManager":
     """Get cached model manager instance without autoload to render UI fast."""

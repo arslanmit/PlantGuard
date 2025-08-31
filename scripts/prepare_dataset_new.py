@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.training.dataset_manager import DatasetConfig, DatasetManager
 
+
 def main() -> None:
     """Prepare dataset with train/val splits."""
 

@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from core.nlp import TextAdapter
 
+
 def test_integration_scenarios() -> None:
     """Test realistic integration scenarios."""
 

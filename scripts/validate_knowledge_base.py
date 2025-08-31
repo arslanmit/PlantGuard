@@ -4,6 +4,7 @@
 import json
 from pathlib import Path
 
+
 def validate_knowledge_base() -> bool:
     """Validate the disease knowledge base."""
     # Load knowledge base

@@ -10,6 +10,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 
+
 def create_synthetic_plant_image(class_id: int, width: int = 224, height: int = 224, seed: int | None = None) -> Image.Image:
     """Create a synthetic plant image with distinguishable patterns for each class.
 

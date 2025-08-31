@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from core.nlp import TextAdapter
 
+
 def test_text_adapter() -> None:
     """Test TextAdapter functionality."""
 

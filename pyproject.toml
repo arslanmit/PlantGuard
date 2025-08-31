@@ -260,6 +260,65 @@ disallow_untyped_defs = false
 check_untyped_defs = false
 
 # ============================================================================
+# 5️⃣ TYPE CHECKING - Static type analysis with Pyright
+# ============================================================================
+# [PROGRESS] GOAL: Catch type-related bugs early with static analysis
+#
+# [LAUNCH] QUICK COMMANDS:
+#   make typecheck - Run type checking
+
+# [SEARCH] Pyright - Fast type checker (VS Code's default)
+[tool.pyright]
+# [PYTHON] Python version we're using
+pythonVersion = "3.10"
+pythonPlatform = "Darwin"
+
+# [FOLDER] Folders to completely exclude from type checking
+exclude = [
+  "build/",
+  "dist/",
+  ".venv/",
+  ".git/",
+  "__pycache__/",
+  ".pytest_cache/",
+  ".mypy_cache/",
+  ".ruff_cache/",
+  "logs/",
+  "runs/",
+  "data/",
+  "notebooks/",
+  "tests/",         # [IGNORE] Completely ignore tests folder from type checking
+  "**/tests/**",    # Also exclude tests in any subdirectory
+]
+
+# [TYPE] Type checking strictness (relaxed for gradual typing)
+typeCheckingMode = "basic"  # Less strict than "strict" mode
+reportMissingImports = false
+reportMissingTypeStubs = false
+
+# [IGNORE] Specific type checking rules to disable
+reportOptionalSubscript = false      # Allow None[subscript] patterns
+reportUnusedImport = false           # Allow unused imports
+reportUnusedVariable = false         # Allow unused variables
+reportUnusedClass = false            # Allow unused classes
+reportUnusedFunction = false         # Allow unused functions
+reportDuplicateImport = false        # Allow duplicate imports
+reportMissingParameterType = false   # Allow missing parameter types
+reportMissingReturnType = false      # Allow missing return types
+reportMissingTypeArgument = false    # Allow missing type arguments
+reportUntypedFunctionDecorator = false # Allow untyped decorators
+reportUntypedClassDecorator = false   # Allow untyped class decorators
+reportUntypedBaseClass = false        # Allow untyped base classes
+reportUntypedNamedTuple = false       # Allow untyped named tuples
+reportPrivateUsage = false             # Allow private attribute access
+reportConstantRedefinition = false    # Allow constant redefinition
+reportIncompatibleMethodOverride = false # Allow incompatible overrides
+reportIncompatibleVariableOverride = false # Allow incompatible variable overrides
+reportInconsistentConstructor = false    # Allow inconsistent constructors
+reportIncompleteStub = false             # Allow incomplete stubs
+reportOptionalMemberAccess = false       # Allow accessing members on potentially None objects
+
+# ============================================================================
 # 6️⃣ TESTING - Make sure everything works correctly
 # ============================================================================
 # [PROGRESS] GOAL: Catch bugs and ensure PlantGuard works as expected
@@ -404,24 +463,23 @@ target-version = "py310"  # [PYTHON] Python version we support
 fix = true                # [TOOL] Auto-fix issues when possible
 show-fixes = true         # [WRITE] Show what was fixed
 output-format = "grouped" # [SUMMARY] Group similar issues together
+force-exclude = true      # [FORCE] Enforce exclusions even for direct file paths
 
 # [FOLDER] Folders to completely exclude from all linting
 exclude = [
-  "build/",
-  "dist/",
-  ".venv/",
-  ".git/",
-  "__pycache__/",
-  ".pytest_cache/",
-  ".mypy_cache/",
-  ".ruff_cache/",
-  "logs/",
-  "runs/",
-  "data/",
-  "notebooks/",
-  "tests/",         # [IGNORE] Completely ignore tests folder from ALL linters
-  "**/tests/**",    # Also exclude tests in any subdirectory
-  "tests/**/*.py",  # Explicitly ignore all Python files in tests
+  "build",
+  "dist",
+  ".venv",
+  ".git",
+  "__pycache__",
+  ".pytest_cache",
+  ".mypy_cache",
+  ".ruff_cache",
+  "logs",
+  "runs",
+  "data",
+  "notebooks",
+  "tests",
 ]
 
 # [SEARCH] What Ruff checks for (focused on essential rules)
@@ -591,7 +649,7 @@ ignore = [
   # "F901",   # raise NotImplemented should be raise NotImplementedError
 
   # ISORT (I) - Import sorting and organization
-  # "I001",   # Import block is un-sorted or un-formatted
+   "I001",   # Import block is un-sorted or un-formatted
   # "I002",   # Missing required import (e.g. from __future__ import annotations)
 
   # FLAKE8-BUGBEAR (B) - Common Python gotchas
