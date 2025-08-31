@@ -9,7 +9,7 @@ Streamlit session state management.
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Generator, List, Optional
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -134,32 +134,32 @@ class MockStreamlitComponents:
         self.selectbox_calls: List[Dict[str, Any]] = []
         self.slider_calls: List[Dict[str, Any]] = []
 
-    def button(self, label: str, **kwargs) -> bool:
+    def button(self, label: str, **kwargs: Any) -> bool:
         """Mock button component."""
         self.button_calls.append({"label": label, "kwargs": kwargs})
-        return kwargs.get("mock_pressed", False)
+        return bool(kwargs.get("mock_pressed", False))
 
-    def file_uploader(self, label: str, **kwargs) -> Optional[Any]:
+    def file_uploader(self, label: str, **kwargs: Any) -> Optional[Any]:
         """Mock file uploader component."""
         self.file_uploader_calls.append({"label": label, "kwargs": kwargs})
         return kwargs.get("mock_file", None)
 
-    def text_input(self, label: str, **kwargs) -> str:
+    def text_input(self, label: str, **kwargs: Any) -> str:
         """Mock text input component."""
         self.text_input_calls.append({"label": label, "kwargs": kwargs})
-        return kwargs.get("mock_value", "")
+        return str(kwargs.get("mock_value", ""))
 
-    def selectbox(self, label: str, options: List[Any], **kwargs) -> Any:
+    def selectbox(self, label: str, options: List[Any], **kwargs: Any) -> Any:
         """Mock selectbox component."""
         self.selectbox_calls.append({"label": label, "options": options, "kwargs": kwargs})
         return kwargs.get("mock_selection", options[0] if options else None)
 
-    def slider(self, label: str, **kwargs) -> Any:
+    def slider(self, label: str, **kwargs: Any) -> Any:
         """Mock slider component."""
         self.slider_calls.append({"label": label, "kwargs": kwargs})
         return kwargs.get("mock_value", kwargs.get("value", 0))
 
-    def columns(self, spec) -> List[Mock]:
+    def columns(self, spec: Any) -> List[Mock]:
         """Mock columns layout."""
         return [Mock() for _ in range(spec if isinstance(spec, int) else len(spec))]
 
@@ -219,7 +219,7 @@ def mock_chat_model() -> Any:
 
 
 @pytest.fixture
-def mock_streamlit_session() -> Generator[Any, None, None]:
+def mock_streamlit_session() -> Any:
     """Provide mock Streamlit session state."""
     mock_session = MockStreamlitSession()
     
@@ -243,7 +243,7 @@ def mock_streamlit_components() -> Any:
 
 
 @pytest.fixture
-def mock_all_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter) -> Generator[Any, None, None]:
+def mock_all_adapters(mock_vision_adapter: Any, mock_audio_adapter: Any, mock_text_adapter: Any) -> Any:
     """Provide all mock adapters with proper patching."""
     with patch.multiple(
         'src.ui.components.mobile_adapter_integration',
@@ -271,7 +271,7 @@ def sample_large_image() -> Any:
 
 
 @pytest.fixture
-def temp_audio_file() -> Generator[Any, None, None]:
+def temp_audio_file() -> Any:
     """Provide temporary audio file for testing."""
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
         audio_file_path = tmp_file.name
@@ -285,7 +285,7 @@ def temp_audio_file() -> Generator[Any, None, None]:
 
 
 @pytest.fixture
-def temp_model_file() -> Generator[Any, None, None]:
+def temp_model_file() -> Any:
     """Provide temporary model file for testing."""
     temp_path = Path("data/models/test_vision_model.pt")
     temp_path.parent.mkdir(parents=True, exist_ok=True)
@@ -344,7 +344,7 @@ def sample_chat_history() -> List[Any]:
 
 
 @pytest.fixture
-def mobile_adapter_integration_with_mocks(mock_streamlit_session, mock_all_adapters) -> Any:
+def mobile_adapter_integration_with_mocks(mock_streamlit_session: Any, mock_all_adapters: Any) -> Any:
     """Provide MobileAdapterIntegration with all mocks configured."""
     from src.ui.components.mobile_adapter_integration import \
         MobileAdapterIntegration
@@ -360,7 +360,7 @@ def mobile_adapter_integration_with_mocks(mock_streamlit_session, mock_all_adapt
 
 
 @pytest.fixture
-def mock_mobile_component_registry() -> Generator[Any, None, None]:
+def mock_mobile_component_registry() -> Any:
     """Mock mobile component registry for testing."""
     mock_registry = Mock()
     mock_registry.get_all_components.return_value = {
@@ -378,7 +378,7 @@ def mock_mobile_component_registry() -> Generator[Any, None, None]:
 
 
 @pytest.fixture
-def mock_mobile_testing_framework_dependencies() -> Generator[Any, None, None]:
+def mock_mobile_testing_framework_dependencies() -> Any:
     """Mock all dependencies for MobileTestingFramework."""
     with patch.multiple(
         'src.ui.components.mobile_testing_framework',
@@ -463,7 +463,7 @@ class TestDataFactory:
 
 # Utility functions for tests
 
-def assert_mock_called_with_pattern(mock_obj, pattern: str) -> bool:
+def assert_mock_called_with_pattern(mock_obj: Any, pattern: str) -> bool:
     """Assert that mock was called with arguments matching pattern."""
     for call in mock_obj.call_args_list:
         args, kwargs = call

@@ -9,7 +9,7 @@ import logging
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, Generator, List
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -46,7 +46,7 @@ def mobile_test_config() -> dict[str, Any]:
 
 # Session-level fixtures
 @pytest.fixture(scope="session", autouse=True)
-def setup_mobile_test_environment(mobile_test_config) -> None:
+def setup_mobile_test_environment(mobile_test_config: Dict[str, Any]) -> None:
     """Set up mobile test environment."""
     # Create test directories
     for dir_path in [mobile_test_config["test_data_dir"], 
@@ -192,7 +192,7 @@ def mock_chat_model() -> Any:
 
 
 @pytest.fixture
-def all_mock_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter, mock_chat_model) -> dict[str, Any]:
+def all_mock_adapters(mock_vision_adapter: Any, mock_audio_adapter: Any, mock_text_adapter: Any, mock_chat_model: Any) -> Any:
     """Provide all mock adapters without importing actual modules."""
     adapters = {
         'vision': mock_vision_adapter,
@@ -218,7 +218,7 @@ def sample_test_images() -> dict[str, Any]:
 
 
 @pytest.fixture
-def temp_audio_files(mobile_test_config) -> dict[str, Any]:
+def temp_audio_files(mobile_test_config: Dict[str, Any]) -> Any:
     """Provide temporary audio files for testing."""
     audio_files = {}
     
@@ -233,7 +233,7 @@ def temp_audio_files(mobile_test_config) -> dict[str, Any]:
 
 
 @pytest.fixture
-def temp_model_files(mobile_test_config) -> dict[str, Any]:
+def temp_model_files(mobile_test_config: Dict[str, Any]) -> Any:
     """Provide temporary model files for testing."""
     model_files = {}
     
@@ -334,7 +334,7 @@ def mock_mobile_component_registry() -> Any:
 
 
 @pytest.fixture
-def mock_mobile_adapter_integration(mock_streamlit_session, all_mock_adapters) -> Any:
+def mock_mobile_adapter_integration(mock_streamlit_session: Any, all_mock_adapters: Any) -> Any:
     """Provide mobile adapter integration with all mocks configured."""
     from src.ui.components.mobile_adapter_integration import \
         MobileAdapterIntegration
@@ -399,7 +399,7 @@ def error_simulation() -> Any:
 
 # Mobile testing framework fixtures
 @pytest.fixture
-def mock_mobile_testing_framework() -> Generator[Any, None, None]:
+def mock_mobile_testing_framework() -> Any:
     """Mock mobile testing framework with comprehensive functionality."""
     with patch.multiple(
         'src.ui.components.mobile_testing_framework',
@@ -446,7 +446,7 @@ def mobile_test_utilities() -> Dict[str, Any]:
             return mock_component
         
         @staticmethod
-        def assert_session_state_updated(session_state, key: str, expected_length: int = None) -> Any:
+        def assert_session_state_updated(session_state: Any, key: str, expected_length: int = None) -> Any:
             """Assert that session state was updated correctly."""
             assert key in session_state
             if expected_length is not None:
@@ -467,7 +467,7 @@ def mobile_test_utilities() -> Dict[str, Any]:
 
 # Cleanup fixtures
 @pytest.fixture(autouse=True)
-def cleanup_after_test(mobile_test_config) -> None:
+def cleanup_after_test(mobile_test_config: Dict[str, Any]) -> None:
     """Cleanup after each test."""
     yield
     

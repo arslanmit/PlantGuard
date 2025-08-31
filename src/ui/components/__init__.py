@@ -6,6 +6,7 @@ and comprehensive error handling for the PlantGuard plant disease detection syst
 """
 
 import logging
+from typing import Any
 
 # Core infrastructure components
 # Base component class

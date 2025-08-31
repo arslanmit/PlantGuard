@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from typing import Any, Dict, Generator, List, Optional, Tuple, Union
+
 """
 Tests for Mobile Component Test Infrastructure.
 
@@ -23,7 +24,7 @@ from tests.fixtures.mobile_test_fixtures import (MockAudioAdapter,
 class TestMobileComponentInfrastructure:
     """Test mobile component infrastructure with comprehensive mocking."""
 
-    def test_mobile_adapter_integration_dependency_injection(self, mock_streamlit_session, all_mock_adapters) -> None:
+    def test_mobile_adapter_integration_dependency_injection(self, mock_streamlit_session: Any, all_mock_adapters: Any) -> None:
         """Test proper dependency injection for mobile adapter integration."""
         # Create a mock integration class to avoid import issues
         class MockMobileAdapterIntegration:
@@ -50,7 +51,7 @@ class TestMobileComponentInfrastructure:
         assert integration._audio_adapter.transcribe("test") == "What disease does my plant have?"
         assert "fungal infection" in integration._text_adapter.generate_response().lower()
 
-    def test_streamlit_session_state_mocking(self, mock_streamlit_session) -> None:
+    def test_streamlit_session_state_mocking(self, mock_streamlit_session: Any) -> None:
         """Test comprehensive Streamlit session state mocking."""
         # Test initial state
         assert 'analysis_results' in mock_streamlit_session
@@ -74,7 +75,7 @@ class TestMobileComponentInfrastructure:
         assert mock_streamlit_session['new_key'] == 'new_value'
         assert len(mock_streamlit_session['analysis_results']) == 1
 
-    def test_mobile_component_registry_mocking(self, mock_mobile_component_registry) -> None:
+    def test_mobile_component_registry_mocking(self, mock_mobile_component_registry: Any) -> None:
         """Test mobile component registry mocking."""
         # Test component retrieval
         components = mock_mobile_component_registry.get_all_components()
@@ -95,7 +96,7 @@ class TestMobileComponentInfrastructure:
         mock_mobile_component_registry.register_component("test_component", Mock)
         mock_mobile_component_registry.register_component.assert_called_with("test_component", Mock)
 
-    def test_mobile_testing_framework_with_mocks(self, mock_mobile_testing_framework, mock_mobile_component_registry) -> None:
+    def test_mobile_testing_framework_with_mocks(self, mock_mobile_testing_framework: Any, mock_mobile_component_registry: Any) -> None:
         """Test mobile testing framework with comprehensive mocking."""
         # Create a mock framework class to avoid import issues
         class MockMobileTestingFramework:
@@ -125,14 +126,14 @@ class TestMobileComponentInfrastructure:
         assert framework.config['continuous_monitoring'] is True
         assert framework.config['comprehensive_reporting'] is True
 
-    def test_adapter_error_handling_with_mocks(self, mock_streamlit_session, error_simulation) -> None:
+    def test_adapter_error_handling_with_mocks(self, mock_streamlit_session: Any, error_simulation: Any) -> None:
         """Test adapter error handling with proper mocking."""
         # Create a mock integration class to avoid import issues
         class MockMobileAdapterIntegration:
             def __init__(self) -> None:
                 self._vision_adapter = None
                 
-            def analyze_image(self, image, source, component_id) -> Dict[str, Any]:
+            def analyze_image(self, image: Any, source: Any, component_id: Any) -> Dict[str, Any]:
                 try:
                     result = self._vision_adapter.predict(image)
                     return {
@@ -171,7 +172,7 @@ class TestMobileComponentInfrastructure:
         assert 'error' in result
         assert "Test vision error" in result['error']
 
-    def test_mobile_component_lifecycle_with_mocks(self, mock_streamlit_session, all_mock_adapters, mobile_test_utilities) -> None:
+    def test_mobile_component_lifecycle_with_mocks(self, mock_streamlit_session: Any, all_mock_adapters: Any, mobile_test_utilities: Any) -> None:
         """Test complete mobile component lifecycle with mocks."""
         # Create a mock integration class to avoid import issues
         class MockMobileAdapterIntegration:
@@ -180,7 +181,7 @@ class TestMobileComponentInfrastructure:
                 self._audio_adapter = None
                 self._text_adapter = None
                 
-            def analyze_image(self, image, source, component_id) -> Dict[str, Any]:
+            def analyze_image(self, image: Any, source: Any, component_id: Any) -> Dict[str, Any]:
                 result = self._vision_adapter.predict(image)
                 # Update session state
                 if 'analysis_results' not in mock_streamlit_session:
@@ -198,7 +199,7 @@ class TestMobileComponentInfrastructure:
                     'component_id': component_id
                 }
                 
-            def transcribe_audio(self, audio_file, source, component_id) -> Dict[str, Any]:
+            def transcribe_audio(self, audio_file: Any, source: Any, component_id: Any) -> Dict[str, Any]:
                 transcription = self._audio_adapter.transcribe(audio_file)
                 # Update session state
                 if 'chat_history' not in mock_streamlit_session:
@@ -216,7 +217,7 @@ class TestMobileComponentInfrastructure:
                     'component_id': component_id
                 }
                 
-            def process_text_query(self, text, source, component_id) -> Any:
+            def process_text_query(self, text: Any, source: Any, component_id: Any) -> Any:
                 response = self._text_adapter.generate_response()
                 # Update session state
                 if 'chat_history' not in mock_streamlit_session:
@@ -259,7 +260,7 @@ class TestMobileComponentInfrastructure:
         assert transcription_result['success'] is True
         assert text_result['response'] is not None
 
-    def test_mobile_performance_monitoring_with_mocks(self, mock_mobile_testing_framework, mobile_performance_config) -> None:
+    def test_mobile_performance_monitoring_with_mocks(self, mock_mobile_testing_framework: Any, mobile_performance_config: Any) -> None:
         """Test mobile performance monitoring with mocks."""
         # Create a mock framework class to avoid import issues
         class MockMobileTestingFramework:
@@ -329,7 +330,7 @@ class TestMobileComponentInfrastructure:
         assert 'performance_monitoring' in result
         assert 'health_checks' in result
 
-    def test_mobile_component_validation_with_comprehensive_mocks(self, mock_mobile_testing_framework, mock_mobile_component_registry) -> None:
+    def test_mobile_component_validation_with_comprehensive_mocks(self, mock_mobile_testing_framework: Any, mock_mobile_component_registry: Any) -> None:
         """Test comprehensive mobile component validation."""
         # Create a mock framework class to avoid import issues
         class MockMobileTestingFramework:
@@ -338,7 +339,7 @@ class TestMobileComponentInfrastructure:
                 self.mobile_specific_tester = Mock()
                 self.ai_agent_tester = Mock()
                 
-            def run_full_component_validation(self, component_id) -> Any:
+            def run_full_component_validation(self, component_id: Any) -> Any:
                 return {
                     'status': "completed",
                     'component_id': component_id,
@@ -499,7 +500,7 @@ class TestMobileComponentInfrastructure:
         assert transcription_result['component_id'] == "test_component"
         assert 'timestamp' in transcription_result
 
-    def test_mobile_component_mock_interfaces(self, all_mock_adapters) -> None:
+    def test_mobile_component_mock_interfaces(self, all_mock_adapters: Any) -> None:
         """Test that all mock adapter interfaces work correctly."""
         vision_adapter = all_mock_adapters['vision']
         audio_adapter = all_mock_adapters['audio']

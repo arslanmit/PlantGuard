@@ -90,7 +90,7 @@ logger = logging.getLogger(__name__)
 _mobile_testing_framework = None
 
 
-def get_ai_testing_framework() -> MobileTestingFramework:
+def get_ai_testing_framework() -> Any:
     """Get or create the global AI testing framework instance."""
     global _mobile_testing_framework
     if _mobile_testing_framework is None:
@@ -483,7 +483,7 @@ class MobilePlantGuardApp:
         except Exception as e:
             logger.error(f"Failed to initialize performance optimization: {e}")
 
-    def analyze_image_with_adapters(self, image) -> dict[str, Any]:
+    def analyze_image_with_adapters(self, image: Any) -> dict[str, Any]:
         """Analyze image using core vision adapter with mobile optimizations."""
         try:
             if not self.vision_adapter:
@@ -540,7 +540,7 @@ class MobilePlantGuardApp:
                 "recommendations": ["Analysis failed. Please try again or check system status."],
             }
 
-    def process_voice_input(self, audio_data) -> str:
+    def process_voice_input(self, audio_data: Any) -> str:
         """Process voice input using audio adapter."""
         try:
             if not self.audio_adapter:

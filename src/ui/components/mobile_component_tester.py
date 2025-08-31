@@ -53,8 +53,8 @@ class ComponentTestSuite:
     component_type: str
     component_class: type
     test_methods: list[str]
-    setup_method: Callable | None = None
-    teardown_method: Callable | None = None
+    setup_method: Callable[[], None] | None = None
+    teardown_method: Callable[[], None] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for reporting."""

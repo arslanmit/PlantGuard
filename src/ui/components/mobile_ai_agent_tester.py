@@ -60,7 +60,7 @@ class HealingAction:
     name: str
     description: str
     trigger_conditions: list[str]
-    action_function: Callable
+    action_function: Callable[[str, str], dict[str, Any]]
     confidence_threshold: float
     max_attempts: int
     cooldown_minutes: int
