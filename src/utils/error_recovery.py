@@ -36,7 +36,7 @@ class SafeTypeConverter:
         try:
             if isinstance(value, int):
                 return value
-            if isinstance(value, (float, str)):
+            if isinstance(value, float | str):
                 return int(value)
             return default
         except (ValueError, TypeError, OverflowError) as e:
@@ -60,7 +60,7 @@ class SafeTypeConverter:
         try:
             if isinstance(value, float):
                 return value
-            if isinstance(value, (int, str)):
+            if isinstance(value, int | str):
                 return float(value)
             return default
         except (ValueError, TypeError, OverflowError) as e:
