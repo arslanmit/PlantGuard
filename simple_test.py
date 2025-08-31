@@ -7,10 +7,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-
 def test_basic_functionality() -> bool:
     """Test basic functionality without Streamlit context."""
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     print("Testing mobile layout and design system...")
 
@@ -47,7 +45,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
         print(f"[FAIL] Test failed: {e}")
         traceback.print_exc()
         return False
-
 
 if __name__ == "__main__":
     success = test_basic_functionality()

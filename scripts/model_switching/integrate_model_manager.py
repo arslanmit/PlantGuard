@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
 """Integrate the Model Manager into your main PlantGuard application."""
 
-
 import sys
 from pathlib import Path
 
 # Add src to Python path (repo root / src)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-
 def update_main_app() -> None:
     """Update the main Streamlit app to use the Model Manager."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     app_code = '''"""PlantGuard - Multimodal Plant Disease Detection System with Model Switching.
 
@@ -36,12 +32,10 @@ from src.utils.logging import setup_logger
 # Configure logging
 logger = setup_logger("plantguard", log_file="logs/app.log")
 
-
 @st.cache_resource
 - **Best for**: Fast inference, mobile/edge devices
     """Get cached model manager instance."""
     return PlantGuardModelManager()
-
 
 def main() -> None:
     """Main PlantGuard application with model switching."""
@@ -337,7 +331,6 @@ Configuration: config/models.json
                 # This would run the benchmark from model_switcher.py
                 st.info("Benchmark feature - run `python scripts/model_switching/model_switcher.py --benchmark` in terminal")
 
-
 if __name__ == "__main__":
     logger.info("Starting PlantGuard application with Model Manager")
     main()
@@ -350,7 +343,6 @@ if __name__ == "__main__":
         f.write(app_code)
 
     print(f"\u2705 Created enhanced PlantGuard app: {output_path}")
-
 
 def create_quick_start_guide() -> None:
     """Create a quick start guide for the model switching system."""
@@ -514,7 +506,6 @@ You should see 100% accuracy on the Vision Transformer model!
 
     print(f"[DONE] Created quick start guide: {guide_path}")
 
-
 def main() -> None:
     """Main integration function."""
     print("[LAUNCH] Integrating Model Manager into PlantGuard")
@@ -558,7 +549,6 @@ def main() -> None:
     print("   [FIRST] Vision Transformer: 100% accuracy (BEST)")
     print("   [SECOND] MobileNet: 95% accuracy (FAST)")
     print("   [THIRD] Local ResNet: 5% accuracy (TRAINING NEEDED)")
-
 
 if __name__ == "__main__":
     main()

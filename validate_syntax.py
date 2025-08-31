@@ -5,10 +5,8 @@ import ast
 import sys
 from pathlib import Path
 
-
 def validate_file(file_path: Path) -> bool:
     """Validate Python syntax of a file."""
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     try:
         with open(file_path, encoding="utf-8") as f:
@@ -22,7 +20,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
     except Exception as e:
         print(f"Error reading {file_path}: {e}")
         return False
-
 
 def main() -> None:
     """Validate all Python files in the project."""
@@ -47,7 +44,6 @@ def main() -> None:
     else:
         print(f"[TODO] Found {errors} files with syntax errors")
         return False
-
 
 if __name__ == "__main__":
     success = main()

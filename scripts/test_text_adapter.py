@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Test the TextAdapter implementation to ensure all methods work correctly."""
 
-
 import sys
 from pathlib import Path
 
@@ -10,11 +9,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from core.nlp import TextAdapter
 
-
 def test_text_adapter() -> None:
     """Test TextAdapter functionality."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     print("[TEST] Testing TextAdapter implementation...")
 
@@ -77,7 +73,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     print("\n[DONE] All TextAdapter tests completed successfully!")
 
-
 def test_knowledge_base_coverage() -> None:
     """Test knowledge base coverage."""
     print("\n[SEARCH] Testing knowledge base coverage...")
@@ -85,7 +80,6 @@ def test_knowledge_base_coverage() -> None:
     adapter = TextAdapter()
 
     # Load class mapping to test all diseases
-    import json
 
     with open("data/knowledge_base/plantvillage_classes.json") as f:
         class_data = json.load(f)
@@ -101,7 +95,6 @@ def test_knowledge_base_coverage() -> None:
     else:
         print(f"   [DONE] All {len(class_data['classes'])} diseases covered in knowledge base")
 
-
 def main() -> None:
     """Run all tests."""
     try:
@@ -110,10 +103,8 @@ def main() -> None:
         print("\n[SUCCESS] All tests passed!")
     except Exception as e:
         print(f"\n[TODO] Test failed with error: {e}")
-        import traceback
 
         traceback.print_exc()
-
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Validate that PlantGuard Streamlit applications can start without import errors."""
 
-
 import importlib
 import importlib.util
 import sys
@@ -10,11 +9,8 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-
 def _is_available(module_name: str) -> bool:
     """Return True if the given module can be imported or discovered via find_spec."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     try:
         if importlib.util.find_spec(module_name) is None:
@@ -23,7 +19,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
         return True
     except Exception:
         return False
-
 
 def validate_main_app() -> bool:
     """Validate main Streamlit app imports."""
@@ -45,7 +40,6 @@ def validate_main_app() -> bool:
 
     print("\u2705 Main app: Core imports successful")
     return True
-
 
 def validate_switcher_app() -> bool:
     """Validate model switcher app imports."""
@@ -71,7 +65,6 @@ def validate_switcher_app() -> bool:
 
     return True
 
-
 def main() -> None:
     """Run validation checks."""
     print("[SEARCH] Validating PlantGuard applications...")
@@ -93,7 +86,6 @@ def main() -> None:
         if not switcher_ok:
             print("[TODO] Switcher app needs attention")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

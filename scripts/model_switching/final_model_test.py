@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Final comprehensive test of the integrated Hugging Face model."""
 
-
 import json
 import sys
 from pathlib import Path
@@ -13,11 +12,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from src.core.huggingface_vision import HuggingFaceVisionAdapter
 
-
 def comprehensive_test() -> None:
     """Run comprehensive test on all 21 images."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     print("[PLANT] PlantGuard Final Model Test")
     print("Using: Abhiram4/PlantDiseaseDetectorVit2 (Vision Transformer)")
@@ -177,10 +173,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
     print(f"   Classes: {len(adapter.class_names)}")
     print(f"   Device: {adapter.device}")
 
-
 def main() -> None:
     comprehensive_test()
-
 
 if __name__ == "__main__":
     main()

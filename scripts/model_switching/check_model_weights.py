@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Check if the model has been properly trained."""
 
-
 import sys
 from pathlib import Path
 
@@ -10,11 +9,8 @@ import torch
 # Add project src to path (repo root / src)
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-
 def check_model_training_status(model_path: str) -> bool:
     """Check if model appears to be trained or is just random weights."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     print("[SEARCH] Analyzing model weights...")
 
@@ -64,7 +60,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
         print("[TODO] Could not find final layer weights")
         return False
 
-
 def main() -> None:
     model_path = "data/models/vision_resnet50.pt"
 
@@ -82,7 +77,6 @@ def main() -> None:
     print("     * Adjusting learning rate")
     print("     * Using data augmentation")
     print("     * Checking training data quality")
-
 
 if __name__ == "__main__":
     main()

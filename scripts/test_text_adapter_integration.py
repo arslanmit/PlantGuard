@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Integration test for TextAdapter with the PlantGuard system."""
 
-
 import sys
 from pathlib import Path
 
@@ -10,11 +9,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from core.nlp import TextAdapter
 
-
 def test_integration_scenarios() -> None:
     """Test realistic integration scenarios."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     print("[LINK] Testing TextAdapter integration scenarios...")
 
@@ -69,12 +65,9 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     print("\n[DONE] All integration scenarios tested successfully!")
 
-
 def test_knowledge_base_consistency() -> None:
     """Test knowledge base consistency with class mappings."""
     print("\n[SEARCH] Testing knowledge base consistency...")
-
-    import json
 
     # Load both files
     with open("data/knowledge_base/plantvillage_classes.json") as f:
@@ -102,7 +95,6 @@ def test_knowledge_base_consistency() -> None:
     else:
         print("   [DONE] Knowledge base is consistent with class mappings")
 
-
 def main() -> None:
     """Run integration tests."""
     try:
@@ -111,10 +103,8 @@ def main() -> None:
         print("\n[SUCCESS] All integration tests passed!")
     except Exception as e:
         print(f"\n[TODO] Integration test failed: {e}")
-        import traceback
 
         traceback.print_exc()
-
 
 if __name__ == "__main__":
     main()

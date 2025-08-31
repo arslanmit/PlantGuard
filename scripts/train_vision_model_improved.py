@@ -23,12 +23,8 @@ from training.monitor import TrainingMonitor
 
 logger = logging.getLogger(__name__)
 
-
 class ImprovedPlantVillageTrainer:
     """Improved trainer class with better hyperparameters and early stopping."""
-
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     def __init__(
         self,
@@ -330,7 +326,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
         logger.info("Training completed. Best validation accuracy: %.2f%%", self.best_val_acc)
 
-
 def create_improved_data_transforms() -> tuple[transforms.Compose, transforms.Compose]:
     """Create improved data transforms with better augmentation."""
     # Training transforms with moderate augmentation
@@ -356,7 +351,6 @@ def create_improved_data_transforms() -> tuple[transforms.Compose, transforms.Co
     )
 
     return train_transform, val_transform
-
 
 def create_improved_data_loaders(
     data_dir: Path,
@@ -402,7 +396,6 @@ def create_improved_data_loaders(
     logger.info("Batch size: %d", batch_size)
 
     return train_loader, val_loader, class_names
-
 
 def main() -> None:
     """Main training function with improved defaults."""
@@ -546,11 +539,9 @@ def main() -> None:
         raise
     finally:
         # Suppress any errors during monitor cleanup; monitor close should be best-effort
-        import contextlib
 
         with contextlib.suppress(Exception):
             monitor.close()
-
 
 if __name__ == "__main__":
     main()

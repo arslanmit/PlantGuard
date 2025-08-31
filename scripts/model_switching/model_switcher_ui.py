@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Simple Streamlit UI for switching between PlantGuard models."""
 
-
 import sys
 from pathlib import Path
 
@@ -13,15 +12,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from src.features.model_switching.model_manager import PlantGuardModelManager
 
-
 @st.cache_resource
 def get_model_manager() -> "PlantGuardModelManager":
     """Get cached model manager instance without autoload to render UI fast."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
     return PlantGuardModelManager(autoload_default=False)
-
 
 def process_image(image: Image.Image, image_name: str, manager: "PlantGuardModelManager", current_model_info: dict) -> None:
     """Process an image and display results."""
@@ -69,7 +64,6 @@ def process_image(image: Image.Image, image_name: str, manager: "PlantGuardModel
 
     else:
         st.error(f"[TODO] Model Error: {current_model_info['error']}")
-
 
 def main() -> None:
     """Main Streamlit app."""
@@ -216,7 +210,6 @@ def main() -> None:
                 - Enable/disable models
                 - Set confidence thresholds
                 """)
-
 
 if __name__ == "__main__":
     main()

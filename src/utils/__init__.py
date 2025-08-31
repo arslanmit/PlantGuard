@@ -3,9 +3,6 @@
 This module contains utility functions and helper classes.
 """
 
-from collections.abc import Generator
-from typing import Any, Dict, List, Optional, Tuple, Union
-
 from .config import Config
 from .error_handling import ErrorHandler
 from .file_utils import FileManager

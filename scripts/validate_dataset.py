@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Script to validate dataset integrity using DatasetManager."""
 
-
 import argparse
 import sys
 from pathlib import Path
@@ -11,11 +10,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.training.dataset_manager import DatasetManager
 
-
 def main() -> None:
     """Validate dataset integrity."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     parser = argparse.ArgumentParser(description="Validate dataset integrity")
     parser.add_argument(
@@ -80,7 +76,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
         sys.exit(1)
     else:
         print("[DONE] All datasets are valid")
-
 
 if __name__ == "__main__":
     main()

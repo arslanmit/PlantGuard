@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Simple test of PlantGuard vision model on sample images."""
 
-
 import json
 import logging
 import sys
@@ -16,11 +15,8 @@ from src.core.vision import VisionAdapter
 
 logger = logging.getLogger(__name__)
 
-
 def _load_model() -> VisionAdapter | None:
     """Load the vision model."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     model_path = "data/models/vision_resnet50.pt"
     vision_adapter = VisionAdapter(device="cpu")
@@ -36,7 +32,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
         logger.error("[TODO] Failed to load model: %s", e)
         return None
 
-
 def _parse_prediction(predicted_class: str) -> tuple[str, str]:
     """Parse prediction into plant and disease components."""
     if "___" in predicted_class:
@@ -46,7 +41,6 @@ def _parse_prediction(predicted_class: str) -> tuple[str, str]:
         pred_plant = "Unknown"
         pred_disease = predicted_class
     return pred_plant, pred_disease
-
 
 def _check_correctness(pred_plant: str, pred_disease: str, gt_plant: str, gt_disease: str, gt_status: str) -> tuple[bool, bool, bool]:
     """Check prediction correctness."""
@@ -64,7 +58,6 @@ def _check_correctness(pred_plant: str, pred_disease: str, gt_plant: str, gt_dis
         exact_correct = any(keyword in pred_lower for keyword in disease_keywords if len(keyword) > 2)
 
     return plant_correct, status_correct, exact_correct
-
 
 def _print_results(
     total: int,
@@ -90,7 +83,6 @@ def _print_results(
     logger.info("[TAG]  Available model classes:")
     for i, class_name in enumerate(vision_adapter.class_names):
         logger.info("  %2d: %s", i, class_name)
-
 
 def main() -> None:
     """Test the model on sample images."""
@@ -174,7 +166,6 @@ def main() -> None:
         logger.info("")
 
     _print_results(total, correct_exact, correct_plant, correct_status, vision_adapter)
-
 
 if __name__ == "__main__":
     main()

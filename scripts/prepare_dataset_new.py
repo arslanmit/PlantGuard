@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Script to prepare dataset using DatasetManager."""
 
-
 import argparse
 import sys
 from pathlib import Path
@@ -11,11 +10,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.training.dataset_manager import DatasetConfig, DatasetManager
 
-
 def main() -> None:
     """Prepare dataset with train/val splits."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     parser = argparse.ArgumentParser(description="Prepare dataset with train/val splits")
     parser.add_argument(
@@ -93,7 +89,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
     else:
         print("[TODO] Dataset preparation failed")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

@@ -10,7 +10,6 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw
 
-
 def create_synthetic_plant_image(class_id: int, width: int = 224, height: int = 224, seed: int | None = None) -> Image.Image:
     """Create a synthetic plant image with distinguishable patterns for each class.
 
@@ -23,8 +22,6 @@ def create_synthetic_plant_image(class_id: int, width: int = 224, height: int = 
     Returns:
         PIL Image with synthetic plant-like patterns
     """
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     if seed is not None:
         random.seed(seed)
@@ -100,7 +97,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
     noise_array = np.clip(noise_array.astype(np.int16) + noise, 0, 255).astype(np.uint8)
 
     return Image.fromarray(noise_array)
-
 
 def create_improved_dummy_dataset(
     output_dir: Path,
@@ -183,7 +179,6 @@ def create_improved_dummy_dataset(
     print(f"[DONE] Improved dummy dataset created successfully at {output_dir}")
     print("[PROGRESS] This dataset has learnable patterns and should achieve >80% accuracy")
 
-
 def main() -> None:
     """Main function."""
     parser = argparse.ArgumentParser(description="Create improved dummy dataset for testing")
@@ -216,7 +211,6 @@ def main() -> None:
     except (OSError, ValueError) as e:
         print(f"[TODO] Error creating improved dummy dataset: {e}")
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

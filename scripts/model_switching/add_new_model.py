@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
 """Add new models to PlantGuard configuration easily."""
 
-
 import argparse
 import json
 from pathlib import Path
 
-
 def add_huggingface_model(model_id: str, name: str | None = None, description: str | None = None) -> bool:
     """Add a new Hugging Face model to the configuration."""
-
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     config_path = Path("config/models.json")
 
@@ -56,7 +52,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
     return True
 
-
 def list_huggingface_plant_models() -> None:
     """Show some popular plant disease models from Hugging Face."""
     models = [
@@ -96,7 +91,6 @@ def list_huggingface_plant_models() -> None:
         print(f"   Description: {model['description']}")
         print(f"   Add with: python add_new_model.py --add {model['id']}")
 
-
 def remove_model(model_key: str) -> bool:
     """Remove a model from the configuration."""
     config_path = Path("config/models.json")
@@ -135,7 +129,6 @@ def remove_model(model_key: str) -> bool:
 
     return True
 
-
 def enable_disable_model(model_key: str, enable: bool) -> bool:
     """Enable or disable a model."""
     config_path = Path("config/models.json")
@@ -163,7 +156,6 @@ def enable_disable_model(model_key: str, enable: bool) -> bool:
     print(f"[DONE] Model {model_key} {status}")
 
     return True
-
 
 def set_default_model(model_key: str) -> bool:
     """Set the default model."""
@@ -197,7 +189,6 @@ def set_default_model(model_key: str) -> bool:
 
     return True
 
-
 def show_config() -> None:
     """Show current configuration."""
     config_path = Path("config/models.json")
@@ -226,7 +217,6 @@ def show_config() -> None:
         print(f"    Model ID: {model_config['model_id']}")
         print(f"    Accuracy: {model_config.get('accuracy', 0):.1%}")
         print(f"    Status: {status}")
-
 
 def main() -> None:
     """Main CLI interface."""
@@ -273,7 +263,6 @@ def main() -> None:
         print("  python add_new_model.py --add Abhiram4/PlantDiseaseDetectorVit2")
         print("  python add_new_model.py --enable vit_best")
         print("  python add_new_model.py --default vit_best")
-
 
 if __name__ == "__main__":
     main()
