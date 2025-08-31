@@ -133,9 +133,9 @@ def main() -> None:
                 errors += 1
 
     if errors == 0:
-        print("✅ All files fixed successfully!")
+        print("[DONE] All files fixed successfully!")
     else:
-        print(f"❌ {errors} files still have errors")
+        print(f"[TODO] {errors} files still have errors")
 
 
 if __name__ == "__main__":

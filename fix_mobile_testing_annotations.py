@@ -260,14 +260,14 @@ class MobileTestingAnnotationFixer:
                 with open(file_path, "w", encoding="utf-8") as f:
                     f.write(content)
 
-                logger.info(f"✅ Fixed type annotations in {file_path}")
+                logger.info(f"[DONE] Fixed type annotations in {file_path}")
                 return True
             else:
                 logger.info(f"i  No changes needed for {file_path}")
                 return False
 
         except Exception as e:
-            logger.error(f"❌ Error processing {file_path}: {e}")
+            logger.error(f"[TODO] Error processing {file_path}: {e}")
             return False
 
     def run(self) -> dict[str, Any]:
@@ -308,7 +308,7 @@ def main() -> None:
         print(f"  - {file_path}")
 
     if results["files_modified"] > 0:
-        print("\n✅ Type annotations have been added to mobile testing files!")
+        print("\n[DONE] Type annotations have been added to mobile testing files!")
         print("Next steps:")
         print("  1. Run 'mypy --strict .' to check for remaining errors")
         print("  2. Run the main fix_strict_type_annotations.py for other files")

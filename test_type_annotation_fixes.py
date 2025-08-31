@@ -191,18 +191,18 @@ def test_type_annotation_fixers() -> bool:
         result = run_fixer_on_test_dir(test_dir, "fix_mobile_testing_annotations.py")
 
         if result["success"]:
-            print("✅ Mobile testing fixer ran successfully")
+            print("[DONE] Mobile testing fixer ran successfully")
         else:
-            print(f"❌ Mobile testing fixer failed: {result.get('error', 'Unknown error')}")
+            print(f"[TODO] Mobile testing fixer failed: {result.get('error', 'Unknown error')}")
 
         # Test general annotation fixer
         print("\n2. Testing general annotation fixer...")
         result = run_fixer_on_test_dir(test_dir, "fix_strict_type_annotations.py")
 
         if result["success"]:
-            print("✅ General annotation fixer ran successfully")
+            print("[DONE] General annotation fixer ran successfully")
         else:
-            print(f"❌ General annotation fixer failed: {result.get('error', 'Unknown error')}")
+            print(f"[TODO] General annotation fixer failed: {result.get('error', 'Unknown error')}")
 
         # Check results
         print("\n3. Checking annotation results...")
@@ -224,10 +224,10 @@ def test_type_annotation_fixers() -> bool:
             if stats["total_functions"] > 0:
                 annotation_rate = stats["annotated_functions"] / stats["total_functions"]
                 if annotation_rate < 0.8:  # At least 80% should be annotated
-                    print(f"  ⚠️  Low annotation rate: {annotation_rate:.1%}")
+                    print(f"  [WARNING]  Low annotation rate: {annotation_rate:.1%}")
                     all_good = False
                 else:
-                    print(f"  ✅ Good annotation rate: {annotation_rate:.1%}")
+                    print(f"  [DONE] Good annotation rate: {annotation_rate:.1%}")
 
         return all_good
 
@@ -243,11 +243,11 @@ def main() -> None:
 
     print("\n" + "=" * 40)
     if success:
-        print("🎉 All type annotation fixers are working correctly!")
-        print("✅ Ready to run on the actual codebase")
+        print("[SUCCESS] All type annotation fixers are working correctly!")
+        print("[DONE] Ready to run on the actual codebase")
     else:
-        print("⚠️  Some issues detected with the type annotation fixers")
-        print("🔧 Review the output above and fix any issues")
+        print("[WARNING]  Some issues detected with the type annotation fixers")
+        print("[TOOL] Review the output above and fix any issues")
 
     print("\nTo run the fixes on the actual codebase:")
     print("  python run_all_type_fixes.py")

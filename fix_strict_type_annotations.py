@@ -420,9 +420,9 @@ def main() -> None:
     logger.info(f"Remaining type errors: {results.get('type_annotation_errors', 'Unknown')}")
 
     if success:
-        logger.info("✅ All type annotation errors have been resolved!")
+        logger.info("[DONE] All type annotation errors have been resolved!")
     else:
-        logger.warning("⚠️  Some type annotation errors remain. Check the report for details.")
+        logger.warning("[WARNING]  Some type annotation errors remain. Check the report for details.")
 
 
 if __name__ == "__main__":

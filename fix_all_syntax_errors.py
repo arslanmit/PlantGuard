@@ -139,9 +139,9 @@ def main() -> None:
             errors += 1
 
     if errors == 0:
-        print("✅ All Python files now have valid syntax!")
+        print("[DONE] All Python files now have valid syntax!")
     else:
-        print(f"❌ {errors} files still have syntax errors")
+        print(f"[TODO] {errors} files still have syntax errors")
 
 
 if __name__ == "__main__":

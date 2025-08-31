@@ -296,7 +296,7 @@ def main() -> None:
             print(f"  - {file_path}")
 
     if results["files_modified"] > 0:
-        print("\n✅ Untyped call errors have been addressed!")
+        print("\n[DONE] Untyped call errors have been addressed!")
         print("Run 'mypy --strict .' to verify the fixes.")
     else:
         print("\ni  No files needed modification.")

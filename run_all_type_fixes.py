@@ -159,9 +159,9 @@ class TypeAnnotationMaster:
             type_errors = final_status.get("type_annotation_errors", 0)
 
             if type_errors == 0:
-                f.write("✅ **SUCCESS**: All type annotation errors have been resolved!\n\n")
+                f.write("[DONE] **SUCCESS**: All type annotation errors have been resolved!\n\n")
             else:
-                f.write(f"⚠️ **PARTIAL SUCCESS**: {type_errors} type annotation errors remain\n\n")
+                f.write(f"[WARNING] **PARTIAL SUCCESS**: {type_errors} type annotation errors remain\n\n")
 
             f.write(f"- Total mypy errors: {total_errors}\n")
             f.write(f"- Type annotation errors: {type_errors}\n")
@@ -175,7 +175,7 @@ class TypeAnnotationMaster:
 
             f.write("## Next Steps\n\n")
             if type_errors == 0:
-                f.write("- ✅ Task 17 is complete!\n")
+                f.write("- [DONE] Task 17 is complete!\n")
                 f.write("- Move to task 18: Fix Remaining Type Safety Issues in Core Components\n")
                 f.write("- Run full test suite to ensure functionality is preserved\n")
             else:
@@ -205,9 +205,9 @@ class TypeAnnotationMaster:
             self.results[script] = result
 
             if result["success"]:
-                logger.info(f"✅ {script} completed successfully")
+                logger.info(f"[DONE] {script} completed successfully")
             else:
-                logger.error(f"❌ {script} failed: {result.get('error', 'Unknown error')}")
+                logger.error(f"[TODO] {script} failed: {result.get('error', 'Unknown error')}")
                 overall_success = False
 
         # Generate final report
@@ -237,11 +237,11 @@ def main() -> None:
     print("=" * 60)
 
     if success:
-        print("🎉 SUCCESS: All type annotation errors have been resolved!")
-        print("✅ Task 17 is complete and ready for production!")
+        print("[SUCCESS] SUCCESS: All type annotation errors have been resolved!")
+        print("[DONE] Task 17 is complete and ready for production!")
     else:
-        print("⚠️  PARTIAL SUCCESS: Some type annotation errors may remain.")
-        print("📋 Check the generated reports for details and next steps.")
+        print("[WARNING]  PARTIAL SUCCESS: Some type annotation errors may remain.")
+        print("[DETAILS] Check the generated reports for details and next steps.")
 
     print("\nGenerated reports:")
     print("  - type_annotation_master_report.json")

@@ -42,10 +42,10 @@ def main() -> None:
             errors += 1
 
     if errors == 0:
-        print("✅ All Python files have valid syntax!")
+        print("[DONE] All Python files have valid syntax!")
         return True
     else:
-        print(f"❌ Found {errors} files with syntax errors")
+        print(f"[TODO] Found {errors} files with syntax errors")
         return False
 
 
