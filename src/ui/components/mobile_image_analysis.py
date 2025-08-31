@@ -224,7 +224,8 @@ class MobileImageAnalysis(MobileComponent):
 
         if clear_clicked:
             self.clear_analysis()
-            st.rerun()
+            # Update state without page refresh
+            st.session_state.analysis_cleared = True
 
         return analyze_clicked
 

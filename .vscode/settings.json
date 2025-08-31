@@ -121,5 +121,8 @@
         "find *"
     ],
     "codium.codeCompletion.enable": false,
-    "chat.agent.maxRequests": 9999
+    "chat.agent.maxRequests": 9999,
+    "cursorpyright.analysis.autoImportCompletions": true,
+    "cursorpyright.analysis.diagnosticMode": "workspace",
+    "cursorpyright.analysis.typeCheckingMode": "basic"
 }

@@ -155,7 +155,8 @@ class MobileHeader(MobileComponent):
                     if not is_current:
                         st.session_state.current_vision_model = model_key
                         self._handle_model_change(model_key)
-                        st.rerun()
+                        # Update state without page refresh
+                        st.session_state.vision_model_updated = True
 
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -297,7 +298,8 @@ class MobileHeader(MobileComponent):
                     if not is_current:
                         st.session_state.current_vision_model = model_key
                         self._handle_model_change(model_key)
-                        st.rerun()
+                        # Update state without page refresh
+                        st.session_state.vision_model_updated = True
 
     def _get_model_info(self, model_key: str) -> dict[str, str]:
         """Get detailed model information."""

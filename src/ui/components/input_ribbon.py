@@ -297,9 +297,9 @@ class InputRibbon:
             st.toast("[CLEAN] All inputs cleared", icon="[CLEAN]")
         logger.info("Cleared all input modes and data")
 
-        # Force rerun to update UI
+        # Update state without page refresh
         with contextlib.suppress(Exception):
-            st.rerun()
+            st.session_state.inputs_cleared = True
 
     def _cleanup_temporary_data(self) -> Any:
         """Clean up temporary files and data."""
@@ -597,9 +597,10 @@ class InputRibbon:
 
         try:
             with contextlib.suppress(Exception):
-                st.rerun()
+                # Update state without page refresh
+                st.session_state.analysis_triggered = True
         except Exception:
-            logger.exception("Unexpected error while rerunning Streamlit")
+            logger.exception("Unexpected error while updating state")
 
     def get_input_data(self, mode_name: str) -> dict[str, Any]:
         """Get input data for a specific mode."""

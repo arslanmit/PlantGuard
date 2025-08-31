@@ -258,7 +258,12 @@ class MobileVoiceInterface(MobileComponent):
 
         if clear_clicked:
             self.clear_audio_data()
-            st.rerun()
+            # Clear voice history
+            if st.button("Clear Voice History", key=f"{self.component_id}_clear_history", use_container_width=True):
+                st.session_state.voice_history = []
+                st.session_state.voice_input_text = ""
+                # Update state without page refresh
+                st.session_state.voice_history_cleared = True
 
         # Perform transcription if requested
         transcribed_text = st.session_state.get("transcribed_text", "")

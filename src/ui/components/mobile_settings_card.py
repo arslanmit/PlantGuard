@@ -401,7 +401,8 @@ class MobileSettingsCard:
             settings_data["active_section"] = section_id
             state["data"]["settings_card"] = settings_data
             self.state_manager.set_component_state(self.component_id, state)
-            st.rerun()
+            # Update state without page refresh
+            st.session_state.settings_section_changed = True
 
         return section_id in settings_data["expanded_sections"]
 
@@ -509,7 +510,8 @@ class MobileSettingsCard:
                 st.session_state.user_preferences["preferred_vision_model"] = model_id
                 self._mark_settings_changed()
                 st.toast(f"Vision model changed to {model_info.get('name', model_id)}", icon="[VISION]")
-                st.rerun()
+                # Update state without page refresh
+                st.session_state.vision_model_changed = True
 
         # Audio model
         st.markdown("#### [VOICE] Audio Model")
@@ -546,7 +548,8 @@ class MobileSettingsCard:
                 st.session_state.user_preferences["preferred_audio_model"] = model_id
                 self._mark_settings_changed()
                 st.toast(f"Audio model changed to {model_info.get('name', model_id)}", icon="[VOICE]")
-                st.rerun()
+                # Update state without page refresh
+                st.session_state.audio_model_changed = True
 
         # Text model
         st.markdown("#### [CHAT] Text Model")
@@ -583,7 +586,8 @@ class MobileSettingsCard:
                 st.session_state.user_preferences["preferred_text_model"] = model_id
                 self._mark_settings_changed()
                 st.toast(f"Text model changed to {model_info.get('name', model_id)}", icon="[CHAT]")
-                st.rerun()
+                # Update state without page refresh
+                st.session_state.text_model_changed = True
 
         # Auto model switching
         self.render_toggle_setting("auto_model_switching", "Auto Model Switching", "Automatically switch to optimal models based on analysis type")
@@ -733,7 +737,8 @@ class MobileSettingsCard:
             self._mark_settings_changed()
 
             st.toast("Settings reset to defaults!", icon="[PARTIAL]")
-            st.rerun()
+            # Update state without page refresh
+            st.session_state.settings_reset = True
 
         except Exception as e:
             logger.error(f"Failed to reset settings: {e}")
@@ -782,7 +787,8 @@ class MobileSettingsCard:
 
             self._mark_settings_changed()
             st.toast("Settings imported successfully!", icon="[DOWNLOAD]")
-            st.rerun()
+            # Update state without page refresh
+            st.session_state.settings_imported = True
             return True
 
         except json.JSONDecodeError:
