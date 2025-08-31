@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from typing import Any
+
 #!/usr/bin/env python3
 """
 Simple system info script for PlantGuard Makefile

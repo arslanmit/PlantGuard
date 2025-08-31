@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Compare View Implementation for PlantGuard.
 
 This module provides comprehensive comparison capabilities including

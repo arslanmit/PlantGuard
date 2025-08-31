@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Integration test for TextAdapter with the PlantGuard system."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import sys
 from pathlib import Path

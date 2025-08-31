@@ -10,7 +10,6 @@ This script implements task 11.2: Perform comprehensive testing and optimization
 
 Requirements addressed: 1.1, 1.3, 6.4, 7.1
 """
-import pytest
 
 
 import logging

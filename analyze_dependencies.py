@@ -4,7 +4,6 @@
 import ast
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
 def extract_imports_from_file(file_path: Path) -> set[str]:

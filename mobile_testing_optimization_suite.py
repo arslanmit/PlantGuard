@@ -10,7 +10,6 @@ Comprehensive testing and optimization implementation:
 
 Requirements: 1.1, 1.3, 6.4, 7.1
 """
-import pytest
 
 
 import json

@@ -6,7 +6,6 @@ This script validates that the user's original issue has been completely resolve
 - "when I click some button page is going to different page and not come back"
 - "show everything in same single page"
 """
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
 import sys

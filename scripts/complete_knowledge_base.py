@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Complete the disease knowledge base with all 38 PlantVillage classes."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
 import json
+from typing import Any
 
 
 def get_all_diseases() -> Any:

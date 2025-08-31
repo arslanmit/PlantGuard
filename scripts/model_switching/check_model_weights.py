@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Check if the model has been properly trained."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import sys
 from pathlib import Path

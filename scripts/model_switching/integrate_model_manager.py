@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Integrate the Model Manager into your main PlantGuard application."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import sys
 from pathlib import Path

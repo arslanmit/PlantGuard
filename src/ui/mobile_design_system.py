@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Mobile CSS Design System for PlantGuard UI.
 

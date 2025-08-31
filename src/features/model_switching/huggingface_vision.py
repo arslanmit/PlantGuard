@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Vision processing module for PlantGuard using Hugging Face models.
 
 This module contains the HuggingFaceVisionAdapter class for plant disease detection

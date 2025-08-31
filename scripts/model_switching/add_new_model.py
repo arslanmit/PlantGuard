@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Add new models to PlantGuard configuration easily."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import argparse
 import json

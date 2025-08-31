@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Example usage of PlantGuard data pipeline utilities.
 
 This script demonstrates how to use the dataset loading, validation,

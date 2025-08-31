@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Generate class mapping JSON file from dataset directory.
 
 This script creates a mapping between model class indices and human-readable names.

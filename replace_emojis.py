@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Script to replace all emojis with text equivalents throughout the codebase.

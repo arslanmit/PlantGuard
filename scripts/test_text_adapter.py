@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Test the TextAdapter implementation to ensure all methods work correctly."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import sys
 from pathlib import Path

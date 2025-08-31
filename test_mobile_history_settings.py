@@ -5,8 +5,6 @@ Test script for Mobile History and Settings Management components.
 This script tests the MobileHistoryView and MobileSettingsCard components
 to ensure they work correctly with the mobile PlantGuard interface.
 """
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-import pytest
 
 
 import sys

@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from typing import Any
+
 """Enhanced Gesture Handler Component for PlantGuard Mobile Interface.
 
 
@@ -619,10 +620,10 @@ class EnhancedGestureHandler:
 
     def enable_enhanced_swipe_navigation(
         self,
-        on_swipe_left: Optional[Callable] = None,
-        on_swipe_right: Optional[Callable] = None,
-        on_swipe_up: Optional[Callable] = None,
-        on_swipe_down: Optional[Callable] = None,
+        on_swipe_left: Callable | None = None,
+        on_swipe_right: Callable | None = None,
+        on_swipe_up: Callable | None = None,
+        on_swipe_down: Callable | None = None,
         velocity_threshold: float = 0.3,
     ):
         """Enable enhanced swipe gestures for navigation with velocity detection.

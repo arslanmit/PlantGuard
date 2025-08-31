@@ -1,4 +1,6 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from collections.abc import Generator
+from typing import Any
+
 """Pytest configuration helpers.
 
 Ensure the repository root and the `src/` package directory are on sys.path
@@ -105,7 +107,7 @@ if MOBILE_FIXTURES_AVAILABLE:
         Path(audio_file_path).unlink(missing_ok=True)
 
     @pytest.fixture
-    def sample_analysis_results() -> List[Any]:
+    def sample_analysis_results() -> list[Any]:
         """Provide sample analysis results for testing."""
         return [
             TestDataFactory.create_analysis_result(disease_name="Powdery Mildew", confidence=0.92, source="camera", component_id="test_camera"),
@@ -205,7 +207,7 @@ if MOBILE_FIXTURES_AVAILABLE:
         return mocks
 
     @pytest.fixture
-    def mobile_test_utilities() -> Dict[str, Any]:
+    def mobile_test_utilities() -> dict[str, Any]:
         """Provide mobile testing utilities."""
 
         class MobileTestUtils:
@@ -243,7 +245,7 @@ if MOBILE_FIXTURES_AVAILABLE:
         return MobileTestUtils()
 
     @pytest.fixture
-    def mobile_performance_config() -> Dict[str, Any]:
+    def mobile_performance_config() -> dict[str, Any]:
         """Configuration for mobile performance testing."""
         return {
             "max_render_time": 200,  # milliseconds

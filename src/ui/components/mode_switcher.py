@@ -1,7 +1,7 @@
 """Lightweight ModeSwitcher component for simple mode selection."""
 
+
 import streamlit as st
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
 class ModeSwitcher:

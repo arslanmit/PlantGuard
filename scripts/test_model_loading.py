@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test model loading and inference."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from typing import Any
 
 import torch
 

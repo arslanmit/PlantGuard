@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Final comprehensive test of the integrated Hugging Face model."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import json
 import sys

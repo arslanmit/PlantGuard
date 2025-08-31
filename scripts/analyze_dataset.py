@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Script to analyze dataset statistics using DatasetManager."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import argparse
 import sys

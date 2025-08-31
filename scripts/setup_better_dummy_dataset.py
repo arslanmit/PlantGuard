@@ -2,8 +2,6 @@
 """Create improved dummy dataset with learnable patterns for testing PlantGuard training pipeline."""
 # ruff: noqa: S311
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
 import argparse
 import random
 import sys

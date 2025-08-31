@@ -4,11 +4,9 @@ Comprehensive Mobile Testing Suite
 
 Tests all mobile components and their integration with the PlantGuard system.
 """
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
-
 import sys
 from pathlib import Path
+from typing import Any
 from unittest.mock import Mock
 
 import pytest

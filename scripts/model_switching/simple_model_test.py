@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Simple test of PlantGuard vision model on sample images."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import json
 import logging

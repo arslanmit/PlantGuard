@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Status Indicator Component for PlantGuard.
 
 Provides visual status indicators for models, system health, and application state.

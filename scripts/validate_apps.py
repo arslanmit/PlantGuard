@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Validate that PlantGuard Streamlit applications can start without import errors."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import importlib
 import importlib.util

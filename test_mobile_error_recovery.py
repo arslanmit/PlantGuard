@@ -5,8 +5,6 @@ Test script for mobile error handling and offline functionality.
 This script validates the error recovery and offline management systems
 for the PlantGuard mobile UI components.
 """
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-import pytest
 
 
 import sys

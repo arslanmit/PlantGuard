@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from typing import Any
+
 #!/usr/bin/env python3
 """
 Integration test for Migration Safety Framework

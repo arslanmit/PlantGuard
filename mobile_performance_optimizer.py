@@ -18,7 +18,6 @@ Usage:
     python mobile_performance_optimizer.py --cleanup
     python mobile_performance_optimizer.py --all
 """
-import pytest
 
 
 import argparse

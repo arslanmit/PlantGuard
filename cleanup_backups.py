@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Cleanup script to remove backup files created by replace_emojis.py

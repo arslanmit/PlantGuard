@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from typing import Any
+
 """Navigation Header Component for PlantGuard Redesigned UI.
 
 

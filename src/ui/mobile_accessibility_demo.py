@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Mobile Accessibility Demo Application for PlantGuard UI.
 

@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """Migration utility for upgrading PlantGuard models to the new registry format.
 

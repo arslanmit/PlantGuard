@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Convert a trained model to the expected format for evaluation."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
 import argparse
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn as nn

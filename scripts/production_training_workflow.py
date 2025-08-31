@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Production Training Workflow for PlantGuard.
 
 This script orchestrates the complete production training pipeline including:

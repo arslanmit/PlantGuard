@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Test model inference on a sample image."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
 import json
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -83,7 +82,7 @@ def preprocess_image(image_path) -> Any:
     return input_batch, image
 
 
-def predict(model, input_batch, class_names) -> List[Any]:
+def predict(model, input_batch, class_names) -> list[Any]:
     """Run model inference and return predictions."""
     with torch.no_grad():
         output = model(input_batch)

@@ -3,7 +3,6 @@
 Final System Validation for Mobile-Only Refactoring
 Comprehensive validation to ensure migration is complete and system is functional.
 """
-import pytest
 
 
 import ast

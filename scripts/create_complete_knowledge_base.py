@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Create complete disease knowledge base for all 38 PlantVillage classes."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
 import json
 from pathlib import Path
+from typing import Any
 
 
 def create_complete_disease_info() -> Any:

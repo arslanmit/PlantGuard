@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Simple Streamlit UI for switching between PlantGuard models."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import sys
 from pathlib import Path

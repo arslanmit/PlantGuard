@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from typing import Any
+
 """Voice and Audio Processing Interface for PlantGuard.
 
 This module provides comprehensive voice and audio processing capabilities

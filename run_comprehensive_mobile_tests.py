@@ -7,7 +7,6 @@ It covers all requirements for task 9: Implement comprehensive testing and valid
 
 Requirements covered: 7.1, 7.2, 7.3, 7.4, 7.5
 """
-import pytest
 
 
 import json

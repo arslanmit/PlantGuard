@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Direct model evaluation script."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
-
 import json
 from pathlib import Path
+from typing import Any
 
 import torch
 import torch.nn as nn

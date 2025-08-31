@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Logging configuration for PlantGuard.
 
 This module provides centralized logging configuration for all PlantGuard components.

@@ -3,7 +3,6 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
 def setup_logger(

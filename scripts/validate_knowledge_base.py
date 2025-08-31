@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Validate the disease knowledge base for completeness and accuracy."""
 
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 import json
 from pathlib import Path

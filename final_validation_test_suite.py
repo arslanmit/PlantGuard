@@ -3,7 +3,6 @@
 Final Validation Test Suite for Mobile-Only PlantGuard Refactoring
 Comprehensive testing to ensure all functionality works after desktop component removal.
 """
-import pytest
 
 
 import importlib.util

@@ -1,4 +1,6 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from collections.abc import Generator
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 """PlantGuard Utilities Module.
 
 This module contains utility functions and helper classes.

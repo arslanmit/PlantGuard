@@ -1,4 +1,5 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+from typing import Any
+
 """Page Transitions Component for PlantGuard Redesigned UI.
 
 Handles page transition animations, loading states, and smooth navigation

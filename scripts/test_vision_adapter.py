@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Test script for VisionAdapter implementation.
 
 This script tests the VisionAdapter functionality without requiring a trained model.

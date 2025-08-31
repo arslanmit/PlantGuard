@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """Test the production training workflow with minimal configuration.
 
