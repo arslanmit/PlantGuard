@@ -13,14 +13,22 @@ import sys
 from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import streamlit as st
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+# Type imports for adapters
+from typing import TYPE_CHECKING
+
 from utils.error_recovery import SafeTypeConverter
+
+if TYPE_CHECKING:
+    from src.core.audio import AudioAdapter
+    from src.core.nlp import TextAdapter
+    from src.core.vision import VisionAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +38,9 @@ class MobileAdapterIntegration:
 
     def __init__(self) -> None:
         """Initialize mobile adapter integration."""
-        self._vision_adapter: Any | None = None
-        self._audio_adapter: Any | None = None
-        self._text_adapter: Any | None = None
+        self._vision_adapter: VisionAdapter | None = None
+        self._audio_adapter: AudioAdapter | None = None
+        self._text_adapter: TextAdapter | None = None
         self._chat_model: Any | None = None
 
         # Mobile-specific preprocessing settings
@@ -57,7 +65,7 @@ class MobileAdapterIntegration:
         }
 
     @property
-    def vision_adapter(self) -> Any | None:
+    def vision_adapter(self) -> Optional["VisionAdapter"]:
         """Get or create vision adapter instance."""
         if self._vision_adapter is None:
             try:
@@ -77,7 +85,7 @@ class MobileAdapterIntegration:
         return self._vision_adapter
 
     @vision_adapter.setter
-    def vision_adapter(self, adapter: Any | None) -> None:
+    def vision_adapter(self, adapter: Optional["VisionAdapter"]) -> None:
         """Set vision adapter instance (for testing)."""
         self._vision_adapter = adapter
 
@@ -87,7 +95,7 @@ class MobileAdapterIntegration:
         self._vision_adapter = None
 
     @property
-    def audio_adapter(self) -> Any | None:
+    def audio_adapter(self) -> Optional["AudioAdapter"]:
         """Get or create audio adapter instance."""
         if self._audio_adapter is None:
             try:
@@ -107,7 +115,7 @@ class MobileAdapterIntegration:
         return self._audio_adapter
 
     @audio_adapter.setter
-    def audio_adapter(self, adapter: Any | None) -> None:
+    def audio_adapter(self, adapter: Optional["AudioAdapter"]) -> None:
         """Set audio adapter instance (for testing)."""
         self._audio_adapter = adapter
 
@@ -117,7 +125,7 @@ class MobileAdapterIntegration:
         self._audio_adapter = None
 
     @property
-    def text_adapter(self) -> Any | None:
+    def text_adapter(self) -> Optional["TextAdapter"]:
         """Get or create text adapter instance."""
         if self._text_adapter is None:
             try:
@@ -137,7 +145,7 @@ class MobileAdapterIntegration:
         return self._text_adapter
 
     @text_adapter.setter
-    def text_adapter(self, adapter: Any | None) -> None:
+    def text_adapter(self, adapter: Optional["TextAdapter"]) -> None:
         """Set text adapter instance (for testing)."""
         self._text_adapter = adapter
 

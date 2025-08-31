@@ -1,4 +1,3 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Tests for mobile adapter integration.
 
@@ -7,11 +6,11 @@ existing PlantGuard adapters (Vision, Audio, Text) with proper
 mock interfaces and dependency injection.
 """
 
-
 import tempfile
 from contextlib import suppress
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
