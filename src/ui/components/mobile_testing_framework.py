@@ -313,7 +313,7 @@ class MobileTestingFramework:
 
             # Determine overall status
             success_rate = summary["success_rate"]
-            if isinstance(success_rate, (int, float)):
+            if isinstance(success_rate, int | float):
                 if success_rate >= 0.9:
                     summary["overall_status"] = "excellent"
                 elif success_rate >= 0.8:

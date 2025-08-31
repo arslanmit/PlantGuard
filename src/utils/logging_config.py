@@ -3,8 +3,6 @@
 This module provides centralized logging configuration for all PlantGuard components.
 """
 
-
-
 import logging
 import sys
 from pathlib import Path

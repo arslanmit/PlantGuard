@@ -445,7 +445,6 @@ class TransferLearningOptimizer:
             Dictionary with transfer learning evaluation metrics
         """
 
-
         evaluation: dict[str, Any] = {
             "strategy": self.config.strategy.value,
             "total_epochs": len(train_losses),

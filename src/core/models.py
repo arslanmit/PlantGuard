@@ -3,8 +3,6 @@
 This module contains the ResNet50 model architecture for plant disease classification.
 """
 
-
-
 import logging
 
 import torch

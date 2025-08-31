@@ -3,8 +3,6 @@
 Provides visual status indicators for models, system health, and application state.
 """
 
-
-
 import logging
 
 import streamlit as st

@@ -11,8 +11,6 @@ the start of a training process. Use the environment variable
 PLANTGUARD_TRAIN_MEMORY_LIMIT_BYTES to opt-in without code changes.
 """
 
-
-
 from __future__ import annotations
 
 import logging

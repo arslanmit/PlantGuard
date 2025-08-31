@@ -5,8 +5,6 @@ A/B image viewer, side-by-side analysis comparison, difference highlighting,
 and comparative metrics for the PlantGuard plant disease detection system.
 """
 
-
-
 import logging
 from datetime import datetime
 
@@ -265,7 +263,9 @@ class CompareView:
 
         # Style the dataframe
         styled_df = df.style.apply(
-            lambda x: ["background-color: #e8f5e8" if "[DONE]" in str(val) else "background-color: #ffe8e8" if "[TODO]" in str(val) else "" for val in x],
+            lambda x: [
+                "background-color: #e8f5e8" if "[DONE]" in str(val) else "background-color: #ffe8e8" if "[TODO]" in str(val) else "" for val in x
+            ],
             subset=["Difference"],
         )
 

@@ -5,8 +5,6 @@ This script tests the basic functionality of all mobile input components
 to ensure they can be instantiated and rendered without errors.
 """
 
-
-
 import logging
 import sys
 from pathlib import Path
