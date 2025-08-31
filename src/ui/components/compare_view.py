@@ -6,6 +6,8 @@ and comparative metrics for the PlantGuard plant disease detection system.
 """
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import logging
 from datetime import datetime
 

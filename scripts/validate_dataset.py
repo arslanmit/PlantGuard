@@ -15,6 +15,8 @@ from src.training.dataset_manager import DatasetManager
 def main() -> None:
     """Validate dataset integrity."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     parser = argparse.ArgumentParser(description="Validate dataset integrity")
     parser.add_argument(
         "--dataset-dir",

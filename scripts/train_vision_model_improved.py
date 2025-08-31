@@ -28,6 +28,8 @@ class ImprovedPlantVillageTrainer:
     """Improved trainer class with better hyperparameters and early stopping."""
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     def __init__(
         self,
         model: nn.Module,

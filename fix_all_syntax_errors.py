@@ -104,7 +104,7 @@ def fix_file_syntax(file_path: Path) -> bool:
         return False
 
 
-def main():
+def main() -> None:
     """Fix all Python files with syntax errors."""
     # Get all Python files in the project
     python_files = []

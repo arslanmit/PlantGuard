@@ -4,6 +4,8 @@ This module contains the core components for the PlantGuard multimodal
 plant disease detection system.
 """
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 from .audio import AudioAdapter
 from .nlp import TextAdapter
 from .vision import VisionAdapter

@@ -66,7 +66,12 @@ class UntypedCallFixer:
     def get_mypy_untyped_call_errors(self) -> list[tuple[str, int, str]]:
         """Get specific no-untyped-call errors from mypy."""
         try:
-            result = subprocess.run(["mypy", "--strict", "."], capture_output=True, text=True, timeout=120)
+            mypy_path = shutil.which("mypy")
+            if not mypy_path:
+                logger.warning("mypy executable not found in PATH")
+                return []
+
+            result = subprocess.run([mypy_path, "--strict", "."], capture_output=True, text=True, timeout=120)
 
             errors = []
             if result.stdout:
@@ -294,7 +299,7 @@ def main() -> None:
         print("\n✅ Untyped call errors have been addressed!")
         print("Run 'mypy --strict .' to verify the fixes.")
     else:
-        print("\nℹ️  No files needed modification.")
+        print("\ni  No files needed modification.")
 
 
 if __name__ == "__main__":

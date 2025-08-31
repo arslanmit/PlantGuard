@@ -18,6 +18,8 @@ from src.features.model_switching.model_manager import PlantGuardModelManager
 def get_model_manager() -> "PlantGuardModelManager":
     """Get cached model manager instance without autoload to render UI fast."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     return PlantGuardModelManager(autoload_default=False)
 
 

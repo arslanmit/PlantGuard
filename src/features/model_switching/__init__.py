@@ -1,3 +1,5 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 """Model switching feature package for PlantGuard."""
 
 from .model_manager import PlantGuardModelManager  # re-export for convenience

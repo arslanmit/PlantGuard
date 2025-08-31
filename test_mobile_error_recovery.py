@@ -7,6 +7,8 @@ for the PlantGuard mobile UI components.
 """
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 

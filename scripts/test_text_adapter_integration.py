@@ -14,6 +14,8 @@ from core.nlp import TextAdapter
 def test_integration_scenarios() -> None:
     """Test realistic integration scenarios."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     print("[LINK] Testing TextAdapter integration scenarios...")
 
     adapter = TextAdapter()

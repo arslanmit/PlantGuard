@@ -14,6 +14,8 @@ from training.model_registry import ModelRegistry
 def main() -> None:
     """List all registered models with details."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     registry = ModelRegistry()
     models = registry.list_models()
 

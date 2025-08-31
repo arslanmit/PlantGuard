@@ -10,6 +10,8 @@ def validate_knowledge_base() -> bool:
     """Validate the disease knowledge base."""
     # Load knowledge base
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     kb_path = Path("data/knowledge_base/disease_info.json")
     if not kb_path.exists():
         print("[TODO] Knowledge base file not found")

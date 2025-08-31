@@ -72,7 +72,7 @@ def fix_file_completely(file_path: Path) -> bool:
         return False
 
 
-def main():
+def main() -> None:
     """Fix all files with syntax errors."""
     # List of files with known syntax errors
     error_files = [

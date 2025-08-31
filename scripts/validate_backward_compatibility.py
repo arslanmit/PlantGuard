@@ -7,6 +7,8 @@ are properly implemented for the mobile-only refactoring.
 """
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import subprocess
 import sys
 from pathlib import Path

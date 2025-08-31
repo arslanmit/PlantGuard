@@ -7,6 +7,8 @@ import streamlit as st
 class ModeSwitcher:
     """Simple mode switcher used by the app and tests."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     def __init__(self, session_key: str = "input_mode", default_mode: str = "vision") -> None:
         self.session_key = session_key
         if self.session_key not in st.session_state:

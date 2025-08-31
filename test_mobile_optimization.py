@@ -10,6 +10,8 @@ This script tests the enhanced mobile functionality including:
 """
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 

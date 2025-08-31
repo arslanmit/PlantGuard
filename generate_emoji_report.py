@@ -4,6 +4,8 @@ Summary report of the emoji replacement task completed in PlantGuard codebase.
 """
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import json
 from datetime import datetime
 

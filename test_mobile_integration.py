@@ -5,6 +5,8 @@ Integration test for Mobile History and Settings components with the main mobile
 This script tests the integration of MobileHistoryView and MobileSettingsCard
 with the existing mobile PlantGuard application.
 """
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 

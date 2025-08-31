@@ -8,6 +8,8 @@ from pathlib import Path
 
 def extract_imports_from_file(file_path: Path) -> set[str]:
     """Extract top-level package imports from a Python file."""
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     try:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()

@@ -46,7 +46,7 @@ def fix_file_imports(file_path: Path) -> bool:
     return False
 
 
-def main():
+def main() -> None:
     """Fix all Python files with misplaced imports."""
     python_files = list(Path().rglob("*.py"))
 

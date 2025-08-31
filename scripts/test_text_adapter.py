@@ -14,6 +14,8 @@ from core.nlp import TextAdapter
 def test_text_adapter() -> None:
     """Test TextAdapter functionality."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     print("[TEST] Testing TextAdapter implementation...")
 
     # Initialize TextAdapter

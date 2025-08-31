@@ -10,6 +10,8 @@ from pathlib import Path
 def add_huggingface_model(model_id: str, name: str | None = None, description: str | None = None) -> bool:
     """Add a new Hugging Face model to the configuration."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     config_path = Path("config/models.json")
 
     if not config_path.exists():

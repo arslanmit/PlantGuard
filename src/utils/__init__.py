@@ -3,6 +3,8 @@
 This module contains utility functions and helper classes.
 """
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 from .config import Config
 from .error_handling import ErrorHandler
 from .file_utils import FileManager

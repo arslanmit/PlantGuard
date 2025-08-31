@@ -15,6 +15,8 @@ from src.training.dataset_manager import DatasetManager
 def main() -> None:
     """Analyze dataset statistics."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     parser = argparse.ArgumentParser(description="Analyze dataset statistics")
     parser.add_argument(
         "--dataset-dir",

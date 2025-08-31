@@ -263,7 +263,7 @@ class MobileTestingAnnotationFixer:
                 logger.info(f"✅ Fixed type annotations in {file_path}")
                 return True
             else:
-                logger.info(f"ℹ️  No changes needed for {file_path}")
+                logger.info(f"i  No changes needed for {file_path}")
                 return False
 
         except Exception as e:
@@ -314,7 +314,7 @@ def main() -> None:
         print("  2. Run the main fix_strict_type_annotations.py for other files")
         print("  3. Run tests to ensure functionality is preserved")
     else:
-        print("\nℹ️  No files needed modification (already have type annotations)")
+        print("\ni  No files needed modification (already have type annotations)")
 
 
 if __name__ == "__main__":

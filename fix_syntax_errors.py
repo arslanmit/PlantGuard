@@ -67,7 +67,7 @@ def fix_syntax_errors(file_path: Path) -> bool:
         return False
 
 
-def main():
+def main() -> None:
     """Fix syntax errors in project files."""
     # Get all Python files with syntax errors
     error_files = [

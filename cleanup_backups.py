@@ -4,6 +4,8 @@ Cleanup script to remove backup files created by replace_emojis.py
 """
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import argparse
 import sys
 from pathlib import Path

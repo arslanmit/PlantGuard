@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 def _load_model() -> VisionAdapter | None:
     """Load the vision model."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     model_path = "data/models/vision_resnet50.pt"
     vision_adapter = VisionAdapter(device="cpu")
 

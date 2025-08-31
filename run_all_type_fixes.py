@@ -27,16 +27,26 @@ class TypeAnnotationMaster:
     def check_mypy_available(self) -> bool:
         """Check if mypy is available."""
         try:
-            subprocess.run(["mypy", "--version"], capture_output=True, check=True)
+            mypy_path = shutil.which("mypy")
+            if not mypy_path:
+                logger.error("mypy is not available. Please install it: pip install mypy")
+                return False
+
+            subprocess.run([mypy_path, "--version"], capture_output=True, check=True, timeout=30)
             return True
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
             logger.error("mypy is not available. Please install it: pip install mypy")
             return False
 
     def get_initial_error_count(self) -> int:
         """Get initial mypy error count."""
         try:
-            result = subprocess.run(["mypy", "--strict", "."], capture_output=True, text=True, timeout=120)
+            mypy_path = shutil.which("mypy")
+            if not mypy_path:
+                logger.warning("mypy executable not found in PATH")
+                return 0
+
+            result = subprocess.run([mypy_path, "--strict", "."], capture_output=True, text=True, timeout=120)
 
             if result.stdout:
                 errors = [line for line in result.stdout.split("\n") if "error:" in line]
@@ -79,7 +89,12 @@ class TypeAnnotationMaster:
     def get_final_error_count(self) -> dict[str, Any]:
         """Get final mypy error count and categorize errors."""
         try:
-            result = subprocess.run(["mypy", "--strict", "."], capture_output=True, text=True, timeout=120)
+            mypy_path = shutil.which("mypy")
+            if not mypy_path:
+                logger.warning("mypy executable not found in PATH")
+                return {"error": "mypy not found"}
+
+            result = subprocess.run([mypy_path, "--strict", "."], capture_output=True, text=True, timeout=120)
 
             if result.stdout:
                 all_errors = [line for line in result.stdout.split("\n") if "error:" in line]

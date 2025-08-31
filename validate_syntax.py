@@ -8,6 +8,8 @@ from pathlib import Path
 
 def validate_file(file_path: Path) -> bool:
     """Validate Python syntax of a file."""
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     try:
         with open(file_path, encoding="utf-8") as f:
             content = f.read()
@@ -22,7 +24,7 @@ def validate_file(file_path: Path) -> bool:
         return False
 
 
-def main():
+def main() -> None:
     """Validate all Python files in the project."""
     project_files = []
 

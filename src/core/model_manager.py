@@ -6,6 +6,8 @@ imports continue to work after reorganization.
 
 # Re-export everything from the new location
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 from src.features.model_switching.model_manager import PlantGuardModelManager
 
 # Backward compatibility alias

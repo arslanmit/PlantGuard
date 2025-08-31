@@ -7,6 +7,8 @@ to ensure they work correctly with the mobile PlantGuard interface.
 """
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 

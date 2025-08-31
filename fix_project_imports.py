@@ -75,7 +75,7 @@ def fix_file_imports(file_path: Path) -> bool:
     return False
 
 
-def main():
+def main() -> None:
     """Fix project files only."""
     # Only fix files in our project directories
     project_dirs = ["src", "tests", "scripts", "."]

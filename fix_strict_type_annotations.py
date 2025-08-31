@@ -62,7 +62,12 @@ class TypeAnnotationFixer:
     def get_mypy_errors(self) -> list[str]:
         """Get mypy errors in strict mode."""
         try:
-            result = subprocess.run(["mypy", "--strict", "."], capture_output=True, text=True, timeout=120)
+            mypy_path = shutil.which("mypy")
+            if not mypy_path:
+                logger.warning("mypy executable not found in PATH")
+                return []
+
+            result = subprocess.run([mypy_path, "--strict", "."], capture_output=True, text=True, timeout=120)
             return result.stdout.split("\n") if result.stdout else []
         except (subprocess.TimeoutExpired, FileNotFoundError) as e:
             logger.warning(f"Could not run mypy: {e}")
@@ -330,7 +335,12 @@ class TypeAnnotationFixer:
         logger.info("Running mypy validation...")
 
         try:
-            result = subprocess.run(["mypy", "--strict", "."], capture_output=True, text=True, timeout=120)
+            mypy_path = shutil.which("mypy")
+            if not mypy_path:
+                logger.error("mypy executable not found in PATH")
+                return False, {"error": "mypy not found"}
+
+            result = subprocess.run([mypy_path, "--strict", "."], capture_output=True, text=True, timeout=120)
 
             errors = result.stdout.split("\n") if result.stdout else []
             type_errors = [

@@ -17,6 +17,8 @@ from src.core.huggingface_vision import HuggingFaceVisionAdapter
 def comprehensive_test() -> None:
     """Run comprehensive test on all 21 images."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
     print("[PLANT] PlantGuard Final Model Test")
     print("Using: Abhiram4/PlantDiseaseDetectorVit2 (Vision Transformer)")
     print("=" * 70)

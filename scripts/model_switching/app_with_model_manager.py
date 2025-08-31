@@ -4,6 +4,8 @@ Enhanced main Streamlit application with easy model switching capabilities.
 """
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 

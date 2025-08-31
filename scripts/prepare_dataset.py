@@ -4,6 +4,8 @@ This script helps prepare the PlantVillage dataset for training.
 """
 
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import argparse
 import logging
 import shutil
