@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Convert a trained model to the expected format for evaluation."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import argparse
 from pathlib import Path
 
@@ -10,7 +12,7 @@ from torchvision import models
 
 
 class CustomResNet(nn.Module):
-    def __init__(self, num_classes=2):
+    def __init__(self, num_classes=2) -> None:
         super().__init__()
         # Load a pre-trained ResNet50
         resnet = models.resnet50(pretrained=False)
@@ -21,7 +23,7 @@ class CustomResNet(nn.Module):
         # Add a custom classifier
         self.fc = nn.Linear(resnet.fc.in_features, num_classes)
 
-    def forward(self, x):
+    def forward(self, x) -> Any:
         # Forward pass through the backbone
         x = self.backbone(x)
         x = x.view(x.size(0), -1)  # Flatten
@@ -29,13 +31,14 @@ class CustomResNet(nn.Module):
         return x
 
 
-def convert_model(input_path, output_path):
+def convert_model(input_path, output_path) -> Any:
     """Convert a trained model to the expected format for evaluation.
 
     Args:
         input_path: Path to the input model file
         output_path: Path to save the converted model
     """
+
     print(f"Loading model from {input_path}...")
     checkpoint = torch.load(input_path, map_location="cpu")
 

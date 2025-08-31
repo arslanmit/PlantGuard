@@ -355,7 +355,7 @@ def mock_mobile_adapter_integration(mock_streamlit_session, all_mock_adapters) -
 
 # Performance testing fixtures
 @pytest.fixture
-def mobile_performance_config():
+def mobile_performance_config() -> Dict[str, Any]:
     """Configuration for mobile performance testing."""
     return {
         "max_render_time": 200,  # milliseconds
@@ -369,28 +369,28 @@ def mobile_performance_config():
 
 # Error simulation fixtures
 @pytest.fixture
-def error_simulation():
+def error_simulation() -> Any:
     """Provide error simulation utilities for testing error handling."""
     class ErrorSimulator:
         @staticmethod
-        def create_adapter_error(adapter_type: str, error_message: str = None):
+        def create_adapter_error(adapter_type: str, error_message: str = None) -> Any:
             """Create an adapter error for testing."""
             if error_message is None:
                 error_message = f"{adapter_type} adapter error"
             return Exception(error_message)
         
         @staticmethod
-        def create_network_error():
+        def create_network_error() -> Any:
             """Create a network error for testing."""
             return ConnectionError("Network connection failed")
         
         @staticmethod
-        def create_file_error():
+        def create_file_error() -> Any:
             """Create a file error for testing."""
             return FileNotFoundError("Model file not found")
         
         @staticmethod
-        def create_memory_error():
+        def create_memory_error() -> Any:
             """Create a memory error for testing."""
             return MemoryError("Insufficient memory")
     
@@ -399,7 +399,7 @@ def error_simulation():
 
 # Mobile testing framework fixtures
 @pytest.fixture
-def mock_mobile_testing_framework():
+def mock_mobile_testing_framework() -> Generator[Any, None, None]:
     """Mock mobile testing framework with comprehensive functionality."""
     with patch.multiple(
         'src.ui.components.mobile_testing_framework',
@@ -430,11 +430,11 @@ def mock_mobile_testing_framework():
 
 # Mobile test utilities fixture
 @pytest.fixture
-def mobile_test_utilities():
+def mobile_test_utilities() -> Dict[str, Any]:
     """Provide mobile testing utilities."""
     class MobileTestUtils:
         @staticmethod
-        def create_mock_component(component_type: str, methods: list[str] = None):
+        def create_mock_component(component_type: str, methods: list[str] = None) -> Any:
             """Create a mock component with specified methods."""
             mock_component = Mock()
             mock_component.component_type = component_type
@@ -446,14 +446,14 @@ def mobile_test_utilities():
             return mock_component
         
         @staticmethod
-        def assert_session_state_updated(session_state, key: str, expected_length: int = None):
+        def assert_session_state_updated(session_state, key: str, expected_length: int = None) -> Any:
             """Assert that session state was updated correctly."""
             assert key in session_state
             if expected_length is not None:
                 assert len(session_state[key]) == expected_length
         
         @staticmethod
-        def create_test_validation_result(status: str = "passed", confidence: float = 0.95):
+        def create_test_validation_result(status: str = "passed", confidence: float = 0.95) -> Any:
             """Create a test validation result."""
             return {
                 "status": status,
@@ -467,7 +467,7 @@ def mobile_test_utilities():
 
 # Cleanup fixtures
 @pytest.fixture(autouse=True)
-def cleanup_after_test(mobile_test_config):
+def cleanup_after_test(mobile_test_config) -> None:
     """Cleanup after each test."""
     yield
     

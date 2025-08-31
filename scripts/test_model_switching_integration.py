@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """Test model switching functionality with registry-managed models.
 
 This script tests the integration between the model registry, VisionAdapter,
 and model switching functionality to ensure models can be loaded and switched correctly.
 """
+
 
 import json
 import logging

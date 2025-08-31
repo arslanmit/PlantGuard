@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Mobile Header Component for PlantGuard
 
@@ -5,7 +6,6 @@ Sticky header with title, model switching, and system status.
 Optimized for mobile touch interactions.
 """
 
-from typing import Any
 
 import streamlit as st
 
@@ -24,7 +24,7 @@ class MobileHeader(MobileComponent):
     - AI agent testable
     """
 
-    def __init__(self, component_id: str = "mobile_header", **kwargs):
+    def __init__(self, component_id: str = "mobile_header", **kwargs) -> None:
         super().__init__(component_id, **kwargs)
         self.title = kwargs.get("title", "PlantGuard AI")
         self.subtitle = kwargs.get("subtitle", "Mobile Plant Disease Detection")

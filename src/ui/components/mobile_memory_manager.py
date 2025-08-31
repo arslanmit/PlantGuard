@@ -31,7 +31,7 @@ class MobileMemoryManager:
     def track_object(self, obj_id: str, obj: Any) -> None:
         """Track object for memory management."""
 
-        def cleanup_callback(ref):
+        def cleanup_callback(ref) -> None:
             if obj_id in self._tracked_objects:
                 del self._tracked_objects[obj_id]
                 logger.debug(f"Cleaned up tracked object: {obj_id}")
@@ -184,7 +184,7 @@ mobile_memory_manager = MobileMemoryManager()
 def auto_cleanup(func) -> Callable:
     """Decorator to automatically check memory pressure after function execution."""
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         result = func(*args, **kwargs)
         mobile_memory_manager.auto_cleanup_if_needed()
         return result

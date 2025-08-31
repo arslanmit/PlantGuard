@@ -18,6 +18,8 @@ Usage:
     python mobile_performance_optimizer.py --cleanup
     python mobile_performance_optimizer.py --all
 """
+import pytest
+
 
 import argparse
 import gc
@@ -41,7 +43,7 @@ logger = logging.getLogger(__name__)
 class MobilePerformanceOptimizer:
     """Comprehensive performance optimizer for mobile PlantGuard application."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.project_root = Path(__file__).parent
         self.src_path = self.project_root / "src"
         self.performance_data = {}

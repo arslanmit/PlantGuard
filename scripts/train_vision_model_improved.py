@@ -14,6 +14,7 @@ from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from tqdm import tqdm
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
@@ -26,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 class ImprovedPlantVillageTrainer:
     """Improved trainer class with better hyperparameters and early stopping."""
+
 
     def __init__(
         self,

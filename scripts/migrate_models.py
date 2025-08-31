@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """Migration utility for upgrading PlantGuard models to the new registry format.
 
 This script helps migrate existing PlantGuard models to the new production
 training pipeline format with proper versioning and metadata.
 """
+
 
 import argparse
 import json

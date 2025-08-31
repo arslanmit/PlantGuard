@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Production Training Workflow for PlantGuard.
 
 This script orchestrates the complete production training pipeline including:
@@ -7,6 +8,7 @@ This script orchestrates the complete production training pipeline including:
 - Model registration and evaluation
 - Integration with existing PlantGuard components
 """
+
 
 import argparse
 import logging
@@ -32,7 +34,7 @@ from utils.logging_config import setup_logging
 class ProductionWorkflow:
     """Production training workflow orchestrator."""
 
-    def __init__(self, config_path: Path | None = None, template: str | None = None):
+    def __init__(self, config_path: Path | None = None, template: str | None = None) -> None:
         """Initialize production workflow."""
         self.logger = logging.getLogger(__name__)
         self.dataset_manager = DatasetManager()
@@ -450,7 +452,7 @@ class ProductionWorkflow:
             return 1
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     parser = argparse.ArgumentParser(description="PlantGuard Production Training Workflow")
     parser.add_argument("--config", type=Path, help="Path to custom training configuration file")

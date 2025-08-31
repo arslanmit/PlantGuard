@@ -5,6 +5,9 @@ Test script for mobile error handling and offline functionality.
 This script validates the error recovery and offline management systems
 for the PlantGuard mobile UI components.
 """
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+import pytest
+
 
 import sys
 from pathlib import Path
@@ -79,7 +82,7 @@ def test_error_handler_functionality() -> bool:
         from src.ui.mobile_error_handler import mobile_error_boundary
 
         @mobile_error_boundary("test_component")
-        def test_function():
+        def test_function() -> None:
             return "success"
 
         # This would normally work with Streamlit session state
@@ -109,7 +112,7 @@ def test_offline_manager_functionality() -> bool:
         from src.ui.mobile_offline_manager import with_offline_support
 
         @with_offline_support("test_op", lambda: "online_result")
-        def test_operation():
+        def test_operation() -> None:
             return "operation_result"
 
         assert callable(test_operation)
@@ -130,14 +133,14 @@ def test_integration_functionality() -> bool:
 
         # Test resilient component decorator
         @create_resilient_mobile_component("test_component", OfflineCapability.FULL)
-        def test_component():
+        def test_component() -> None:
             return "component_rendered"
 
         assert callable(test_component)
 
         # Test operation handler decorator
         @handle_mobile_operation("test_component", "test_operation")
-        def test_operation():
+        def test_operation() -> None:
             return "operation_result"
 
         assert callable(test_operation)

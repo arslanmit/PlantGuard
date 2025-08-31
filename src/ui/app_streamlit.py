@@ -249,7 +249,7 @@ def get_model_status() -> dict[str, str]:
 
 
 # Initialize adapters at module level so later code can reference them safely
-def _load_adapters_safely():
+def _load_adapters_safely() -> None:
     """Safely load adapters with proper error handling."""
     try:
         return load_adapters()
@@ -915,7 +915,7 @@ with tab4:
 
         if launch_tb:
             # Add this function definition before the main code
-            def launch_tensorboard(runs_dir, tb_port):
+            def launch_tensorboard(runs_dir, tb_port) -> bool:
                 """Launch TensorBoard with the specified log directory and port."""
                 try:
                     # Using shlex.quote to properly escape paths and arguments

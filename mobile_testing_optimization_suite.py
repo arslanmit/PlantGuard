@@ -10,6 +10,8 @@ Comprehensive testing and optimization implementation:
 
 Requirements: 1.1, 1.3, 6.4, 7.1
 """
+import pytest
+
 
 import json
 import logging
@@ -32,7 +34,7 @@ logger = logging.getLogger(__name__)
 class MobileTestingOptimizationSuite:
     """Comprehensive testing and optimization suite for mobile PlantGuard."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.test_results: dict[str, Any] = {}
         self.start_time = time.time()
 

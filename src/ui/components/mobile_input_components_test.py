@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Test script for mobile input components.
 
 This script tests the basic functionality of all mobile input components
 to ensure they can be instantiated and rendered without errors.
 """
+
 
 import logging
 import sys

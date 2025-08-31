@@ -1,5 +1,7 @@
 """Unit tests for optimizer and scheduler factories."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import pytest
 import torch
 from torch import nn
@@ -23,6 +25,7 @@ from src.training.optimizers import (
 
 class SimpleModel(nn.Module):
     """Simple model for testing."""
+
 
     def __init__(self) -> None:
         super().__init__()

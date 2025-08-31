@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Test model loading and inference."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import torch
 
 
-def load_model(model_path):
+def load_model(model_path) -> Any:
     """Load the model and print its architecture."""
+
     print(f"Loading model from {model_path}...")
     checkpoint = torch.load(model_path, map_location="cpu")
     print("Checkpoint keys:", checkpoint.keys())

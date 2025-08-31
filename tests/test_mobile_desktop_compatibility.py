@@ -26,7 +26,7 @@ from ui.components.mobile_layout_manager import MobileLayoutManager
 class TestMobileDesktopCompatibility(unittest.TestCase):
     """Test mobile components maintain fixed 428px design on desktop."""
     
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test environment."""
         # Mock Streamlit session state
         self.mock_session_state = {
@@ -47,7 +47,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         self.mock_markdown = self.st_patcher.start()
         self.addCleanup(self.st_patcher.stop)
     
-    def test_layout_manager_desktop_compatibility(self):
+    def test_layout_manager_desktop_compatibility(self) -> None:
         """Test layout manager maintains 428px design on desktop."""
         layout_manager = MobileLayoutManager("test_layout")
         
@@ -69,7 +69,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         
         print("[DONE] Layout Manager: Fixed 428px design verified")
     
-    def test_header_responsive_design(self):
+    def test_header_responsive_design(self) -> None:
         """Test header component responsive design."""
         header = MobileHeader("test_header")
         
@@ -85,7 +85,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         
         print("[DONE] Mobile Header: Responsive design verified")
     
-    def test_input_ribbon_desktop_layout(self):
+    def test_input_ribbon_desktop_layout(self) -> None:
         """Test input ribbon works on desktop."""
         input_ribbon = MobileInputRibbon("test_input")
         
@@ -114,7 +114,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         
         print("[DONE] Input Ribbon: Desktop layout compatibility verified")
     
-    def test_content_tabs_desktop_behavior(self):
+    def test_content_tabs_desktop_behavior(self) -> None:
         """Test content tabs behavior on desktop."""
         content_tabs = MobileContentTabs("test_tabs")
         
@@ -140,7 +140,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         
         print("[DONE] Content Tabs: Desktop behavior verified")
     
-    def test_desktop_responsive_css_features(self):
+    def test_desktop_responsive_css_features(self) -> None:
         """Test CSS maintains fixed 428px design on desktop."""
         layout_manager = MobileLayoutManager("test_css")
         
@@ -162,7 +162,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         
         print("[DONE] CSS Framework: Fixed 428px design verified")
     
-    def test_mobile_app_desktop_session_state(self):
+    def test_mobile_app_desktop_session_state(self) -> None:
         """Test mobile app maintains fixed design session state."""
         # Simulate fixed mobile design state
         self.mock_session_state.update({
@@ -176,7 +176,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         
         print("[DONE] Session State: Fixed 428px design verified")
     
-    def test_always_visible_design_principles(self):
+    def test_always_visible_design_principles(self) -> None:
         """Test that always-visible design works on desktop."""
         # Test header
         header = MobileHeader("test_always_visible")

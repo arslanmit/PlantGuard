@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class InputRibbon:
     """Input ribbon component with multimodal input support."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.input_modes = {
             "text": {
                 "icon": "⌨️",
@@ -54,7 +54,7 @@ class InputRibbon:
         }
         self._initialize_state_management()
 
-    def _initialize_state_management(self):
+    def _initialize_state_management(self) -> Any:
         """Initialize state management for input modes."""
         if "input_modes" not in st.session_state:
             st.session_state["input_modes"] = dict.fromkeys(self.input_modes.keys(), False)
@@ -96,7 +96,7 @@ class InputRibbon:
 
         return active_modes
 
-    def _render_ribbon_header(self):
+    def _render_ribbon_header(self) -> Any:
         """Render the ribbon header with instructions."""
         st.markdown(
             """
@@ -154,7 +154,7 @@ class InputRibbon:
 
         return active_modes
 
-    def _render_clear_button(self):
+    def _render_clear_button(self) -> Any:
         """Render clear all button with enhanced styling."""
         if st.session_state.get("mobile_view", False):
             st.markdown("---")
@@ -178,7 +178,7 @@ class InputRibbon:
                 ):
                     self._clear_all_inputs()
 
-    def _handle_mode_activation(self, mode_name: str, is_active: bool):
+    def _handle_mode_activation(self, mode_name: str, is_active: bool) -> Any:
         """Handle mode activation/deactivation with multiple mode support."""
         current_modes = st.session_state.get("input_modes", {})
         settings = st.session_state.get("input_mode_settings", {})
@@ -219,7 +219,7 @@ class InputRibbon:
         if settings.get("auto_validate", True):
             self._update_validation_state()
 
-    def _initialize_mode_data(self, mode_name: str):
+    def _initialize_mode_data(self, mode_name: str) -> Any:
         """Initialize data storage for a specific mode."""
         active_inputs = st.session_state.get("active_inputs", {})
 
@@ -236,7 +236,7 @@ class InputRibbon:
 
         st.session_state["active_inputs"] = active_inputs
 
-    def _update_validation_state(self):
+    def _update_validation_state(self) -> Any:
         """Update validation state for all active modes."""
         validation_state: dict[str, dict] = {}
         active_modes = self.get_active_modes()
@@ -279,14 +279,14 @@ class InputRibbon:
 
         return False
 
-    def _clear_mode_data(self, mode_name: str):
+    def _clear_mode_data(self, mode_name: str) -> Any:
         """Clear data for a specific input mode."""
         active_inputs = st.session_state.get("active_inputs", {})
         if mode_name in active_inputs:
             del active_inputs[mode_name]
             st.session_state["active_inputs"] = active_inputs
 
-    def _clear_all_inputs(self):
+    def _clear_all_inputs(self) -> Any:
         """Clear all input modes and data."""
         st.session_state["input_modes"] = dict.fromkeys(self.input_modes.keys(), False)
         st.session_state["active_inputs"] = {}
@@ -301,7 +301,7 @@ class InputRibbon:
         with contextlib.suppress(Exception):
             st.rerun()
 
-    def _cleanup_temporary_data(self):
+    def _cleanup_temporary_data(self) -> Any:
         """Clean up temporary files and data."""
         temp_audio_files = st.session_state.get("temp_audio_files", [])
         for file_path in temp_audio_files:
@@ -328,7 +328,7 @@ class InputRibbon:
             if key in st.session_state:
                 del st.session_state[key]
 
-    def render_mode_status(self):
+    def render_mode_status(self) -> None:
         """Render enhanced status of active input modes with input validation."""
         active_modes = st.session_state.get("input_modes", {})
         active_count = sum(1 for active in active_modes.values() if active)
@@ -352,7 +352,7 @@ class InputRibbon:
 
             self._render_input_validation_status()
 
-    def _render_mode_status_card(self, mode_name: str):
+    def _render_mode_status_card(self, mode_name: str) -> Any:
         """Render individual mode status card with validation."""
         mode_info = self.input_modes[mode_name]
         validation_status = self._validate_mode_input(mode_name)
@@ -402,7 +402,7 @@ class InputRibbon:
             unsafe_allow_html=True,
         )
 
-    def _render_input_validation_status(self):
+    def _render_input_validation_status(self) -> Any:
         """Render overall input validation status."""
         validation_results: dict[str, str] = {}
         active_modes = self.get_active_modes()
@@ -437,7 +437,7 @@ class InputRibbon:
         active_modes = st.session_state.get("input_modes", {})
         return active_modes.get(mode_name, False)
 
-    def set_mode_active(self, mode_name: str, active: bool):
+    def set_mode_active(self, mode_name: str, active: bool) -> Any:
         """Programmatically set a mode as active/inactive."""
         if mode_name in self.input_modes:
             input_modes = st.session_state.get("input_modes", {})
@@ -446,7 +446,7 @@ class InputRibbon:
 
             self._handle_mode_activation(mode_name, active)
 
-    def render_keyboard_shortcuts(self):
+    def render_keyboard_shortcuts(self) -> None:
         """Render keyboard shortcuts help."""
         with st.expander("⌨️ Keyboard Shortcuts", expanded=False):
             st.markdown("**Input Mode Shortcuts:**")
@@ -459,7 +459,7 @@ class InputRibbon:
             st.markdown("- **Ctrl + Enter** - Analyze (when inputs are ready)")
             st.markdown("- **Esc** - Cancel current operation")
 
-    def render_input_mode_settings(self):
+    def render_input_mode_settings(self) -> None:
         """Render input mode settings and configuration options."""
         with st.expander("[SETTINGS] Input Mode Settings", expanded=False):
             settings = st.session_state.get("input_mode_settings", {})
@@ -507,7 +507,7 @@ class InputRibbon:
                 if not allow_multiple and settings.get("allow_multiple_modes", True):
                     self.toggle_multiple_mode_support(False)
 
-    def handle_keyboard_shortcuts(self):
+    def handle_keyboard_shortcuts(self) -> Any:
         """Handle keyboard shortcuts (placeholder for future implementation)."""
         pass
 
@@ -583,7 +583,7 @@ class InputRibbon:
 
         return any(self._validate_mode_input(mode) == "valid" for mode in active_modes)
 
-    def _trigger_analysis(self, valid_modes: list[str]):
+    def _trigger_analysis(self, valid_modes: list[str]) -> Any:
         """Trigger analysis for valid input modes."""
         st.session_state["analysis_requested"] = True
         st.session_state["analysis_modes"] = valid_modes
@@ -636,7 +636,7 @@ class InputRibbon:
 
         return {}
 
-    def set_input_data(self, mode_name: str, data: Any):
+    def set_input_data(self, mode_name: str, data: Any) -> Any:
         """Set input data for a specific mode."""
         active_inputs = st.session_state.get("active_inputs", {})
 
@@ -649,7 +649,7 @@ class InputRibbon:
 
         st.session_state["active_inputs"] = active_inputs
 
-    def toggle_multiple_mode_support(self, allow_multiple: bool):
+    def toggle_multiple_mode_support(self, allow_multiple: bool) -> Any:
         """Toggle support for multiple simultaneous input modes."""
         settings = st.session_state.get("input_mode_settings", {})
         settings["allow_multiple_modes"] = allow_multiple
@@ -695,7 +695,7 @@ class InputRibbon:
 
         return summary
 
-    def render_multimodal_input_preview(self):
+    def render_multimodal_input_preview(self) -> None:
         """Render preview of all active input modes and their data."""
         summary = self.get_multimodal_input_summary()
 
@@ -711,7 +711,7 @@ class InputRibbon:
             with st.expander(f"{self.input_modes[mode]['icon']} {self.input_modes[mode]['label']} Input", expanded=False):
                 self._render_mode_input_preview(mode, summary["input_data"].get(mode, {}))
 
-    def _render_mode_input_preview(self, mode_name: str, input_data: dict):
+    def _render_mode_input_preview(self, mode_name: str, input_data: dict) -> Any:
         """Render preview for a specific input mode."""
         if not input_data:
             st.warning(f"No input data for {mode_name} mode")

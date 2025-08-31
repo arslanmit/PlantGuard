@@ -24,11 +24,11 @@ logger = logging.getLogger(__name__)
 class FileStructureOptimizer:
     """Optimize file structure for mobile-only PlantGuard system."""
 
-    def __init__(self, workspace_root: Path | None = None):
+    def __init__(self, workspace_root: Path | None = None) -> None:
         self.workspace_root = workspace_root or Path.cwd()
         self.optimization_log = []
 
-    def log_action(self, action: str, details: str, status: str = "success"):
+    def log_action(self, action: str, details: str, status: str = "success") -> None:
         """Log optimization actions."""
         entry = {"action": action, "details": details, "status": status, "timestamp": str(Path.cwd())}
         self.optimization_log.append(entry)

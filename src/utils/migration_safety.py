@@ -35,31 +35,31 @@ class MigrationStatus:
     backup_created: bool = False
     rollback_available: bool = False
 
-    def add_removed_file(self, filepath: str):
+    def add_removed_file(self, filepath: str) -> Any:
         """Track a removed file."""
         if filepath not in self.files_removed:
             self.files_removed.append(filepath)
             logger.info(f"Tracked file removal: {filepath}")
 
-    def add_modified_file(self, filepath: str):
+    def add_modified_file(self, filepath: str) -> Any:
         """Track a modified file."""
         if filepath not in self.files_modified:
             self.files_modified.append(filepath)
             logger.info(f"Tracked file modification: {filepath}")
 
-    def add_backed_up_file(self, filepath: str):
+    def add_backed_up_file(self, filepath: str) -> Any:
         """Track a backed up file."""
         if filepath not in self.files_backed_up:
             self.files_backed_up.append(filepath)
 
-    def add_cleaned_import(self, filepath: str, import_name: str):
+    def add_cleaned_import(self, filepath: str, import_name: str) -> Any:
         """Track cleaned import."""
         entry = f"{filepath}:{import_name}"
         if entry not in self.imports_cleaned:
             self.imports_cleaned.append(entry)
             logger.info(f"Tracked import cleanup: {entry}")
 
-    def add_removed_target(self, target: str):
+    def add_removed_target(self, target: str) -> Any:
         """Track removed Makefile target."""
         if target not in self.targets_removed:
             self.targets_removed.append(target)
@@ -89,7 +89,7 @@ class MigrationStatus:
 class MigrationBackupManager:
     """Manages backup creation and restoration for migration safety."""
 
-    def __init__(self, backup_dir: Path | None = None):
+    def __init__(self, backup_dir: Path | None = None) -> None:
         self.backup_dir = backup_dir or Path(".migration_backups")
         self.backup_dir.mkdir(exist_ok=True)
 
@@ -218,7 +218,7 @@ class MigrationBackupManager:
 class MigrationTracker:
     """Tracks all changes made during migration."""
 
-    def __init__(self, migration_id: str):
+    def __init__(self, migration_id: str) -> None:
         self.migration_id = migration_id
         self.status = MigrationStatus(migration_id=migration_id, start_time=datetime.now().isoformat())
         self.log_file = Path(f".migration_logs/migration_{migration_id}.json")
@@ -227,7 +227,7 @@ class MigrationTracker:
         # Save initial status
         self._save_status()
 
-    def _save_status(self):
+    def _save_status(self) -> Any:
         """Save current status to log file."""
         try:
             with open(self.log_file, "w") as f:
@@ -235,27 +235,27 @@ class MigrationTracker:
         except Exception as e:
             logger.error(f"Failed to save migration status: {e}")
 
-    def track_file_removal(self, filepath: str):
+    def track_file_removal(self, filepath: str) -> Any:
         """Track file removal."""
         self.status.add_removed_file(filepath)
         self._save_status()
 
-    def track_file_modification(self, filepath: str):
+    def track_file_modification(self, filepath: str) -> Any:
         """Track file modification."""
         self.status.add_modified_file(filepath)
         self._save_status()
 
-    def track_import_cleanup(self, filepath: str, import_name: str):
+    def track_import_cleanup(self, filepath: str, import_name: str) -> Any:
         """Track import cleanup."""
         self.status.add_cleaned_import(filepath, import_name)
         self._save_status()
 
-    def track_target_removal(self, target: str):
+    def track_target_removal(self, target: str) -> Any:
         """Track Makefile target removal."""
         self.status.add_removed_target(target)
         self._save_status()
 
-    def set_backup_created(self, backup_path: Path):
+    def set_backup_created(self, backup_path: Path) -> Any:
         """Mark backup as created."""
         self.status.backup_created = True
         self.status.rollback_available = True
@@ -264,12 +264,12 @@ class MigrationTracker:
                 self.status.add_backed_up_file(str(file_path.relative_to(backup_path)))
         self._save_status()
 
-    def set_migration_complete(self, success: bool = True):
+    def set_migration_complete(self, success: bool = True) -> Any:
         """Mark migration as complete."""
         self.status.migration_complete = success
         self._save_status()
 
-    def set_validation_passed(self, passed: bool = True):
+    def set_validation_passed(self, passed: bool = True) -> Any:
         """Mark validation as passed."""
         self.status.validation_passed = passed
         self._save_status()
@@ -282,7 +282,7 @@ class MigrationTracker:
 class MigrationValidator:
     """Validates system integrity during migration."""
 
-    def __init__(self, migration_tracker: MigrationTracker):
+    def __init__(self, migration_tracker: MigrationTracker) -> None:
         self.tracker = migration_tracker
         self.validation_results = []
 
@@ -456,7 +456,7 @@ class MigrationValidator:
 class MigrationSafetyFramework:
     """Main framework coordinating all migration safety components."""
 
-    def __init__(self, migration_name: str = "mobile_only_refactoring"):
+    def __init__(self, migration_name: str = "mobile_only_refactoring") -> None:
         self.migration_id = f"{migration_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
         # Initialize components

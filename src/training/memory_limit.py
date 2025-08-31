@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Memory limit helper for training entrypoints.
 
 Provides a small, opt-in mechanism to enforce a soft memory limit for training
@@ -10,6 +11,7 @@ This file is intentionally small and opt-in. Call enforce_memory_limit(bytes=...
 the start of a training process. Use the environment variable
 PLANTGUARD_TRAIN_MEMORY_LIMIT_BYTES to opt-in without code changes.
 """
+
 
 from __future__ import annotations
 

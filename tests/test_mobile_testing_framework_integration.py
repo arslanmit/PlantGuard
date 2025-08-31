@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Tests for Mobile Testing Framework Integration.
 
 This module tests the mobile testing framework with proper mock interfaces
 and dependency injection for comprehensive testing infrastructure.
 """
+
 
 from datetime import datetime
 from unittest.mock import MagicMock, Mock, patch
@@ -21,7 +23,7 @@ class TestMobileTestingFrameworkIntegration:
     """Test mobile testing framework with proper mocking infrastructure."""
 
     @pytest.fixture
-    def mock_testing_framework_dependencies(self):
+    def mock_testing_framework_dependencies(self) -> Generator[Any, None, None]:
         """Mock all testing framework dependencies."""
         with patch.multiple(
             'src.ui.components.mobile_testing_framework',
@@ -33,7 +35,7 @@ class TestMobileTestingFrameworkIntegration:
             yield mocks
 
     @pytest.fixture
-    def mock_component_registry(self):
+    def mock_component_registry(self) -> Generator[Any, None, None]:
         """Mock mobile component registry."""
         mock_registry = Mock()
         mock_registry.get_all_components.return_value = {
@@ -47,7 +49,7 @@ class TestMobileTestingFrameworkIntegration:
         with patch('src.ui.components.mobile_component_registry.mobile_component_registry', mock_registry):
             yield mock_registry
 
-    def test_framework_initialization_with_mocks(self, mock_testing_framework_dependencies):
+    def test_framework_initialization_with_mocks(self, mock_testing_framework_dependencies) -> None:
         """Test framework initialization with proper dependency mocking."""
         from src.ui.components.mobile_testing_framework import \
             MobileTestingFramework
@@ -66,7 +68,7 @@ class TestMobileTestingFrameworkIntegration:
         assert framework.mobile_specific_tester is not None
         assert framework.state_manager is not None
 
-    def test_component_validation_with_mocked_adapters(self, mock_testing_framework_dependencies, mock_component_registry):
+    def test_component_validation_with_mocked_adapters(self, mock_testing_framework_dependencies, mock_component_registry) -> None:
         """Test component validation with mocked adapters."""
         from src.ui.components.mobile_testing_framework import \
             MobileTestingFramework
@@ -121,7 +123,7 @@ class TestMobileTestingFrameworkIntegration:
         assert isinstance(summary["success_rate"], (int, float))
         assert summary["mobile_readiness"] == "excellent"
 
-    def test_continuous_monitoring_with_mocks(self, mock_testing_framework_dependencies):
+    def test_continuous_monitoring_with_mocks(self, mock_testing_framework_dependencies) -> None:
         """Test continuous monitoring with proper mocking."""
         from src.ui.components.mobile_testing_framework import \
             MobileTestingFramework
@@ -178,7 +180,7 @@ class TestMobileTestingFrameworkIntegration:
         assert summary["components_monitored"] == 3
         assert summary["monitoring_status"] == "completed"
 
-    def test_comprehensive_report_generation(self, mock_testing_framework_dependencies):
+    def test_comprehensive_report_generation(self, mock_testing_framework_dependencies) -> None:
         """Test comprehensive report generation with mocks."""
         from src.ui.components.mobile_testing_framework import \
             MobileTestingFramework
@@ -234,7 +236,7 @@ class TestMobileTestingFrameworkIntegration:
         assert "timestamp" in framework_info
         assert "configuration" in framework_info
 
-    def test_auto_healing_with_mocks(self, mock_testing_framework_dependencies):
+    def test_auto_healing_with_mocks(self, mock_testing_framework_dependencies) -> None:
         """Test auto-healing functionality with proper mocking."""
         from src.ui.components.mobile_testing_framework import \
             MobileTestingFramework
@@ -267,7 +269,7 @@ class TestMobileTestingFrameworkIntegration:
         assert len(healing_results["actions_taken"]) == 2
         assert "Fixed component initialization" in healing_results["actions_taken"]
 
-    def test_framework_status_reporting(self, mock_testing_framework_dependencies):
+    def test_framework_status_reporting(self, mock_testing_framework_dependencies) -> None:
         """Test framework status reporting with mocks."""
         from src.ui.components.mobile_testing_framework import \
             MobileTestingFramework
@@ -304,7 +306,7 @@ class TestMobileTestingFrameworkWithRealAdapters:
     """Test mobile testing framework with real adapter mocking."""
 
     @pytest.fixture
-    def framework_with_adapter_mocks(self, mock_streamlit_session):
+    def framework_with_adapter_mocks(self, mock_streamlit_session) -> Generator[Any, None, None]:
         """Create framework with adapter mocks."""
         from src.ui.components.mobile_testing_framework import \
             MobileTestingFramework
@@ -325,7 +327,7 @@ class TestMobileTestingFrameworkWithRealAdapters:
             
             yield framework
 
-    def test_framework_with_adapter_integration(self, framework_with_adapter_mocks, mock_streamlit_session):
+    def test_framework_with_adapter_integration(self, framework_with_adapter_mocks, mock_streamlit_session) -> None:
         """Test framework integration with adapter mocks."""
         framework = framework_with_adapter_mocks
         
@@ -338,7 +340,7 @@ class TestMobileTestingFrameworkWithRealAdapters:
         status = framework.get_framework_status()
         assert status["framework_initialized"] is True
 
-    def test_component_validation_with_adapter_context(self, framework_with_adapter_mocks, mock_streamlit_session):
+    def test_component_validation_with_adapter_context(self, framework_with_adapter_mocks, mock_streamlit_session) -> None:
         """Test component validation with adapter context."""
         framework = framework_with_adapter_mocks
         

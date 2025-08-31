@@ -1,8 +1,10 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Comprehensive integration tests for production training pipeline.
 
 This module provides extensive integration testing coverage for the complete
 production training pipeline, including all component interactions.
 """
+
 
 import collections
 import logging
@@ -31,7 +33,7 @@ class TestComprehensiveIntegration:
     """Comprehensive integration tests for production training pipeline."""
 
     @pytest.fixture
-    def temp_workspace(self):
+    def temp_workspace(self) -> Generator[Any, None, None]:
         """Create temporary workspace for integration tests."""
         with tempfile.TemporaryDirectory() as temp_dir:
             workspace = Path(temp_dir)
@@ -45,7 +47,7 @@ class TestComprehensiveIntegration:
             yield workspace
 
     @pytest.fixture
-    def integration_dataset(self, temp_workspace):
+    def integration_dataset(self, temp_workspace) -> Any:
         """Create integration test dataset."""
         dataset_dir = temp_workspace / "data" / "integration_dataset"
 
@@ -71,7 +73,7 @@ class TestComprehensiveIntegration:
         return dataset_dir
 
     @pytest.fixture
-    def production_config(self, integration_dataset, temp_workspace):
+    def production_config(self, integration_dataset, temp_workspace) -> Any:
         """Create production-like training configuration."""
         return TrainingConfig(
             experiment_name="integration_test_production",
@@ -90,7 +92,7 @@ class TestComprehensiveIntegration:
             early_stopping={"enabled": True, "patience": 10, "min_delta": 0.001},
         )
 
-    def test_complete_training_to_deployment_workflow(self, production_config, temp_workspace):
+    def test_complete_training_to_deployment_workflow(self, production_config, temp_workspace) -> None:
         """Test complete workflow from training to deployment."""
         logger.info("Testing complete training to deployment workflow...")
 
@@ -193,7 +195,7 @@ class TestComprehensiveIntegration:
 
         logger.info("[DONE] Complete training to deployment workflow test passed")
 
-    def test_model_registry_vision_adapter_integration(self, temp_workspace):
+    def test_model_registry_vision_adapter_integration(self, temp_workspace) -> None:
         """Test deep integration between ModelRegistry and VisionAdapter."""
         logger.info("Testing ModelRegistry-VisionAdapter integration...")
 
@@ -288,7 +290,7 @@ class TestComprehensiveIntegration:
 
         logger.info("[DONE] ModelRegistry-VisionAdapter integration test passed")
 
-    def test_model_switching_with_registry_models(self, temp_workspace):
+    def test_model_switching_with_registry_models(self, temp_workspace) -> None:
         """Test comprehensive model switching functionality with registry models."""
         logger.info("Testing model switching with registry models...")
 
@@ -352,7 +354,7 @@ class TestComprehensiveIntegration:
         # Sync with registry
         with patch.object(manager, "_load_local_model") as mock_load:
 
-            def mock_load_func(model_config):
+            def mock_load_func(model_config) -> Any:
                 mock_adapter = MagicMock()
                 # Return different predictions based on model
                 if "fast" in model_config.get("model_id", ""):
@@ -409,7 +411,7 @@ class TestComprehensiveIntegration:
 
         logger.info("[DONE] Model switching with registry models test passed")
 
-    def test_end_to_end_ui_deployment_integration(self, temp_workspace):
+    def test_end_to_end_ui_deployment_integration(self, temp_workspace) -> None:
         """Test end-to-end integration from training to UI deployment."""
         logger.info("Testing end-to-end UI deployment integration...")
 
@@ -544,7 +546,7 @@ class TestComprehensiveIntegration:
 
         logger.info("[DONE] End-to-end UI deployment integration test passed")
 
-    def test_performance_regression_detection(self, temp_workspace):
+    def test_performance_regression_detection(self, temp_workspace) -> None:
         """Test performance regression detection in training pipeline."""
         logger.info("Testing performance regression detection...")
 
@@ -615,7 +617,7 @@ class TestComprehensiveIntegration:
 
         logger.info("[DONE] Performance regression detection test passed")
 
-    def test_cross_platform_compatibility(self, temp_workspace):
+    def test_cross_platform_compatibility(self, temp_workspace) -> None:
         """Test cross-platform compatibility of training pipeline."""
         logger.info("Testing cross-platform compatibility...")
 
@@ -671,7 +673,7 @@ class TestComprehensiveIntegration:
 
         logger.info("[DONE] Cross-platform compatibility test passed")
 
-    def test_concurrent_training_integration(self, temp_workspace):
+    def test_concurrent_training_integration(self, temp_workspace) -> None:
         """Test integration with concurrent training scenarios."""
         logger.info("Testing concurrent training integration...")
 
@@ -681,7 +683,7 @@ class TestComprehensiveIntegration:
         registry = ModelRegistry(temp_workspace / "models")
         results_queue = queue.Queue()
 
-        def concurrent_training_worker(worker_id: int):
+        def concurrent_training_worker(worker_id: int) -> Any:
             """Simulate concurrent training worker."""
             try:
                 # Create worker-specific model
@@ -748,7 +750,7 @@ class TestComprehensiveIntegration:
 
         logger.info("[DONE] Concurrent training integration test passed")
 
-    def test_memory_and_resource_management(self, temp_workspace):
+    def test_memory_and_resource_management(self, temp_workspace) -> None:
         """Test memory and resource management in integration scenarios."""
         logger.info("Testing memory and resource management...")
         import gc

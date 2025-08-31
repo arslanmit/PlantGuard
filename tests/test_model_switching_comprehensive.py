@@ -1,8 +1,10 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Comprehensive tests for model switching with registry models.
 
 This module provides extensive testing for model switching functionality,
 including integration with the model registry and UI components.
 """
+
 
 import tempfile
 from pathlib import Path
@@ -20,7 +22,7 @@ class TestModelSwitchingComprehensive:
     """Comprehensive tests for model switching functionality."""
 
     @pytest.fixture
-    def temp_workspace(self):
+    def temp_workspace(self) -> Generator[Any, None, None]:
         """Create temporary workspace."""
         with tempfile.TemporaryDirectory() as temp_dir:
             workspace = Path(temp_dir)
@@ -29,7 +31,7 @@ class TestModelSwitchingComprehensive:
             yield workspace
 
     @pytest.fixture
-    def registry_with_models(self, temp_workspace):
+    def registry_with_models(self, temp_workspace) -> Any:
         """Create registry with multiple test models."""
         registry = ModelRegistry(temp_workspace / "models")
 
@@ -120,12 +122,12 @@ class TestModelSwitchingComprehensive:
         return registry, model_ids, model_configs
 
     @pytest.fixture
-    def model_manager(self, temp_workspace):
+    def model_manager(self, temp_workspace) -> Any:
         """Create PlantGuardModelManager instance."""
         config_path = temp_workspace / "config" / "models.json"
         return PlantGuardModelManager(config_path=str(config_path), autoload_default=False)
 
-    def test_registry_sync_and_model_discovery(self, registry_with_models, model_manager):
+    def test_registry_sync_and_model_discovery(self, registry_with_models, model_manager) -> None:
         """Test syncing with registry and discovering models."""
         registry, model_ids, model_configs = registry_with_models
 
@@ -136,7 +138,7 @@ class TestModelSwitchingComprehensive:
         # Sync with registry
         with patch.object(model_manager, "_load_local_model") as mock_load:
 
-            def mock_load_func(model_config):
+            def mock_load_func(model_config) -> Any:
                 mock_adapter = MagicMock()
                 # Return predictions based on model accuracy
                 accuracy = float(model_config.get("accuracy", 0.9))
@@ -162,7 +164,7 @@ class TestModelSwitchingComprehensive:
             assert model["type"] == "local"
             assert model["enabled"] is True
 
-    def test_model_filtering_and_selection(self, registry_with_models, model_manager):
+    def test_model_filtering_and_selection(self, registry_with_models, model_manager) -> None:
         """Test model filtering and selection capabilities."""
         registry, model_ids, model_configs = registry_with_models
 
@@ -191,14 +193,14 @@ class TestModelSwitchingComprehensive:
         production_fast_models = model_manager.filter_models_by_tags(["production", "fast"])
         assert len(production_fast_models) >= 1  # base model
 
-    def test_model_switching_workflow(self, registry_with_models, model_manager):
+    def test_model_switching_workflow(self, registry_with_models, model_manager) -> None:
         """Test complete model switching workflow."""
         registry, model_ids, model_configs = registry_with_models
 
         # Sync with registry
         with patch.object(model_manager, "_load_local_model") as mock_load:
 
-            def mock_load_func(model_config):
+            def mock_load_func(model_config) -> Any:
                 mock_adapter = MagicMock()
                 # Different predictions based on model name
                 model_name = model_config.get("name", "unknown")
@@ -262,7 +264,7 @@ class TestModelSwitchingComprehensive:
 
                 assert metadata["model_name"] == expected_name
 
-    def test_model_comparison_and_benchmarking(self, registry_with_models, model_manager):
+    def test_model_comparison_and_benchmarking(self, registry_with_models, model_manager) -> None:
         """Test model comparison and benchmarking features."""
         registry, model_ids, model_configs = registry_with_models
 
@@ -297,7 +299,7 @@ class TestModelSwitchingComprehensive:
         assert recommendation["accuracy"] >= 0.90
         assert recommendation["inference_time"] <= 0.10
 
-    def test_model_switching_performance_impact(self, registry_with_models, model_manager):
+    def test_model_switching_performance_impact(self, registry_with_models, model_manager) -> None:
         """Test performance impact of model switching."""
         registry, model_ids, model_configs = registry_with_models
 
@@ -353,7 +355,7 @@ class TestModelSwitchingComprehensive:
         avg_prediction_time = sum(prediction_times) / len(prediction_times)
         assert avg_prediction_time < 0.5, f"Predictions too slow: {avg_prediction_time:.3f}s"
 
-    def test_model_configuration_persistence(self, registry_with_models, model_manager, temp_workspace):
+    def test_model_configuration_persistence(self, registry_with_models, model_manager, temp_workspace) -> None:
         """Test model configuration persistence across sessions."""
         registry, model_ids, model_configs = registry_with_models
 
@@ -392,7 +394,7 @@ class TestModelSwitchingComprehensive:
             assert config["enabled"] is True
             assert config["custom_setting"] == f"test_value_{model['id']}"
 
-    def test_model_switching_error_handling(self, registry_with_models, model_manager):
+    def test_model_switching_error_handling(self, registry_with_models, model_manager) -> None:
         """Test error handling in model switching scenarios."""
         registry, model_ids, model_configs = registry_with_models
 
@@ -421,7 +423,7 @@ class TestModelSwitchingComprehensive:
                 success = model_manager.load_model(registry_models[0]["id"])
                 assert success, "Should recover and load valid model"
 
-    def test_ui_integration_scenarios(self, registry_with_models, model_manager):
+    def test_ui_integration_scenarios(self, registry_with_models, model_manager) -> None:
         """Test model switching scenarios specific to UI integration."""
         registry, model_ids, model_configs = registry_with_models
 
@@ -462,7 +464,7 @@ class TestModelSwitchingComprehensive:
             assert "model_info" in result
             assert result["model_info"]["name"] == selected_model["display_name"]
 
-    def test_batch_model_operations(self, registry_with_models, model_manager):
+    def test_batch_model_operations(self, registry_with_models, model_manager) -> None:
         """Test batch operations on multiple models."""
         registry, model_ids, model_configs = registry_with_models
 
@@ -497,7 +499,7 @@ class TestModelSwitchingComprehensive:
             assert config["confidence_threshold"] == 0.75
             assert config["batch_updated"] is True
 
-    def test_model_switching_with_different_architectures(self, temp_workspace, model_manager):
+    def test_model_switching_with_different_architectures(self, temp_workspace, model_manager) -> None:
         """Test model switching between different architectures."""
         registry = ModelRegistry(temp_workspace / "models")
 
@@ -552,7 +554,7 @@ class TestModelSwitchingComprehensive:
         # Test switching between different architectures
         with patch.object(model_manager, "_load_local_model") as mock_load:
 
-            def mock_load_func(model_config):
+            def mock_load_func(model_config) -> Any:
                 mock_adapter = MagicMock()
                 arch = model_config.get("architecture", "unknown")
                 mock_adapter.predict.return_value = (f"{arch}_prediction", 0.90)

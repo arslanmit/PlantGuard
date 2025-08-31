@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class MobileComponent(ABC):
     """Abstract base class for mobile components."""
 
-    def __init__(self, component_id: str, title: str):
+    def __init__(self, component_id: str, title: str) -> None:
         """Initialize mobile component."""
         self.component_id = component_id
         self.title = title

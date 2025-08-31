@@ -444,7 +444,7 @@ class TransferLearningOptimizer:
         Returns:
             Dictionary with transfer learning evaluation metrics
         """
-        from typing import Any
+
 
         evaluation: dict[str, Any] = {
             "strategy": self.config.strategy.value,

@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class MobileHistoryView:
     """Mobile-optimized history view component."""
 
-    def __init__(self, component_id: str, title: str = "Analysis History"):
+    def __init__(self, component_id: str, title: str = "Analysis History") -> None:
         """Initialize mobile history view component.
 
         Args:

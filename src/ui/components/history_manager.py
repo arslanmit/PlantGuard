@@ -105,7 +105,7 @@ class HistoryEntry:
 class HistoryManager:
     """History management system with JSON storage and search capabilities."""
 
-    def __init__(self, history_file: str = "data/plantguard_history.json"):
+    def __init__(self, history_file: str = "data/plantguard_history.json") -> None:
         """Initialize history manager.
 
         Args:

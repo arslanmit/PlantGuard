@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class MobileTestComponent(MobileBaseComponent):
     """Test component for validating mobile infrastructure."""
 
-    def __init__(self, component_id: str, title: str, **kwargs):
+    def __init__(self, component_id: str, title: str, **kwargs) -> None:
         """
         Initialize test component.
 

@@ -1,4 +1,6 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Enhanced Gesture Handler Component for PlantGuard Mobile Interface.
+
 
 Provides comprehensive touch gesture support for mobile devices including:
 - Advanced swipe gestures with velocity detection
@@ -20,7 +22,7 @@ logger = logging.getLogger(__name__)
 class EnhancedGestureHandler:
     """Enhanced handler for mobile touch gestures and interactions with advanced features."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.gesture_events = {
             "swipe_left": [],
             "swipe_right": [],
@@ -52,7 +54,7 @@ class EnhancedGestureHandler:
         self._initialize_gesture_state()
         self._setup_touch_optimization()
 
-    def _initialize_gesture_state(self):
+    def _initialize_gesture_state(self) -> Any:
         """Initialize enhanced gesture state management."""
         if "enhanced_gesture_state" not in st.session_state:
             st.session_state.enhanced_gesture_state = {
@@ -72,12 +74,12 @@ class EnhancedGestureHandler:
                 "gesture_start_time": 0,
             }
 
-    def _setup_touch_optimization(self):
+    def _setup_touch_optimization(self) -> Any:
         """Setup touch optimization CSS and JavaScript."""
         self._inject_touch_optimization_css()
         self._inject_enhanced_gesture_js()
 
-    def _inject_touch_optimization_css(self):
+    def _inject_touch_optimization_css(self) -> Any:
         """Inject comprehensive touch optimization CSS."""
         touch_css = """
         <style>
@@ -304,7 +306,7 @@ class EnhancedGestureHandler:
         """
         st.markdown(touch_css, unsafe_allow_html=True)
 
-    def _inject_enhanced_gesture_js(self):
+    def _inject_enhanced_gesture_js(self) -> Any:
         """Inject enhanced gesture recognition JavaScript."""
         gesture_js = """
         <script>
@@ -648,7 +650,7 @@ class EnhancedGestureHandler:
         # Enable gesture recognition (already injected in __init__)
         logger.info("Enhanced swipe navigation enabled with velocity threshold: %f", velocity_threshold)
 
-    def enable_pinch_zoom(self, target_element: str = "image", on_zoom_in: Callable | None = None, on_zoom_out: Callable | None = None):
+    def enable_pinch_zoom(self, target_element: str = "image", on_zoom_in: Callable | None = None, on_zoom_out: Callable | None = None) -> Any:
         """Enable pinch-to-zoom gesture for images.
 
         Args:
@@ -702,7 +704,7 @@ class EnhancedGestureHandler:
 
         st.markdown(pinch_js, unsafe_allow_html=True)
 
-    def enable_touch_feedback(self):
+    def enable_touch_feedback(self) -> Any:
         """Enable visual feedback for touch interactions."""
         touch_feedback_css = """
         <style>
@@ -813,11 +815,11 @@ class EnhancedGestureHandler:
             st.session_state.swipe_image_index = current_index
 
         # Enable swipe navigation for images
-        def next_image():
+        def next_image() -> Any:
             if st.session_state.swipe_image_index < len(images) - 1:
                 st.session_state.swipe_image_index += 1
 
-        def prev_image():
+        def prev_image() -> Any:
             if st.session_state.swipe_image_index > 0:
                 st.session_state.swipe_image_index -= 1
 
@@ -867,7 +869,7 @@ class EnhancedGestureHandler:
 
         return st.session_state.swipe_image_index
 
-    def handle_gesture_event(self, gesture_type: str, data: dict | None = None):
+    def handle_gesture_event(self, gesture_type: str, data: dict | None = None) -> Any:
         """Handle gesture events and trigger callbacks.
 
         Args:
@@ -888,7 +890,7 @@ class EnhancedGestureHandler:
         st.session_state.gesture_state["last_gesture"] = gesture_type
         st.session_state.gesture_state["gesture_data"] = data or {}
 
-    def render_gesture_debug_info(self):
+    def render_gesture_debug_info(self) -> None:
         """Render debug information for gesture testing."""
         if st.checkbox("Show Gesture Debug Info", value=False):
             st.markdown("### [SMALL] Gesture Debug Information")
@@ -924,7 +926,7 @@ class EnhancedGestureHandler:
                 if st.button("Test Pinch Zoom"):
                     self.handle_gesture_event("pinch_zoom", {"direction": "in"})
 
-    def create_touch_friendly_interface(self):
+    def create_touch_friendly_interface(self) -> Any:
         """Create touch-friendly interface improvements."""
         # Add touch-friendly CSS
         self.enable_touch_feedback()

@@ -4,6 +4,9 @@ Test script for mobile layout and design system implementation.
 This script verifies that the mobile layout manager and design system
 are working correctly and can be imported and initialized.
 """
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+import pytest
+
 
 import sys
 from pathlib import Path

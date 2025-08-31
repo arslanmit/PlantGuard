@@ -22,7 +22,7 @@ class ResponsiveLayout:
     proper touch targets and Apple Silicon optimization.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.device = self._get_device()
         self.breakpoints = {"mobile": 768, "tablet": 1024, "desktop": 1200}
         self._initialize_layout_state()
@@ -36,7 +36,7 @@ class ResponsiveLayout:
         else:
             return torch.device("cpu")
 
-    def _initialize_layout_state(self):
+    def _initialize_layout_state(self) -> Any:
         """Initialize layout state in session."""
         if "layout_config" not in st.session_state:
             st.session_state.layout_config = {
@@ -108,7 +108,7 @@ class ResponsiveLayout:
                 "font_scale": 1.0,
             }
 
-    def render_adaptive_columns(self, left_content=None, right_content=None):
+    def render_adaptive_columns(self, left_content=None, right_content=None) -> None:
         """Render adaptive columns based on viewport.
 
         Args:
@@ -124,7 +124,7 @@ class ResponsiveLayout:
             # Desktop: Side-by-side columns
             self._render_desktop_layout(left_content, right_content, config["columns"])
 
-    def _render_desktop_layout(self, left_content, right_content, columns: list[int]):
+    def _render_desktop_layout(self, left_content, right_content, columns: list[int]) -> Any:
         """Render desktop layout with specified column ratios."""
         try:
             col1, col2 = st.columns(columns)
@@ -145,7 +145,7 @@ class ResponsiveLayout:
             if right_content:
                 right_content()
 
-    def _render_mobile_layout(self, left_content, right_content):
+    def _render_mobile_layout(self, left_content, right_content) -> Any:
         """Render mobile layout with stacked components."""
         try:
             # Mobile: Input section first, then results, then chat
@@ -165,7 +165,7 @@ class ResponsiveLayout:
             if right_content:
                 right_content()
 
-    def _render_content_with_error_handling(self, content_func, section_name: str):
+    def _render_content_with_error_handling(self, content_func, section_name: str) -> Any:
         """Render content with proper error handling."""
         try:
             if callable(content_func):
@@ -176,7 +176,7 @@ class ResponsiveLayout:
             st.error(f"{section_name} failed to render: {e}")
             st.info(f"Please refresh the page to restore {section_name} functionality.")
 
-    def render_responsive_container(self, content, container_type: str = "default"):
+    def render_responsive_container(self, content, container_type: str = "default") -> None:
         """Render responsive container with appropriate styling.
 
         Args:
@@ -234,7 +234,7 @@ class ResponsiveLayout:
 
         return st.button(label, key=key, **kwargs)
 
-    def render_responsive_grid(self, items: list, columns_per_row: int = 3):
+    def render_responsive_grid(self, items: list, columns_per_row: int = 3) -> None:
         """Render responsive grid that adapts to viewport.
 
         Args:
@@ -263,7 +263,7 @@ class ResponsiveLayout:
                     except Exception as e:
                         st.error(f"Grid item {i + j} failed to render: {e}")
 
-    def apply_mobile_optimizations(self):
+    def apply_mobile_optimizations(self) -> Any:
         """Apply mobile-specific optimizations."""
         config = self.get_layout_config()
 
@@ -312,7 +312,7 @@ class ResponsiveLayout:
             """
             st.markdown(mobile_css, unsafe_allow_html=True)
 
-    def render_mobile_navigation(self, pages: dict[str, Callable]):
+    def render_mobile_navigation(self, pages: dict[str, Callable]) -> None:
         """Render mobile-friendly navigation.
 
         Args:
@@ -345,12 +345,12 @@ class ResponsiveLayoutManager:
 
     _instance = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the layout manager."""
         if not hasattr(self, "layout"):
             self.layout: ResponsiveLayout = ResponsiveLayout()
 
-    def __new__(cls):
+    def __new__(cls) -> Any:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance.layout = ResponsiveLayout()

@@ -1,7 +1,9 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Test offline functionality for PlantGuard.
 
 This test ensures the application works without internet connection.
 """
+
 
 import sys
 import unittest

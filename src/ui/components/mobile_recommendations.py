@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class MobileRecommendations(MobileBaseComponent):
     """Mobile-optimized treatment recommendations component."""
 
-    def __init__(self, component_id: str, title: str = "Treatment Recommendations", **kwargs):
+    def __init__(self, component_id: str, title: str = "Treatment Recommendations", **kwargs) -> None:
         """
         Initialize mobile recommendations component.
 

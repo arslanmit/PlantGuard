@@ -48,7 +48,7 @@ class MobileVoiceInterface(MobileComponent):
     - AI agent testable
     """
 
-    def __init__(self, component_id: str = "mobile_voice_interface", **kwargs):
+    def __init__(self, component_id: str = "mobile_voice_interface", **kwargs) -> None:
         super().__init__(component_id, **kwargs)
         self.audio_adapter = None
         self.text_adapter = None

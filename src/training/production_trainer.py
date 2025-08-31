@@ -591,7 +591,7 @@ class ProductionTrainer:
 
             # Use cast to tell MyPy that dataset has __len__ method
             from collections.abc import Sized
-            from typing import cast
+
 
             train_dataset = cast(Sized, self.train_loader.dataset)
             val_dataset = cast(Sized, self.val_loader.dataset)

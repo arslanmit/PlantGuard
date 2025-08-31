@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """Convert a trained model to the expected format for evaluation."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import argparse
 from pathlib import Path
 
 import torch
 
 
-def convert_model(input_path, output_path):
+def convert_model(input_path, output_path) -> Any:
     """Convert a trained model to the expected format for evaluation.
 
     Args:
         input_path: Path to the input model file
         output_path: Path to save the converted model
     """
+
     print(f"Loading model from {input_path}...")
     checkpoint = torch.load(input_path, map_location="cpu")
 

@@ -1,7 +1,9 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Status Indicator Component for PlantGuard.
 
 Provides visual status indicators for models, system health, and application state.
 """
+
 
 import logging
 
@@ -68,7 +70,7 @@ def render_status_indicator(status: object, label: str = "", size: str = "medium
 class StatusIndicator:
     """Advanced status indicator component with multiple display modes."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.status_history = []
 
     def render_system_status(self) -> None:

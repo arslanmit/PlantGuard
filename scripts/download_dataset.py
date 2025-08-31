@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 class DatasetDownloader:
     """Download and prepare PlantVillage dataset with progress tracking."""
 
-    def __init__(self, data_dir: str = "data", use_kaggle_api: bool = True):
+    def __init__(self, data_dir: str = "data", use_kaggle_api: bool = True) -> None:
         self.data_dir = Path(data_dir)
         self.raw_dir = self.data_dir / "raw"
         self.processed_dir = self.data_dir / "processed" / "plantvillage"
@@ -350,7 +350,7 @@ class DatasetDownloader:
         return workflow_result
 
 
-def main():
+def main() -> None:
     """Main function with CLI support and JSON output."""
     import argparse
 

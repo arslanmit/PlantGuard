@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class MobileLazyLoader:
     """Lazy loading utilities for mobile components."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._loaded_components: dict[str, Any] = {}
         self._deferred_operations: dict[str, Callable] = {}
         self._loading_states: dict[str, bool] = {}
@@ -185,9 +185,9 @@ mobile_lazy_loader = MobileLazyLoader()
 def lazy_load(component_id: str) -> Callable:
     """Decorator for lazy loading components."""
 
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             return mobile_lazy_loader.lazy_component(component_id, func, *args, **kwargs)
 
         return wrapper
@@ -198,10 +198,10 @@ def lazy_load(component_id: str) -> Callable:
 def defer_execution(operation_id: str, delay: float = 0.1) -> Callable:
     """Decorator for deferring operation execution."""
 
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        def wrapper(*args, **kwargs):
-            def operation():
+        def wrapper(*args, **kwargs) -> Any:
+            def operation() -> Any:
                 return func(*args, **kwargs)
 
             return mobile_lazy_loader.defer_operation(operation_id, operation, delay)

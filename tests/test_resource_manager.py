@@ -1,6 +1,7 @@
 """Unit tests for resource management utilities."""
 
-from typing import Any
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 from unittest.mock import MagicMock, patch
 
 import pytest

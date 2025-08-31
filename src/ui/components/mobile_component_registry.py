@@ -38,7 +38,7 @@ class ComponentMetadata:
 class MobileComponent:
     """Base class for all mobile components with AI agent support."""
 
-    def __init__(self, component_id: str, **kwargs):
+    def __init__(self, component_id: str, **kwargs) -> None:
         """Initialize mobile component with AI agent support."""
         self.component_id = component_id
         self.kwargs = kwargs
@@ -82,7 +82,7 @@ class MobileComponent:
 def register_mobile_component(component_class) -> Callable:
     """Decorator to register a mobile component class."""
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         # Get the global registry instance
         if not hasattr(register_mobile_component, "_registry"):
             register_mobile_component._registry = MobileComponentRegistry()

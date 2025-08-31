@@ -1,8 +1,10 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """PlantGuard Core Module.
 
 This module contains the core components for the PlantGuard multimodal
 plant disease detection system.
 """
+
 
 __version__ = "0.1.0"
 __author__ = "PlantGuard Team"

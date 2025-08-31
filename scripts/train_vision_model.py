@@ -1,7 +1,9 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Training script for PlantGuard vision model.
 
 This script trains a ResNet50 model on the PlantVillage dataset for plant disease classification.
 """
+
 
 import argparse
 import json

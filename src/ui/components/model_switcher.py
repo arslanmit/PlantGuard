@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class ModelSwitcher:
     """Component for managing and switching between different AI models."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.session_key = "selected_models"
         self.available_models = {
             "vision": {

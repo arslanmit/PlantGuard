@@ -18,7 +18,7 @@ InterfaceMode = Literal["simple", "expert"]
 class InterfaceToggle:
     """Simple/Expert interface toggle component."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the interface toggle."""
         # Initialize session state
         if "interface_mode" not in st.session_state:
@@ -320,7 +320,7 @@ class InterfaceToggle:
             unsafe_allow_html=True,
         )
 
-    def wrap_with_cognitive_indicator(self, content_func, complexity: str = "low"):
+    def wrap_with_cognitive_indicator(self, content_func, complexity: str = "low") -> Any:
         """Wrap content with cognitive load indicator.
 
         Args:
@@ -383,7 +383,7 @@ if __name__ == "__main__":
         st.success("[PROGRESS] This is a simple-mode feature!")
 
     # Test cognitive load wrapper
-    def complex_content():
+    def complex_content() -> Any:
         st.write("This is complex content that might cause cognitive overload")
         st.slider("Complex parameter", 0, 100, 50)
 

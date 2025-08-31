@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Integrate the Model Manager into your main PlantGuard application."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 
@@ -10,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 def update_main_app() -> None:
     """Update the main Streamlit app to use the Model Manager."""
+
     app_code = '''"""PlantGuard - Multimodal Plant Disease Detection System with Model Switching.
 
 Enhanced main Streamlit application with easy model switching capabilities.
@@ -39,7 +42,7 @@ logger = setup_logger("plantguard", log_file="logs/app.log")
     return PlantGuardModelManager()
 
 
-def main():
+def main() -> None:
     """Main PlantGuard application with model switching."""
     st.set_page_config(
         page_title="PlantGuard - Plant Disease Detection",

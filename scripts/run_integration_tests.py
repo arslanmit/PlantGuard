@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class IntegrationTestRunner:
     """Runner for comprehensive integration tests."""
 
-    def __init__(self, workspace_root: Path | None = None):
+    def __init__(self, workspace_root: Path | None = None) -> None:
         """Initialize test runner."""
         self.workspace_root = workspace_root or Path.cwd()
         self.test_results: dict[str, Any] = {
@@ -360,7 +360,7 @@ class IntegrationTestRunner:
         return True
 
 
-def main():
+def main() -> None:
     """Main function."""
     parser = argparse.ArgumentParser(description="Run comprehensive integration tests for production training pipeline")
     parser.add_argument("--no-performance", action="store_true", help="Skip performance regression tests")

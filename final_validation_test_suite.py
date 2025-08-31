@@ -3,6 +3,8 @@
 Final Validation Test Suite for Mobile-Only PlantGuard Refactoring
 Comprehensive testing to ensure all functionality works after desktop component removal.
 """
+import pytest
+
 
 import importlib.util
 import json
@@ -21,7 +23,7 @@ logger = logging.getLogger(__name__)
 class FinalValidationTestSuite:
     """Comprehensive test suite for final mobile-only validation."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.test_results = {}
         self.start_time = time.time()
         self.errors = []

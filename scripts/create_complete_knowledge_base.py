@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Create complete disease knowledge base for all 38 PlantVillage classes."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import json
 from pathlib import Path
 
 
-def create_complete_disease_info():
+def create_complete_disease_info() -> Any:
     """Create comprehensive disease information for all 38 classes."""
+
     diseases = {
         "Apple___Apple_scab": {
             "disease_name": "Apple Scab",
@@ -252,7 +255,7 @@ def create_complete_disease_info():
     }
 
 
-def main():
+def main() -> None:
     """Create and save the complete knowledge base."""
     kb_dir = Path("data/knowledge_base")
     kb_dir.mkdir(parents=True, exist_ok=True)

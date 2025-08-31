@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Dependency Cleanup Script for Mobile PlantGuard
 
 Analyzes and removes unused dependencies to optimize mobile performance.
 """
+
 
 from pathlib import Path
 

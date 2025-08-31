@@ -211,7 +211,7 @@ class MobileErrorHandler:
             Wrapped render function with error handling
         """
 
-        def error_boundary_wrapper(*args, **kwargs):
+        def error_boundary_wrapper(*args, **kwargs) -> None:
             try:
                 return render_function(*args, **kwargs)
             except Exception as e:
@@ -570,7 +570,7 @@ class MobileErrorBoundary:
         """Enter the error boundary context."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Handle exceptions that occur within the boundary."""
         if exc_type is not None:
             # Handle the error
@@ -606,8 +606,8 @@ def mobile_error_boundary(component_id: str, fallback_renderer: Callable | None 
         fallback_renderer: Optional custom fallback renderer
     """
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func) -> None:
+        def wrapper(*args, **kwargs) -> None:
             try:
                 return func(*args, **kwargs)
             except Exception as e:

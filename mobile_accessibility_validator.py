@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 class MobileAccessibilityValidator:
     """Accessibility validator and improver for mobile components."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.validation_results = {}
         self.improvements_applied = []
 
@@ -105,7 +105,7 @@ logger = logging.getLogger(__name__)
 class MobileAriaHelper:
     """Helper class for ARIA accessibility in mobile components."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.aria_labels = {
             "camera_button": "Take photo with camera",
             "upload_button": "Upload image from device",
@@ -408,7 +408,7 @@ logger = logging.getLogger(__name__)
 class MobileSemanticHelper:
     """Helper for creating semantic HTML structure."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.heading_level = 1
         self.landmark_regions = []
         
@@ -714,7 +714,7 @@ logger = logging.getLogger(__name__)
 class MobileKeyboardHelper:
     """Helper for keyboard navigation in mobile components."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.focusable_elements = []
         self.current_focus_index = 0
         self.keyboard_shortcuts = {}

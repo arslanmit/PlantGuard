@@ -1,8 +1,10 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Specialized integration tests for VisionAdapter with ModelRegistry.
 
 This module focuses specifically on testing the deep integration between
 VisionAdapter and ModelRegistry components.
 """
+
 
 import tempfile
 from pathlib import Path
@@ -20,7 +22,7 @@ class TestVisionAdapterRegistryIntegration:
     """Test VisionAdapter integration with ModelRegistry."""
 
     @pytest.fixture
-    def temp_workspace(self):
+    def temp_workspace(self) -> Generator[Any, None, None]:
         """Create temporary workspace."""
         with tempfile.TemporaryDirectory() as temp_dir:
             workspace = Path(temp_dir)
@@ -28,12 +30,12 @@ class TestVisionAdapterRegistryIntegration:
             yield workspace
 
     @pytest.fixture
-    def registry(self, temp_workspace):
+    def registry(self, temp_workspace) -> Any:
         """Create ModelRegistry instance."""
         return ModelRegistry(temp_workspace / "models")
 
     @pytest.fixture
-    def sample_registry_model(self, temp_workspace, registry):
+    def sample_registry_model(self, temp_workspace, registry) -> Any:
         """Create a sample model in registry format."""
         model_path = temp_workspace / "sample_model.pt"
         checkpoint = {
@@ -70,7 +72,7 @@ class TestVisionAdapterRegistryIntegration:
 
         return model_id
 
-    def test_registry_format_detection(self, temp_workspace, registry):
+    def test_registry_format_detection(self, temp_workspace, registry) -> None:
         """Test VisionAdapter can detect registry vs legacy format."""
         adapter = VisionAdapter()
 
@@ -98,7 +100,7 @@ class TestVisionAdapterRegistryIntegration:
         assert adapter.is_compatible_with_registry_format(str(registry_path))
         assert not adapter.is_compatible_with_registry_format(str(legacy_path))
 
-    def test_load_from_registry_by_id(self, registry, sample_registry_model):
+    def test_load_from_registry_by_id(self, registry, sample_registry_model) -> None:
         """Test loading model from registry by ID."""
         adapter = VisionAdapter()
 
@@ -118,7 +120,7 @@ class TestVisionAdapterRegistryIntegration:
             # Verify model creation was called with correct parameters
             mock_create_model.assert_called_once_with(num_classes=38)
 
-    def test_load_from_registry_by_name(self, registry, sample_registry_model):
+    def test_load_from_registry_by_name(self, registry, sample_registry_model) -> None:
         """Test loading model from registry by name."""
         adapter = VisionAdapter()
 
@@ -132,7 +134,7 @@ class TestVisionAdapterRegistryIntegration:
             assert adapter.is_loaded
             assert adapter.current_model_id == sample_registry_model
 
-    def test_load_latest_version(self, registry, temp_workspace):
+    def test_load_latest_version(self, registry, temp_workspace) -> None:
         """Test loading latest version of a model."""
         adapter = VisionAdapter()
 
@@ -171,7 +173,7 @@ class TestVisionAdapterRegistryIntegration:
             assert adapter.is_loaded
             assert adapter.current_model_id == model_ids[-1]  # Latest version
 
-    def test_model_metadata_access(self, registry, sample_registry_model):
+    def test_model_metadata_access(self, registry, sample_registry_model) -> None:
         """Test accessing model metadata through VisionAdapter."""
         adapter = VisionAdapter()
 
@@ -195,7 +197,7 @@ class TestVisionAdapterRegistryIntegration:
             assert adapter.get_model_architecture() == "resnet50"
             assert adapter.get_dataset_version() == "plantvillage_v1.0"
 
-    def test_model_switching_between_registry_models(self, registry, temp_workspace):
+    def test_model_switching_between_registry_models(self, registry, temp_workspace) -> None:
         """Test switching between different registry models."""
         adapter = VisionAdapter()
 
@@ -234,7 +236,7 @@ class TestVisionAdapterRegistryIntegration:
 
         with patch.object(adapter, "_create_model") as mock_create_model:
 
-            def mock_create_model_func(num_classes):
+            def mock_create_model_func(num_classes) -> Any:
                 mock_model = MagicMock()
                 mock_model.num_classes = num_classes
                 return mock_model
@@ -254,7 +256,7 @@ class TestVisionAdapterRegistryIntegration:
             # Verify model switching worked
             assert adapter.current_model_id == model_ids[1]
 
-    def test_prediction_with_registry_model(self, registry, sample_registry_model):
+    def test_prediction_with_registry_model(self, registry, sample_registry_model) -> None:
         """Test prediction workflow with registry-loaded model."""
         adapter = VisionAdapter()
 
@@ -284,7 +286,7 @@ class TestVisionAdapterRegistryIntegration:
                 assert isinstance(confidence, float)
                 assert 0.0 <= confidence <= 1.0
 
-    def test_batch_prediction_with_registry_model(self, registry, sample_registry_model):
+    def test_batch_prediction_with_registry_model(self, registry, sample_registry_model) -> None:
         """Test batch prediction with registry-loaded model."""
         adapter = VisionAdapter()
 
@@ -322,7 +324,7 @@ class TestVisionAdapterRegistryIntegration:
                     assert predicted_class == f"class_{i}"
                     assert isinstance(confidence, float)
 
-    def test_model_validation_and_health_check(self, registry, sample_registry_model):
+    def test_model_validation_and_health_check(self, registry, sample_registry_model) -> None:
         """Test model validation and health checks."""
         adapter = VisionAdapter()
 
@@ -347,7 +349,7 @@ class TestVisionAdapterRegistryIntegration:
             is_healthy = adapter.check_model_health()
             assert not is_healthy
 
-    def test_legacy_model_migration(self, temp_workspace, registry):
+    def test_legacy_model_migration(self, temp_workspace, registry) -> None:
         """Test migration of legacy models to registry format."""
         adapter = VisionAdapter()
 
@@ -384,7 +386,7 @@ class TestVisionAdapterRegistryIntegration:
             assert adapter.is_loaded
             assert len(adapter.class_names) == 38
 
-    def test_model_comparison_through_adapter(self, registry, temp_workspace):
+    def test_model_comparison_through_adapter(self, registry, temp_workspace) -> None:
         """Test model comparison functionality through VisionAdapter."""
         adapter = VisionAdapter()
 
@@ -427,7 +429,7 @@ class TestVisionAdapterRegistryIntegration:
         best_model_id = adapter.find_best_registry_model(metric="accuracy")
         assert best_model_id == model_ids[2]  # Highest accuracy model
 
-    def test_model_export_through_adapter(self, registry, sample_registry_model, temp_workspace):
+    def test_model_export_through_adapter(self, registry, sample_registry_model, temp_workspace) -> None:
         """Test model export functionality through VisionAdapter."""
         adapter = VisionAdapter()
 
@@ -450,7 +452,7 @@ class TestVisionAdapterRegistryIntegration:
             assert "class_names" in exported_data
             assert exported_data["deployment_info"]["optimized"] is True
 
-    def test_error_handling_and_recovery(self, registry, temp_workspace):
+    def test_error_handling_and_recovery(self, registry, temp_workspace) -> None:
         """Test error handling and recovery in registry integration."""
         adapter = VisionAdapter()
 
@@ -510,7 +512,7 @@ class TestVisionAdapterRegistryIntegration:
             adapter.load_from_registry(valid_id)
             assert adapter.is_loaded
 
-    def test_performance_monitoring_integration(self, registry, sample_registry_model):
+    def test_performance_monitoring_integration(self, registry, sample_registry_model) -> None:
         """Test performance monitoring integration."""
         adapter = VisionAdapter()
 

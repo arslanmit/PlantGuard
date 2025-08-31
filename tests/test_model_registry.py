@@ -10,28 +10,30 @@ import torch
 import torch.nn as nn
 
 from src.training.model_registry import ModelMetadata, ModelRegistry
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
 class SimpleModel(nn.Module):
     """Simple model for testing."""
 
-    def __init__(self):
+
+    def __init__(self) -> None:
         super().__init__()
         self.linear = nn.Linear(10, 2)
 
-    def forward(self, x):
+    def forward(self, x) -> Any:
         return self.linear(x)
 
 
 @pytest.fixture
-def temp_registry():
+def temp_registry() -> Generator[Any, None, None]:
     """Create temporary registry for testing."""
     with tempfile.TemporaryDirectory() as temp_dir:
         yield ModelRegistry(temp_dir)
 
 
 @pytest.fixture
-def sample_model_file():
+def sample_model_file() -> Generator[Any, None, None]:
     """Create a sample model file for testing."""
     with tempfile.NamedTemporaryFile(suffix=".pt", delete=False) as f:
         model = SimpleModel()
@@ -40,7 +42,7 @@ def sample_model_file():
         Path(f.name).unlink(missing_ok=True)
 
 
-def test_model_metadata_serialization():
+def test_model_metadata_serialization() -> None:
     """Test ModelMetadata serialization and deserialization."""
     metadata = ModelMetadata(
         model_id="test_v1.0.0",
@@ -70,7 +72,7 @@ def test_model_metadata_serialization():
     assert restored.hyperparameters == metadata.hyperparameters
 
 
-def test_registry_initialization(temp_registry):
+def test_registry_initialization(temp_registry) -> None:
     """Test registry initialization."""
     assert temp_registry.registry_dir.exists()
     assert temp_registry._registry_data["version"] == "1.0.0"
@@ -81,7 +83,7 @@ def test_registry_initialization(temp_registry):
     assert temp_registry.registry_file.exists()
 
 
-def test_register_model(temp_registry, sample_model_file):
+def test_register_model(temp_registry, sample_model_file) -> None:
     """Test model registration."""
     model_id = temp_registry.register_model(
         model_path=sample_model_file,
@@ -104,7 +106,7 @@ def test_register_model(temp_registry, sample_model_file):
     assert (model_dir / f"{model_id}_config.json").exists()
 
 
-def test_list_models(temp_registry, sample_model_file):
+def test_list_models(temp_registry, sample_model_file) -> None:
     """Test listing models."""
     # Register a model
     temp_registry.register_model(
@@ -122,7 +124,7 @@ def test_list_models(temp_registry, sample_model_file):
     assert models[0].is_valid
 
 
-def test_get_model(temp_registry, sample_model_file):
+def test_get_model(temp_registry, sample_model_file) -> None:
     """Test getting specific model."""
     model_id = temp_registry.register_model(
         model_path=sample_model_file,
@@ -142,7 +144,7 @@ def test_get_model(temp_registry, sample_model_file):
     assert temp_registry.get_model("nonexistent") is None
 
 
-def test_search_models(temp_registry, sample_model_file):
+def test_search_models(temp_registry, sample_model_file) -> None:
     """Test model search functionality."""
     # Register multiple models
     temp_registry.register_model(
@@ -180,7 +182,7 @@ def test_search_models(temp_registry, sample_model_file):
     assert high_acc_models[0].metadata.performance_metrics["accuracy"] >= 0.93
 
 
-def test_model_versioning(temp_registry, sample_model_file):
+def test_model_versioning(temp_registry, sample_model_file) -> None:
     """Test model versioning functionality."""
     # Register first version
     model_id_1 = temp_registry.register_model(
@@ -216,7 +218,7 @@ def test_model_versioning(temp_registry, sample_model_file):
     assert latest.metadata.version == "1.0.1"
 
 
-def test_validate_model(temp_registry, sample_model_file):
+def test_validate_model(temp_registry, sample_model_file) -> None:
     """Test model validation."""
     model_id = temp_registry.register_model(
         model_path=sample_model_file,
@@ -234,7 +236,7 @@ def test_validate_model(temp_registry, sample_model_file):
     assert not temp_registry.validate_model("nonexistent")
 
 
-def test_update_metadata(temp_registry, sample_model_file):
+def test_update_metadata(temp_registry, sample_model_file) -> None:
     """Test metadata updates."""
     model_id = temp_registry.register_model(
         model_path=sample_model_file,
@@ -263,7 +265,7 @@ def test_update_metadata(temp_registry, sample_model_file):
     assert "updated" in model_info.metadata.tags
 
 
-def test_registry_persistence(sample_model_file):
+def test_registry_persistence(sample_model_file) -> None:
     """Test registry persistence across instances."""
     with tempfile.TemporaryDirectory() as temp_dir:
         # Create first registry instance
@@ -284,7 +286,7 @@ def test_registry_persistence(sample_model_file):
         assert models[0].metadata.model_id == model_id
 
 
-def test_checksum_calculation(temp_registry, sample_model_file):
+def test_checksum_calculation(temp_registry, sample_model_file) -> None:
     """Test checksum calculation and validation."""
     model_id = temp_registry.register_model(
         model_path=sample_model_file,
@@ -303,7 +305,7 @@ def test_checksum_calculation(temp_registry, sample_model_file):
     assert temp_registry.validate_model(model_id)
 
 
-def test_compare_models(temp_registry, sample_model_file):
+def test_compare_models(temp_registry, sample_model_file) -> None:
     """Test model comparison functionality."""
     # Register multiple models
     model_id_1 = temp_registry.register_model(
@@ -342,7 +344,7 @@ def test_compare_models(temp_registry, sample_model_file):
     assert summary["best_performers"]["accuracy"]["model"] == model_id_2
 
 
-def test_delete_model(temp_registry, sample_model_file):
+def test_delete_model(temp_registry, sample_model_file) -> None:
     """Test model deletion functionality."""
     # Register multiple versions
     model_id_1 = temp_registry.register_model(
@@ -383,7 +385,7 @@ def test_delete_model(temp_registry, sample_model_file):
     assert temp_registry.get_model(model_id_2) is None
 
 
-def test_backup_and_restore_model(temp_registry, sample_model_file):
+def test_backup_and_restore_model(temp_registry, sample_model_file) -> None:
     """Test model backup and restoration."""
     import tempfile
 
@@ -429,7 +431,7 @@ def test_backup_and_restore_model(temp_registry, sample_model_file):
         assert "restored" in restored_model.metadata.tags
 
 
-def test_cleanup_old_models(temp_registry, sample_model_file):
+def test_cleanup_old_models(temp_registry, sample_model_file) -> None:
     """Test cleanup of old model versions."""
     # Register multiple versions
     model_ids = []
@@ -469,7 +471,7 @@ def test_cleanup_old_models(temp_registry, sample_model_file):
     assert "1.0.0" not in versions  # Should be deleted
 
 
-def test_model_comparison_dataframe(temp_registry, sample_model_file):
+def test_model_comparison_dataframe(temp_registry, sample_model_file) -> None:
     """Test DataFrame conversion for model comparison."""
     # Register models
     model_id_1 = temp_registry.register_model(
@@ -501,7 +503,7 @@ def test_model_comparison_dataframe(temp_registry, sample_model_file):
         assert "f1_score" in df.columns
 
 
-def test_export_model_pytorch(temp_registry, sample_model_file):
+def test_export_model_pytorch(temp_registry, sample_model_file) -> None:
     """Test PyTorch model export."""
     import tempfile
 
@@ -532,7 +534,7 @@ def test_export_model_pytorch(temp_registry, sample_model_file):
         assert export_data["export_info"]["format"] == "pytorch"
 
 
-def test_create_deployment_package(temp_registry, sample_model_file):
+def test_create_deployment_package(temp_registry, sample_model_file) -> None:
     """Test deployment package creation."""
     import tempfile
 
@@ -570,7 +572,7 @@ def test_create_deployment_package(temp_registry, sample_model_file):
         assert "dependencies" in deployment_info
 
 
-def test_optimize_model_for_deployment(temp_registry, sample_model_file):
+def test_optimize_model_for_deployment(temp_registry, sample_model_file) -> None:
     """Test model optimization for deployment."""
     # Register a model
     model_id = temp_registry.register_model(
@@ -596,7 +598,7 @@ def test_optimize_model_for_deployment(temp_registry, sample_model_file):
     assert "standard" in optimized_model.metadata.tags
 
 
-def test_export_unsupported_format(temp_registry, sample_model_file):
+def test_export_unsupported_format(temp_registry, sample_model_file) -> None:
     """Test export with unsupported format."""
     # Register a model
     model_id = temp_registry.register_model(
@@ -614,7 +616,7 @@ def test_export_unsupported_format(temp_registry, sample_model_file):
     assert export_path is None
 
 
-def test_export_nonexistent_model(temp_registry):
+def test_export_nonexistent_model(temp_registry) -> None:
     """Test export of non-existent model."""
     export_path = temp_registry.export_model(model_id="nonexistent_model", export_format="pytorch")
 

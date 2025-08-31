@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class MobileOptimizedLoader:
     """Optimized loader for mobile components with lazy loading and caching."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._component_cache: dict[str, Any] = {}
         self._load_times: dict[str, float] = {}
         self._performance_metrics = {"total_loads": 0, "cache_hits": 0, "average_load_time": 0.0}

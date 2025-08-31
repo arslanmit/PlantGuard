@@ -28,7 +28,7 @@ class MobileInputRibbon(MobileComponent):
     - AI agent testable and self-healing
     """
 
-    def __init__(self, component_id: str = "mobile_input_ribbon", **kwargs):
+    def __init__(self, component_id: str = "mobile_input_ribbon", **kwargs) -> None:
         super().__init__(component_id, **kwargs)
         self.layout_style = kwargs.get("layout_style", "grid")  # 'grid' or 'vertical'
         self.show_labels = kwargs.get("show_labels", True)

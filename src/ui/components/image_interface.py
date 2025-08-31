@@ -25,7 +25,7 @@ cv2 = ImportErrorRecovery.safe_import("cv2", logger_name="image_interface")
 class ImageInterface:
     """Image input and camera integration with upload and capture capabilities."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize image interface."""
         self.max_file_size = 200 * 1024 * 1024  # 200MB
         self.supported_formats = ["jpg", "jpeg", "png"]

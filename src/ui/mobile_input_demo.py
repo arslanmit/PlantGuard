@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Mobile Input Components Demo App.
 
 This demo showcases all mobile input components in a unified interface
 to demonstrate their functionality and integration.
 """
+
 
 import logging
 import sys

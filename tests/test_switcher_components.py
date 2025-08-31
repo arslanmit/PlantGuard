@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 # TODO: ModelSwitcher component doesn't exist yet - implement it or remove this test
 # Mock streamlit before importing components
@@ -89,7 +90,8 @@ import pytest
 class TestModelSwitcherStandalone:
     """Standalone test cases for model switching logic."""
 
-    def test_default_models(self):
+
+    def test_default_models(self) -> None:
         """Test default model selection (independent verification)."""
 
         # Use a local dict to verify assumed default model names format.

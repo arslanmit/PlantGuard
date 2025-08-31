@@ -138,7 +138,7 @@ def create_fallback_app_class() -> type:
     class FallbackPlantGuardApp:
         """Fallback app class for testing."""
         
-        def __init__(self):
+        def __init__(self) -> None:
             self.models = {"vision": {}, "audio": {}, "text": {}}
             self.layout_manager = Mock()
             self.header = Mock()
@@ -151,28 +151,28 @@ def create_fallback_app_class() -> type:
             self.audio_adapter = create_mock_adapter('audio')
             self.text_adapter = create_mock_adapter('text')
 
-        def render_header(self):
+        def render_header(self) -> None:
             return "PlantGuard AI"
 
-        def render_image_analysis_tab(self):
+        def render_image_analysis_tab(self) -> None:
             return "Image Analysis"
 
-        def render_voice_assistant_tab(self):
+        def render_voice_assistant_tab(self) -> None:
             return "Voice Assistant"
 
-        def render_chat_interface_tab(self):
+        def render_chat_interface_tab(self) -> None:
             return "Chat Assistant"
 
-        def render_history_settings_tab(self):
+        def render_history_settings_tab(self) -> None:
             return "History & Settings"
 
-        def render_comparison_tab(self):
+        def render_comparison_tab(self) -> None:
             return "Image Comparison"
 
-        def initialize_components(self):
+        def initialize_components(self) -> None:
             pass
 
-        def initialize_app_state(self):
+        def initialize_app_state(self) -> None:
             pass
     
     return FallbackPlantGuardApp

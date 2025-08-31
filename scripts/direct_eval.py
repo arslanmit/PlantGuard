@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Direct model evaluation script."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import json
 from pathlib import Path
 
@@ -14,7 +16,7 @@ from tqdm import tqdm
 
 # Define the model architecture to match the training
 class PlantDiseaseModel(nn.Module):
-    def __init__(self, num_classes=2):
+    def __init__(self, num_classes=2) -> None:
         super().__init__()
         # Use a pre-trained ResNet50 as the backbone
         self.backbone = models.resnet50(pretrained=False)
@@ -23,12 +25,13 @@ class PlantDiseaseModel(nn.Module):
         in_features = self.backbone.fc.in_features
         self.backbone.fc = nn.Linear(in_features, num_classes)
 
-    def forward(self, x):
+    def forward(self, x) -> Any:
         return self.backbone(x)
 
 
-def load_model(model_path, num_classes=2):
+def load_model(model_path, num_classes=2) -> Any:
     """Load the model from checkpoint."""
+
     print(f"Loading model from {model_path}...")
 
     # Create model with the correct architecture
@@ -56,7 +59,7 @@ def load_model(model_path, num_classes=2):
 class PlantDiseaseDataset(Dataset):
     """Custom dataset for plant disease classification."""
 
-    def __init__(self, root_dir, transform=None):
+    def __init__(self, root_dir, transform=None) -> None:
         """Initialize the dataset.
 
         Args:
@@ -79,10 +82,10 @@ class PlantDiseaseDataset(Dataset):
                 if img_path.suffix.lower() in (".png", ".jpg", ".jpeg"):
                     self.samples.append((str(img_path), self.class_to_idx[class_name]))
 
-    def __len__(self):
+    def __len__(self) -> Any:
         return len(self.samples)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Any:
         img_path, label = self.samples[idx]
         image = Image.open(img_path).convert("RGB")
 
@@ -92,7 +95,7 @@ class PlantDiseaseDataset(Dataset):
         return image, label
 
 
-def evaluate_model(model, data_loader, device, class_names):
+def evaluate_model(model, data_loader, device, class_names) -> Any:
     """Evaluate the model on the given data loader."""
     model = model.to(device)
     model.eval()
@@ -133,7 +136,7 @@ def evaluate_model(model, data_loader, device, class_names):
     return accuracy, class_correct, class_total
 
 
-def main():
+def main() -> None:
     # Set device
     device = torch.device("mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")

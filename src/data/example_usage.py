@@ -1,8 +1,10 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Example usage of PlantGuard data pipeline utilities.
 
 This script demonstrates how to use the dataset loading, validation,
 and analysis utilities for the PlantVillage dataset.
 """
+
 
 import logging
 from pathlib import Path

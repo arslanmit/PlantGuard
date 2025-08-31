@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Compare View Implementation for PlantGuard.
 
 This module provides comprehensive comparison capabilities including
 A/B image viewer, side-by-side analysis comparison, difference highlighting,
 and comparative metrics for the PlantGuard plant disease detection system.
 """
+
 
 import logging
 from datetime import datetime
@@ -85,7 +87,7 @@ class ComparisonResult:
 class CompareView:
     """Compare view component for A/B analysis comparison."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize compare view."""
         # Initialize session state
         if "comparison_images" not in st.session_state:

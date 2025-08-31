@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class StateManager:
     """Manages application state and user preferences."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.session_keys = {
             # Navigation state
             "current_page": "Home",
@@ -52,7 +52,7 @@ class StateManager:
             },
         }
 
-    def initialize_defaults(self):
+    def initialize_defaults(self) -> None:
         """Initialize session state with default values."""
         for key, default_value in self.session_keys.items():
             if key not in st.session_state:
@@ -90,7 +90,7 @@ class StateManager:
         """Get value from session state."""
         return st.session_state.get(key, default)
 
-    def set_state(self, key: str, value: Any, persist: bool = False):
+    def set_state(self, key: str, value: Any, persist: bool = False) -> Any:
         """Set value in session state."""
         st.session_state[key] = value
 
@@ -99,12 +99,12 @@ class StateManager:
 
         logger.debug(f"Set session state: {key} = {value}")
 
-    def update_state(self, updates: dict[str, Any]):
+    def update_state(self, updates: dict[str, Any]) -> Any:
         """Update multiple state values at once."""
         for key, value in updates.items():
             self.set_state(key, value)
 
-    def clear_state(self, keys: list[str] | None = None):
+    def clear_state(self, keys: list[str] | None = None) -> Any:
         """Clear specific keys or all session state."""
         if keys is None:
             # Clear all except essential keys
@@ -133,7 +133,7 @@ class StateManager:
 
         return preferences.get(key, default)
 
-    def set_user_preference(self, key: str, value: Any):
+    def set_user_preference(self, key: str, value: Any) -> Any:
         """Set user preference value."""
         preferences = self.get_state("user_preferences", {})
 
@@ -152,13 +152,13 @@ class StateManager:
         self.set_state("user_preferences", preferences, persist=True)
         logger.info(f"Updated user preference: {key} = {value}")
 
-    def _persist_preference(self, key: str, value: Any):
+    def _persist_preference(self, key: str, value: Any) -> Any:
         """Persist preference to local storage (placeholder)."""
         # In a real implementation, this would save to local storage
         # For now, we just log it
         logger.debug(f"Would persist preference: {key} = {value}")
 
-    def add_message(self, role: str, content: str, metadata: dict | None = None):
+    def add_message(self, role: str, content: str, metadata: dict | None = None) -> Any:
         """Add message to chat history."""
         message = {
             "role": role,
@@ -173,12 +173,12 @@ class StateManager:
 
         logger.debug(f"Added message: {role} - {len(content)} chars")
 
-    def clear_chat_history(self):
+    def clear_chat_history(self) -> Any:
         """Clear chat message history."""
         self.set_state("messages", [])
         logger.info("Cleared chat history")
 
-    def add_analysis_result(self, result: dict[str, Any]):
+    def add_analysis_result(self, result: dict[str, Any]) -> Any:
         """Add analysis result to history."""
         result["id"] = f"analysis_{len(self.get_state('analysis_results', []))}"
         result["timestamp"] = datetime.now().isoformat()
@@ -197,13 +197,13 @@ class StateManager:
             return results[-limit:]
         return results
 
-    def clear_analysis_history(self):
+    def clear_analysis_history(self) -> Any:
         """Clear analysis history."""
         self.set_state("analysis_results", [])
         self.set_state("current_analysis", None)
         logger.info("Cleared analysis history")
 
-    def set_input_mode(self, mode: str, active: bool):
+    def set_input_mode(self, mode: str, active: bool) -> Any:
         """Set input mode state."""
         input_modes = self.get_state("input_modes", {})
         input_modes[mode] = active
@@ -216,13 +216,13 @@ class StateManager:
         input_modes = self.get_state("input_modes", {})
         return [mode for mode, active in input_modes.items() if active]
 
-    def clear_all_inputs(self):
+    def clear_all_inputs(self) -> Any:
         """Clear all input modes and data."""
         self.set_state("input_modes", {"text": False, "voice": False, "camera": False, "upload": False})
         self.set_state("active_inputs", {})
         logger.info("Cleared all input modes")
 
-    def track_page_visit(self, page: str):
+    def track_page_visit(self, page: str) -> Any:
         """Track page visit for analytics."""
         page_history = self.get_state("page_history", [])
         page_history.append({"page": page, "timestamp": datetime.now().isoformat()})
@@ -237,7 +237,7 @@ class StateManager:
         # Track page transition for animations
         self._track_page_transition(page)
 
-    def _track_page_transition(self, new_page: str):
+    def _track_page_transition(self, new_page: str) -> Any:
         """Track page transition for smooth animations."""
         previous_page = self.get_state("previous_page")
 
@@ -253,7 +253,7 @@ class StateManager:
 
         self.set_state("previous_page", new_page)
 
-    def complete_page_transition(self):
+    def complete_page_transition(self) -> Any:
         """Complete page transition and clear loading state."""
         transition = self.get_state("page_transition", {})
         if transition.get("in_progress"):
@@ -317,7 +317,7 @@ class StateManager:
         """Check if mobile view is active."""
         return self.get_state("mobile_view", False)
 
-    def set_mobile_view(self, mobile: bool):
+    def set_mobile_view(self, mobile: bool) -> Any:
         """Set mobile view state."""
         self.set_state("mobile_view", mobile)
 
@@ -325,7 +325,7 @@ class StateManager:
         """Get current theme."""
         return self.get_user_preference("theme", "light")
 
-    def set_theme(self, theme: str):
+    def set_theme(self, theme: str) -> Any:
         """Set application theme."""
         self.set_user_preference("theme", theme)
         logger.info(f"Theme changed to: {theme}")

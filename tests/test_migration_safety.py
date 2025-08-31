@@ -1,8 +1,10 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Test suite for Migration Safety Framework
 
 Tests backup, tracking, rollback, and validation functionality.
 """
+
 
 import json
 import shutil
@@ -23,7 +25,7 @@ from utils.migration_safety import (MigrationBackupManager,
 class TestMigrationStatus:
     """Test MigrationStatus data class."""
     
-    def test_migration_status_creation(self):
+    def test_migration_status_creation(self) -> None:
         """Test creating migration status."""
         status = MigrationStatus(
             migration_id="test_migration_123",
@@ -35,7 +37,7 @@ class TestMigrationStatus:
         assert status.files_removed == []
         assert status.migration_complete is False
     
-    def test_add_removed_file(self):
+    def test_add_removed_file(self) -> None:
         """Test tracking removed files."""
         status = MigrationStatus("test", "2024-01-01T10:00:00")
         
@@ -50,7 +52,7 @@ class TestMigrationStatus:
         status.add_removed_file("spa_app.py")
         assert len(status.files_removed) == 2
     
-    def test_add_modified_file(self):
+    def test_add_modified_file(self) -> None:
         """Test tracking modified files."""
         status = MigrationStatus("test", "2024-01-01T10:00:00")
         
@@ -61,7 +63,7 @@ class TestMigrationStatus:
         assert "mobile_spa_app.py" in status.files_modified
         assert len(status.files_modified) == 2
     
-    def test_get_summary(self):
+    def test_get_summary(self) -> None:
         """Test getting migration summary."""
         status = MigrationStatus("test", "2024-01-01T10:00:00")
         status.add_removed_file("spa_app.py")
@@ -79,7 +81,7 @@ class TestMigrationStatus:
 class TestMigrationBackupManager:
     """Test MigrationBackupManager functionality."""
     
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         self.temp_dir = Path(tempfile.mkdtemp())
         self.backup_manager = MigrationBackupManager(self.temp_dir / "backups")
@@ -96,11 +98,11 @@ class TestMigrationBackupManager:
             full_path.parent.mkdir(parents=True, exist_ok=True)
             full_path.write_text(content)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_create_full_backup(self):
+    def test_create_full_backup(self) -> None:
         """Test creating full backup."""
         # Change to temp directory for test
         original_cwd = Path.cwd()
@@ -124,7 +126,7 @@ class TestMigrationBackupManager:
         finally:
             os.chdir(original_cwd)
     
-    def test_list_backups(self):
+    def test_list_backups(self) -> None:
         """Test listing available backups."""
         # Create test backup directory structure
         backup_dir = self.backup_manager.backup_dir / "backup_test_123"
@@ -149,7 +151,7 @@ class TestMigrationBackupManager:
 class TestMigrationTracker:
     """Test MigrationTracker functionality."""
     
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         self.temp_dir = Path(tempfile.mkdtemp())
         
@@ -157,32 +159,32 @@ class TestMigrationTracker:
         with patch.object(Path, 'cwd', return_value=self.temp_dir):
             self.tracker = MigrationTracker("test_migration")
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_track_file_removal(self):
+    def test_track_file_removal(self) -> None:
         """Test tracking file removal."""
         self.tracker.track_file_removal("spa_app.py")
         
         status = self.tracker.get_status()
         assert "spa_app.py" in status.files_removed
     
-    def test_track_file_modification(self):
+    def test_track_file_modification(self) -> None:
         """Test tracking file modification."""
         self.tracker.track_file_modification("Makefile")
         
         status = self.tracker.get_status()
         assert "Makefile" in status.files_modified
     
-    def test_track_import_cleanup(self):
+    def test_track_import_cleanup(self) -> None:
         """Test tracking import cleanup."""
         self.tracker.track_import_cleanup("mobile_spa_app.py", "from spa_app import")
         
         status = self.tracker.get_status()
         assert "mobile_spa_app.py:from spa_app import" in status.imports_cleaned
     
-    def test_set_migration_complete(self):
+    def test_set_migration_complete(self) -> None:
         """Test setting migration complete."""
         self.tracker.set_migration_complete(True)
         
@@ -193,7 +195,7 @@ class TestMigrationTracker:
 class TestMigrationValidator:
     """Test MigrationValidator functionality."""
     
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         self.temp_dir = Path(tempfile.mkdtemp())
         
@@ -201,11 +203,11 @@ class TestMigrationValidator:
             self.tracker = MigrationTracker("test_migration")
             self.validator = MigrationValidator(self.tracker)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_validate_file_integrity_success(self):
+    def test_validate_file_integrity_success(self) -> None:
         """Test file integrity validation with all files present."""
         # Create essential files
         essential_files = [
@@ -240,7 +242,7 @@ class TestMigrationValidator:
         finally:
             os.chdir(original_cwd)
     
-    def test_validate_file_integrity_missing_files(self):
+    def test_validate_file_integrity_missing_files(self) -> None:
         """Test file integrity validation with missing files."""
         original_cwd = Path.cwd()
         try:
@@ -255,7 +257,7 @@ class TestMigrationValidator:
         finally:
             os.chdir(original_cwd)
     
-    def test_validate_import_statements(self):
+    def test_validate_import_statements(self) -> None:
         """Test import statement validation."""
         original_cwd = Path.cwd()
         try:
@@ -278,7 +280,7 @@ import mobile_components
         finally:
             os.chdir(original_cwd)
     
-    def test_validate_makefile_targets(self):
+    def test_validate_makefile_targets(self) -> None:
         """Test Makefile target validation."""
         original_cwd = Path.cwd()
         try:
@@ -307,7 +309,7 @@ test:
 class TestMigrationSafetyFramework:
     """Test complete MigrationSafetyFramework."""
     
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         self.temp_dir = Path(tempfile.mkdtemp())
         
@@ -327,11 +329,11 @@ class TestMigrationSafetyFramework:
             full_path.parent.mkdir(parents=True, exist_ok=True)
             full_path.write_text(content)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_framework_initialization(self):
+    def test_framework_initialization(self) -> None:
         """Test framework initialization."""
         original_cwd = Path.cwd()
         try:
@@ -348,7 +350,7 @@ class TestMigrationSafetyFramework:
         finally:
             os.chdir(original_cwd)
     
-    def test_create_safety_checkpoint(self):
+    def test_create_safety_checkpoint(self) -> None:
         """Test creating safety checkpoint."""
         original_cwd = Path.cwd()
         try:
@@ -367,7 +369,7 @@ class TestMigrationSafetyFramework:
         finally:
             os.chdir(original_cwd)
     
-    def test_get_migration_status(self):
+    def test_get_migration_status(self) -> None:
         """Test getting migration status."""
         original_cwd = Path.cwd()
         try:

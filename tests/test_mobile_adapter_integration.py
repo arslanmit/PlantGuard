@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Tests for mobile adapter integration.
 
@@ -5,6 +6,7 @@ This module tests the integration between mobile components and
 existing PlantGuard adapters (Vision, Audio, Text) with proper
 mock interfaces and dependency injection.
 """
+
 
 import tempfile
 from contextlib import suppress
@@ -27,7 +29,7 @@ from tests.fixtures.mobile_test_fixtures import (MockAudioAdapter,
 class TestMobileAdapterIntegration:
     """Test mobile adapter integration functionality with proper mocking."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.integration = MobileAdapterIntegration()
         
@@ -36,7 +38,7 @@ class TestMobileAdapterIntegration:
             if hasattr(st, 'session_state'):
                 st.session_state.clear()
 
-    def test_vision_adapter_initialization(self, mock_streamlit_session):
+    def test_vision_adapter_initialization(self, mock_streamlit_session) -> None:
         """Test vision adapter initialization with proper mocking."""
         # Test direct adapter injection (dependency injection pattern)
         mock_adapter = MockVisionAdapter()
@@ -53,7 +55,7 @@ class TestMobileAdapterIntegration:
         result = adapter.predict("test")
         assert result == ("Healthy Plant", 0.95)
 
-    def test_audio_adapter_initialization(self, mock_streamlit_session):
+    def test_audio_adapter_initialization(self, mock_streamlit_session) -> None:
         """Test audio adapter initialization with proper mocking."""
         # Test direct adapter injection (dependency injection pattern)
         mock_adapter = MockAudioAdapter()
@@ -70,7 +72,7 @@ class TestMobileAdapterIntegration:
         result = adapter.transcribe("test")
         assert result == "What disease does my plant have?"
 
-    def test_text_adapter_initialization(self, mock_streamlit_session):
+    def test_text_adapter_initialization(self, mock_streamlit_session) -> None:
         """Test text adapter initialization with proper mocking."""
         # Test direct adapter injection (dependency injection pattern)
         mock_adapter = MockTextAdapter()
@@ -87,7 +89,7 @@ class TestMobileAdapterIntegration:
         result = adapter.generate_response()
         assert "fungal infection" in result.lower()
 
-    def test_preprocess_mobile_image(self):
+    def test_preprocess_mobile_image(self) -> None:
         """Test mobile image preprocessing."""
         # Create test image
         test_image = Image.new('RGB', (2000, 1500), color='red')
@@ -104,7 +106,7 @@ class TestMobileAdapterIntegration:
         assert processed_image.size[0] <= max_size[0]
         assert processed_image.size[1] <= max_size[1]
 
-    def test_analyze_image_success(self, mock_streamlit_session, sample_test_image):
+    def test_analyze_image_success(self, mock_streamlit_session, sample_test_image) -> None:
         """Test successful image analysis with proper mocking."""
         # Set up mock adapters
         mock_vision = MockVisionAdapter()
@@ -139,7 +141,7 @@ class TestMobileAdapterIntegration:
         mock_vision.predict.assert_called_once()
         mock_text.get_disease_info.assert_called_once_with("Healthy Plant")
 
-    def test_analyze_image_error(self, mock_streamlit_session, sample_test_image):
+    def test_analyze_image_error(self, mock_streamlit_session, sample_test_image) -> None:
         """Test image analysis error handling with proper mocking."""
         # Set up mock adapter with error
         mock_vision = MockVisionAdapter()
@@ -161,7 +163,7 @@ class TestMobileAdapterIntegration:
         assert "error" in result
         assert result["error"] == "Vision error"
 
-    def test_transcribe_audio_success(self, mock_streamlit_session, temp_audio_file):
+    def test_transcribe_audio_success(self, mock_streamlit_session, temp_audio_file) -> None:
         """Test successful audio transcription with proper mocking."""
         # Set up mock adapter
         mock_audio = MockAudioAdapter()
@@ -188,7 +190,7 @@ class TestMobileAdapterIntegration:
         assert len(mock_streamlit_session["chat_history"]) == 1
         assert mock_streamlit_session["chat_history"][0]["content"] == "What disease does my plant have?"
 
-    def test_transcribe_audio_error(self, mock_streamlit_session):
+    def test_transcribe_audio_error(self, mock_streamlit_session) -> None:
         """Test audio transcription error handling with proper mocking."""
         # Set up mock adapter with error
         mock_audio = MockAudioAdapter()
@@ -210,7 +212,7 @@ class TestMobileAdapterIntegration:
         assert "error" in result
         assert result["error"] == "Audio error"
 
-    def test_process_text_query_success(self, mock_streamlit_session):
+    def test_process_text_query_success(self, mock_streamlit_session) -> None:
         """Test successful text query processing with proper mocking."""
         # Set up mock adapter
         mock_text = MockTextAdapter()
@@ -236,7 +238,7 @@ class TestMobileAdapterIntegration:
         assert "chat_history" in mock_streamlit_session
         assert len(mock_streamlit_session["chat_history"]) == 2  # User + Assistant messages
 
-    def test_process_text_query_with_context(self, mock_streamlit_session, sample_analysis_results):
+    def test_process_text_query_with_context(self, mock_streamlit_session, sample_analysis_results) -> None:
         """Test text query processing with analysis context using proper mocking."""
         # Set up analysis results in session state
         mock_streamlit_session["analysis_results"] = sample_analysis_results
@@ -261,7 +263,7 @@ class TestMobileAdapterIntegration:
         assert call_args[1]["disease_class"] == "Leaf Spot"  # Most recent from sample data
         assert call_args[1]["confidence"] == 0.87
 
-    def test_preprocess_mobile_text(self):
+    def test_preprocess_mobile_text(self) -> None:
         """Test mobile text preprocessing."""
         # Test whitespace cleaning
         text = "  What's   wrong   with   my   plant?  "
@@ -274,7 +276,7 @@ class TestMobileAdapterIntegration:
         assert len(processed) <= 1000
         assert processed.endswith("...")
 
-    def test_get_recent_analysis(self, mock_streamlit_session):
+    def test_get_recent_analysis(self, mock_streamlit_session) -> None:
         """Test getting recent analysis results with proper session state mocking."""
         # Set up analysis results
         test_results = [
@@ -292,7 +294,7 @@ class TestMobileAdapterIntegration:
         assert recent[0]["disease_name"] == "Disease 2"
         assert recent[1]["disease_name"] == "Disease 3"
 
-    def test_clear_analysis_history(self, mock_streamlit_session):
+    def test_clear_analysis_history(self, mock_streamlit_session) -> None:
         """Test clearing analysis history with proper session state mocking."""
         # Set up history
         mock_streamlit_session["analysis_results"] = [{"test": "data"}]
@@ -305,7 +307,7 @@ class TestMobileAdapterIntegration:
         assert mock_streamlit_session["analysis_results"] == []
         assert mock_streamlit_session["chat_history"] == []
 
-    def test_get_adapter_status(self):
+    def test_get_adapter_status(self) -> None:
         """Test getting adapter status with proper mock injection."""
         # Inject mock adapters
         self.integration._vision_adapter = MockVisionAdapter()
@@ -319,14 +321,14 @@ class TestMobileAdapterIntegration:
         assert status["audio_adapter"] is True
         assert status["text_adapter"] is True
 
-    def test_adapter_status_with_errors(self):
+    def test_adapter_status_with_errors(self) -> None:
         """Test adapter status when adapters fail to initialize."""
         # Create properties that raise exceptions
-        def vision_error():
+        def vision_error() -> Any:
             raise Exception("Vision error")
-        def audio_error():
+        def audio_error() -> Any:
             raise Exception("Audio error")
-        def text_error():
+        def text_error() -> Any:
             raise Exception("Text error")
             
         # Patch the properties to raise exceptions
@@ -341,7 +343,7 @@ class TestMobileAdapterIntegration:
                     assert status["audio_adapter"] is False
                     assert status["text_adapter"] is False
 
-    def test_mobile_config_defaults(self):
+    def test_mobile_config_defaults(self) -> None:
         """Test mobile configuration defaults."""
         config = self.integration.mobile_config
         
@@ -362,7 +364,7 @@ class TestMobileAdapterIntegration:
 class TestMobileAdapterIntegrationIntegration:
     """Integration tests for mobile adapter integration with comprehensive mocking."""
 
-    def test_full_image_analysis_workflow(self, mock_streamlit_session, sample_test_image):
+    def test_full_image_analysis_workflow(self, mock_streamlit_session, sample_test_image) -> None:
         """Test complete image analysis workflow with proper dependency injection."""
         integration = MobileAdapterIntegration()
         
@@ -400,7 +402,7 @@ class TestMobileAdapterIntegrationIntegration:
         # Verify session state was updated
         assert len(mock_streamlit_session["analysis_results"]) == 1
 
-    def test_full_text_processing_workflow(self, mock_streamlit_session):
+    def test_full_text_processing_workflow(self, mock_streamlit_session) -> None:
         """Test complete text processing workflow with proper mocking."""
         integration = MobileAdapterIntegration()
         
@@ -432,7 +434,7 @@ class TestMobileAdapterIntegrationIntegration:
         # Verify chat history was updated
         assert len(mock_streamlit_session["chat_history"]) == 2  # User + Assistant messages
 
-    def test_full_audio_transcription_workflow(self, mock_streamlit_session, temp_audio_file):
+    def test_full_audio_transcription_workflow(self, mock_streamlit_session, temp_audio_file) -> None:
         """Test complete audio transcription workflow with proper mocking."""
         integration = MobileAdapterIntegration()
         
@@ -459,7 +461,7 @@ class TestMobileAdapterIntegrationIntegration:
         assert len(mock_streamlit_session["chat_history"]) == 1
         assert mock_streamlit_session["chat_history"][0]["content"] == "My plant leaves are turning yellow"
 
-    def test_end_to_end_multimodal_workflow(self, mock_streamlit_session, sample_test_image, temp_audio_file):
+    def test_end_to_end_multimodal_workflow(self, mock_streamlit_session, sample_test_image, temp_audio_file) -> None:
         """Test end-to-end multimodal workflow with all adapters."""
         integration = MobileAdapterIntegration()
         

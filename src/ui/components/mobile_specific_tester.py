@@ -123,7 +123,7 @@ class MobileSpecificTester:
     with AI agent support for automated testing and validation.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mobile-specific testing framework."""
         self.component_tester = MobileComponentTester()
         self.state_manager = MobileStateManager()

@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class ProductionPipelineValidator:
     """Validates the complete production training pipeline."""
 
-    def __init__(self, temp_dir: Path | None = None):
+    def __init__(self, temp_dir: Path | None = None) -> None:
         """Initialize validator with temporary directory."""
         self.temp_dir = Path(temp_dir) if temp_dir else Path(tempfile.mkdtemp())
         self.temp_dir.mkdir(parents=True, exist_ok=True)

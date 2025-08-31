@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Script to replace all emojis with text equivalents throughout the codebase.
@@ -17,6 +18,7 @@ Emoji mappings:
 🎯 -> [PROGRESS]
 📋 -> [DETAILS]
 """
+
 
 import argparse
 import re
@@ -203,7 +205,7 @@ SKIP_FILES = {
 
 
 class EmojiReplacer:
-    def __init__(self, root_path: str, backup: bool = True, dry_run: bool = False):
+    def __init__(self, root_path: str, backup: bool = True, dry_run: bool = False) -> None:
         self.root_path = Path(root_path)
         self.backup = backup
         self.dry_run = dry_run

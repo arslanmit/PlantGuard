@@ -1,7 +1,9 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Simple system info script for PlantGuard Makefile
 """
+
 
 import json
 import platform
@@ -10,7 +12,7 @@ from datetime import datetime
 import psutil
 
 
-def get_system_info():
+def get_system_info() -> Any:
     """Get comprehensive system information"""
     info = {
         "timestamp": datetime.now().isoformat(),

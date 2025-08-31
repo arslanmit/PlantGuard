@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Integration test for TextAdapter with the PlantGuard system."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 
@@ -10,8 +12,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from core.nlp import TextAdapter
 
 
-def test_integration_scenarios():
+def test_integration_scenarios() -> None:
     """Test realistic integration scenarios."""
+
     print("[LINK] Testing TextAdapter integration scenarios...")
 
     adapter = TextAdapter()
@@ -66,7 +69,7 @@ def test_integration_scenarios():
     print("\n[DONE] All integration scenarios tested successfully!")
 
 
-def test_knowledge_base_consistency():
+def test_knowledge_base_consistency() -> None:
     """Test knowledge base consistency with class mappings."""
     print("\n[SEARCH] Testing knowledge base consistency...")
 
@@ -99,7 +102,7 @@ def test_knowledge_base_consistency():
         print("   [DONE] Knowledge base is consistent with class mappings")
 
 
-def main():
+def main() -> None:
     """Run integration tests."""
     try:
         test_integration_scenarios()

@@ -110,7 +110,7 @@ class AIAgentTestingFramework:
     - Test history and reporting
     """
 
-    def __init__(self, component_registry=None):
+    def __init__(self, component_registry=None) -> None:
         self.component_registry = component_registry
         self.test_results: list[TestResult] = []
         self.component_health: dict[str, ComponentHealthStatus] = {}
@@ -903,7 +903,7 @@ class AutonomousInteractionTester:
     - Touch interactions
     """
 
-    def __init__(self, testing_framework):
+    def __init__(self, testing_framework) -> None:
         self.testing_framework = testing_framework
         self.interaction_results: list[InteractionTestResult] = []
         self.test_timeout = 10.0  # seconds per interaction

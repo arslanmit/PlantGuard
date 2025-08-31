@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Simple model evaluation script."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import json
 from pathlib import Path
 
@@ -13,7 +15,7 @@ from tqdm import tqdm
 
 # Define the model architecture
 class CustomResNet(nn.Module):
-    def __init__(self, num_classes=2):
+    def __init__(self, num_classes=2) -> None:
         super().__init__()
         # Load a pre-trained ResNet50
         resnet = torch.hub.load("pytorch/vision", "resnet50", weights=None)
@@ -24,7 +26,7 @@ class CustomResNet(nn.Module):
         # Add a custom classifier
         self.fc = nn.Linear(resnet.fc.in_features, num_classes)
 
-    def forward(self, x):
+    def forward(self, x) -> Any:
         # Forward pass through the backbone
         x = self.backbone(x)
         x = x.view(x.size(0), -1)  # Flatten
@@ -32,8 +34,9 @@ class CustomResNet(nn.Module):
         return x
 
 
-def load_model(model_path):
+def load_model(model_path) -> Any:
     """Load the model from checkpoint."""
+
     print(f"Loading model from {model_path}...")
     checkpoint = torch.load(model_path, map_location="cpu")
 
@@ -59,7 +62,7 @@ def load_model(model_path):
     return model
 
 
-def evaluate_model(model, data_loader, device):
+def evaluate_model(model, data_loader, device) -> Any:
     """Evaluate model on the given data loader."""
     model = model.to(device)
     correct = 0
@@ -77,7 +80,7 @@ def evaluate_model(model, data_loader, device):
     return accuracy
 
 
-def main():
+def main() -> None:
     # Set device
     device = torch.device("mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")

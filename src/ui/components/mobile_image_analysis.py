@@ -42,7 +42,7 @@ class MobileImageAnalysis(MobileComponent):
     - AI agent testable
     """
 
-    def __init__(self, component_id: str = "mobile_image_analysis", **kwargs):
+    def __init__(self, component_id: str = "mobile_image_analysis", **kwargs) -> None:
         super().__init__(component_id, **kwargs)
         self.vision_adapter = None
         self.model_manager = kwargs.get("model_manager")

@@ -90,7 +90,7 @@ class AnalysisResult:
 class AnalysisCard:
     """Analysis card component for displaying disease prediction results."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize analysis card."""
         self.disease_info = {
             # Common plant diseases information

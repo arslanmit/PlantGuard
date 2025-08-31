@@ -74,7 +74,7 @@ class OfflineOperation:
 class MobileOfflineManager:
     """Offline functionality manager for mobile devices."""
 
-    def __init__(self, cache_dir: Path | None = None):
+    def __init__(self, cache_dir: Path | None = None) -> None:
         """
         Initialize offline manager.
 

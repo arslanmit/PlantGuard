@@ -5,6 +5,9 @@ Mobile Performance Validation Script
 Validates that the mobile-only PlantGuard application meets performance requirements
 after optimization and resource cleanup.
 """
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+import pytest
+
 
 import json
 import sys

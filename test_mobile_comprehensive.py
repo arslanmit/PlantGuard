@@ -4,6 +4,8 @@ Comprehensive Mobile Testing Suite
 
 Tests all mobile components and their integration with the PlantGuard system.
 """
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 
 import sys
 from pathlib import Path
@@ -21,40 +23,40 @@ import streamlit as st  # noqa: E402
 class MockStreamlit:
     """Mock Streamlit for testing without running the full app."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.button_calls = []
         self.file_uploader_calls = []
 
-    def button(self, label, **kwargs):
+    def button(self, label, **kwargs) -> Any:
         self.button_calls.append({"label": label, "kwargs": kwargs})
         return False  # Default to not pressed
 
-    def file_uploader(self, label, **kwargs):
+    def file_uploader(self, label, **kwargs) -> Any:
         self.file_uploader_calls.append({"label": label, "kwargs": kwargs})
         return None  # Default to no file
 
-    def columns(self, spec):
+    def columns(self, spec) -> Any:
         return [Mock() for _ in range(spec if isinstance(spec, int) else len(spec))]
 
-    def container(self):
+    def container(self) -> Any:
         return Mock()
 
-    def expander(self, label, expanded=False):
+    def expander(self, label, expanded=False) -> Any:
         return Mock()
 
-    def tabs(self, labels):
+    def tabs(self, labels) -> Any:
         return [Mock() for _ in labels]
 
-    def success(self, message):
+    def success(self, message) -> Any:
         pass
 
-    def error(self, message):
+    def error(self, message) -> Any:
         pass
 
-    def warning(self, message):
+    def warning(self, message) -> Any:
         pass
 
-    def info(self, message):
+    def info(self, message) -> Any:
         pass
 
 

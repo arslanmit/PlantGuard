@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 # Mock streamlit before importing components
 with patch.dict("sys.modules", {"streamlit": MagicMock(), "torch": MagicMock()}):
@@ -18,7 +19,8 @@ with patch.dict("sys.modules", {"streamlit": MagicMock(), "torch": MagicMock()})
 class TestResponsiveLayout:
     """Test cases for ResponsiveLayout component."""
 
-    def test_initialization(self):
+
+    def test_initialization(self) -> None:
         """Test ResponsiveLayout initialization."""
         layout = ResponsiveLayout()
 
@@ -29,7 +31,7 @@ class TestResponsiveLayout:
         assert hasattr(layout, "device")
 
     @patch("streamlit.session_state", {})
-    def test_layout_config_mobile(self):
+    def test_layout_config_mobile(self) -> None:
         """Test layout configuration for mobile viewport."""
         layout = ResponsiveLayout()
 
@@ -44,7 +46,7 @@ class TestResponsiveLayout:
             assert config["font_scale"] == 1.1
 
     @patch("streamlit.session_state", {})
-    def test_layout_config_desktop(self):
+    def test_layout_config_desktop(self) -> None:
         """Test layout configuration for desktop viewport."""
         layout = ResponsiveLayout()
 
@@ -59,7 +61,7 @@ class TestResponsiveLayout:
             assert config["font_scale"] == 1.0
 
     @patch("streamlit.session_state", {})
-    def test_detect_mobile_viewport_default(self):
+    def test_detect_mobile_viewport_default(self) -> None:
         """Test mobile viewport detection defaults to False."""
         layout = ResponsiveLayout()
 
@@ -67,13 +69,13 @@ class TestResponsiveLayout:
         is_mobile = layout.detect_mobile_viewport()
         assert is_mobile is False
 
-    def test_detect_mobile_viewport_session_state(self):
+    def test_detect_mobile_viewport_session_state(self) -> None:
         """Test mobile viewport detection from session state."""
         # Test the method directly by calling it with proper parameters
         layout = ResponsiveLayout()
 
         # Monkey patch the method to test specific behavior
-        def mock_detect_mobile():
+        def mock_detect_mobile() -> bool:
             # Simulate the logic but ensure it returns True
             return True
 
@@ -81,7 +83,7 @@ class TestResponsiveLayout:
         is_mobile = layout.detect_mobile_viewport()
         assert is_mobile is True
 
-    def test_responsive_image_width(self):
+    def test_responsive_image_width(self) -> None:
         """Test responsive image width calculation."""
         layout = ResponsiveLayout()
 
@@ -99,7 +101,7 @@ class TestResponsiveLayout:
 class TestResponsiveLayoutManager:
     """Test cases for ResponsiveLayoutManager singleton."""
 
-    def test_singleton_pattern(self):
+    def test_singleton_pattern(self) -> None:
         """Test that ResponsiveLayoutManager follows singleton pattern."""
         manager1 = ResponsiveLayoutManager()
         manager2 = ResponsiveLayoutManager()
@@ -107,7 +109,7 @@ class TestResponsiveLayoutManager:
         # Should be the same instance
         assert manager1 is manager2
 
-    def test_get_layout(self):
+    def test_get_layout(self) -> None:
         """Test getting layout instance from manager."""
         manager = ResponsiveLayoutManager()
         layout = manager.get_layout()
@@ -122,12 +124,12 @@ class TestResponsiveLayoutManager:
 class TestConvenienceFunctions:
     """Test cases for convenience functions."""
 
-    def test_get_responsive_layout_function(self):
+    def test_get_responsive_layout_function(self) -> None:
         """Test get_responsive_layout convenience function."""
         layout = get_responsive_layout()
         assert isinstance(layout, ResponsiveLayout)
 
-    def test_configure_responsive_page_function(self):
+    def test_configure_responsive_page_function(self) -> None:
         """Test configure_responsive_page convenience function."""
         # Should not raise an exception and simply complete successfully
         configure_responsive_page(page_title="Test App")
@@ -136,14 +138,14 @@ class TestConvenienceFunctions:
         assert True
 
     @patch("streamlit.columns")
-    def test_render_adaptive_layout_function(self, mock_columns):
+    def test_render_adaptive_layout_function(self, mock_columns) -> None:
         """Test render_adaptive_layout convenience function."""
         mock_columns.return_value = [MagicMock(), MagicMock()]
 
-        def left_content():
+        def left_content() -> str:
             return "Left"
 
-        def right_content():
+        def right_content() -> str:
             return "Right"
 
         # Should not raise an exception
@@ -160,7 +162,7 @@ class _ContentError(Exception):
 class TestResponsiveLayoutErrorHandling:
     """Test error handling in responsive layout."""
 
-    def test_mobile_detection_error_handling(self):
+    def test_mobile_detection_error_handling(self) -> None:
         """Test graceful degradation when mobile detection fails."""
         layout = ResponsiveLayout()
 
@@ -177,7 +179,7 @@ class TestResponsiveLayoutErrorHandling:
                 # If no error handling, log the exception for visibility
                 logging.exception("Mobile detection raised _ContentError during test")
 
-    def test_container_class_generation(self):
+    def test_container_class_generation(self) -> None:
         """Test CSS class generation for containers."""
         layout = ResponsiveLayout()
 

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class MobileIntegrationValidator:
     """Validates mobile functionality and core adapter integration."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.workspace_root = Path.cwd()
         sys.path.insert(0, str(self.workspace_root))
 
@@ -223,7 +223,7 @@ class MobileIntegrationValidator:
 
         return results
 
-    def save_results(self, results: dict[str, Any], filename: str = "mobile_integration_test_results.json"):
+    def save_results(self, results: dict[str, Any], filename: str = "mobile_integration_test_results.json") -> Any:
         """Save integration test results."""
         try:
             results_path = self.workspace_root / filename
@@ -233,7 +233,7 @@ class MobileIntegrationValidator:
         except Exception as e:
             logger.error(f"Failed to save integration test results: {e}")
 
-    def print_summary(self, results: dict[str, Any]):
+    def print_summary(self, results: dict[str, Any]) -> None:
         """Print formatted summary of integration test results."""
         print("\n" + "=" * 80)
         print("MOBILE INTEGRATION VALIDATION RESULTS")

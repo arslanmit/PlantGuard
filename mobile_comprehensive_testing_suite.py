@@ -10,6 +10,8 @@ This script implements task 11.2: Perform comprehensive testing and optimization
 
 Requirements addressed: 1.1, 1.3, 6.4, 7.1
 """
+import pytest
+
 
 import logging
 import sys
@@ -52,7 +54,7 @@ logger = logging.getLogger(__name__)
 class MobileComprehensiveTestingSuite:
     """Comprehensive testing and optimization suite for mobile PlantGuard."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.test_results: dict[str, Any] = {}
         self.optimization_results: dict[str, Any] = {}
         self.performance_metrics: dict[str, float] = {}
@@ -234,7 +236,7 @@ class MobileComprehensiveTestingSuite:
                 assert content_tabs.component_id == "test_tabs"
 
                 # Test tab registration
-                def dummy_content():
+                def dummy_content() -> Any:
                     pass
 
                 content_tabs.register_tab_content("test_tab", dummy_content)

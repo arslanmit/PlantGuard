@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Check if the model has been properly trained."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 
@@ -12,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 def check_model_training_status(model_path: str) -> bool:
     """Check if model appears to be trained or is just random weights."""
+
     print("[SEARCH] Analyzing model weights...")
 
     checkpoint = torch.load(model_path, map_location="cpu", weights_only=False)

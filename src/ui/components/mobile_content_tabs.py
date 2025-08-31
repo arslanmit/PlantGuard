@@ -31,7 +31,7 @@ class MobileContentTabs(MobileComponent):
     - AI agent testable with clear identification
     """
 
-    def __init__(self, component_id: str = "mobile_content_tabs", **kwargs):
+    def __init__(self, component_id: str = "mobile_content_tabs", **kwargs) -> None:
         super().__init__(component_id, **kwargs)
         self.tab_style = kwargs.get("tab_style", "pills")  # 'pills' or 'underline'
         self.scrollable_tabs = kwargs.get("scrollable_tabs", True)
@@ -285,7 +285,7 @@ class MobileContentTabs(MobileComponent):
                 self.spa_manager.register_content_area(tab_id, tab["title"], tab["icon"], callback)
             else:
                 # Register with default content
-                def default_callback(tab_info=tab):
+                def default_callback(tab_info=tab) -> Any:
                     return self._render_default_tab_content(tab_info["id"], tab_info)
 
                 self.spa_manager.register_content_area(tab_id, tab["title"], tab["icon"], default_callback)

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 Example usage of the Migration Safety Framework
 
 This script demonstrates how to use the migration safety framework
@@ -15,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from utils.migration_safety import MigrationSafetyFramework
 
 
-def main():
+def main() -> None:
     """Demonstrate migration safety framework usage."""
 
     print("=== PlantGuard Migration Safety Framework Example ===\n")

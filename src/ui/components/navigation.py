@@ -1,4 +1,6 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Navigation Header Component for PlantGuard Redesigned UI.
+
 
 Provides multi-page navigation with responsive design and accessibility features.
 """
@@ -14,7 +16,7 @@ logger = logging.getLogger(__name__)
 class NavigationHeader:
     """Navigation header component with multi-page support."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.pages = {
             "Home": {
                 "icon": "[HOME]",
@@ -310,7 +312,7 @@ class NavigationHeader:
 
         return selected_page
 
-    def _track_page_change(self, new_page: str):
+    def _track_page_change(self, new_page: str) -> Any:
         """Track page change for analytics."""
         from .state_manager import StateManager
 
@@ -425,10 +427,10 @@ class NavigationHeader:
 class NavigationSidebar:
     """Sidebar navigation component."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.nav_header = NavigationHeader()
 
-    def render(self, container=None):
+    def render(self, container=None) -> None:
         """Render sidebar navigation into a provided container (left column) or fallback to a left column.
 
         This avoids relying on Streamlit's `st.sidebar` DOM and keeps the sidebar static.
@@ -482,7 +484,7 @@ class NavigationSidebar:
         except Exception:
             st.markdown("<div class='status-container'>Status</div>", unsafe_allow_html=True)
 
-    def _render_session_info(self):
+    def _render_session_info(self) -> Any:
         """Render session information in sidebar."""
         from .state_manager import StateManager
 

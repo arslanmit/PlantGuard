@@ -1,8 +1,10 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Page Transitions Component for PlantGuard Redesigned UI.
 
 Handles page transition animations, loading states, and smooth navigation
 between different pages in the application.
 """
+
 
 import logging
 import time
@@ -15,7 +17,7 @@ logger = logging.getLogger(__name__)
 class PageTransitionManager:
     """Manages page transitions and loading states."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.transition_duration = 0.3  # seconds
         self.loading_messages = [
             "[PLANT] Loading PlantGuard...",
@@ -166,7 +168,7 @@ class PageTransitionManager:
 class BreadcrumbNavigation:
     """Handles breadcrumb navigation and page history."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.max_breadcrumb_items = 5
 
     def render_breadcrumbs(self) -> None:
@@ -283,7 +285,7 @@ class BreadcrumbNavigation:
 class MobileNavigationMenu:
     """Handles always-visible mobile navigation menu."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.is_mobile = self._detect_mobile_view()
 
     def _detect_mobile_view(self) -> bool:
@@ -474,10 +476,10 @@ class MobileNavigationMenu:
 class PageAnimations:
     """Handles page transition animations and effects."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.animation_enabled = True
 
-    def render_fade_transition(self, content_func, duration: float = 0.3):
+    def render_fade_transition(self, content_func, duration: float = 0.3) -> None:
         """Render content with fade transition."""
         if not self.animation_enabled:
             content_func()
@@ -508,7 +510,7 @@ class PageAnimations:
             content_func()
             st.markdown("</div>", unsafe_allow_html=True)
 
-    def render_slide_transition(self, content_func, direction: str = "left"):
+    def render_slide_transition(self, content_func, direction: str = "left") -> None:
         """Render content with slide transition."""
         if not self.animation_enabled:
             content_func()
@@ -541,10 +543,10 @@ class PageAnimations:
             content_func()
             st.markdown("</div>", unsafe_allow_html=True)
 
-    def disable_animations(self):
+    def disable_animations(self) -> Any:
         """Disable animations for accessibility."""
         self.animation_enabled = False
 
-    def enable_animations(self):
+    def enable_animations(self) -> Any:
         """Enable animations."""
         self.animation_enabled = True

@@ -2,6 +2,8 @@
 """Create improved dummy dataset with learnable patterns for testing PlantGuard training pipeline."""
 # ruff: noqa: S311
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import argparse
 import random
 import sys
@@ -23,6 +25,7 @@ def create_synthetic_plant_image(class_id: int, width: int = 224, height: int = 
     Returns:
         PIL Image with synthetic plant-like patterns
     """
+
     if seed is not None:
         random.seed(seed)
         np.random.seed(seed)

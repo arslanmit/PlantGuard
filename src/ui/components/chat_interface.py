@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class ChatMessage:
     """Represents a single chat message with metadata."""
 
-    def __init__(self, role: str, content: str, timestamp: datetime | None = None, metadata: dict | None = None):
+    def __init__(self, role: str, content: str, timestamp: datetime | None = None, metadata: dict | None = None) -> None:
         """Initialize a chat message.
 
         Args:
@@ -60,7 +60,7 @@ class ChatMessage:
 class ChatInterface:
     """Enhanced chat interface with message history and conversation management."""
 
-    def __init__(self, session_key: str = "messages"):
+    def __init__(self, session_key: str = "messages") -> None:
         """Initialize chat interface.
 
         Args:

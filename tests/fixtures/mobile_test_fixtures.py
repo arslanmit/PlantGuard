@@ -20,7 +20,7 @@ from PIL import Image
 class MockVisionAdapter:
     """Mock Vision Adapter for testing."""
 
-    def __init__(self, model_path: Optional[str] = None, lazy_load: bool = True):
+    def __init__(self, model_path: Optional[str] = None, lazy_load: bool = True) -> None:
         """Initialize mock vision adapter."""
         self.model_path = model_path
         self.lazy_load = lazy_load
@@ -37,7 +37,7 @@ class MockVisionAdapter:
 class MockAudioAdapter:
     """Mock Audio Adapter for testing."""
 
-    def __init__(self, model_name: str = "openai/whisper-tiny"):
+    def __init__(self, model_name: str = "openai/whisper-tiny") -> None:
         """Initialize mock audio adapter."""
         self.model_name = model_name
         self.is_loaded = True
@@ -49,7 +49,7 @@ class MockAudioAdapter:
 class MockTextAdapter:
     """Mock Text Adapter for testing."""
 
-    def __init__(self, knowledge_base_path: Optional[str] = None):
+    def __init__(self, knowledge_base_path: Optional[str] = None) -> None:
         """Initialize mock text adapter."""
         self.knowledge_base_path = knowledge_base_path
         self.is_loaded = True
@@ -67,7 +67,7 @@ class MockTextAdapter:
 class MockChatModel:
     """Mock Chat Model for testing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mock chat model."""
         self.is_loaded = True
         self.predict = MagicMock(return_value="I can help you identify and treat plant diseases.")
@@ -77,7 +77,7 @@ class MockChatModel:
 class MockStreamlitSession:
     """Mock Streamlit session state for testing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mock session state."""
         self._state: Dict[str, Any] = {}
         self.analysis_results: List[Dict[str, Any]] = []
@@ -110,15 +110,15 @@ class MockStreamlitSession:
         """Clear session state."""
         self._state.clear()
 
-    def keys(self):
+    def keys(self) -> Any:
         """Get session state keys."""
         return self._state.keys()
 
-    def values(self):
+    def values(self) -> Any:
         """Get session state values."""
         return self._state.values()
 
-    def items(self):
+    def items(self) -> Any:
         """Get session state items."""
         return self._state.items()
 
@@ -126,7 +126,7 @@ class MockStreamlitSession:
 class MockStreamlitComponents:
     """Mock Streamlit UI components for testing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mock components."""
         self.button_calls: List[Dict[str, Any]] = []
         self.file_uploader_calls: List[Dict[str, Any]] = []
@@ -195,31 +195,31 @@ class MockStreamlitComponents:
 # Test Fixtures
 
 @pytest.fixture
-def mock_vision_adapter():
+def mock_vision_adapter() -> Any:
     """Provide mock vision adapter."""
     return MockVisionAdapter()
 
 
 @pytest.fixture
-def mock_audio_adapter():
+def mock_audio_adapter() -> Any:
     """Provide mock audio adapter."""
     return MockAudioAdapter()
 
 
 @pytest.fixture
-def mock_text_adapter():
+def mock_text_adapter() -> Any:
     """Provide mock text adapter."""
     return MockTextAdapter()
 
 
 @pytest.fixture
-def mock_chat_model():
+def mock_chat_model() -> Any:
     """Provide mock chat model."""
     return MockChatModel()
 
 
 @pytest.fixture
-def mock_streamlit_session():
+def mock_streamlit_session() -> Generator[Any, None, None]:
     """Provide mock Streamlit session state."""
     mock_session = MockStreamlitSession()
     
@@ -237,13 +237,13 @@ def mock_streamlit_session():
 
 
 @pytest.fixture
-def mock_streamlit_components():
+def mock_streamlit_components() -> Any:
     """Provide mock Streamlit components."""
     return MockStreamlitComponents()
 
 
 @pytest.fixture
-def mock_all_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter):
+def mock_all_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter) -> Generator[Any, None, None]:
     """Provide all mock adapters with proper patching."""
     with patch.multiple(
         'src.ui.components.mobile_adapter_integration',
@@ -259,19 +259,19 @@ def mock_all_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter
 
 
 @pytest.fixture
-def sample_test_image():
+def sample_test_image() -> Any:
     """Provide sample test image."""
     return Image.new('RGB', (224, 224), color='green')
 
 
 @pytest.fixture
-def sample_large_image():
+def sample_large_image() -> Any:
     """Provide sample large image for testing preprocessing."""
     return Image.new('RGB', (2000, 1500), color='blue')
 
 
 @pytest.fixture
-def temp_audio_file():
+def temp_audio_file() -> Generator[Any, None, None]:
     """Provide temporary audio file for testing."""
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
         audio_file_path = tmp_file.name
@@ -285,7 +285,7 @@ def temp_audio_file():
 
 
 @pytest.fixture
-def temp_model_file():
+def temp_model_file() -> Generator[Any, None, None]:
     """Provide temporary model file for testing."""
     temp_path = Path("data/models/test_vision_model.pt")
     temp_path.parent.mkdir(parents=True, exist_ok=True)
@@ -299,7 +299,7 @@ def temp_model_file():
 
 
 @pytest.fixture
-def sample_analysis_results():
+def sample_analysis_results() -> List[Any]:
     """Provide sample analysis results for testing."""
     return [
         {
@@ -322,7 +322,7 @@ def sample_analysis_results():
 
 
 @pytest.fixture
-def sample_chat_history():
+def sample_chat_history() -> List[Any]:
     """Provide sample chat history for testing."""
     return [
         {
@@ -344,7 +344,7 @@ def sample_chat_history():
 
 
 @pytest.fixture
-def mobile_adapter_integration_with_mocks(mock_streamlit_session, mock_all_adapters):
+def mobile_adapter_integration_with_mocks(mock_streamlit_session, mock_all_adapters) -> Any:
     """Provide MobileAdapterIntegration with all mocks configured."""
     from src.ui.components.mobile_adapter_integration import \
         MobileAdapterIntegration
@@ -360,7 +360,7 @@ def mobile_adapter_integration_with_mocks(mock_streamlit_session, mock_all_adapt
 
 
 @pytest.fixture
-def mock_mobile_component_registry():
+def mock_mobile_component_registry() -> Generator[Any, None, None]:
     """Mock mobile component registry for testing."""
     mock_registry = Mock()
     mock_registry.get_all_components.return_value = {
@@ -378,7 +378,7 @@ def mock_mobile_component_registry():
 
 
 @pytest.fixture
-def mock_mobile_testing_framework_dependencies():
+def mock_mobile_testing_framework_dependencies() -> Generator[Any, None, None]:
     """Mock all dependencies for MobileTestingFramework."""
     with patch.multiple(
         'src.ui.components.mobile_testing_framework',
@@ -391,7 +391,7 @@ def mock_mobile_testing_framework_dependencies():
 
 
 @pytest.fixture(autouse=True)
-def setup_test_environment():
+def setup_test_environment() -> None:
     """Set up test environment with proper logging and cleanup."""
     import logging
 
@@ -463,7 +463,7 @@ class TestDataFactory:
 
 # Utility functions for tests
 
-def assert_mock_called_with_pattern(mock_obj, pattern: str):
+def assert_mock_called_with_pattern(mock_obj, pattern: str) -> bool:
     """Assert that mock was called with arguments matching pattern."""
     for call in mock_obj.call_args_list:
         args, kwargs = call

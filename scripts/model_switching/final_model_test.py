@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Final comprehensive test of the integrated Hugging Face model."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import json
 import sys
 from pathlib import Path
@@ -15,6 +17,7 @@ from src.core.huggingface_vision import HuggingFaceVisionAdapter
 
 def comprehensive_test() -> None:
     """Run comprehensive test on all 21 images."""
+
     print("[PLANT] PlantGuard Final Model Test")
     print("Using: Abhiram4/PlantDiseaseDetectorVit2 (Vision Transformer)")
     print("=" * 70)

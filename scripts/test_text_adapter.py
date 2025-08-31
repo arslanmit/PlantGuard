@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Test the TextAdapter implementation to ensure all methods work correctly."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 
@@ -10,8 +12,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from core.nlp import TextAdapter
 
 
-def test_text_adapter():
+def test_text_adapter() -> None:
     """Test TextAdapter functionality."""
+
     print("[TEST] Testing TextAdapter implementation...")
 
     # Initialize TextAdapter
@@ -74,7 +77,7 @@ def test_text_adapter():
     print("\n[DONE] All TextAdapter tests completed successfully!")
 
 
-def test_knowledge_base_coverage():
+def test_knowledge_base_coverage() -> None:
     """Test knowledge base coverage."""
     print("\n[SEARCH] Testing knowledge base coverage...")
 
@@ -98,7 +101,7 @@ def test_knowledge_base_coverage():
         print(f"   [DONE] All {len(class_data['classes'])} diseases covered in knowledge base")
 
 
-def main():
+def main() -> None:
     """Run all tests."""
     try:
         test_text_adapter()

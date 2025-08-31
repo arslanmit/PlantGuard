@@ -87,7 +87,7 @@ class MobileAIAgentTester:
     designed for AI agent understanding and autonomous operation.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize AI agent testing framework."""
         self.component_registry = MobileComponentRegistry()
         self.component_tester = MobileComponentTester()

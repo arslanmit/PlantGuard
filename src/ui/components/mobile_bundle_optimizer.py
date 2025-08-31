@@ -55,7 +55,7 @@ class ResourceBundle:
 class MobileBundleOptimizer:
     """Bundle optimization system for mobile performance."""
 
-    def __init__(self, cache_dir: Path | None = None):
+    def __init__(self, cache_dir: Path | None = None) -> None:
         """
         Initialize bundle optimizer.
 

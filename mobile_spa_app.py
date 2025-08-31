@@ -155,7 +155,7 @@ class MobilePlantGuardApp:
     Provides AI agent testing and autonomous development capabilities.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.layout_manager = None
         self.header = None
         self.input_ribbon = None
@@ -248,7 +248,7 @@ class MobilePlantGuardApp:
                 self.layout_manager = MobileLayoutManager("fallback_layout")
 
             # Create fallback content function
-            def render_fallback_content():
+            def render_fallback_content() -> None:
                 st.markdown("### :herb: PlantGuard Mobile - Loading...")
                 st.info("Some components are still initializing. Please refresh if issues persist.")
 

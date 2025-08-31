@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Test Mobile Accessibility Implementation for PlantGuard UI.
 
@@ -5,6 +6,7 @@ This test file validates the comprehensive accessibility features including
 ARIA labels, semantic HTML, keyboard navigation, screen reader support,
 high contrast mode, and voice-over compatibility.
 """
+
 
 import sys
 from pathlib import Path
@@ -174,7 +176,7 @@ class TestMobileAccessibilityManager:
         assert landmarks["close"] == "</div>"
 
     @patch("streamlit.session_state", {})
-    def test_screen_reader_announcement(self):
+    def test_screen_reader_announcement(self) -> None:
         """Test screen reader announcement functionality."""
         # Mock streamlit session state
         with patch("streamlit.session_state", {}) as mock_session:
@@ -189,7 +191,7 @@ class TestMobileAccessibilityManager:
             # Verify session state was updated
             assert mock_session.__setitem__.called
 
-    def test_accessibility_status(self):
+    def test_accessibility_status(self) -> None:
         """Test accessibility status retrieval."""
         with patch(
             "streamlit.session_state",
@@ -214,7 +216,7 @@ class TestMobileAccessibilityManager:
             assert status["total_announcements"] == 1
             assert status["last_announcement"]["message"] == "last test"
 
-    def test_accessibility_compliance_validation(self):
+    def test_accessibility_compliance_validation(self) -> None:
         """Test accessibility compliance validation."""
         with patch("streamlit.session_state", {"mobile_accessibility": {"screen_reader_active": True, "contrast_mode": "high"}}):
             validation_results = self.accessibility_manager.validate_accessibility_compliance()
@@ -238,11 +240,11 @@ class TestMobileAccessibilityManager:
 class TestAccessibleMobileComponents:
     """Test accessible mobile components."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         self.accessibility_manager = MobileAccessibilityManager()
 
-    def test_accessible_camera_input_creation(self):
+    def test_accessible_camera_input_creation(self) -> None:
         """Test accessible camera input component creation."""
         component = AccessibleMobileCameraInput("test_camera", "Test Camera")
 
@@ -264,7 +266,7 @@ class TestAccessibleMobileComponents:
         assert metadata["accessibility"]["keyboard_navigation"] is True
         assert metadata["accessibility"]["screen_reader_support"] is True
 
-    def test_accessible_upload_input_creation(self):
+    def test_accessible_upload_input_creation(self) -> None:
         """Test accessible upload input component creation."""
         component = AccessibleMobileUploadInput("test_upload", "Test Upload")
 
@@ -276,7 +278,7 @@ class TestAccessibleMobileComponents:
         assert "mobile-upload-input" in css_classes
         assert "mobile-accessible-component" in css_classes
 
-    def test_accessible_analysis_display_creation(self):
+    def test_accessible_analysis_display_creation(self) -> None:
         """Test accessible analysis display component creation."""
         component = AccessibleMobileAnalysisDisplay("test_analysis", "Test Analysis")
 
@@ -288,7 +290,7 @@ class TestAccessibleMobileComponents:
         assert "mobile-analysis-display" in css_classes
         assert "mobile-accessible-component" in css_classes
 
-    def test_accessible_settings_card_creation(self):
+    def test_accessible_settings_card_creation(self) -> None:
         """Test accessible settings card component creation."""
         component = AccessibleMobileSettingsCard("test_settings", "Test Settings")
 
@@ -300,7 +302,7 @@ class TestAccessibleMobileComponents:
         assert "mobile-settings-card" in css_classes
         assert "mobile-accessible-component" in css_classes
 
-    def test_create_accessible_mobile_component_function(self):
+    def test_create_accessible_mobile_component_function(self) -> None:
         """Test create_accessible_mobile_component utility function."""
         # Test valid component creation
         component = create_accessible_mobile_component("camera_input", "test_camera", "Test Camera")
@@ -311,7 +313,7 @@ class TestAccessibleMobileComponents:
         component = create_accessible_mobile_component("invalid_type", "test_invalid", "Test Invalid")
         assert component is None
 
-    def test_validate_accessibility_compliance_function(self):
+    def test_validate_accessibility_compliance_function(self) -> None:
         """Test validate_accessibility_compliance utility function."""
         with patch("streamlit.session_state", {"mobile_accessibility": {"screen_reader_active": True, "contrast_mode": "normal"}}):
             compliance_results = validate_accessibility_compliance()
@@ -321,7 +323,7 @@ class TestAccessibleMobileComponents:
             assert "aria_labels" in compliance_results
             assert "semantic_html" in compliance_results
 
-    def test_get_accessibility_test_results_function(self):
+    def test_get_accessibility_test_results_function(self) -> None:
         """Test get_accessibility_test_results utility function."""
         test_results = get_accessibility_test_results()
 
@@ -345,16 +347,16 @@ class TestAccessibleMobileComponents:
 class TestAccessibilityTestSuite:
     """Test accessibility testing suite."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         self.test_suite = AccessibilityTestSuite()
 
-    def test_test_suite_initialization(self):
+    def test_test_suite_initialization(self) -> None:
         """Test accessibility test suite initialization."""
         assert self.test_suite.compliance_level == "WCAG 2.1 AA"
         assert isinstance(self.test_suite.accessibility_manager, MobileAccessibilityManager)
 
-    def test_aria_labels_testing(self):
+    def test_aria_labels_testing(self) -> None:
         """Test ARIA labels testing functionality."""
         aria_results = self.test_suite._test_aria_labels()
 
@@ -363,7 +365,7 @@ class TestAccessibilityTestSuite:
         assert "tests" in aria_results
         assert len(aria_results["tests"]) == 5
 
-    def test_button_aria_labels_testing(self):
+    def test_button_aria_labels_testing(self) -> None:
         """Test button ARIA labels testing."""
         button_test = self.test_suite._test_button_aria_labels()
 
@@ -372,28 +374,28 @@ class TestAccessibilityTestSuite:
         assert "description" in button_test
         assert "details" in button_test
 
-    def test_input_aria_labels_testing(self):
+    def test_input_aria_labels_testing(self) -> None:
         """Test input ARIA labels testing."""
         input_test = self.test_suite._test_input_aria_labels()
 
         assert input_test["test_name"] == "Input ARIA Labels"
         assert input_test["status"] in ["passed", "failed", "error"]
 
-    def test_heading_aria_labels_testing(self):
+    def test_heading_aria_labels_testing(self) -> None:
         """Test heading ARIA labels testing."""
         heading_test = self.test_suite._test_heading_aria_labels()
 
         assert heading_test["test_name"] == "Heading ARIA Labels"
         assert heading_test["status"] in ["passed", "failed", "error"]
 
-    def test_dynamic_aria_labels_testing(self):
+    def test_dynamic_aria_labels_testing(self) -> None:
         """Test dynamic content ARIA labels testing."""
         dynamic_test = self.test_suite._test_dynamic_aria_labels()
 
         assert dynamic_test["test_name"] == "Dynamic Content ARIA Labels"
         assert dynamic_test["status"] in ["passed", "failed", "error"]
 
-    def test_semantic_html_testing(self):
+    def test_semantic_html_testing(self) -> None:
         """Test semantic HTML structure testing."""
         semantic_results = self.test_suite._test_semantic_html_structure()
 
@@ -402,7 +404,7 @@ class TestAccessibilityTestSuite:
         assert semantic_results["passed_tests"] == 4
         assert semantic_results["failed_tests"] == 0
 
-    def test_keyboard_navigation_testing(self):
+    def test_keyboard_navigation_testing(self) -> None:
         """Test keyboard navigation testing."""
         keyboard_results = self.test_suite._test_keyboard_navigation()
 
@@ -410,7 +412,7 @@ class TestAccessibilityTestSuite:
         assert keyboard_results["total_tests"] == 3
         assert keyboard_results["passed_tests"] == 3
 
-    def test_screen_reader_support_testing(self):
+    def test_screen_reader_support_testing(self) -> None:
         """Test screen reader support testing."""
         screen_reader_results = self.test_suite._test_screen_reader_support()
 
@@ -418,7 +420,7 @@ class TestAccessibilityTestSuite:
         assert screen_reader_results["total_tests"] == 3
         assert screen_reader_results["passed_tests"] == 3
 
-    def test_high_contrast_mode_testing(self):
+    def test_high_contrast_mode_testing(self) -> None:
         """Test high contrast mode testing."""
         contrast_results = self.test_suite._test_high_contrast_mode()
 
@@ -426,7 +428,7 @@ class TestAccessibilityTestSuite:
         assert contrast_results["total_tests"] == 2
         assert contrast_results["passed_tests"] == 2
 
-    def test_font_scaling_testing(self):
+    def test_font_scaling_testing(self) -> None:
         """Test font scaling testing."""
         font_results = self.test_suite._test_font_scaling()
 
@@ -434,7 +436,7 @@ class TestAccessibilityTestSuite:
         assert font_results["total_tests"] == 2
         assert font_results["passed_tests"] == 2
 
-    def test_touch_target_compliance_testing(self):
+    def test_touch_target_compliance_testing(self) -> None:
         """Test touch target compliance testing."""
         touch_results = self.test_suite._test_touch_target_compliance()
 
@@ -442,7 +444,7 @@ class TestAccessibilityTestSuite:
         assert touch_results["total_tests"] == 2
         assert touch_results["passed_tests"] == 2
 
-    def test_focus_indicators_testing(self):
+    def test_focus_indicators_testing(self) -> None:
         """Test focus indicators testing."""
         focus_results = self.test_suite._test_focus_indicators()
 
@@ -450,7 +452,7 @@ class TestAccessibilityTestSuite:
         assert focus_results["total_tests"] == 2
         assert focus_results["passed_tests"] == 2
 
-    def test_live_regions_testing(self):
+    def test_live_regions_testing(self) -> None:
         """Test live regions testing."""
         live_results = self.test_suite._test_live_regions()
 
@@ -458,7 +460,7 @@ class TestAccessibilityTestSuite:
         assert live_results["total_tests"] == 2
         assert live_results["passed_tests"] == 2
 
-    def test_voice_over_compatibility_testing(self):
+    def test_voice_over_compatibility_testing(self) -> None:
         """Test VoiceOver compatibility testing."""
         voiceover_results = self.test_suite._test_voice_over_compatibility()
 
@@ -466,7 +468,7 @@ class TestAccessibilityTestSuite:
         assert voiceover_results["total_tests"] == 2
         assert voiceover_results["passed_tests"] == 2
 
-    def test_reduced_motion_support_testing(self):
+    def test_reduced_motion_support_testing(self) -> None:
         """Test reduced motion support testing."""
         motion_results = self.test_suite._test_reduced_motion_support()
 
@@ -474,7 +476,7 @@ class TestAccessibilityTestSuite:
         assert motion_results["total_tests"] == 1
         assert motion_results["passed_tests"] == 1
 
-    def test_individual_components_testing(self):
+    def test_individual_components_testing(self) -> None:
         """Test individual component testing."""
         component_results = self.test_suite._test_individual_components()
 
@@ -483,7 +485,7 @@ class TestAccessibilityTestSuite:
         assert "analysis_display" in component_results
         assert "settings_card" in component_results
 
-    def test_camera_input_accessibility_testing(self):
+    def test_camera_input_accessibility_testing(self) -> None:
         """Test camera input accessibility testing."""
         camera_results = self.test_suite._test_camera_input_accessibility()
 
@@ -493,7 +495,7 @@ class TestAccessibilityTestSuite:
             assert "accessibility_features" in camera_results
             assert camera_results["compliance_level"] == "WCAG 2.1 AA"
 
-    def test_comprehensive_accessibility_tests(self):
+    def test_comprehensive_accessibility_tests(self) -> None:
         """Test comprehensive accessibility test execution."""
         with patch("streamlit.session_state", {"mobile_accessibility": {"screen_reader_active": True, "contrast_mode": "normal"}}):
             test_results = self.test_suite.run_comprehensive_accessibility_tests()
@@ -508,7 +510,7 @@ class TestAccessibilityTestSuite:
             assert "component_tests" in test_results
             assert "recommendations" in test_results
 
-    def test_accessibility_report_generation(self):
+    def test_accessibility_report_generation(self) -> None:
         """Test accessibility report generation."""
         with patch("streamlit.session_state", {"mobile_accessibility": {"screen_reader_active": True, "contrast_mode": "normal"}}):
             report = self.test_suite.generate_accessibility_report()
@@ -524,7 +526,7 @@ class TestUtilityFunctions:
     """Test utility functions."""
 
     @patch("streamlit.session_state", {})
-    def test_initialize_mobile_accessibility(self):
+    def test_initialize_mobile_accessibility(self) -> None:
         """Test initialize_mobile_accessibility utility function."""
         with patch("streamlit.session_state", {}) as mock_session:
             mock_session.__contains__ = Mock(return_value=False)
@@ -535,7 +537,7 @@ class TestUtilityFunctions:
             assert isinstance(manager, MobileAccessibilityManager)
             assert mock_session.__setitem__.called
 
-    def test_create_accessible_component_function(self):
+    def test_create_accessible_component_function(self) -> None:
         """Test create_accessible_component utility function."""
         # Test button creation
         button_html = create_accessible_component("button", "test-btn", text="Test Button")
@@ -556,7 +558,7 @@ class TestUtilityFunctions:
         unknown_html = create_accessible_component("unknown", "test-unknown")
         assert unknown_html == ""
 
-    def test_run_accessibility_tests_function(self):
+    def test_run_accessibility_tests_function(self) -> None:
         """Test run_accessibility_tests utility function."""
         with patch("streamlit.session_state", {"mobile_accessibility": {"screen_reader_active": True, "contrast_mode": "normal"}}):
             test_results = run_accessibility_tests()
@@ -565,7 +567,7 @@ class TestUtilityFunctions:
             assert "test_suite" in test_results
             assert "overall_status" in test_results
 
-    def test_generate_accessibility_report_function(self):
+    def test_generate_accessibility_report_function(self) -> None:
         """Test generate_accessibility_report utility function."""
         with patch("streamlit.session_state", {"mobile_accessibility": {"screen_reader_active": True, "contrast_mode": "normal"}}):
             report = generate_accessibility_report()
@@ -573,7 +575,7 @@ class TestUtilityFunctions:
             assert isinstance(report, str)
             assert "Mobile Accessibility Compliance Report" in report
 
-    def test_validate_component_accessibility_function(self):
+    def test_validate_component_accessibility_function(self) -> None:
         """Test validate_component_accessibility utility function."""
         # Test valid component types
         camera_results = validate_component_accessibility("camera_input")

@@ -28,7 +28,7 @@ class MobileTestingFramework:
     reporting and AI agent support.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the unified mobile testing framework."""
         # Initialize all testing components
         self.component_tester = MobileComponentTester()

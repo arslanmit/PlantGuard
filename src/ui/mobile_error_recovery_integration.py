@@ -90,7 +90,7 @@ class MobileErrorRecoveryIntegration:
             Wrapped render function with error recovery and offline support
         """
 
-        def resilient_wrapper(*args, **kwargs):
+        def resilient_wrapper(*args, **kwargs) -> None:
             try:
                 # Register offline capability if not already registered
                 if not MobileOfflineManager.can_function_offline(component_id):
@@ -501,7 +501,7 @@ def create_resilient_mobile_component(component_id: str, offline_capability: Off
         offline_capability: Offline capability level
     """
 
-    def decorator(render_func):
+    def decorator(render_func) -> Any:
         return MobileErrorRecoveryIntegration.create_resilient_component_wrapper(component_id, render_func, offline_capability)
 
     return decorator
@@ -517,8 +517,8 @@ def handle_mobile_operation(component_id: str, operation_name: str, cache_key: s
         cache_key: Optional cache key for results
     """
 
-    def decorator(operation_func):
-        def wrapper(*args, **kwargs):
+    def decorator(operation_func) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
             return MobileErrorRecoveryIntegration.handle_network_dependent_operation(
                 component_id=component_id, operation_name=operation_name, operation_func=lambda: operation_func(*args, **kwargs), cache_key=cache_key
             )

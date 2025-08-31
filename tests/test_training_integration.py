@@ -6,10 +6,12 @@ from torch import nn
 from src.training.config import TrainingConfig
 from src.training.optimizers import create_training_components
 from src.training.resource_manager import get_resource_manager
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
 class SimpleModel(nn.Module):
     """Simple model for testing."""
+
 
     def __init__(self) -> None:
         super().__init__()

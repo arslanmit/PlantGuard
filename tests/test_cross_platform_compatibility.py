@@ -1,8 +1,10 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Cross-platform compatibility tests for PlantGuard production training pipeline.
 
 These tests ensure the training system works correctly across different platforms
 (macOS, Linux) and handles platform-specific features appropriately.
 """
+
 
 import platform
 import shutil
@@ -25,14 +27,14 @@ class TestCrossPlatformCompatibility:
     """Cross-platform compatibility tests."""
 
     @pytest.fixture
-    def temp_dir(self):
+    def temp_dir(self) -> Generator[Any, None, None]:
         """Create temporary directory for tests."""
         temp_dir = Path(tempfile.mkdtemp())
         yield temp_dir
         shutil.rmtree(temp_dir, ignore_errors=True)
 
     @pytest.fixture
-    def test_dataset(self, temp_dir):
+    def test_dataset(self, temp_dir) -> None:
         """Create test dataset with cross-platform path handling."""
         dataset_dir = temp_dir / "cross_platform_dataset"
 
@@ -52,7 +54,7 @@ class TestCrossPlatformCompatibility:
 
         return dataset_dir
 
-    def test_path_handling_across_platforms(self, test_dataset, temp_dir):
+    def test_path_handling_across_platforms(self, test_dataset, temp_dir) -> None:
         """Test that path handling works correctly across platforms."""
         config = TrainingConfig(
             experiment_name="cross_platform_test",
@@ -89,7 +91,7 @@ class TestCrossPlatformCompatibility:
         else:
             assert "/" in model_path_str
 
-    def test_file_permissions_unix(self, test_dataset, temp_dir):
+    def test_file_permissions_unix(self, test_dataset, temp_dir) -> None:
         """Test file permissions handling on Unix-like systems."""
         if platform.system() == "Windows":
             pytest.skip("Unix-specific test")
@@ -121,7 +123,7 @@ class TestCrossPlatformCompatibility:
         model_dir = model_file.parent
         assert model_dir.stat().st_mode & 0o700, "Model directory should be accessible"
 
-    def test_memory_management_differences(self, test_dataset, temp_dir):
+    def test_memory_management_differences(self, test_dataset, temp_dir) -> None:
         """Test memory management across different platforms."""
         import psutil
 
@@ -163,7 +165,7 @@ class TestCrossPlatformCompatibility:
 
         assert memory_increase < max_memory_increase, f"Memory usage too high on {platform.system()}: {memory_increase:.1f}MB"
 
-    def test_multiprocessing_compatibility(self, test_dataset, temp_dir):
+    def test_multiprocessing_compatibility(self, test_dataset, temp_dir) -> None:
         """Test multiprocessing data loading across platforms."""
         # Different platforms handle multiprocessing differently
 
@@ -185,7 +187,7 @@ class TestCrossPlatformCompatibility:
         result = trainer.train()
         assert result.success, f"Multiprocessing should work on {platform.system()}"
 
-    def test_file_locking_behavior(self, test_dataset, temp_dir):
+    def test_file_locking_behavior(self, test_dataset, temp_dir) -> None:
         """Test file locking behavior across platforms."""
         config = TrainingConfig(
             experiment_name="file_locking_test",
@@ -225,7 +227,7 @@ class TestCrossPlatformCompatibility:
             else:
                 raise
 
-    def test_environment_variable_handling(self, test_dataset, temp_dir):
+    def test_environment_variable_handling(self, test_dataset, temp_dir) -> None:
         """Test environment variable handling across platforms."""
         import os
 
@@ -265,7 +267,7 @@ class TestCrossPlatformCompatibility:
 
                 assert trainer.setup_training()
 
-    def test_python_version_compatibility(self, test_dataset, temp_dir):
+    def test_python_version_compatibility(self, test_dataset, temp_dir) -> None:
         """Test compatibility with different Python versions."""
         python_version = sys.version_info
 
@@ -289,7 +291,7 @@ class TestCrossPlatformCompatibility:
         result = trainer.train()
         assert result.success, f"Should work with Python {python_version.major}.{python_version.minor}"
 
-    def test_torch_version_compatibility(self, test_dataset, temp_dir):
+    def test_torch_version_compatibility(self, test_dataset, temp_dir) -> None:
         """Test compatibility with different PyTorch versions."""
         torch_version = torch.__version__
 
@@ -314,7 +316,7 @@ class TestCrossPlatformCompatibility:
             # PyTorch 2.0+ features
             pass
 
-    def test_unicode_path_handling(self, temp_dir):
+    def test_unicode_path_handling(self, temp_dir) -> None:
         """Test handling of Unicode characters in file paths."""
         # Create dataset with Unicode characters in path
         unicode_dataset_dir = temp_dir / "测试数据集_тест_[LEAF]"
@@ -349,7 +351,7 @@ class TestCrossPlatformCompatibility:
         result = trainer.train()
         assert result.success, "Training should work with Unicode paths"
 
-    def test_large_file_handling(self, temp_dir):
+    def test_large_file_handling(self, temp_dir) -> None:
         """Test handling of large files across platforms."""
         # Create a larger test dataset
         large_dataset_dir = temp_dir / "large_dataset"

@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Integration test for Migration Safety Framework
 
 This script tests the complete migration safety workflow in a controlled environment.
 """
+
 
 import shutil
 import sys
@@ -16,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from utils.migration_safety import MigrationSafetyFramework
 
 
-def create_test_project(temp_dir: Path):
+def create_test_project(temp_dir: Path) -> Any:
     """Create a test project structure."""
     test_files = {
         # Main applications
@@ -46,17 +48,17 @@ st.write("Legacy multi-page application")
         "src/core/__init__.py": "",
         "src/core/vision.py": """
 class VisionAdapter:
-    def predict(self, image):
+    def predict(self, image) -> str:
         return "healthy", 0.95
 """,
         "src/core/audio.py": """
 class AudioAdapter:
-    def transcribe(self, audio):
+    def transcribe(self, audio) -> str:
         return "plant looks healthy"
 """,
         "src/core/nlp.py": """
 class TextAdapter:
-    def extract_features(self, text):
+    def extract_features(self, text) -> List[Any]:
         return [0.1, 0.2, 0.3]
 """,
         # UI components
@@ -66,7 +68,7 @@ class TextAdapter:
 import streamlit as st
 from spa_app import desktop_function  # This should be cleaned
 
-def mobile_header():
+def mobile_header() -> Any:
     st.header("Mobile Header")
 """,
         # Configuration and build files
@@ -112,15 +114,15 @@ Plant disease detection system with desktop and mobile interfaces.
 """,
         # Test files
         "test_spa_navigation.py": """
-def test_spa_navigation():
+def test_spa_navigation() -> None:
     assert True
 """,
         "test_unified_ui.py": """
-def test_unified_ui():
+def test_unified_ui() -> None:
     assert True
 """,
         "test_mobile_integration.py": """
-def test_mobile_integration():
+def test_mobile_integration() -> None:
     assert True
 """,
     }
@@ -133,7 +135,7 @@ def test_mobile_integration():
     print(f"Created test project with {len(test_files)} files")
 
 
-def simulate_migration_changes(framework: MigrationSafetyFramework):
+def simulate_migration_changes(framework: MigrationSafetyFramework) -> Any:
     """Simulate the migration changes."""
     print("\n=== Simulating Migration Changes ===")
 
@@ -207,7 +209,7 @@ This system has been migrated to mobile-only. Desktop SPA interface has been rem
         print("✓ Updated README for mobile-only")
 
 
-def main():
+def main() -> None:
     """Run complete integration test."""
     print("=== Migration Safety Framework Integration Test ===")
 

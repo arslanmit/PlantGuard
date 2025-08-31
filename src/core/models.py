@@ -1,7 +1,9 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Model architectures for PlantGuard.
 
 This module contains the ResNet50 model architecture for plant disease classification.
 """
+
 
 import logging
 

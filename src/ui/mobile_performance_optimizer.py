@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class PerformanceMonitor:
     """Monitors and tracks performance metrics."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.metrics: dict[str, list[float]] = {}
         self.start_times: dict[str, float] = {}
 
@@ -69,7 +69,7 @@ class PerformanceMonitor:
 class LazyLoader:
     """Implements lazy loading for components and resources."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.loaded_components: dict[str, Any] = {}
         self.loading_states: dict[str, bool] = {}
 
@@ -109,7 +109,7 @@ class LazyLoader:
 class CacheManager:
     """Manages caching for mobile application."""
 
-    def __init__(self, cache_dir: Path | None = None):
+    def __init__(self, cache_dir: Path | None = None) -> None:
         self.cache_dir = cache_dir or Path.cwd() / ".mobile_cache"
         self.cache_dir.mkdir(exist_ok=True)
         self.memory_cache: dict[str, Any] = {}
@@ -214,7 +214,7 @@ class CacheManager:
 class MemoryManager:
     """Manages memory usage for mobile application."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.memory_threshold = 100 * 1024 * 1024  # 100MB threshold
         self.cleanup_callbacks: list[Callable] = []
 
@@ -275,7 +275,7 @@ class MemoryManager:
 class BundleOptimizer:
     """Optimizes resource bundles for mobile."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.css_cache: dict[str, str] = {}
         self.js_cache: dict[str, str] = {}
 
@@ -356,9 +356,9 @@ class BundleOptimizer:
 def performance_timer(operation_name: str) -> Callable:
     """Decorator to time function execution."""
 
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             monitor = get_performance_monitor()
             monitor.start_timer(operation_name)
 
@@ -377,9 +377,9 @@ def performance_timer(operation_name: str) -> Callable:
 def cached_component(cache_key: str, ttl: int = 3600) -> Callable:
     """Decorator to cache component results."""
 
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             cache_manager = get_cache_manager()
 
             # Generate cache key with function arguments
@@ -403,9 +403,9 @@ def cached_component(cache_key: str, ttl: int = 3600) -> Callable:
 def memory_efficient(cleanup_after: bool = True) -> Callable:
     """Decorator to ensure memory efficient execution."""
 
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             memory_manager = get_memory_manager()
 
             # Check memory before execution

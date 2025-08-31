@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """Create a dummy model checkpoint for PlantGuard development.
 
 This script creates a mock trained model checkpoint that can be used
 for testing the application without requiring actual training.
 """
+
 
 import json
 import logging

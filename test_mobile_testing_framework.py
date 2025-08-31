@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Test runner for Mobile Testing Framework.
@@ -6,6 +7,7 @@ This script demonstrates the comprehensive mobile testing framework
 for PlantGuard UI components with automated testing, validation,
 and reporting capabilities.
 """
+
 
 import logging
 import sys

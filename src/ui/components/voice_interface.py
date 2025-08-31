@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Voice and Audio Processing Interface for PlantGuard.
 
 This module provides comprehensive voice and audio processing capabilities
 including microphone capture, file upload, transcription, and audio analysis
 for the PlantGuard multimodal plant disease detection system.
 """
+
 
 import logging
 import tempfile
@@ -40,7 +42,7 @@ logger = logging.getLogger(__name__)
 class VoiceInterface:
     """Voice and audio processing interface with real-time capture and file upload."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize voice interface."""
         self.sample_rate = 16000  # 16 kHz for Whisper
         self.max_duration = 60  # Maximum 60 seconds
@@ -179,7 +181,7 @@ class VoiceInterface:
 
             # Load Whisper model (cached)
             @st.cache_resource
-            def load_whisper_model():
+            def load_whisper_model() -> Any:
                 return whisper.load_model("tiny")
 
             model = load_whisper_model()
@@ -251,7 +253,7 @@ class VoiceInterface:
         # Audio capture state
         audio_frames: list[np.ndarray] = []
 
-        def audio_frame_callback(frame: av.AudioFrame):
+        def audio_frame_callback(frame: av.AudioFrame) -> Any:
             """Callback for processing audio frames."""
             processed_audio = self.process_audio_frame(frame)
             if len(processed_audio) > 0:

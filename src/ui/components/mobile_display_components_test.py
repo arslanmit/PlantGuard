@@ -1,4 +1,6 @@
 """
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 Test suite for Mobile Display Components.
 
 This module provides comprehensive testing for the mobile display components
@@ -23,7 +25,7 @@ logger = logging.getLogger(__name__)
 class TestMobileAnalysisDisplay:
     """Test suite for MobileAnalysisDisplay component."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         # Clear session state
         for key in list(st.session_state.keys()):
@@ -32,13 +34,13 @@ class TestMobileAnalysisDisplay:
         # Create test component
         self.component = MobileAnalysisDisplay("test_analysis", "Test Analysis Display")
 
-    def test_component_initialization(self):
+    def test_component_initialization(self) -> None:
         """Test component initialization."""
         assert self.component.component_id == "test_analysis"
         assert self.component.title == "Test Analysis Display"
         assert "analysis_data" in self.component.get_state()["data"]
 
-    def test_empty_state_rendering(self):
+    def test_empty_state_rendering(self) -> None:
         """Test rendering when no analysis results are available."""
         # Ensure no analysis results
         if "analysis_results" in st.session_state:
@@ -50,7 +52,7 @@ class TestMobileAnalysisDisplay:
         except Exception as e:
             pytest.fail(f"Empty state rendering failed: {e}")
 
-    def test_analysis_results_processing(self):
+    def test_analysis_results_processing(self) -> None:
         """Test processing of analysis results."""
         # Create mock analysis results
         mock_image = Image.new("RGB", (100, 100), color="green")
@@ -79,20 +81,20 @@ class TestMobileAnalysisDisplay:
         assert len(results) == 2
         assert results[0]["prediction"][0] in ["Apple Scab", "Healthy Plant"]
 
-    def test_confidence_level_calculation(self):
+    def test_confidence_level_calculation(self) -> None:
         """Test confidence level categorization."""
         assert self.component._get_confidence_level(0.9) == "high"
         assert self.component._get_confidence_level(0.7) == "medium"
         assert self.component._get_confidence_level(0.3) == "low"
 
-    def test_timestamp_formatting(self):
+    def test_timestamp_formatting(self) -> None:
         """Test timestamp formatting for display."""
         timestamp = datetime.now().isoformat()
         formatted = self.component._format_timestamp(timestamp)
         assert isinstance(formatted, str)
         assert len(formatted) > 0
 
-    def test_disease_info_loading(self):
+    def test_disease_info_loading(self) -> None:
         """Test disease information loading from knowledge base."""
         # Test with existing disease
         disease_info = self.component._get_disease_info("Apple___Apple_scab")
@@ -100,7 +102,7 @@ class TestMobileAnalysisDisplay:
         # Should either find info or return None gracefully
         assert disease_info is None or isinstance(disease_info, dict)
 
-    def test_display_mode_switching(self):
+    def test_display_mode_switching(self) -> None:
         """Test display mode switching functionality."""
         # Test setting different display modes
         self.component._set_display_mode("history")
@@ -111,7 +113,7 @@ class TestMobileAnalysisDisplay:
         state = self.component.get_state()
         assert state["data"]["analysis_data"]["display_mode"] == "detailed"
 
-    def test_result_sharing(self):
+    def test_result_sharing(self) -> None:
         """Test result sharing functionality."""
         mock_result = {"prediction": ("Test Disease", 0.75), "timestamp": datetime.now().isoformat(), "source": "test"}
 
@@ -121,7 +123,7 @@ class TestMobileAnalysisDisplay:
         except Exception as e:
             pytest.fail(f"Result sharing failed: {e}")
 
-    def test_clear_results(self):
+    def test_clear_results(self) -> None:
         """Test clearing analysis results."""
         # Add some results first
         st.session_state.analysis_results = [{"test": "data"}]
@@ -136,7 +138,7 @@ class TestMobileAnalysisDisplay:
 class TestMobileRecommendations:
     """Test suite for MobileRecommendations component."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         # Clear session state
         for key in list(st.session_state.keys()):
@@ -145,13 +147,13 @@ class TestMobileRecommendations:
         # Create test component
         self.component = MobileRecommendations("test_recommendations", "Test Recommendations")
 
-    def test_component_initialization(self):
+    def test_component_initialization(self) -> None:
         """Test component initialization."""
         assert self.component.component_id == "test_recommendations"
         assert self.component.title == "Test Recommendations"
         assert "recommendations_data" in self.component.get_state()["data"]
 
-    def test_no_analysis_state(self):
+    def test_no_analysis_state(self) -> None:
         """Test rendering when no analysis is available."""
         # Ensure no analysis results
         if "analysis_results" in st.session_state:
@@ -163,7 +165,7 @@ class TestMobileRecommendations:
         except Exception as e:
             pytest.fail(f"No analysis state rendering failed: {e}")
 
-    def test_current_disease_update(self):
+    def test_current_disease_update(self) -> None:
         """Test updating current disease in state."""
         self.component._update_current_disease("Test Disease", 0.8)
 
@@ -173,27 +175,27 @@ class TestMobileRecommendations:
         assert recommendations_data["current_disease"] == "Test Disease"
         assert recommendations_data["current_confidence"] == 0.8
 
-    def test_confidence_warning_levels(self):
+    def test_confidence_warning_levels(self) -> None:
         """Test confidence-based warning generation."""
         # Test different confidence levels
         assert self.component._get_confidence_level(0.9) == "high"
         assert self.component._get_confidence_level(0.7) == "medium"
         assert self.component._get_confidence_level(0.3) == "low"
 
-    def test_treatment_templates_loading(self):
+    def test_treatment_templates_loading(self) -> None:
         """Test loading of treatment templates."""
         templates = self.component._load_treatment_templates()
         assert isinstance(templates, dict)
         assert "generic_immediate" in templates
         assert "generic_preventive" in templates
 
-    def test_disease_info_retrieval(self):
+    def test_disease_info_retrieval(self) -> None:
         """Test disease information retrieval."""
         # Test with non-existent disease
         disease_info = self.component._get_disease_info("NonExistent Disease")
         assert disease_info is None
 
-    def test_recommendations_sharing(self):
+    def test_recommendations_sharing(self) -> None:
         """Test recommendations sharing functionality."""
         # This should not raise an exception
         try:
@@ -201,7 +203,7 @@ class TestMobileRecommendations:
         except Exception as e:
             pytest.fail(f"Recommendations sharing failed: {e}")
 
-    def test_custom_notes_saving(self):
+    def test_custom_notes_saving(self) -> None:
         """Test saving custom notes."""
         test_notes = "These are my test notes about the treatment."
         self.component._save_custom_notes(test_notes)
@@ -210,13 +212,13 @@ class TestMobileRecommendations:
         recommendations_data = state["data"]["recommendations_data"]
         assert recommendations_data["custom_notes"] == test_notes
 
-    def test_section_expansion_state(self):
+    def test_section_expansion_state(self) -> None:
         """Test section expansion state management."""
         # Test default expansion states
         assert self.component._is_section_expanded("immediate")
         assert not self.component._is_section_expanded("preventive")
 
-    def test_recommendations_with_analysis_context(self):
+    def test_recommendations_with_analysis_context(self) -> None:
         """Test recommendations with analysis context."""
         # Create mock analysis result
         mock_image = Image.new("RGB", (100, 100), color="green")
@@ -234,7 +236,7 @@ class TestMobileRecommendations:
 class TestMobileChatInterface:
     """Test suite for MobileChatInterface component."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         # Clear session state
         for key in list(st.session_state.keys()):
@@ -243,7 +245,7 @@ class TestMobileChatInterface:
         # Create test component
         self.component = MobileChatInterface("test_chat", "Test Chat")
 
-    def test_component_initialization(self):
+    def test_component_initialization(self) -> None:
         """Test component initialization."""
         assert self.component.component_id == "test_chat"
         assert self.component.title == "Test Chat"
@@ -255,7 +257,7 @@ class TestMobileChatInterface:
         assert len(messages) > 0
         assert messages[0]["type"] == "bot"
 
-    def test_message_addition(self):
+    def test_message_addition(self) -> None:
         """Test adding messages to chat."""
         test_message = {"id": "test_msg_1", "type": "user", "content": "Test message", "timestamp": datetime.now().isoformat(), "context": None}
 
@@ -268,7 +270,7 @@ class TestMobileChatInterface:
         assert len(messages) >= 2
         assert any(msg["content"] == "Test message" for msg in messages)
 
-    def test_typing_indicator(self):
+    def test_typing_indicator(self) -> None:
         """Test typing indicator functionality."""
         # Set typing
         self.component._set_typing(True)
@@ -278,7 +280,7 @@ class TestMobileChatInterface:
         self.component._set_typing(False)
         assert not self.component.is_typing()
 
-    def test_context_building(self):
+    def test_context_building(self) -> None:
         """Test chat context building."""
         # Add mock analysis results
         mock_image = Image.new("RGB", (100, 100), color="green")
@@ -294,7 +296,7 @@ class TestMobileChatInterface:
         assert "analysis_results" in context
         assert len(context["analysis_results"]) > 0
 
-    def test_fallback_responses(self):
+    def test_fallback_responses(self) -> None:
         """Test fallback response generation."""
         # Test water-related question
         response = self.component._get_fallback_response("How often should I water my plant?")
@@ -308,7 +310,7 @@ class TestMobileChatInterface:
         response = self.component._get_fallback_response("My plant looks sick")
         assert "disease" in response.lower() or "sick" in response.lower()
 
-    def test_message_timestamp_formatting(self):
+    def test_message_timestamp_formatting(self) -> None:
         """Test message timestamp formatting."""
         timestamp = datetime.now().isoformat()
         formatted = self.component._format_message_timestamp(timestamp)
@@ -316,7 +318,7 @@ class TestMobileChatInterface:
         # Should be in HH:MM format
         assert ":" in formatted
 
-    def test_chat_clearing(self):
+    def test_chat_clearing(self) -> None:
         """Test chat clearing functionality."""
         # Add some messages first
         test_message = {"id": "test_msg", "type": "user", "content": "Test", "timestamp": datetime.now().isoformat(), "context": None}
@@ -332,7 +334,7 @@ class TestMobileChatInterface:
         assert len(messages) == 1
         assert messages[0]["type"] == "bot"
 
-    def test_message_history_limits(self):
+    def test_message_history_limits(self) -> None:
         """Test message history length limits."""
         # Add many messages
         for i in range(60):  # More than max_history_length (50)
@@ -351,7 +353,7 @@ class TestMobileChatInterface:
         assert len(messages) <= self.component.chat_config["max_history_length"]
 
     @patch("src.core.nlp.TextAdapter")
-    def test_bot_response_generation(self, mock_text_adapter):
+    def test_bot_response_generation(self, mock_text_adapter) -> None:
         """Test bot response generation with mocked adapters."""
         # Mock the text adapter
         mock_text_instance = Mock()
@@ -363,7 +365,7 @@ class TestMobileChatInterface:
         assert isinstance(response, str)
         assert len(response) > 0
 
-    def test_context_prompt_building(self):
+    def test_context_prompt_building(self) -> None:
         """Test context-aware prompt building."""
         context = {"current_disease": {"name": "Apple Scab", "confidence": 0.85}, "analysis_results": [{"prediction": ("Apple Scab", 0.85)}]}
 
@@ -376,13 +378,13 @@ class TestMobileChatInterface:
 class TestMobileDisplayComponentsIntegration:
     """Integration tests for mobile display components."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         # Clear session state
         for key in list(st.session_state.keys()):
             del st.session_state[key]
 
-    def test_components_integration(self):
+    def test_components_integration(self) -> None:
         """Test integration between display components."""
         # Create all components
         analysis_display = MobileAnalysisDisplay("test_analysis")
@@ -405,7 +407,7 @@ class TestMobileDisplayComponentsIntegration:
         context = chat_interface._get_current_context()
         assert len(context["analysis_results"]) > 0
 
-    def test_css_class_generation(self):
+    def test_css_class_generation(self) -> None:
         """Test CSS class generation for AI agent discovery."""
         analysis_display = MobileAnalysisDisplay("test_analysis")
 
@@ -414,7 +416,7 @@ class TestMobileDisplayComponentsIntegration:
         assert "mobile-mobileanalysisdisplay" in css_classes
         assert "ai-discoverable" in css_classes
 
-    def test_error_handling_integration(self):
+    def test_error_handling_integration(self) -> None:
         """Test error handling across components."""
         analysis_display = MobileAnalysisDisplay("test_analysis")
 
@@ -424,7 +426,7 @@ class TestMobileDisplayComponentsIntegration:
         except Exception as e:
             pytest.fail(f"Error handling failed: {e}")
 
-    def test_state_management_integration(self):
+    def test_state_management_integration(self) -> None:
         """Test state management across components."""
         analysis_display = MobileAnalysisDisplay("test_analysis")
         recommendations = MobileRecommendations("test_recommendations")

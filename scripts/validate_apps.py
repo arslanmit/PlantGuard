@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Validate that PlantGuard Streamlit applications can start without import errors."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import importlib
 import importlib.util
 import sys
@@ -12,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 def _is_available(module_name: str) -> bool:
     """Return True if the given module can be imported or discovered via find_spec."""
+
     try:
         if importlib.util.find_spec(module_name) is None:
             return False

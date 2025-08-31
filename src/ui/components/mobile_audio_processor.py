@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 class MobileAudioProcessor(MobileBaseComponent):
     """Mobile-optimized audio processor with speech-to-text and analysis."""
 
-    def __init__(self, component_id: str, title: str = "Audio Processor", **kwargs):
+    def __init__(self, component_id: str, title: str = "Audio Processor", **kwargs) -> None:
         """
         Initialize mobile audio processor.
 

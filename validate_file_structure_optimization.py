@@ -3,6 +3,8 @@
 Validation script for Task 10: File Structure Optimization
 Validates that all requirements have been met for mobile-only file structure.
 """
+import pytest
+
 
 import json
 from pathlib import Path

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Script to prepare dataset using DatasetManager."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import argparse
 import sys
 from pathlib import Path
@@ -13,6 +15,7 @@ from src.training.dataset_manager import DatasetConfig, DatasetManager
 
 def main() -> None:
     """Prepare dataset with train/val splits."""
+
     parser = argparse.ArgumentParser(description="Prepare dataset with train/val splits")
     parser.add_argument(
         "--source-dir",

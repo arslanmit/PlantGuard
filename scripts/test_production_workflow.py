@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """Test the production training workflow with minimal configuration.
 
 This script tests the complete production training pipeline with a small
 dataset and minimal epochs to verify the end-to-end workflow works.
 """
+
 
 import logging
 import sys

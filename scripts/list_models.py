@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Script to list all registered models."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from pathlib import Path
 
@@ -10,8 +12,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from training.model_registry import ModelRegistry
 
 
-def main():
+def main() -> None:
     """List all registered models with details."""
+
     registry = ModelRegistry()
     models = registry.list_models()
 

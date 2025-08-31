@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Validate Backward Compatibility Implementation
@@ -5,6 +6,7 @@ Validate Backward Compatibility Implementation
 This script validates that all backward compatibility and user guidance features
 are properly implemented for the mobile-only refactoring.
 """
+
 
 import subprocess
 import sys
@@ -14,7 +16,7 @@ from pathlib import Path
 class BackwardCompatibilityValidator:
     """Validates backward compatibility implementation."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.deprecated_commands = [
             "run",
             "r",
@@ -311,7 +313,7 @@ class BackwardCompatibilityValidator:
         print(f"[DOCUMENT] Detailed validation report saved to: {report_path}")
 
 
-def main():
+def main() -> None:
     """Main validation function."""
     validator = BackwardCompatibilityValidator()
     results = validator.run_comprehensive_validation()

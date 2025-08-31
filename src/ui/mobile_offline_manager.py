@@ -776,8 +776,8 @@ def with_offline_support(operation_id: str, operation_func: Callable, fallback_f
         cache_result: Whether to cache the result for offline use
     """
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func) -> None:
+        def wrapper(*args, **kwargs) -> None:
             if MobileOfflineManager.is_online():
                 try:
                     result = operation_func(*args, **kwargs)

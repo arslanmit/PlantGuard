@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class AccessibilityTestSuite:
     """Comprehensive accessibility testing suite for mobile components."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize accessibility test suite."""
         self.accessibility_manager = initialize_mobile_accessibility()
         self.test_results: dict[str, Any] = {}

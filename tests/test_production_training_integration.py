@@ -11,10 +11,12 @@ from PIL import Image
 from src.core.model_manager import PlantGuardModelManager
 from src.core.vision import VisionAdapter
 from src.training.model_registry import ModelRegistry
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
 class TestProductionTrainingIntegration:
     """Test integration between production training pipeline and existing components."""
+
 
     def setup_method(self) -> None:
         """Set up test environment."""
@@ -179,7 +181,7 @@ class TestProductionTrainingIntegration:
 
             mod = types.ModuleType("scripts.migrate_models")
 
-            def _stub_scan_for_legacy_models():
+            def _stub_scan_for_legacy_models() -> Any:
                 return legacy_models
 
             mod.scan_for_legacy_models = _stub_scan_for_legacy_models

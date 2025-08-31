@@ -377,7 +377,7 @@ if __name__ == "__main__":
     main()
 
 
-def _create_temp_samples(tmp_path):
+def _create_temp_samples(tmp_path) -> Any:
     """Create a small set of temporary sample images and metadata for tests."""
     images_dir = tmp_path / "data_raw"
     images_dir.mkdir(parents=True, exist_ok=True)

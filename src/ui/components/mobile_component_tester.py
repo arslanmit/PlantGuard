@@ -75,7 +75,7 @@ class MobileComponentTester:
     adapter integration, and performance optimization with AI agent support.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mobile component tester."""
         self.state_manager = MobileStateManager()
         self.test_results: list[TestResult] = []

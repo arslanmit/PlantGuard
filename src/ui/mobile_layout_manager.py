@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Mobile Layout Manager for PlantGuard UI.
 
 This module provides the core mobile layout management system with responsive design,
 touch optimization, and AI agent-friendly component architecture.
 """
+
 
 import logging
 
@@ -15,7 +17,7 @@ logger = logging.getLogger(__name__)
 class MobileLayoutManager:
     """Main layout manager for mobile interface with single-column responsive design."""
 
-    def __init__(self, component_id: str = "mobile_layout", **kwargs):
+    def __init__(self, component_id: str = "mobile_layout", **kwargs) -> None:
         """Initialize mobile layout manager with configuration."""
         self.component_id = component_id
         self.config = {

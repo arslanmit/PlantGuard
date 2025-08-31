@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Complete the disease knowledge base with all 38 PlantVillage classes."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import json
 
 
-def get_all_diseases():
+def get_all_diseases() -> Any:
     """Return comprehensive disease information for all 38 classes."""
     # Read existing classes
+
     with open("data/knowledge_base/plantvillage_classes.json") as f:
         class_data = json.load(f)
 
@@ -137,7 +140,7 @@ def get_all_diseases():
     return diseases
 
 
-def main():
+def main() -> None:
     """Create complete knowledge base."""
     diseases = get_all_diseases()
 

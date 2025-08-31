@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Command-line interface for PlantGuard Migration Safety Framework
@@ -10,6 +11,7 @@ Usage:
     python scripts/migration_safety_cli.py list-backups
 """
 
+
 import argparse
 import sys
 from pathlib import Path
@@ -20,7 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 from utils.migration_safety import MigrationBackupManager, MigrationSafetyFramework, create_migration_framework
 
 
-def create_checkpoint(args):
+def create_checkpoint(args) -> Any:
     """Create a migration safety checkpoint."""
     print("Creating migration safety checkpoint...")
 
@@ -37,7 +39,7 @@ def create_checkpoint(args):
         sys.exit(1)
 
 
-def validate_migration(args):
+def validate_migration(args) -> bool:
     """Validate current migration state."""
     print("Validating migration state...")
 
@@ -68,7 +70,7 @@ def validate_migration(args):
         sys.exit(1)
 
 
-def rollback_migration(args):
+def rollback_migration(args) -> Any:
     """Rollback migration to previous state."""
     migration_id = args.migration_id
 
@@ -110,7 +112,7 @@ def rollback_migration(args):
         sys.exit(1)
 
 
-def show_status(args):
+def show_status(args) -> None:
     """Show current migration status."""
     framework = create_migration_framework("mobile_only_refactoring")
     status = framework.get_migration_status()
@@ -132,7 +134,7 @@ def show_status(args):
     print(f"  Rollback Available: {migration_status['rollback_available']}")
 
 
-def list_backups(args):
+def list_backups(args) -> Any:
     """List available backups."""
     backup_manager = MigrationBackupManager()
     backups = backup_manager.list_backups()
@@ -150,7 +152,7 @@ def list_backups(args):
         print()
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="PlantGuard Migration Safety Framework CLI",
         formatter_class=argparse.RawDescriptionHelpFormatter,

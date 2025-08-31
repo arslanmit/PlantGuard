@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class EndToEndIntegrationTest:
     """End-to-end integration test for the production training pipeline."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the test."""
         self.temp_dir = Path(tempfile.mkdtemp())
         self.results: dict[str, Any] = {"tests_passed": 0, "tests_failed": 0, "test_results": {}, "errors": []}

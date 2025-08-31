@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class MobileCameraInput(MobileBaseComponent):
     """Mobile-optimized camera input component with device camera integration."""
 
-    def __init__(self, component_id: str, title: str = "Camera Input", **kwargs):
+    def __init__(self, component_id: str, title: str = "Camera Input", **kwargs) -> None:
         """
         Initialize mobile camera input component.
 

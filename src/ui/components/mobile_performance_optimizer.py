@@ -95,7 +95,7 @@ class CacheEntry:
 class MobileResourceCache:
     """Resource caching system optimized for mobile devices."""
 
-    def __init__(self, max_size_mb: int = 50, max_entries: int = 1000):
+    def __init__(self, max_size_mb: int = 50, max_entries: int = 1000) -> None:
         """
         Initialize mobile resource cache.
 
@@ -220,7 +220,7 @@ class MobileResourceCache:
 class LazyLoader:
     """Lazy loading system for mobile components and resources."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize lazy loader."""
         self._loaded_components: WeakValueDictionary = WeakValueDictionary()
         self._loading_queue: list[str] = []
@@ -287,7 +287,7 @@ class LazyLoader:
 class MemoryManager:
     """Memory management system for mobile constraints."""
 
-    def __init__(self, warning_threshold_mb: int = 100, critical_threshold_mb: int = 150):
+    def __init__(self, warning_threshold_mb: int = 100, critical_threshold_mb: int = 150) -> None:
         """
         Initialize memory manager.
 
@@ -399,7 +399,7 @@ class MemoryManager:
 class MobilePerformanceOptimizer:
     """Main performance optimization system for mobile devices."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mobile performance optimizer."""
         self.cache = MobileResourceCache()
         self.lazy_loader = LazyLoader()
@@ -448,7 +448,7 @@ class MobilePerformanceOptimizer:
 
         def decorator(render_func: Callable) -> Callable:
             @wraps(render_func)
-            def wrapper(*args, **kwargs):
+            def wrapper(*args, **kwargs) -> Any:
                 if not self._optimization_enabled:
                     return render_func(*args, **kwargs)
 

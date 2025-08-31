@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Mobile Components Package for PlantGuard UI.
 
 This package provides mobile-optimized components with AI agent support
 and comprehensive error handling for the PlantGuard plant disease detection system.
 """
+
 
 import logging
 

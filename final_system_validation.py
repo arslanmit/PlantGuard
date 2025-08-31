@@ -3,6 +3,8 @@
 Final System Validation for Mobile-Only Refactoring
 Comprehensive validation to ensure migration is complete and system is functional.
 """
+import pytest
+
 
 import ast
 import importlib.util
@@ -18,7 +20,7 @@ from typing import Any
 class FinalSystemValidator:
     """Comprehensive validator for mobile-only system migration."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.results = {}
         self.errors = []
         self.warnings = []

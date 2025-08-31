@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """Pytest configuration helpers.
 
 Ensure the repository root and the `src/` package directory are on sys.path
@@ -5,6 +6,7 @@ early during test collection so tests that import `src.*` succeed.
 
 This is a minimal, non-invasive helper intended only for the test runtime.
 """
+
 
 from __future__ import annotations
 
@@ -54,7 +56,7 @@ def pytest_sessionstart(session) -> None:
 if MOBILE_FIXTURES_AVAILABLE:
 
     @pytest.fixture
-    def mock_streamlit_session():
+    def mock_streamlit_session() -> Generator[Any, None, None]:
         """Provide mock Streamlit session state."""
         mock_session = MockStreamlitSession()
 
@@ -65,32 +67,32 @@ if MOBILE_FIXTURES_AVAILABLE:
             yield mock_session
 
     @pytest.fixture
-    def mock_vision_adapter():
+    def mock_vision_adapter() -> Any:
         """Provide mock vision adapter."""
         return MockVisionAdapter()
 
     @pytest.fixture
-    def mock_audio_adapter():
+    def mock_audio_adapter() -> Any:
         """Provide mock audio adapter."""
         return MockAudioAdapter()
 
     @pytest.fixture
-    def mock_text_adapter():
+    def mock_text_adapter() -> Any:
         """Provide mock text adapter."""
         return MockTextAdapter()
 
     @pytest.fixture
-    def sample_test_image():
+    def sample_test_image() -> Any:
         """Provide sample test image."""
         return Image.new("RGB", (224, 224), color="green")
 
     @pytest.fixture
-    def sample_large_image():
+    def sample_large_image() -> Any:
         """Provide sample large image for testing preprocessing."""
         return Image.new("RGB", (2000, 1500), color="blue")
 
     @pytest.fixture
-    def temp_audio_file():
+    def temp_audio_file() -> Generator[Any, None, None]:
         """Provide temporary audio file for testing."""
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
             audio_file_path = tmp_file.name
@@ -103,7 +105,7 @@ if MOBILE_FIXTURES_AVAILABLE:
         Path(audio_file_path).unlink(missing_ok=True)
 
     @pytest.fixture
-    def sample_analysis_results():
+    def sample_analysis_results() -> List[Any]:
         """Provide sample analysis results for testing."""
         return [
             TestDataFactory.create_analysis_result(disease_name="Powdery Mildew", confidence=0.92, source="camera", component_id="test_camera"),
@@ -111,14 +113,14 @@ if MOBILE_FIXTURES_AVAILABLE:
         ]
 
     @pytest.fixture
-    def mock_chat_model():
+    def mock_chat_model() -> Any:
         """Provide mock chat model."""
         from tests.fixtures.mobile_test_fixtures import MockChatModel
 
         return MockChatModel()
 
     @pytest.fixture
-    def all_mock_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter, mock_chat_model):
+    def all_mock_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter, mock_chat_model) -> Any:
         """Provide all mock adapters without importing actual modules."""
         adapters = {"vision": mock_vision_adapter, "audio": mock_audio_adapter, "text": mock_text_adapter, "chat": mock_chat_model}
 
@@ -126,7 +128,7 @@ if MOBILE_FIXTURES_AVAILABLE:
         return adapters
 
     @pytest.fixture
-    def mock_mobile_component_registry():
+    def mock_mobile_component_registry() -> Any:
         """Mock mobile component registry for testing."""
         mock_registry = Mock()
         mock_registry.get_all_components.return_value = {
@@ -143,36 +145,36 @@ if MOBILE_FIXTURES_AVAILABLE:
         return mock_registry
 
     @pytest.fixture
-    def error_simulation():
+    def error_simulation() -> Any:
         """Provide error simulation utilities for testing error handling."""
 
         class ErrorSimulator:
             @staticmethod
-            def create_adapter_error(adapter_type: str, error_message: str | None = None):
+            def create_adapter_error(adapter_type: str, error_message: str | None = None) -> Any:
                 """Create an adapter error for testing."""
                 if error_message is None:
                     error_message = f"{adapter_type} adapter error"
                 return Exception(error_message)
 
             @staticmethod
-            def create_network_error():
+            def create_network_error() -> Any:
                 """Create a network error for testing."""
                 return ConnectionError("Network connection failed")
 
             @staticmethod
-            def create_file_error():
+            def create_file_error() -> Any:
                 """Create a file error for testing."""
                 return FileNotFoundError("Model file not found")
 
             @staticmethod
-            def create_memory_error():
+            def create_memory_error() -> Any:
                 """Create a memory error for testing."""
                 return MemoryError("Insufficient memory")
 
         return ErrorSimulator()
 
     @pytest.fixture
-    def mock_mobile_testing_framework():
+    def mock_mobile_testing_framework() -> Any:
         """Mock mobile testing framework with comprehensive functionality."""
         # Create mock objects without trying to patch the actual modules
         mock_component_tester = Mock()
@@ -203,12 +205,12 @@ if MOBILE_FIXTURES_AVAILABLE:
         return mocks
 
     @pytest.fixture
-    def mobile_test_utilities():
+    def mobile_test_utilities() -> Dict[str, Any]:
         """Provide mobile testing utilities."""
 
         class MobileTestUtils:
             @staticmethod
-            def create_mock_component(component_type: str, methods: list[str] | None = None):
+            def create_mock_component(component_type: str, methods: list[str] | None = None) -> Any:
                 """Create a mock component with specified methods."""
                 mock_component = Mock()
                 mock_component.component_type = component_type
@@ -220,14 +222,14 @@ if MOBILE_FIXTURES_AVAILABLE:
                 return mock_component
 
             @staticmethod
-            def assert_session_state_updated(session_state, key: str, expected_length: int | None = None):
+            def assert_session_state_updated(session_state, key: str, expected_length: int | None = None) -> Any:
                 """Assert that session state was updated correctly."""
                 assert key in session_state
                 if expected_length is not None:
                     assert len(session_state[key]) == expected_length
 
             @staticmethod
-            def create_test_validation_result(status: str = "passed", confidence: float = 0.95):
+            def create_test_validation_result(status: str = "passed", confidence: float = 0.95) -> Any:
                 """Create a test validation result."""
                 from datetime import datetime
 
@@ -241,7 +243,7 @@ if MOBILE_FIXTURES_AVAILABLE:
         return MobileTestUtils()
 
     @pytest.fixture
-    def mobile_performance_config():
+    def mobile_performance_config() -> Dict[str, Any]:
         """Configuration for mobile performance testing."""
         return {
             "max_render_time": 200,  # milliseconds

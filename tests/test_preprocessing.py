@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Test different preprocessing approaches on a sample image."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import sys
 from collections.abc import Callable
 from pathlib import Path
@@ -19,6 +21,7 @@ from src.core.vision import VisionAdapter
 def test_different_preprocessing() -> None:
     """Test different preprocessing approaches."""
     # Load model
+
     vision_adapter = VisionAdapter(device="cpu")
     vision_adapter.load_checkpoint("data/models/vision_resnet50.pt")
 

@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Mobile Display Components Demo for PlantGuard UI.
 
 This module demonstrates the mobile display components including
 MobileAnalysisDisplay, MobileRecommendations, and MobileChatInterface.
 """
+
 
 import logging
 from datetime import datetime

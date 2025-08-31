@@ -19,13 +19,13 @@ except ImportError:
     # Fallback if test_utils not available
     import importlib.util
     
-    def safe_import(module_name):
+    def safe_import(module_name) -> None:
         try:
             return importlib.import_module(module_name)
         except ImportError:
             return None
     
-    def setup_test_environment():
+    def setup_test_environment() -> None:
         src_path = Path(__file__).parent.parent / "src"
         if str(src_path) not in sys.path:
             sys.path.insert(0, str(src_path))
@@ -33,9 +33,9 @@ except ImportError:
         if str(root_path) not in sys.path:
             sys.path.insert(0, str(root_path))
     
-    def create_fallback_app_class():
+    def create_fallback_app_class() -> Any:
         class FallbackApp:
-            def __init__(self):
+            def __init__(self) -> None:
                 self.models = {"vision": {}, "audio": {}, "text": {}}
             def render_header(self): return "PlantGuard AI"
             def render_image_analysis_tab(self): return "Image Analysis"
@@ -47,10 +47,10 @@ except ImportError:
             def initialize_app_state(self): pass
         return FallbackApp
     
-    def handle_missing_model_files(paths):
+    def handle_missing_model_files(paths) -> Dict[str, Any]:
         return {path: Path(path).exists() for path in paths}
     
-    def validate_test_requirements():
+    def validate_test_requirements() -> bool:
         return {}
 
 # Setup test environment

@@ -1,7 +1,9 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """PlantGuard - Multimodal Plant Disease Detection System with Model Switching.
 
 Enhanced main Streamlit application with easy model switching capabilities.
 """
+
 
 import sys
 from pathlib import Path

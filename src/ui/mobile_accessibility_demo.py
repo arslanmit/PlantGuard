@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Mobile Accessibility Demo Application for PlantGuard UI.
 
@@ -5,6 +6,7 @@ This module demonstrates the comprehensive accessibility features implemented
 for mobile users, including ARIA labels, screen reader support, keyboard navigation,
 high contrast mode, and voice-over compatibility.
 """
+
 
 import logging
 

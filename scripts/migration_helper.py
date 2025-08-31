@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 PlantGuard Migration Helper
@@ -5,6 +6,7 @@ PlantGuard Migration Helper
 Provides helpful guidance for users transitioning from desktop to mobile-only PlantGuard.
 This script can be called when users try to access removed desktop functionality.
 """
+
 
 import json
 import sys
@@ -14,7 +16,7 @@ from pathlib import Path
 class MigrationHelper:
     """Helper class for guiding users through the mobile-only migration."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.command_mappings = {
             # Primary commands
             "run": "mobile",
@@ -173,7 +175,7 @@ class MigrationHelper:
         print(f"[SUMMARY] Migration report saved to: {output_file}")
 
 
-def main():
+def main() -> None:
     """Main CLI interface for the migration helper."""
     helper = MigrationHelper()
 

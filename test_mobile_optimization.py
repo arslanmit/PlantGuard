@@ -8,6 +8,9 @@ This script tests the enhanced mobile functionality including:
 - Enhanced UI features
 - Mobile-only system validation
 """
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+import pytest
+
 
 import sys
 from pathlib import Path

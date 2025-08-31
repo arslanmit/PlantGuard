@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Simple test of PlantGuard vision model on sample images."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import json
 import logging
 import sys
@@ -18,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 def _load_model() -> VisionAdapter | None:
     """Load the vision model."""
+
     model_path = "data/models/vision_resnet50.pt"
     vision_adapter = VisionAdapter(device="cpu")
 

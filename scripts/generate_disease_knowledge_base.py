@@ -203,7 +203,7 @@ def create_disease_info() -> dict[str, Any]:
     return {"schema_version": "1.0", "last_updated": "2025-01-17", "diseases": diseases}
 
 
-def main():
+def main() -> None:
     """Generate and save the disease knowledge base."""
     # Create the knowledge base directory if it doesn't exist
     kb_dir = Path("data/knowledge_base")

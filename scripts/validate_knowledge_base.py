@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """Validate the disease knowledge base for completeness and accuracy."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import json
 from pathlib import Path
 
 
-def validate_knowledge_base():
+def validate_knowledge_base() -> bool:
     """Validate the disease knowledge base."""
     # Load knowledge base
+
     kb_path = Path("data/knowledge_base/disease_info.json")
     if not kb_path.exists():
         print("[TODO] Knowledge base file not found")
@@ -96,7 +99,7 @@ def validate_knowledge_base():
     return missing == set() and treatment_issues == 0
 
 
-def main():
+def main() -> None:
     """Run validation."""
     success = validate_knowledge_base()
     if success:

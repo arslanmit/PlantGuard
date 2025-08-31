@@ -42,7 +42,7 @@ class NavigationItem:
 class MobileNavigationManager:
     """Manages mobile navigation and routing."""
 
-    def __init__(self, navigation_id: str):
+    def __init__(self, navigation_id: str) -> None:
         self.navigation_id = navigation_id
         self.navigation_items: dict[str, NavigationItem] = {}
         self.current_route = "home"

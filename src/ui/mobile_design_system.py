@@ -1,9 +1,11 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """
 Mobile CSS Design System for PlantGuard UI.
 
 This module provides standardized CSS classes, component styling, and design tokens
 optimized for mobile interfaces and AI agent recognition.
 """
+
 
 from enum import Enum
 

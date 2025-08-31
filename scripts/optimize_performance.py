@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 class PerformanceOptimizer:
     """System performance analysis and optimization recommendations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.system_info = self._gather_system_info()
         self.optimization_results = {}
 
@@ -445,7 +445,7 @@ class PerformanceOptimizer:
         return results
 
 
-def main():
+def main() -> None:
     """Main function with CLI support and JSON output."""
     import argparse
 

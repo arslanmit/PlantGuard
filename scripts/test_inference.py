@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Test model inference on a sample image."""
 
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 import json
 from pathlib import Path
 
@@ -11,7 +13,7 @@ from torchvision import models, transforms
 
 
 class CustomResNet(nn.Module):
-    def __init__(self, num_classes=2):
+    def __init__(self, num_classes=2) -> None:
         super().__init__()
         # Load a pre-trained ResNet50
         resnet = models.resnet50(pretrained=False)
@@ -22,7 +24,7 @@ class CustomResNet(nn.Module):
         # Add a custom classifier
         self.fc = nn.Linear(resnet.fc.in_features, num_classes)
 
-    def forward(self, x):
+    def forward(self, x) -> Any:
         # Forward pass through the backbone
         x = self.backbone(x)
         x = x.view(x.size(0), -1)  # Flatten
@@ -30,8 +32,9 @@ class CustomResNet(nn.Module):
         return x
 
 
-def load_model(model_path):
+def load_model(model_path) -> Any:
     """Load the model from checkpoint."""
+
     print(f"Loading model from {model_path}...")
     checkpoint = torch.load(model_path, map_location="cpu")
 
@@ -60,7 +63,7 @@ def load_model(model_path):
     return model, class_names
 
 
-def preprocess_image(image_path):
+def preprocess_image(image_path) -> Any:
     """Preprocess image for model inference."""
     # Define the same transforms used during training
     transform = transforms.Compose(
@@ -80,7 +83,7 @@ def preprocess_image(image_path):
     return input_batch, image
 
 
-def predict(model, input_batch, class_names):
+def predict(model, input_batch, class_names) -> List[Any]:
     """Run model inference and return predictions."""
     with torch.no_grad():
         output = model(input_batch)

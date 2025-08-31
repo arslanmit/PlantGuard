@@ -1,12 +1,13 @@
 """Lightweight ModeSwitcher component for simple mode selection."""
 
 import streamlit as st
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
 class ModeSwitcher:
     """Simple mode switcher used by the app and tests."""
 
-    def __init__(self, session_key: str = "input_mode", default_mode: str = "vision"):
+    def __init__(self, session_key: str = "input_mode", default_mode: str = "vision") -> None:
         self.session_key = session_key
         if self.session_key not in st.session_state:
             st.session_state[self.session_key] = default_mode

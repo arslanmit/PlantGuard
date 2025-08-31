@@ -1,8 +1,10 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 """End-to-end tests from training to UI deployment.
 
 This module tests the complete workflow from model training through
 deployment to UI integration, ensuring all components work together.
 """
+
 
 import json
 import tempfile
@@ -25,7 +27,7 @@ class TestEndToEndDeployment:
     """Test complete end-to-end deployment workflow."""
 
     @pytest.fixture
-    def deployment_workspace(self):
+    def deployment_workspace(self) -> Generator[Any, None, None]:
         """Create comprehensive workspace for deployment testing."""
         with tempfile.TemporaryDirectory() as temp_dir:
             workspace = Path(temp_dir)
@@ -41,7 +43,7 @@ class TestEndToEndDeployment:
             yield workspace
 
     @pytest.fixture
-    def production_dataset(self, deployment_workspace):
+    def production_dataset(self, deployment_workspace) -> Any:
         """Create production-like dataset for end-to-end testing."""
         dataset_dir = deployment_workspace / "data" / "production_dataset"
 
@@ -89,7 +91,7 @@ class TestEndToEndDeployment:
 
         return dataset_dir
 
-    def test_complete_training_to_ui_workflow(self, deployment_workspace, production_dataset):
+    def test_complete_training_to_ui_workflow(self, deployment_workspace, production_dataset) -> None:
         """Test complete workflow from training to UI deployment."""
         # Phase 1: Training Setup and Execution
         print("\n=== Phase 1: Training Setup ===")
@@ -403,7 +405,7 @@ class TestEndToEndDeployment:
         print(f"Package Path: {package_path}")
         print("[SUCCESS] End-to-end deployment test completed successfully!")
 
-    def test_multi_model_deployment_scenario(self, deployment_workspace, production_dataset):
+    def test_multi_model_deployment_scenario(self, deployment_workspace, production_dataset) -> None:
         """Test deployment scenario with multiple models."""
         print("\n=== Multi-Model Deployment Test ===")
 
@@ -484,7 +486,7 @@ class TestEndToEndDeployment:
         # Sync all models
         with patch.object(manager, "_load_local_model") as mock_load:
 
-            def mock_load_func(model_config):
+            def mock_load_func(model_config) -> Any:
                 mock_adapter = MagicMock()
                 model_name = model_config.get("name", "unknown")
                 if "fast" in model_name:
@@ -539,7 +541,7 @@ class TestEndToEndDeployment:
 
         print("[DONE] Multi-model deployment scenario completed")
 
-    def test_deployment_rollback_scenario(self, deployment_workspace):
+    def test_deployment_rollback_scenario(self, deployment_workspace) -> None:
         """Test deployment rollback scenario."""
         print("\n=== Deployment Rollback Test ===")
 
@@ -641,7 +643,7 @@ class TestEndToEndDeployment:
 
         print("[DONE] Rollback to stable model successful")
 
-    def test_deployment_monitoring_and_health_checks(self, deployment_workspace):
+    def test_deployment_monitoring_and_health_checks(self, deployment_workspace) -> None:
         """Test deployment monitoring and health check capabilities."""
         print("\n=== Deployment Monitoring Test ===")
 
@@ -716,7 +718,7 @@ class TestEndToEndDeployment:
 
         print("[DONE] Deployment monitoring test completed")
 
-    def test_deployment_configuration_management(self, deployment_workspace):
+    def test_deployment_configuration_management(self, deployment_workspace) -> None:
         """Test deployment configuration management."""
         print("\n=== Deployment Configuration Test ===")
 

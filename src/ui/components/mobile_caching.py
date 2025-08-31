@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class MobileCacheManager:
     """Cache manager optimized for mobile devices."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._cache: dict[str, tuple[Any, float, float]] = {}  # value, timestamp, ttl
         self._cache_stats = {"hits": 0, "misses": 0, "evictions": 0}
         self._max_cache_size = 50  # Reduced for mobile
@@ -94,9 +94,9 @@ mobile_cache_manager = MobileCacheManager()
 def mobile_cache(ttl: float = 300, key_func: callable | None = None) -> Callable:
     """Decorator for caching function results."""
 
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             if key_func:
                 cache_key = key_func(*args, **kwargs)
@@ -124,7 +124,7 @@ def streamlit_cache_optimized(func) -> Callable:
 
     @st.cache_data(ttl=300, max_entries=20)  # Reduced for mobile
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         return func(*args, **kwargs)
 
     return wrapper
@@ -133,9 +133,9 @@ def streamlit_cache_optimized(func) -> Callable:
 def cache_component_state(component_id: str, ttl: float = 600) -> Callable:
     """Cache component state."""
 
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             cache_key = f"component_state_{component_id}"
 
             # Try to get from cache
@@ -158,7 +158,7 @@ def cache_component_state(component_id: str, ttl: float = 600) -> Callable:
 class MobileResourceCache:
     """Cache for mobile resources like images and data."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._resource_cache: dict[str, bytes] = {}
         self._max_resource_size = 5 * 1024 * 1024  # 5MB total
         self._current_size = 0

@@ -1,3 +1,5 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 """Training module for PlantGuard production pipeline."""
 
 from .evaluator import ModelEvaluator, ModelMetrics, ValidationResult

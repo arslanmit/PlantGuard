@@ -61,7 +61,7 @@ class ErrorInfo:
 class MobileErrorHandler:
     """Centralized error handling for mobile components with graceful degradation."""
 
-    def __init__(self, state_manager: MobileStateManager | None = None):
+    def __init__(self, state_manager: MobileStateManager | None = None) -> None:
         """
         Initialize error handler.
 

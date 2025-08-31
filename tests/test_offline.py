@@ -1,3 +1,5 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
 def test_offline_placeholder() -> None:
     """Minimal offline test file to satisfy checker existence check."""
     # Include tokens for checker: network, disconnection

@@ -7,6 +7,8 @@ It covers all requirements for task 9: Implement comprehensive testing and valid
 
 Requirements covered: 7.1, 7.2, 7.3, 7.4, 7.5
 """
+import pytest
+
 
 import json
 import logging
@@ -24,7 +26,7 @@ logger = logging.getLogger(__name__)
 class ComprehensiveMobileTestRunner:
     """Runs all mobile migration tests and generates comprehensive report."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.workspace_root = Path.cwd()
         self.test_scripts = [
             {
@@ -221,7 +223,7 @@ class ComprehensiveMobileTestRunner:
 
         return summary
 
-    def save_comprehensive_report(self, results: dict[str, Any], filename: str = "comprehensive_mobile_test_report.json"):
+    def save_comprehensive_report(self, results: dict[str, Any], filename: str = "comprehensive_mobile_test_report.json") -> Any:
         """Save comprehensive test report."""
         try:
             report_path = self.workspace_root / filename
@@ -231,7 +233,7 @@ class ComprehensiveMobileTestRunner:
         except Exception as e:
             logger.error(f"Failed to save comprehensive report: {e}")
 
-    def print_comprehensive_summary(self, results: dict[str, Any]):
+    def print_comprehensive_summary(self, results: dict[str, Any]) -> Any:
         """Print comprehensive test summary."""
         print("\n" + "=" * 100)
         print("COMPREHENSIVE MOBILE-ONLY MIGRATION TEST REPORT")

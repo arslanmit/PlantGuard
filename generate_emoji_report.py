@@ -1,7 +1,9 @@
+from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 #!/usr/bin/env python3
 """
 Summary report of the emoji replacement task completed in PlantGuard codebase.
 """
+
 
 import json
 from datetime import datetime

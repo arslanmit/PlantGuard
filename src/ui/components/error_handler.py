@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class ErrorHandler:
     """Comprehensive error handling for PlantGuard UI."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.error_types = {
             "model_error": {"icon": "[AI]", "title": "Model Error", "color": "#EF4444"},
             "input_error": {"icon": "[WRITE]", "title": "Input Error", "color": "#F59E0B"},
@@ -73,7 +73,7 @@ class ErrorHandler:
 
         return error_info
 
-    def _display_error_message(self, error_info: dict[str, Any], show_details: bool):
+    def _display_error_message(self, error_info: dict[str, Any], show_details: bool) -> Any:
         """Display user-friendly error message."""
         error_type_info = self.error_types.get(error_info["type"], self.error_types["system_error"])
 
@@ -156,7 +156,7 @@ class ErrorHandler:
         else:
             return "An unexpected error occurred. Please try again or refresh the page if the problem persists."
 
-    def _provide_recovery_options(self, error_type: str, error_info: dict[str, Any]):
+    def _provide_recovery_options(self, error_type: str, error_info: dict[str, Any]) -> Any:
         """Provide recovery options based on error type."""
         st.markdown("### [TOOL] Try These Solutions:")
 
@@ -213,7 +213,7 @@ class ErrorHandler:
                     st.session_state.current_page = "Home"
                     st.rerun()
 
-    def _clear_model_cache(self):
+    def _clear_model_cache(self) -> Any:
         """Clear model cache."""
         # Clear Streamlit cache
         st.cache_data.clear()
@@ -227,7 +227,7 @@ class ErrorHandler:
             "fusion": "not_loaded",
         }
 
-    def _restart_session(self):
+    def _restart_session(self) -> Any:
         """Restart the session by clearing most session state."""
         from .state_manager import StateManager
 
@@ -236,7 +236,7 @@ class ErrorHandler:
 
         st.success("Session restarted! Please refresh the page.")
 
-    def _clear_current_inputs(self):
+    def _clear_current_inputs(self) -> Any:
         """Clear current input data."""
         input_keys = ["uploaded_images", "camera_image", "recorded_audio", "transcribed_text", "active_inputs"]
 
@@ -244,7 +244,7 @@ class ErrorHandler:
             if key in st.session_state:
                 del st.session_state[key]
 
-    def _clear_file_inputs(self):
+    def _clear_file_inputs(self) -> Any:
         """Clear file-related inputs."""
         file_keys = ["uploaded_images", "camera_image", "uploaded_audio"]
 
@@ -252,7 +252,7 @@ class ErrorHandler:
             if key in st.session_state:
                 del st.session_state[key]
 
-    def _show_input_guidelines(self):
+    def _show_input_guidelines(self) -> Any:
         """Show input format guidelines."""
         with st.expander("[DETAILS] Input Guidelines", expanded=True):
             st.markdown("""
@@ -273,7 +273,7 @@ class ErrorHandler:
             - Use clear, simple language
             """)
 
-    def _show_file_format_help(self):
+    def _show_file_format_help(self) -> Any:
         """Show file format help."""
         with st.expander("[FOLDER] Supported File Formats", expanded=True):
             col1, col2 = st.columns(2)
@@ -302,7 +302,7 @@ class ErrorHandler:
 
         return f"ERR_{uuid.uuid4().hex[:8].upper()}"
 
-    def _update_error_tracking(self, error_info: dict[str, Any]):
+    def _update_error_tracking(self, error_info: dict[str, Any]) -> Any:
         """Update error tracking in session state."""
         error_count = st.session_state.get("error_count", 0)
         st.session_state.error_count = error_count + 1
@@ -315,7 +315,7 @@ class ErrorHandler:
             recent_errors = recent_errors[-10:]
         st.session_state.recent_errors = recent_errors
 
-    def handle_page_error(self, error: Exception, page_name: str):
+    def handle_page_error(self, error: Exception, page_name: str) -> Any:
         """Handle page-specific errors."""
         context = {"page": page_name, "user_action": "page_navigation"}
 
@@ -345,7 +345,7 @@ class ErrorHandler:
                 st.session_state.current_page = "History"
                 st.rerun()
 
-    def render_error_summary(self):
+    def render_error_summary(self) -> None:
         """Render error summary for debugging."""
         if st.session_state.get("debug_mode", False):
             recent_errors = st.session_state.get("recent_errors", [])

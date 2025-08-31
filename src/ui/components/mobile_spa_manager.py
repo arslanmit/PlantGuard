@@ -26,7 +26,7 @@ class MobileSPAManager(MobileComponent):
     - True SPA behavior where everything stays on same page
     """
 
-    def __init__(self, component_id: str = "mobile_spa_manager", **kwargs):
+    def __init__(self, component_id: str = "mobile_spa_manager", **kwargs) -> None:
         super().__init__(component_id, **kwargs)
         self.content_areas = {}
         self.content_callbacks = {}
@@ -258,23 +258,23 @@ def create_spa_manager() -> MobileSPAManager:
 def register_default_content_areas(spa_manager: MobileSPAManager) -> None:
     """Register default PlantGuard content areas."""
 
-    def image_analysis_content():
+    def image_analysis_content() -> Any:
         st.markdown("### [PHOTO] Image Analysis")
         st.file_uploader("Upload plant image", type=["jpg", "jpeg", "png"], key="spa_image_upload")
         st.info("Upload an image to analyze your plant's health")
 
-    def voice_assistant_content():
+    def voice_assistant_content() -> Any:
         st.markdown("### [VOICE] Voice Assistant")
         if st.button("[MICROPHONE]️ Start Recording", key="spa_voice_record"):
             st.info("Voice recording feature")
         st.info("Voice assistant for plant care questions")
 
-    def chat_interface_content():
+    def chat_interface_content() -> Any:
         st.markdown("### [CHAT] Chat Assistant")
         st.text_input("Ask about plant care", key="spa_chat_input", placeholder="How often should I water my plants?")
         st.info("Chat with AI about plant care")
 
-    def history_settings_content():
+    def history_settings_content() -> Any:
         st.markdown("### [SUMMARY] History & Settings")
         st.info("View your analysis history and adjust settings")
 
