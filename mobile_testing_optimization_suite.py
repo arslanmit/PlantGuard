@@ -11,7 +11,6 @@ Comprehensive testing and optimization implementation:
 Requirements: 1.1, 1.3, 6.4, 7.1
 """
 
-
 import json
 import logging
 import sys
@@ -106,7 +105,7 @@ class MobileTestingOptimizationSuite:
 
         return component_tests
 
-    def test_layout_manager(self, component_class) -> dict[str, Any]:
+    def test_layout_manager(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileLayoutManager component."""
         try:
             with patch("streamlit.markdown") as mock_markdown:
@@ -132,7 +131,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_header_component(self, component_class) -> dict[str, Any]:
+    def test_header_component(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileHeader component."""
         try:
             with patch("streamlit.markdown") as mock_markdown:
@@ -157,7 +156,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_input_ribbon(self, component_class) -> dict[str, Any]:
+    def test_input_ribbon(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileInputRibbon component."""
         try:
             with patch("streamlit.columns") as mock_columns, patch("streamlit.button") as mock_button:
@@ -177,7 +176,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_content_tabs(self, component_class) -> dict[str, Any]:
+    def test_content_tabs(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileContentTabs component."""
         try:
             with patch("streamlit.tabs") as mock_tabs:
@@ -191,7 +190,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_image_analysis(self, component_class) -> dict[str, Any]:
+    def test_image_analysis(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileImageAnalysis component."""
         try:
             with patch("streamlit.file_uploader") as mock_uploader, patch("streamlit.button") as mock_button:
@@ -206,7 +205,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_voice_interface(self, component_class) -> dict[str, Any]:
+    def test_voice_interface(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileVoiceInterface component."""
         try:
             with patch("streamlit.button") as mock_button:
@@ -220,7 +219,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_chat_interface(self, component_class) -> dict[str, Any]:
+    def test_chat_interface(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileChatInterface component."""
         try:
             with patch("streamlit.text_input") as mock_input, patch("streamlit.button") as mock_button:
@@ -235,7 +234,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_history_view(self, component_class) -> dict[str, Any]:
+    def test_history_view(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileHistoryView component."""
         try:
             with patch("streamlit.session_state", {"analysis_history": []}):
@@ -247,7 +246,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_settings_card(self, component_class) -> dict[str, Any]:
+    def test_settings_card(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileSettingsCard component."""
         try:
             with patch("streamlit.selectbox") as mock_select, patch("streamlit.checkbox") as mock_checkbox:
@@ -262,7 +261,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_state_manager(self, component_class) -> dict[str, Any]:
+    def test_state_manager(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileStateManager component."""
         try:
             state_manager = component_class()
@@ -279,7 +278,7 @@ class MobileTestingOptimizationSuite:
         except Exception as e:
             return {"status": "failed", "error": str(e)}
 
-    def test_error_handler(self, component_class) -> dict[str, Any]:
+    def test_error_handler(self, component_class: type[Any]) -> dict[str, Any]:
         """Test MobileErrorHandler component."""
         try:
             error_handler = component_class()
@@ -325,7 +324,7 @@ class MobileTestingOptimizationSuite:
 
             # Simulate loading all mobile components
             component_count = 0
-            with suppress(ImportError):
+            with contextlib.suppress(ImportError):
                 from ui.components.mobile_header import MobileHeader
                 from ui.components.mobile_input_ribbon import MobileInputRibbon
                 from ui.components.mobile_layout_manager import MobileLayoutManager
@@ -412,7 +411,7 @@ class MobileTestingOptimizationSuite:
                 start_time = time.time()
 
                 # Simulate multiple renders
-                with suppress(ImportError):
+                with contextlib.suppress(ImportError):
                     from ui.components.mobile_layout_manager import MobileLayoutManager
 
                     layout_manager = MobileLayoutManager("render_test")
@@ -514,7 +513,7 @@ class MobileTestingOptimizationSuite:
             # Check for lazy loading patterns in components
             lazy_loading_features = []
 
-            with suppress(ImportError):
+            with contextlib.suppress(ImportError):
                 from ui.components.mobile_image_analysis import MobileImageAnalysis
 
                 image_analysis = MobileImageAnalysis("lazy_test")
@@ -691,7 +690,7 @@ class MobileTestingOptimizationSuite:
             total_components = 0
 
             component_classes = []
-            with suppress(ImportError):
+            with contextlib.suppress(ImportError):
                 from ui.components.mobile_image_analysis import MobileImageAnalysis
                 from ui.components.mobile_input_ribbon import MobileInputRibbon
 
@@ -699,7 +698,7 @@ class MobileTestingOptimizationSuite:
 
             for component_class in component_classes:
                 total_components += 1
-                with suppress(Exception):
+                with contextlib.suppress(Exception):
                     component = component_class(f"touch_test_{total_components}")
                     # Check if component has touch-related methods
                     if hasattr(component, "handle_touch_start") or hasattr(component, "handle_touch_end") or hasattr(component, "on_touch"):
@@ -899,7 +898,7 @@ class MobileTestingOptimizationSuite:
 
                 # Test multiple components for semantic HTML
                 component_classes = []
-                with suppress(ImportError):
+                with contextlib.suppress(ImportError):
                     from ui.components.mobile_header import MobileHeader
                     from ui.components.mobile_layout_manager import MobileLayoutManager
 
@@ -907,7 +906,7 @@ class MobileTestingOptimizationSuite:
 
                 for component_class, args in component_classes:
                     component_count += 1
-                    with suppress(Exception):
+                    with contextlib.suppress(Exception):
                         component = component_class(*args)
                         if hasattr(component, "render"):
                             component.render()
@@ -1034,7 +1033,7 @@ class MobileTestingOptimizationSuite:
                 # Test loading state patterns
                 loading_patterns_found = 0
 
-                with suppress(ImportError):
+                with contextlib.suppress(ImportError):
                     from ui.components.mobile_image_analysis import MobileImageAnalysis
 
                     image_analysis = MobileImageAnalysis("loading_test")
@@ -1091,7 +1090,7 @@ class MobileTestingOptimizationSuite:
             # Test gesture handling components
             gesture_support_found = 0
 
-            with suppress(ImportError):
+            with contextlib.suppress(ImportError):
                 from ui.components.gesture_handler import GestureHandler
 
                 gesture_handler = GestureHandler()
