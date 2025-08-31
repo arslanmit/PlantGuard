@@ -1891,6 +1891,119 @@
       "model_path": "test_production_model_v1.0.16/test_production_model_v1.0.16.pt",
       "config_path": "test_production_model_v1.0.16/test_production_model_v1.0.16_config.json",
       "classes_path": null
+    },
+    "test_production_model_v1.0.17": {
+      "metadata": {
+        "model_id": "test_production_model_v1.0.17",
+        "version": "1.0.17",
+        "architecture": "resnet50",
+        "training_date": "2025-08-31T12:00:23.463339",
+        "dataset_version": "plantvillage",
+        "hyperparameters": {
+          "experiment_name": "test_production_workflow",
+          "experiment_description": "Production training with PlantVillage dataset",
+          "tags": [
+            "production",
+            "resnet50"
+          ],
+          "model_architecture": "resnet50",
+          "num_classes": 38,
+          "pretrained": true,
+          "freeze_backbone": false,
+          "dropout_rate": 0.5,
+          "epochs": 2,
+          "batch_size": 4,
+          "learning_rate": 0.001,
+          "weight_decay": 0.0001,
+          "optimizer": "adam",
+          "momentum": 0.9,
+          "scheduler": {
+            "type": "step",
+            "step_size": 30,
+            "gamma": 0.1,
+            "patience": 10,
+            "factor": 0.5,
+            "T_max": 100,
+            "eta_min": 0.0
+          },
+          "early_stopping": {
+            "enabled": true,
+            "patience": 10,
+            "min_delta": 0.001,
+            "monitor": "val_loss",
+            "mode": "min"
+          },
+          "data_augmentation": {
+            "enabled": true,
+            "rotation": 15.0,
+            "brightness": 0.2,
+            "contrast": 0.2,
+            "horizontal_flip": true,
+            "vertical_flip": false,
+            "normalize": true
+          },
+          "mixed_precision": false,
+          "gradient_accumulation_steps": 1,
+          "gradient_clip_norm": 1.0,
+          "device": "cpu",
+          "num_workers": 4,
+          "pin_memory": true,
+          "persistent_workers": true,
+          "prefetch_factor": 2,
+          "use_memory_mapping": false,
+          "profile_data_loading": false,
+          "profile_batches": 10,
+          "max_gradient_accumulation_steps": 8,
+          "enable_automatic_gc": true,
+          "gc_frequency": 10,
+          "clear_cache_frequency": 50,
+          "enable_dynamic_batch_size": true,
+          "memory_threshold": 0.9,
+          "enable_memory_profiling": false,
+          "enable_transfer_learning": true,
+          "transfer_learning_strategy": "gradual_unfreeze",
+          "backbone_lr_multiplier": 0.1,
+          "classifier_lr_multiplier": 1.0,
+          "unfreeze_schedule": [
+            10,
+            20,
+            30
+          ],
+          "warmup_epochs": 5,
+          "dataset_path": null,
+          "data_dir": null,
+          "train_ratio": 0.8,
+          "val_ratio": 0.2,
+          "random_seed": 42,
+          "output_dir": null,
+          "save_every_n_epochs": 1,
+          "log_every_n_steps": 100,
+          "max_checkpoints_to_keep": 5,
+          "enable_performance_optimization": false,
+          "target_throughput_samples_per_sec": 100.0,
+          "max_memory_usage_gb": 4.0,
+          "enable_profiling": false,
+          "enable_distributed_training": false,
+          "skip_memory_check": false
+        },
+        "performance_metrics": {
+          "accuracy": 0.85,
+          "f1_score": 0.83
+        },
+        "file_size": 314749,
+        "checksum": "7338ebdfa1a4c5eafcd3df15146eebabbfef3dbbdd0b3b436bde79372733509a",
+        "name": "test_production_model",
+        "description": "Test model from production workflow",
+        "tags": [
+          "test",
+          "production",
+          "workflow"
+        ],
+        "author": null
+      },
+      "model_path": "test_production_model_v1.0.17/test_production_model_v1.0.17.pt",
+      "config_path": "test_production_model_v1.0.17/test_production_model_v1.0.17_config.json",
+      "classes_path": null
     }
   },
   "version": "1.0.0"

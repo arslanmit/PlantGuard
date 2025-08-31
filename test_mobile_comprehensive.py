@@ -9,6 +9,8 @@ import sys
 from pathlib import Path
 from unittest.mock import Mock
 
+import pytest
+
 # Add src to Python path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
@@ -90,7 +92,7 @@ def test_mobile_component_imports() -> None:
 
     except ImportError as e:
         st.error(f"[FAIL] Import error: {e}")
-        assert False, f"Import error: {e}"
+        pytest.fail(f"Import error: {e}")
 
 
 def test_mobile_app_integration() -> None:
@@ -109,10 +111,10 @@ def test_mobile_app_integration() -> None:
                     st.success("[PASS] Mobile app can be imported and has main class")
                 else:
                     st.warning("[WARNING] Mobile app imported but missing MobilePlantGuardApp class")
-                    assert False, "Mobile app missing MobilePlantGuardApp class"
+                    pytest.fail("Mobile app missing MobilePlantGuardApp class")
             except Exception as e:
                 st.warning(f"[WARNING] Mobile app found but import failed: {e}")
-                assert False, f"Mobile app import failed: {e}"
+                pytest.fail(f"Mobile app import failed: {e}")
         else:
             st.warning("[WARNING] Mobile app module not found - may be in different location")
             # Try alternative import paths
@@ -128,11 +130,11 @@ def test_mobile_app_integration() -> None:
                 st.success("[PASS] Mobile app found in root directory")
             except ImportError:
                 st.error("[FAIL] Mobile app not found in any location")
-                assert False, "Mobile app not found in any location"
+                pytest.fail("Mobile app not found in any location")
 
     except ImportError as e:
         st.error(f"[FAIL] Mobile app import error: {e}")
-        assert False, f"Mobile app import error: {e}"
+        pytest.fail(f"Mobile app import error: {e}")
 
 
 def test_adapter_integration() -> None:

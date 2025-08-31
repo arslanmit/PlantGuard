@@ -518,7 +518,7 @@ class MobileOfflineManager:
         }
 
     @staticmethod
-    def cleanup_offline_data(force: bool = False) -> dict[str, int]:
+    def cleanup_offline_data(force: bool = False) -> dict[str, int | str]:
         """
         Clean up offline data (expired cache, old queue items, etc.).
 

@@ -148,7 +148,7 @@ if MOBILE_FIXTURES_AVAILABLE:
 
         class ErrorSimulator:
             @staticmethod
-            def create_adapter_error(adapter_type: str, error_message: str = None):
+            def create_adapter_error(adapter_type: str, error_message: str | None = None):
                 """Create an adapter error for testing."""
                 if error_message is None:
                     error_message = f"{adapter_type} adapter error"
@@ -208,7 +208,7 @@ if MOBILE_FIXTURES_AVAILABLE:
 
         class MobileTestUtils:
             @staticmethod
-            def create_mock_component(component_type: str, methods: list[str] = None):
+            def create_mock_component(component_type: str, methods: list[str] | None = None):
                 """Create a mock component with specified methods."""
                 mock_component = Mock()
                 mock_component.component_type = component_type
@@ -220,7 +220,7 @@ if MOBILE_FIXTURES_AVAILABLE:
                 return mock_component
 
             @staticmethod
-            def assert_session_state_updated(session_state, key: str, expected_length: int = None):
+            def assert_session_state_updated(session_state, key: str, expected_length: int | None = None):
                 """Assert that session state was updated correctly."""
                 assert key in session_state
                 if expected_length is not None:

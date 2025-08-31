@@ -226,7 +226,7 @@ class MobileComponentRegistry:
 
         return discovery_info
 
-    def validate_component_interface(self, component_type: str) -> dict[str, bool]:
+    def validate_component_interface(self, component_type: str) -> dict[str, bool | str]:
         """
         Validate that a component follows the expected interface.
 

@@ -87,7 +87,7 @@ class MobileMemoryManager:
 
         logger.info("Performing memory cleanup")
 
-        cleanup_results = {
+        cleanup_results: dict[str, int | float] = {
             "objects_before": len(self._tracked_objects),
             "session_state_keys_before": len(st.session_state) if hasattr(st, "session_state") else 0,
         }
