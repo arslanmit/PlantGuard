@@ -555,7 +555,7 @@ class MobileErrorHandler:
 class MobileErrorBoundary:
     """Error boundary component for wrapping mobile components."""
 
-    def __init__(self, component_id: str, fallback_renderer: Callable | None = None):
+    def __init__(self, component_id: str, fallback_renderer: Callable | None = None) -> None:
         """
         Initialize error boundary.
 
@@ -566,7 +566,7 @@ class MobileErrorBoundary:
         self.component_id = component_id
         self.fallback_renderer = fallback_renderer or self._default_fallback
 
-    def __enter__(self):
+    def __enter__(self) -> "MobileErrorBoundary":
         """Enter the error boundary context."""
         return self
 
@@ -597,7 +597,7 @@ class MobileErrorBoundary:
 
 
 # Decorator for easy error boundary usage
-def mobile_error_boundary(component_id: str, fallback_renderer: Callable | None = None):
+def mobile_error_boundary(component_id: str, fallback_renderer: Callable | None = None) -> Callable:
     """
     Decorator to wrap functions with error boundary protection.
 

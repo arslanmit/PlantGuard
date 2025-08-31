@@ -1269,7 +1269,7 @@ class AutonomousInteractionTester:
 ai_testing_framework = None
 
 
-def get_ai_testing_framework():
+def get_ai_testing_framework() -> Any:
     """Get or create the global AI testing framework instance."""
     global ai_testing_framework
 

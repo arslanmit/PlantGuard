@@ -15,7 +15,7 @@ src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
 
-def validate_user_issue_resolution():
+def validate_user_issue_resolution() -> bool:
     """Validate that the user's original navigation issue has been resolved."""
 
     print("[INFO] PlantGuard Mobile SPA - User Issue Resolution Validation")
@@ -195,7 +195,7 @@ def validate_user_issue_resolution():
         return False
 
 
-def main():
+def main() -> None:
     """Run the complete validation."""
     success = validate_user_issue_resolution()
     return success

@@ -182,7 +182,7 @@ class ModelComparison:
                 return m
         return None
 
-    def to_dataframe(self):
+    def to_dataframe(self) -> Any:
         try:
             import pandas as pd
 

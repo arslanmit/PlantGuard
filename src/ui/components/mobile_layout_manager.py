@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 class MobileLayoutManager:
     """Main layout manager for mobile interface."""
 
-    def __init__(self, component_id: str = "mobile_layout", **kwargs):
+    def __init__(self, component_id: str = "mobile_layout", **kwargs) -> None:
         """Initialize mobile layout manager with configuration."""
         self.component_id = component_id
         self.config = {
@@ -483,7 +483,7 @@ class MobileLayoutManager:
         """Register a new mobile component type."""
         self.component_registry.register_component(component_type, component_class)
 
-    def create_component(self, component_type: str, component_id: str, title: str):
+    def create_component(self, component_type: str, component_id: str, title: str) -> Any:
         """Create a mobile component instance."""
         return self.component_registry.create_component(component_type, component_id, title)
 

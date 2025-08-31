@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class MockVisionAdapter:
     """Mock Vision Adapter for unified interface compatibility."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mock vision adapter."""
         logger.info("Initialized Mock Vision Adapter")
 
@@ -39,7 +39,7 @@ class MockVisionAdapter:
 class MockAudioAdapter:
     """Mock Audio Adapter for unified interface compatibility."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mock audio adapter."""
         logger.info("Initialized Mock Audio Adapter")
 
@@ -65,7 +65,7 @@ class MockAudioAdapter:
 class MockTextAdapter:
     """Mock Text Adapter for unified interface compatibility."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mock text adapter."""
         logger.info("Initialized Mock Text Adapter")
 

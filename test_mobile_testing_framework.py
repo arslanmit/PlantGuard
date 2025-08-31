@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(level
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """Run mobile testing framework demonstration."""
     logger.info("Starting Mobile Testing Framework demonstration")
 

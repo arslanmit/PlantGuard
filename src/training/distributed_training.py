@@ -54,7 +54,7 @@ class DistributedConfig:
 class DistributedTrainingManager:
     """Manager for distributed training setup and coordination."""
 
-    def __init__(self, config: DistributedConfig):
+    def __init__(self, config: DistributedConfig) -> None:
         """Initialize distributed training manager.
 
         Args:
@@ -436,7 +436,7 @@ def launch_distributed_training(
 class DistributedTrainingIntegration:
     """Integration class for adding distributed training to existing trainers."""
 
-    def __init__(self, trainer_class: type):
+    def __init__(self, trainer_class: type) -> None:
         """Initialize distributed training integration.
 
         Args:
@@ -480,7 +480,7 @@ class DistributedTrainingIntegration:
         original_train = trainer.train
         original_save_checkpoint = getattr(trainer, "save_checkpoint", None)
 
-        def enhanced_setup():
+        def enhanced_setup() -> bool:
             """Enhanced setup with distributed training."""
             # Setup distributed training first
             if not trainer.distributed_manager.setup_distributed_training():
@@ -515,7 +515,7 @@ class DistributedTrainingIntegration:
 
             return True
 
-        def enhanced_train():
+        def enhanced_train() -> None:
             """Enhanced training with distributed coordination."""
             try:
                 # Set epoch for distributed sampler
@@ -534,7 +534,7 @@ class DistributedTrainingIntegration:
             finally:
                 trainer.distributed_manager.cleanup()
 
-        def enhanced_save_checkpoint(*args, **kwargs):
+        def enhanced_save_checkpoint(*args, **kwargs) -> Any:
             """Enhanced checkpoint saving for distributed training."""
             if original_save_checkpoint:
                 return trainer.distributed_manager.save_checkpoint(*args, **kwargs)

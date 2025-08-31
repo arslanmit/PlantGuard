@@ -220,7 +220,7 @@ def validate_mobile_assets_only(workspace_root: Path) -> dict[str, Any]:
     }
 
 
-def main():
+def main() -> None:
     """Main validation function."""
 
     print("[SEARCH] Validating Task 10: File Structure Optimization")

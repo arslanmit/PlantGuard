@@ -545,7 +545,7 @@ class TaskChecker:
         }
 
 
-def print_results(results: dict[str, Any]):
+def print_results(results: dict[str, Any]) -> None:
     """Print formatted results with colors."""
     pass
     print(f"\n{Colors.BOLD}{Colors.CYAN}[INFO] PlantGuard Task Checker Results{Colors.END}")
@@ -620,7 +620,7 @@ def print_results(results: dict[str, Any]):
     print(f"\n{Colors.GREEN}[SUCCESS] Great progress! {completed} out of {total} tasks completed!{Colors.END}")
 
 
-def main():
+def main() -> None:
     """Main execution function."""
     pass
     project_root = Path(__file__).parent

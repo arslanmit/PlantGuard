@@ -41,7 +41,7 @@ def _start_watchdog(limit_bytes: int, check_interval: float = 1.0) -> threading.
         pid = os.getpid()
         proc = psutil.Process(pid)
 
-        def _watch():
+        def _watch() -> None:
             logger.debug("Memory watchdog started (limit=%d bytes)", limit_bytes)
             while True:
                 try:

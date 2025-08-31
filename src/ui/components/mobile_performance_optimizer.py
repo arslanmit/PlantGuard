@@ -705,12 +705,12 @@ class MobilePerformanceOptimizer:
 mobile_performance_optimizer = MobilePerformanceOptimizer()
 
 
-def optimize_mobile_render(component_id: str):
+def optimize_mobile_render(component_id: str) -> Callable:
     """Decorator for optimizing mobile component rendering."""
     return mobile_performance_optimizer.optimize_component_render(component_id)
 
 
-def lazy_load_mobile_component(component_id: str, load_callback: Callable):
+def lazy_load_mobile_component(component_id: str, load_callback: Callable) -> Any:
     """Lazy load a mobile component."""
     return mobile_performance_optimizer.lazy_load_component(component_id, load_callback)
 

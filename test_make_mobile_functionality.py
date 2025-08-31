@@ -12,7 +12,9 @@ import contextlib
 import json
 import logging
 import os
+import shutil
 import signal
+import socket
 import subprocess
 import sys
 import time
@@ -27,7 +29,7 @@ logger = logging.getLogger(__name__)
 class MakeMobileTester:
     """Test the make mobile command functionality."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.workspace_root = Path.cwd()
 
     def test_make_mobile_dry_run(self) -> dict[str, Any]:
@@ -229,7 +231,7 @@ class MakeMobileTester:
             ("Mobile App Quick Startup", self.test_mobile_app_startup_quick),
         ]
 
-        results = {}
+        results: dict[str, Any] = {}
         overall_status = "passed"
 
         for test_name, test_func in tests:
@@ -259,7 +261,7 @@ class MakeMobileTester:
 
         return results
 
-    def save_results(self, results: dict[str, Any], filename: str = "make_mobile_test_results.json"):
+    def save_results(self, results: dict[str, Any], filename: str = "make_mobile_test_results.json") -> None:
         """Save test results."""
         try:
             results_path = self.workspace_root / filename
@@ -269,7 +271,7 @@ class MakeMobileTester:
         except Exception as e:
             logger.error(f"Failed to save test results: {e}")
 
-    def print_summary(self, results: dict[str, Any]):
+    def print_summary(self, results: dict[str, Any]) -> None:
         """Print formatted summary of test results."""
         print("\n" + "=" * 80)
         print("MAKE MOBILE FUNCTIONALITY TEST RESULTS")
@@ -310,7 +312,7 @@ class MakeMobileTester:
         print("=" * 80)
 
 
-def main():
+def main() -> None:
     """Main function to run make mobile functionality tests."""
     tester = MakeMobileTester()
 

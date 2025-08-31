@@ -353,7 +353,7 @@ class BundleOptimizer:
         return "\n".join(critical_lines)
 
 
-def performance_timer(operation_name: str):
+def performance_timer(operation_name: str) -> Callable:
     """Decorator to time function execution."""
 
     def decorator(func):
@@ -374,7 +374,7 @@ def performance_timer(operation_name: str):
     return decorator
 
 
-def cached_component(cache_key: str, ttl: int = 3600):
+def cached_component(cache_key: str, ttl: int = 3600) -> Callable:
     """Decorator to cache component results."""
 
     def decorator(func):
@@ -400,7 +400,7 @@ def cached_component(cache_key: str, ttl: int = 3600):
     return decorator
 
 
-def memory_efficient(cleanup_after: bool = True):
+def memory_efficient(cleanup_after: bool = True) -> Callable:
     """Decorator to ensure memory efficient execution."""
 
     def decorator(func):

@@ -354,7 +354,7 @@ class EmojiReplacer:
                 print(f"{emoji} -> {replacement}: {count} total replacements")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Replace emojis with text equivalents in codebase",
         formatter_class=argparse.RawDescriptionHelpFormatter,

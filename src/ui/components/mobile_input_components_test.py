@@ -23,7 +23,7 @@ from .mobile_voice_input import MobileVoiceInput
 logger = logging.getLogger(__name__)
 
 
-def test_mobile_input_components():
+def test_mobile_input_components() -> None:
     """Test all mobile input components."""
     st.title("[TEST] Mobile Input Components Test")
 

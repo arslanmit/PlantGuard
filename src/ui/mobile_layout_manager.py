@@ -299,7 +299,7 @@ class MobileLayoutManager:
 
         st.markdown("</div></div>", unsafe_allow_html=True)
 
-    def get_responsive_columns(self, mobile_cols: int = 1):
+    def get_responsive_columns(self, mobile_cols: int = 1) -> list[Any]:
         """Create mobile column layout."""
         # Mobile-only system - use mobile column count
         return st.columns(mobile_cols)

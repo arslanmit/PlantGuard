@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 # Global test configuration
 @pytest.fixture(scope="session")
-def mobile_test_config():
+def mobile_test_config() -> dict[str, Any]:
     """Global mobile test configuration."""
     return {
         "test_data_dir": Path("tests/data"),
@@ -46,7 +46,7 @@ def mobile_test_config():
 
 # Session-level fixtures
 @pytest.fixture(scope="session", autouse=True)
-def setup_mobile_test_environment(mobile_test_config):
+def setup_mobile_test_environment(mobile_test_config) -> None:
     """Set up mobile test environment."""
     # Create test directories
     for dir_path in [mobile_test_config["test_data_dir"], 
@@ -65,7 +65,7 @@ def setup_mobile_test_environment(mobile_test_config):
 
 # Streamlit mocking fixtures
 @pytest.fixture
-def mock_streamlit_session():
+def mock_streamlit_session() -> Any:
     """Provide comprehensive Streamlit session state mock."""
     mock_session = MockStreamlitSession()
     
@@ -90,7 +90,7 @@ def mock_streamlit_session():
 
 
 @pytest.fixture
-def mock_streamlit_components():
+def mock_streamlit_components() -> Any:
     """Provide comprehensive Streamlit components mock."""
     components = MockStreamlitComponents()
     
@@ -115,7 +115,7 @@ def mock_streamlit_components():
 
 # Adapter mocking fixtures
 @pytest.fixture
-def mock_vision_adapter():
+def mock_vision_adapter() -> Any:
     """Provide mock vision adapter with comprehensive functionality."""
     adapter = MockVisionAdapter()
     
@@ -135,7 +135,7 @@ def mock_vision_adapter():
 
 
 @pytest.fixture
-def mock_audio_adapter():
+def mock_audio_adapter() -> Any:
     """Provide mock audio adapter with comprehensive functionality."""
     adapter = MockAudioAdapter()
     
@@ -156,7 +156,7 @@ def mock_audio_adapter():
 
 
 @pytest.fixture
-def mock_text_adapter():
+def mock_text_adapter() -> Any:
     """Provide mock text adapter with comprehensive functionality."""
     adapter = MockTextAdapter()
     
@@ -180,7 +180,7 @@ def mock_text_adapter():
 
 
 @pytest.fixture
-def mock_chat_model():
+def mock_chat_model() -> Any:
     """Provide mock chat model with comprehensive functionality."""
     model = MockChatModel()
     
@@ -192,7 +192,7 @@ def mock_chat_model():
 
 
 @pytest.fixture
-def all_mock_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter, mock_chat_model):
+def all_mock_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter, mock_chat_model) -> dict[str, Any]:
     """Provide all mock adapters with proper patching."""
     adapters = {
         'vision': mock_vision_adapter,
@@ -217,7 +217,7 @@ def all_mock_adapters(mock_vision_adapter, mock_audio_adapter, mock_text_adapter
 
 # Test data fixtures
 @pytest.fixture
-def sample_test_images():
+def sample_test_images() -> dict[str, Any]:
     """Provide various test images."""
     return {
         'small': Image.new('RGB', (224, 224), color='green'),
@@ -228,7 +228,7 @@ def sample_test_images():
 
 
 @pytest.fixture
-def temp_audio_files(mobile_test_config):
+def temp_audio_files(mobile_test_config) -> dict[str, Any]:
     """Provide temporary audio files for testing."""
     audio_files = {}
     
@@ -243,7 +243,7 @@ def temp_audio_files(mobile_test_config):
 
 
 @pytest.fixture
-def temp_model_files(mobile_test_config):
+def temp_model_files(mobile_test_config) -> dict[str, Any]:
     """Provide temporary model files for testing."""
     model_files = {}
     
@@ -259,7 +259,7 @@ def temp_model_files(mobile_test_config):
 
 
 @pytest.fixture
-def sample_analysis_results():
+def sample_analysis_results() -> list[dict[str, Any]]:
     """Provide comprehensive sample analysis results."""
     return [
         TestDataFactory.create_analysis_result(
@@ -284,7 +284,7 @@ def sample_analysis_results():
 
 
 @pytest.fixture
-def sample_chat_history():
+def sample_chat_history() -> list[dict[str, Any]]:
     """Provide comprehensive sample chat history."""
     return [
         TestDataFactory.create_chat_message(
@@ -316,7 +316,7 @@ def sample_chat_history():
 
 # Mobile component mocking fixtures
 @pytest.fixture
-def mock_mobile_component_registry():
+def mock_mobile_component_registry() -> Any:
     """Mock mobile component registry with comprehensive components."""
     mock_registry = Mock()
     
@@ -344,7 +344,7 @@ def mock_mobile_component_registry():
 
 
 @pytest.fixture
-def mock_mobile_adapter_integration(mock_streamlit_session, all_mock_adapters):
+def mock_mobile_adapter_integration(mock_streamlit_session, all_mock_adapters) -> Any:
     """Provide mobile adapter integration with all mocks configured."""
     from src.ui.components.mobile_adapter_integration import \
         MobileAdapterIntegration

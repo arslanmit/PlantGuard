@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class MobileUploadInput(MobileBaseComponent):
     """Mobile-optimized file upload component with drag-and-drop support."""
 
-    def __init__(self, component_id: str, title: str = "Upload Input", **kwargs):
+    def __init__(self, component_id: str, title: str = "Upload Input", **kwargs) -> None:
         """
         Initialize mobile upload input component.
 

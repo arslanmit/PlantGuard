@@ -81,7 +81,7 @@ def create_mock_adapter(adapter_type: str) -> Mock:
     return mock_adapter
 
 
-def setup_test_environment():
+def setup_test_environment() -> None:
     """Setup test environment with proper path configuration."""
     # Add src to Python path
     src_path = Path(__file__).parent.parent / "src"
@@ -132,7 +132,7 @@ def handle_missing_model_files(model_paths: list[str]) -> Dict[str, bool]:
     return status
 
 
-def create_fallback_app_class():
+def create_fallback_app_class() -> type:
     """Create a fallback app class for testing when main app is not available."""
     
     class FallbackPlantGuardApp:

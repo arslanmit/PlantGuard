@@ -335,7 +335,7 @@ def _create_temp_samples(tmp_path):
     return str(images_dir), str(metadata_path)
 
 
-def test_huggingface_models_with_temp_samples(tmp_path):
+def test_huggingface_models_with_temp_samples(tmp_path) -> None:
     """Pytest wrapper: create temp samples and run Hugging Face model tests.
 
     This test will attempt to load remote HF models; skip if internet/network or transformers support isn't available.

@@ -704,7 +704,7 @@ print("SUCCESS:True")
         return test_results
 
 
-def main():
+def main() -> None:
     """Main function to run performance optimization."""
     parser = argparse.ArgumentParser(description="PlantGuard Mobile Performance Optimizer")
     parser.add_argument("--measure", action="store_true", help="Measure current performance")

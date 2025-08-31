@@ -30,12 +30,12 @@ except ImportError:
 class PlantGuardPageUtils:
     """Shared utilities for all PlantGuard pages."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.logger = logging.getLogger(__name__)
         self.initialize_session_state()
         self.initialize_adapters()
 
-    def initialize_session_state(self):
+    def initialize_session_state(self) -> None:
         """Initialize session state variables used across pages."""
         if "analysis_history" not in st.session_state:
             st.session_state.analysis_history = []
@@ -44,7 +44,7 @@ class PlantGuardPageUtils:
         if "current_models" not in st.session_state:
             st.session_state.current_models = {"vision": "resnet50_plantvillage_v1", "audio": "whisper_tiny_local", "text": "distilbert_plant_qa_v1"}
 
-    def initialize_adapters(self):
+    def initialize_adapters(self) -> None:
         """Initialize AI model adapters."""
         try:
             self.vision_adapter = VisionAdapter()
@@ -79,7 +79,7 @@ class PlantGuardPageUtils:
             },
         }
 
-    def render_page_header(self, title: str, description: str):
+    def render_page_header(self, title: str, description: str) -> None:
         """Render a consistent page header."""
         st.markdown(
             f"""
@@ -92,7 +92,7 @@ class PlantGuardPageUtils:
             unsafe_allow_html=True,
         )
 
-    def render_model_selector(self, model_type: str = "vision"):
+    def render_model_selector(self, model_type: str = "vision") -> None:
         """Render model selection interface in main content area."""
         st.markdown(f"### {model_type.title()} Model")
 
@@ -113,7 +113,7 @@ class PlantGuardPageUtils:
             st.session_state.current_models[model_type] = new_model_key
             st.success(f"[DONE] Updated to {self.models_config[model_type][new_model_key]['name']}")
 
-    def render_tips_card(self, tips: list):
+    def render_tips_card(self, tips: list[str]) -> None:
         """Render a tips card with helpful information."""
         tips_html = "".join([f"<li>{tip}</li>" for tip in tips])
         st.markdown(
@@ -128,7 +128,7 @@ class PlantGuardPageUtils:
             unsafe_allow_html=True,
         )
 
-    def analyze_image(self, image):
+    def analyze_image(self, image: Any) -> dict[str, Any] | None:
         """Analyze an image for plant disease detection."""
         try:
             if self.vision_adapter:
@@ -148,7 +148,7 @@ class PlantGuardPageUtils:
             self.logger.error(f"Image analysis failed: {e}")
             return None
 
-    def process_text_query(self, query: str):
+    def process_text_query(self, query: str) -> str:
         """Process a text query using the text adapter."""
         try:
             if self.text_adapter:
@@ -161,7 +161,7 @@ class PlantGuardPageUtils:
             self.logger.error(f"Text processing failed: {e}")
             return "I'm sorry, I couldn't process your question at the moment."
 
-    def display_analysis_result(self, result: dict[str, Any]):
+    def display_analysis_result(self, result: dict[str, Any]) -> None:
         """Display analysis results in a consistent format."""
         if not result:
             st.error("Analysis failed. Please try again.")

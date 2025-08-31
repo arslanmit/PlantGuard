@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 # Disable Streamlit caching during pytest to avoid large in-memory caches
 if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
 
-    def _noop_cache(*args, **kwargs):
-        def _wrap(f):
+    def _noop_cache(*args, **kwargs) -> Callable:
+        def _wrap(f: Callable) -> Callable:
             return f
 
         return _wrap

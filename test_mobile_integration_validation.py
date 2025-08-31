@@ -274,7 +274,7 @@ class MobileIntegrationValidator:
         print("=" * 80)
 
 
-def main():
+def main() -> None:
     """Main function to run mobile integration validation."""
     validator = MobileIntegrationValidator()
 

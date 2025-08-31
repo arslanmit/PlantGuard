@@ -8,7 +8,7 @@ Analyzes and removes unused dependencies to optimize mobile performance.
 from pathlib import Path
 
 
-def analyze_unused_dependencies():
+def analyze_unused_dependencies() -> None:
     """Analyze and suggest unused dependencies for removal."""
 
     # Read current requirements

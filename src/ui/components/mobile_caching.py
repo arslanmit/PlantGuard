@@ -91,7 +91,7 @@ mobile_cache_manager = MobileCacheManager()
 
 
 # Caching decorators
-def mobile_cache(ttl: float = 300, key_func: callable | None = None):
+def mobile_cache(ttl: float = 300, key_func: callable | None = None) -> Callable:
     """Decorator for caching function results."""
 
     def decorator(func):
@@ -119,7 +119,7 @@ def mobile_cache(ttl: float = 300, key_func: callable | None = None):
     return decorator
 
 
-def streamlit_cache_optimized(func):
+def streamlit_cache_optimized(func) -> Callable:
     """Optimized Streamlit caching for mobile."""
 
     @st.cache_data(ttl=300, max_entries=20)  # Reduced for mobile
@@ -130,7 +130,7 @@ def streamlit_cache_optimized(func):
     return wrapper
 
 
-def cache_component_state(component_id: str, ttl: float = 600):
+def cache_component_state(component_id: str, ttl: float = 600) -> Callable:
     """Cache component state."""
 
     def decorator(func):

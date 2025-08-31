@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 class MobileSettingsCard:
     """Mobile-optimized settings card component."""
 
-    def __init__(self, component_id: str, title: str = "Settings"):
+    def __init__(self, component_id: str, title: str = "Settings") -> None:
         """Initialize mobile settings card component.
 
         Args:
@@ -574,7 +574,10 @@ class MobileSettingsCard:
             )
 
             if st.button(
-                "[DONE] Selected" if is_selected else "Select", key=f"{self.component_id}_text_{model_id}", disabled=is_selected, use_container_width=True
+                "[DONE] Selected" if is_selected else "Select",
+                key=f"{self.component_id}_text_{model_id}",
+                disabled=is_selected,
+                use_container_width=True,
             ):
                 self.model_switcher.set_model("text", model_id)
                 st.session_state.user_preferences["preferred_text_model"] = model_id
@@ -872,7 +875,10 @@ class MobileSettingsCard:
 
                     # Import
                     uploaded_file = st.file_uploader(
-                        "[DOWNLOAD] Import Settings", type=["json"], key=f"{self.component_id}_import", help="Upload a previously exported settings file"
+                        "[DOWNLOAD] Import Settings",
+                        type=["json"],
+                        key=f"{self.component_id}_import",
+                        help="Upload a previously exported settings file",
                     )
 
                     if uploaded_file is not None:

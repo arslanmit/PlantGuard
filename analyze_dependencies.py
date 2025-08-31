@@ -54,7 +54,7 @@ def get_requirements_packages() -> set[str]:
     return packages
 
 
-def main():
+def main() -> None:
     """Main analysis function."""
     print("[INFO] Analyzing dependency usage...")
 

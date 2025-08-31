@@ -43,11 +43,11 @@ from src.ui.mobile_accessible_components import (
 class TestMobileAccessibilityManager:
     """Test MobileAccessibilityManager functionality."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test environment."""
         self.accessibility_manager = MobileAccessibilityManager()
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test accessibility manager initialization."""
         assert self.accessibility_manager.config["accessibility_level"] == AccessibilityLevel.ENHANCED
         assert self.accessibility_manager.config["contrast_mode"] == ContrastMode.NORMAL
@@ -55,7 +55,7 @@ class TestMobileAccessibilityManager:
         assert self.accessibility_manager.config["screen_reader_enabled"] is True
         assert self.accessibility_manager.config["keyboard_navigation_enabled"] is True
 
-    def test_accessibility_css_generation(self):
+    def test_accessibility_css_generation(self) -> None:
         """Test accessibility CSS generation."""
         css = self.accessibility_manager._generate_accessibility_css()
 
@@ -70,7 +70,7 @@ class TestMobileAccessibilityManager:
         assert "prefers-reduced-motion" in css
         assert "prefers-contrast" in css
 
-    def test_contrast_mode_css(self):
+    def test_contrast_mode_css(self) -> None:
         """Test high contrast mode CSS generation."""
         # Test high contrast mode
         high_contrast_css = self.accessibility_manager._get_contrast_mode_css("high")
@@ -83,7 +83,7 @@ class TestMobileAccessibilityManager:
         assert "background-color: white !important" in extra_high_css
         assert "color: black !important" in extra_high_css
 
-    def test_font_scale_css(self):
+    def test_font_scale_css(self) -> None:
         """Test font scaling CSS generation."""
         # Test large font scale
         large_font_css = self.accessibility_manager._get_font_scale_css("large")
@@ -95,7 +95,7 @@ class TestMobileAccessibilityManager:
         assert "--mobile-font-size-base: 20.0px" in xl_font_css
         assert "min-height: 55.0px" in xl_font_css  # Touch target scaling
 
-    def test_accessible_button_creation(self):
+    def test_accessible_button_creation(self) -> None:
         """Test accessible button creation."""
         button_html = self.accessibility_manager.create_accessible_button(
             text="Test Button", button_id="test-btn", aria_label="Test button for validation", aria_describedby="test-desc", disabled=False
@@ -112,7 +112,7 @@ class TestMobileAccessibilityManager:
         assert "mobile-keyboard-accessible" in button_html
         assert "mobile-voiceover-optimized" in button_html
 
-    def test_accessible_input_creation(self):
+    def test_accessible_input_creation(self) -> None:
         """Test accessible input creation."""
         input_html = self.accessibility_manager.create_accessible_input(
             input_id="test-input", label_text="Test Input", required=True, error_message="Test error"
@@ -127,7 +127,7 @@ class TestMobileAccessibilityManager:
         assert 'aria-live="assertive"' in input_html
         assert "Test error" in input_html
 
-    def test_accessible_heading_creation(self):
+    def test_accessible_heading_creation(self) -> None:
         """Test accessible heading creation."""
         heading_html = self.accessibility_manager.create_accessible_heading(
             text="Test Heading", level=2, heading_id="test-heading", aria_label="Test heading for validation"
@@ -140,7 +140,7 @@ class TestMobileAccessibilityManager:
         assert 'class="mobile-heading-2"' in heading_html
         assert "Test Heading" in heading_html
 
-    def test_live_region_creation(self):
+    def test_live_region_creation(self) -> None:
         """Test live region creation."""
         live_region_html = self.accessibility_manager.create_live_region(region_id="test-region", aria_live="assertive", aria_atomic=True)
 
@@ -151,7 +151,7 @@ class TestMobileAccessibilityManager:
         assert 'aria-relevant="additions text"' in live_region_html
         assert 'class="mobile-live-region"' in live_region_html
 
-    def test_skip_links_creation(self):
+    def test_skip_links_creation(self) -> None:
         """Test skip navigation links creation."""
         skip_links_html = self.accessibility_manager.create_skip_links()
 
@@ -162,7 +162,7 @@ class TestMobileAccessibilityManager:
         assert 'href="#input-section"' in skip_links_html
         assert 'class="skip-link"' in skip_links_html
 
-    def test_landmark_regions_creation(self):
+    def test_landmark_regions_creation(self) -> None:
         """Test landmark regions creation."""
         landmarks = self.accessibility_manager.create_landmark_regions()
 

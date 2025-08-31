@@ -97,7 +97,7 @@ except Exception as e:
     app.models = {"vision": {}, "audio": {}, "text": {}, "fallback_mode": True}
 
 
-def test_mobile_app_initialization():
+def test_mobile_app_initialization() -> None:
     """Test that the mobile app can be initialized."""
     # Test that mobile_spa_app can be imported and initialized
     assert app is not None
@@ -118,7 +118,7 @@ def test_mobile_app_initialization():
         assert app is not None
 
 
-def test_mobile_app_components():
+def test_mobile_app_components() -> None:
     """Test that all main components exist in mobile app."""
     # Test that mobile_spa_app has required functions
     
@@ -131,7 +131,7 @@ def test_mobile_app_components():
     assert hasattr(app, "render_comparison_tab") or hasattr(app, "render_image_comparison")
 
 
-def test_legacy_pages_removed():
+def test_legacy_pages_removed() -> None:
     """Test that legacy pages are properly removed."""
     # This test ensures legacy imports fail as expected
     legacy_pages = ["home", "compare", "settings", "guide", "history"]
@@ -146,7 +146,7 @@ def test_legacy_pages_removed():
             pass
 
 
-def test_unified_interface_features():
+def test_unified_interface_features() -> None:
     """Test that unified interface provides expected features."""
     test_app = MobilePlantGuardApp() if MobilePlantGuardApp else Mock()
 
@@ -163,7 +163,7 @@ def test_unified_interface_features():
         assert hasattr(test_app, method) or hasattr(test_app, method.replace("_tab", "")), f"Missing method: {method}"
 
 
-def test_module_availability_checks():
+def test_module_availability_checks() -> None:
     """Test that module availability is properly checked."""
     # Test that we can handle missing mobile_spa_app gracefully
     assert mobile_spa_app is not None or MobilePlantGuardApp is not None
@@ -177,7 +177,7 @@ def test_module_availability_checks():
         assert hasattr(app, "models")
 
 
-def test_graceful_model_file_handling():
+def test_graceful_model_file_handling() -> None:
     """Test that missing model files are handled gracefully."""
     # Test that app can be initialized even without model files
     test_app = MobilePlantGuardApp() if MobilePlantGuardApp else Mock()

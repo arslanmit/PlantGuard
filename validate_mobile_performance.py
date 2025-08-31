@@ -12,7 +12,7 @@ import time
 from pathlib import Path
 
 
-def validate_performance_improvements():
+def validate_performance_improvements() -> None:
     """Validate that performance optimizations were successful."""
 
     print("[VALIDATION] PlantGuard Mobile Performance Validation")
@@ -154,7 +154,7 @@ def validate_performance_improvements():
     return validation_passed
 
 
-def test_mobile_functionality():
+def test_mobile_functionality() -> bool:
     """Test basic mobile functionality."""
     print("\n[TOOL] MOBILE FUNCTIONALITY TEST:")
     print("-" * 30)

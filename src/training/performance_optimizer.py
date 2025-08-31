@@ -80,7 +80,7 @@ class OptimizationResult:
 class PerformanceOptimizer:
     """Comprehensive performance optimizer for training pipelines."""
 
-    def __init__(self, config: PerformanceOptimizationConfig):
+    def __init__(self, config: PerformanceOptimizationConfig) -> None:
         """Initialize performance optimizer.
 
         Args:

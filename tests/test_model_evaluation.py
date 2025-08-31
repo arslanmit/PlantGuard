@@ -9,12 +9,15 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 
-def test_evaluator_imports():
+def test_evaluator_imports() -> None:
     """Test that evaluation modules can be imported."""
     try:
-        from training.evaluator import ModelEvaluator, ModelMetrics, ValidationResult
-        from training.model_comparison import BenchmarkResult, ModelComparator, ModelRanking
-        from training.model_validator import AutomatedModelValidator, ValidationConfig
+        from training.evaluator import (ModelEvaluator, ModelMetrics,
+                                        ValidationResult)
+        from training.model_comparison import (BenchmarkResult,
+                                               ModelComparator, ModelRanking)
+        from training.model_validator import (AutomatedModelValidator,
+                                              ValidationConfig)
 
         # Test that classes can be instantiated (without dependencies)
         assert ModelEvaluator is not None
@@ -30,7 +33,7 @@ def test_evaluator_imports():
         pytest.skip(f"Skipping test due to missing dependencies: {e}")
 
 
-def test_validation_config():
+def test_validation_config() -> None:
     """Test ValidationConfig creation and validation."""
     try:
         from training.model_validator import ValidationConfig
@@ -51,7 +54,7 @@ def test_validation_config():
         pytest.skip(f"Skipping test due to missing dependencies: {e}")
 
 
-def test_model_metrics_structure():
+def test_model_metrics_structure() -> None:
     """Test ModelMetrics dataclass structure."""
     try:
         from training.evaluator import ClassMetrics, ModelMetrics

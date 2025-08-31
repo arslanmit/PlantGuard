@@ -57,56 +57,30 @@ from utils.error_recovery import ImportErrorRecovery  # noqa: E402
 
 # Conditional imports with proper error handling and logging
 MobileTestingFramework = ImportErrorRecovery.safe_import_from(
-    "ui.components.mobile_testing_framework", 
+    "ui.components.mobile_testing_framework",
     "MobileTestingFramework",
-    fallback=type("MobileTestingFramework", (), {
-        "test_all_components": lambda self: {
-            "components_tested": 0, 
-            "status": "testing_framework_unavailable"
-        }
-    }),
-    logger_name="mobile_spa_app"
+    fallback=type(
+        "MobileTestingFramework", (), {"test_all_components": lambda self: {"components_tested": 0, "status": "testing_framework_unavailable"}}
+    ),
+    logger_name="mobile_spa_app",
 )
 
 mobile_performance_optimizer = ImportErrorRecovery.safe_import_from(
     "ui.components.mobile_performance_optimizer",
-    "mobile_performance_optimizer", 
-    fallback=type("MockPerformanceOptimizer", (), {
-        "set_optimization_level": lambda self, level: None,
-        "enable_offline_mode": lambda self: None,
-        "preload_critical_components": lambda self, components: None,
-        "optimize_images": lambda self, data: data,
-        "get_performance_report": lambda self: {}
-    })(),
-    logger_name="mobile_spa_app"
+    "mobile_performance_optimizer",
+    fallback=type(
+        "MockPerformanceOptimizer",
+        (),
+        {
+            "set_optimization_level": lambda self, level: None,
+            "enable_offline_mode": lambda self: None,
+            "preload_critical_components": lambda self, components: None,
+            "optimize_images": lambda self, data: data,
+            "get_performance_report": lambda self: {},
+        },
+    )(),
+    logger_name="mobile_spa_app",
 )
-
-        def optimize_component_render(self, component_id):
-            def decorator(func):
-                return func
-
-            return decorator
-
-        @property
-        def cache(self):
-            class MockCache:
-                def clear(self):
-                    pass
-
-                def get_stats(self):
-                    return {}
-
-            return MockCache()
-
-        @property
-        def memory_manager(self):
-            class MockMemoryManager:
-                def cleanup_memory(self, force=False):
-                    return {"freed_mb": 0}
-
-            return MockMemoryManager()
-
-    mobile_performance_optimizer = MockPerformanceOptimizer()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -126,7 +100,7 @@ def get_ai_testing_framework() -> MobileTestingFramework:
 
 # Global adapter instances for enhanced functionality
 @st.cache_resource
-def load_core_adapters():
+def load_core_adapters() -> tuple[Any, Any, Any]:
     """Load and cache core PlantGuard adapters for mobile use."""
     try:
         vision_adapter = VisionAdapter(lazy_load=True)
@@ -1409,7 +1383,7 @@ class MobilePlantGuardApp:
                             st.error("[ERROR] No components found to test")
 
 
-def main():
+def main() -> None:
     """Main application entry point."""
     try:
         # Create and run the mobile app

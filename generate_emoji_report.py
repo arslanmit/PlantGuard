@@ -7,7 +7,7 @@ import json
 from datetime import datetime
 
 
-def create_summary_report():
+def create_summary_report() -> str:
     """Create a summary report of the emoji replacement task."""
 
     # Data from the script execution
@@ -142,7 +142,7 @@ code readability and maintaining professional documentation standards.
     return report, replacement_stats
 
 
-def save_report(report: str, stats: dict):
+def save_report(report: str, stats: dict) -> None:
     """Save the report to files."""
 
     # Save markdown report
@@ -157,7 +157,7 @@ def save_report(report: str, stats: dict):
     print("[DONE] Statistics saved to emoji_replacement_stats.json")
 
 
-def main():
+def main() -> None:
     """Generate and save the emoji replacement completion report."""
     print("[PROGRESS] Generating emoji replacement completion report...")
 

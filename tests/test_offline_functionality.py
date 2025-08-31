@@ -15,14 +15,14 @@ sys.path.insert(0, str(src_path))
 class TestOfflineFunctionality:
     """Test offline functionality."""
 
-    def test_local_model_loading(self):
+    def test_local_model_loading(self) -> None:
         """Test that models load from local files only."""
         vision_path = Path("src/core/vision.py")
         if vision_path.exists():
             content = vision_path.read_text()
             assert "local" in content.lower(), "Vision should use local models"
 
-    def test_no_external_api_calls(self):
+    def test_no_external_api_calls(self) -> None:
         """Test that no external API calls are made."""
         # Check that there are no external API references
         core_files = ["src/core/vision.py", "src/core/audio.py", "src/core/nlp.py"]
@@ -32,7 +32,7 @@ class TestOfflineFunctionality:
                 assert "api.openai" not in content.lower(), f"{file_path} should not use external APIs"
                 assert "replicate" not in content.lower(), f"{file_path} should not use external APIs"
 
-    def test_offline_capable_components(self):
+    def test_offline_capable_components(self) -> None:
         """Test that components are designed for offline use."""
         # Check for offline-related indicators
         assert True

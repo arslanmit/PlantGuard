@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 
-def test_mobile_imports():
+def test_mobile_imports() -> bool:
     """Test that mobile modules can be imported."""
     import importlib.util
 
@@ -30,10 +30,9 @@ def test_mobile_imports():
     except ImportError as e:
         print(f"[FAIL] Import error: {e}")
         return False
-        return False
 
 
-def test_mobile_layout_manager():
+def test_mobile_layout_manager() -> bool:
     """Test mobile layout manager initialization."""
     try:
         from src.ui.mobile_layout_manager import MobileLayoutManager
@@ -58,7 +57,7 @@ def test_mobile_layout_manager():
         return False
 
 
-def test_mobile_design_system():
+def test_mobile_design_system() -> bool:
     """Test mobile design system functionality."""
     try:
         from src.ui.mobile_design_system import ButtonVariant, ComponentSize, MobileDesignSystem
@@ -88,7 +87,7 @@ def test_mobile_design_system():
         return False
 
 
-def test_mobile_component_registry():
+def test_mobile_component_registry() -> bool:
     """Test mobile component registry functionality."""
     try:
         from src.ui.mobile_component_registry import MobileComponentRegistry, MobileStateManager
@@ -127,7 +126,7 @@ def test_mobile_component_registry():
         return False
 
 
-def test_css_classes():
+def test_css_classes() -> bool:
     """Test that required CSS classes are present."""
     try:
         from src.ui.mobile_design_system import MobileDesignSystem
@@ -163,7 +162,7 @@ def test_css_classes():
         return False
 
 
-def main():
+def main() -> bool:
     """Run all tests."""
     print("[TEST] Testing Mobile Layout and Design System Implementation")
     print("=" * 60)

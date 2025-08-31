@@ -61,7 +61,7 @@ class DatasetValidationResult:
 class DatasetManager:
     """Manages dataset download, validation, and preparation for production training."""
 
-    def __init__(self, base_data_dir: Path = Path("data")):
+    def __init__(self, base_data_dir: Path = Path("data")) -> None:
         """Initialize DatasetManager.
 
         Args:

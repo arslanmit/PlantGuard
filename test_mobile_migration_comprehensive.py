@@ -435,7 +435,7 @@ class MobileMigrationTester:
         print("=" * 80)
 
 
-def main():
+def main() -> None:
     """Main function to run the mobile migration test suite."""
     tester = MobileMigrationTester()
 

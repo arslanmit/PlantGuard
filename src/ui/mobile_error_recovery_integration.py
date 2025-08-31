@@ -487,12 +487,12 @@ class MobileErrorRecoveryIntegration:
 # Convenience functions for easy integration
 
 
-def initialize_mobile_error_recovery():
+def initialize_mobile_error_recovery() -> None:
     """Initialize the complete mobile error recovery system."""
     MobileErrorRecoveryIntegration.initialize_integrated_system()
 
 
-def create_resilient_mobile_component(component_id: str, offline_capability: OfflineCapability = OfflineCapability.LIMITED):
+def create_resilient_mobile_component(component_id: str, offline_capability: OfflineCapability = OfflineCapability.LIMITED) -> Callable:
     """
     Decorator to create resilient mobile components.
 
@@ -507,7 +507,7 @@ def create_resilient_mobile_component(component_id: str, offline_capability: Off
     return decorator
 
 
-def handle_mobile_operation(component_id: str, operation_name: str, cache_key: str | None = None):
+def handle_mobile_operation(component_id: str, operation_name: str, cache_key: str | None = None) -> Callable:
     """
     Decorator to handle mobile operations with error recovery and offline support.
 

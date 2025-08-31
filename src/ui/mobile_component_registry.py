@@ -277,7 +277,7 @@ class MobileStateManager:
 class MobileComponentRegistry:
     """Registry for managing mobile components with AI agent support."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize component registry."""
         self._components: dict[str, type[MobileComponent]] = {}
         self._instances: dict[str, MobileComponent] = {}
@@ -703,7 +703,7 @@ class MobileComponentRegistry:
 class MobileComponentFactory:
     """Factory for creating mobile components with standardized patterns."""
 
-    def __init__(self, registry: MobileComponentRegistry):
+    def __init__(self, registry: MobileComponentRegistry) -> None:
         """Initialize component factory."""
         self.registry = registry
 

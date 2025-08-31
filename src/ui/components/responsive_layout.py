@@ -402,12 +402,12 @@ def get_responsive_layout() -> ResponsiveLayout:
     return ResponsiveLayoutManager().get_layout()
 
 
-def configure_responsive_page(**kwargs):
+def configure_responsive_page(**kwargs) -> Any:
     """Configure responsive page layout."""
     return ResponsiveLayoutManager().configure_page_layout(**kwargs)
 
 
-def render_adaptive_layout(left_content=None, right_content=None):
+def render_adaptive_layout(left_content=None, right_content=None) -> None:
     """Render adaptive layout with provided content."""
     layout = get_responsive_layout()
     return layout.render_adaptive_columns(left_content, right_content)

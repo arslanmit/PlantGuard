@@ -17,7 +17,7 @@ from .mobile_accessible_components import get_accessibility_test_results, valida
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
     """Main accessibility demo application."""
     st.set_page_config(page_title="PlantGuard Mobile Accessibility Demo", page_icon="♿", layout="wide", initial_sidebar_state="collapsed")
 
@@ -84,7 +84,7 @@ def main():
     st.markdown(live_region, unsafe_allow_html=True)
 
 
-def render_accessibility_overview(accessibility_manager):
+def render_accessibility_overview(accessibility_manager) -> None:
     """Render accessibility overview section."""
     overview_heading = accessibility_manager.create_accessible_heading(
         text="[FEATURE] Accessibility Features Overview", level=2, heading_id="overview-heading"
@@ -147,7 +147,9 @@ def render_accessibility_overview(accessibility_manager):
         """)
 
     # Compliance information
-    compliance_heading = accessibility_manager.create_accessible_heading(text="[DETAILS] Compliance Standards", level=3, heading_id="compliance-heading")
+    compliance_heading = accessibility_manager.create_accessible_heading(
+        text="[DETAILS] Compliance Standards", level=3, heading_id="compliance-heading"
+    )
     st.markdown(compliance_heading, unsafe_allow_html=True)
 
     st.info("""
@@ -164,9 +166,11 @@ def render_accessibility_overview(accessibility_manager):
     """)
 
 
-def render_component_demonstrations(accessibility_manager):
+def render_component_demonstrations(accessibility_manager) -> None:
     """Render component demonstrations section."""
-    demo_heading = accessibility_manager.create_accessible_heading(text="[PUZZLE] Accessible Component Demonstrations", level=2, heading_id="demo-heading")
+    demo_heading = accessibility_manager.create_accessible_heading(
+        text="[PUZZLE] Accessible Component Demonstrations", level=2, heading_id="demo-heading"
+    )
     st.markdown(demo_heading, unsafe_allow_html=True)
 
     # Component selection
@@ -190,7 +194,7 @@ def render_component_demonstrations(accessibility_manager):
         demo_settings_card(accessibility_manager)
 
 
-def demo_camera_input(accessibility_manager):
+def demo_camera_input(accessibility_manager) -> None:
     """Demonstrate accessible camera input component."""
     st.markdown("""
     ### [CAMERA] Accessible Camera Input Demo
@@ -229,7 +233,7 @@ def demo_camera_input(accessibility_manager):
         st.success("[DONE] Camera activation announced to screen readers!")
 
 
-def demo_upload_input(accessibility_manager):
+def demo_upload_input(accessibility_manager) -> None:
     """Demonstrate accessible upload input component."""
     st.markdown("""
     ### [FOLDER] Accessible File Upload Demo
@@ -274,7 +278,7 @@ def demo_upload_input(accessibility_manager):
         st.success(f"[DONE] File upload announced: {uploaded_file.name}")
 
 
-def demo_analysis_display(accessibility_manager):
+def demo_analysis_display(accessibility_manager) -> None:
     """Demonstrate accessible analysis display component."""
     st.markdown("""
     ### [MICROSCOPE] Accessible Analysis Display Demo
@@ -341,7 +345,7 @@ def demo_analysis_display(accessibility_manager):
         st.success("[DONE] Analysis results announced to screen readers!")
 
 
-def demo_settings_card(accessibility_manager):
+def demo_settings_card(accessibility_manager) -> None:
     """Demonstrate accessible settings card component."""
     st.markdown("""
     ### [SETTINGS] Accessible Settings Demo
@@ -391,7 +395,7 @@ def demo_settings_card(accessibility_manager):
         st.success("[DONE] Settings changes announced to screen readers!")
 
 
-def render_accessibility_settings_demo(accessibility_manager):
+def render_accessibility_settings_demo(accessibility_manager) -> None:
     """Render accessibility settings demonstration."""
     settings_heading = accessibility_manager.create_accessible_heading(
         text="[SETTINGS] Live Accessibility Settings", level=2, heading_id="settings-demo-heading"
@@ -420,7 +424,7 @@ def render_accessibility_settings_demo(accessibility_manager):
     st.json(status)
 
 
-def render_testing_validation_demo(accessibility_manager):
+def render_testing_validation_demo(accessibility_manager) -> None:
     """Render testing and validation demonstration."""
     testing_heading = accessibility_manager.create_accessible_heading(
         text="[TEST] Accessibility Testing & Validation", level=2, heading_id="testing-heading"
@@ -472,9 +476,11 @@ def render_testing_validation_demo(accessibility_manager):
             st.markdown(report)
 
 
-def render_compliance_report_demo(accessibility_manager):
+def render_compliance_report_demo(accessibility_manager) -> None:
     """Render compliance report demonstration."""
-    report_heading = accessibility_manager.create_accessible_heading(text="[SUMMARY] Accessibility Compliance Report", level=2, heading_id="report-heading")
+    report_heading = accessibility_manager.create_accessible_heading(
+        text="[SUMMARY] Accessibility Compliance Report", level=2, heading_id="report-heading"
+    )
     st.markdown(report_heading, unsafe_allow_html=True)
 
     st.markdown(

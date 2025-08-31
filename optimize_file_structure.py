@@ -276,7 +276,7 @@ class FileStructureOptimizer:
         return results
 
 
-def main():
+def main() -> None:
     """Main function to run file structure optimization."""
 
     optimizer = FileStructureOptimizer()

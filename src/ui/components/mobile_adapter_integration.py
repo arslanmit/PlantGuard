@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 class MobileAdapterIntegration:
     """Integration layer between mobile components and PlantGuard adapters."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mobile adapter integration."""
         self._vision_adapter: Any | None = None
         self._audio_adapter: Any | None = None

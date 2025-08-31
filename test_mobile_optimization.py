@@ -17,7 +17,7 @@ src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
 
-def test_mobile_app_imports():
+def test_mobile_app_imports() -> None:
     """Test that all mobile app imports work correctly."""
     print("[TEST] Testing mobile app imports...")
 
@@ -42,7 +42,7 @@ def test_mobile_app_imports():
         return False
 
 
-def test_mobile_app_class():
+def test_mobile_app_class() -> None:
     """Test mobile app class initialization."""
     print("\n[TEST] Testing mobile app class...")
 
@@ -77,7 +77,7 @@ def test_mobile_app_class():
         return False
 
 
-def test_performance_optimizer():
+def test_performance_optimizer() -> None:
     """Test performance optimizer integration."""
     print("\n[TEST] Testing performance optimizer...")
 
@@ -103,7 +103,7 @@ def test_performance_optimizer():
         return False
 
 
-def test_core_adapters():
+def test_core_adapters() -> None:
     """Test core adapter functionality."""
     print("\n[TEST] Testing core adapters...")
 
@@ -133,7 +133,7 @@ def test_core_adapters():
         return False
 
 
-def main():
+def main() -> None:
     """Run all tests."""
     print("[LAUNCH] Starting mobile app optimization tests...\n")
 

@@ -20,7 +20,7 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-def load_mobile_display_styles():
+def load_mobile_display_styles() -> None:
     """Load mobile display component styles."""
     try:
         styles_path = Path(__file__).parent / "components" / "mobile_display_styles.css"
@@ -38,7 +38,7 @@ def load_mobile_display_styles():
         st.error(f"[TODO] Failed to load styles: {e}")
 
 
-def create_sample_analysis_results():
+def create_sample_analysis_results() -> dict[str, Any]:
     """Create sample analysis results for demonstration."""
     # Create sample images
     sample_image_1 = Image.new("RGB", (300, 200), color="#90EE90")  # Light green
@@ -75,7 +75,7 @@ def create_sample_analysis_results():
     return sample_results
 
 
-def demo_mobile_analysis_display():
+def demo_mobile_analysis_display() -> None:
     """Demonstrate MobileAnalysisDisplay component."""
     st.markdown("## [MICROSCOPE] Mobile Analysis Display Demo")
 
@@ -119,7 +119,7 @@ def demo_mobile_analysis_display():
         st.json(state["data"]["analysis_data"])
 
 
-def demo_mobile_recommendations():
+def demo_mobile_recommendations() -> None:
     """Demonstrate MobileRecommendations component."""
     st.markdown("## [TIP] Mobile Recommendations Demo")
 
@@ -173,7 +173,7 @@ def demo_mobile_recommendations():
         st.json(state["data"]["recommendations_data"])
 
 
-def demo_mobile_chat_interface():
+def demo_mobile_chat_interface() -> None:
     """Demonstrate MobileChatInterface component."""
     st.markdown("## [CHAT] Mobile Chat Interface Demo")
 
@@ -253,7 +253,7 @@ def demo_mobile_chat_interface():
             st.json(last_message)
 
 
-def demo_components_integration():
+def demo_components_integration() -> None:
     """Demonstrate integration between display components."""
     st.markdown("## [LINK] Components Integration Demo")
 
@@ -314,7 +314,7 @@ def demo_components_integration():
         st.warning("[WARNING] **No Integration Context** - Click 'Setup Full Integration' to connect components")
 
 
-def main():
+def main() -> None:
     """Main demo application."""
     st.set_page_config(page_title="Mobile Display Components Demo", page_icon="[LEAF]", layout="wide", initial_sidebar_state="collapsed")
 
@@ -331,7 +331,8 @@ def main():
 
     # Navigation
     demo_option = st.selectbox(
-        "Choose Demo Section:", ["[MICROSCOPE] Analysis Display", "[TIP] Recommendations", "[CHAT] Chat Interface", "[LINK] Integration Demo", "[SUMMARY] All Components"]
+        "Choose Demo Section:",
+        ["[MICROSCOPE] Analysis Display", "[TIP] Recommendations", "[CHAT] Chat Interface", "[LINK] Integration Demo", "[SUMMARY] All Components"],
     )
 
     st.markdown("---")

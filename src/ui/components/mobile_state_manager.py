@@ -54,7 +54,7 @@ class StateEntry:
 class MobileStateManager:
     """Centralized state management for mobile components."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize state manager with default configuration."""
         self._state_prefix = "mobile_state"
         self._error_prefix = "mobile_error"

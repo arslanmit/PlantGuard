@@ -33,7 +33,7 @@ class ComponentSize(Enum):
 class MobileDesignSystem:
     """Mobile CSS design system with standardized components and styling."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize mobile design system."""
         self.design_tokens = self._get_design_tokens()
         self._apply_design_system()

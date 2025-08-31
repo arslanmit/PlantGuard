@@ -438,7 +438,7 @@ class TestMobileDisplayComponentsIntegration:
         assert "recommendations_data" in recommendations_state["data"]
 
 
-def run_mobile_display_tests():
+def run_mobile_display_tests() -> None:
     """Run all mobile display component tests."""
     print("[TEST] Running Mobile Display Components Tests...")
 

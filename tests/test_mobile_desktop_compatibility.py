@@ -6,20 +6,20 @@ Tests to ensure mobile PlantGuard components render properly on desktop viewport
 and maintain functionality across different screen sizes.
 """
 
-import unittest
 import sys
+import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 # Add src to Python path
 src_path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
-# Import mobile components
-from ui.components.mobile_layout_manager import MobileLayoutManager
+from ui.components.mobile_content_tabs import MobileContentTabs
 from ui.components.mobile_header import MobileHeader
 from ui.components.mobile_input_ribbon import MobileInputRibbon
-from ui.components.mobile_content_tabs import MobileContentTabs
+# Import mobile components
+from ui.components.mobile_layout_manager import MobileLayoutManager
 
 
 class TestMobileDesktopCompatibility(unittest.TestCase):
@@ -202,7 +202,7 @@ class TestMobileDesktopCompatibility(unittest.TestCase):
         print("[DONE] Always-Visible Design: Desktop compatibility verified")
 
 
-def run_desktop_compatibility_tests():
+def run_desktop_compatibility_tests() -> dict[str, Any]:
     """Run desktop compatibility tests and return results."""
     suite = unittest.TestLoader().loadTestsFromTestCase(TestMobileDesktopCompatibility)
     runner = unittest.TextTestRunner(verbosity=2, stream=sys.stdout)

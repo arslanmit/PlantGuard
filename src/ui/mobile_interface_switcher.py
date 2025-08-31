@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class MobileInterfaceSwitcher:
     """Handles automatic switching between desktop and mobile interfaces."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.mobile_threshold = 768  # pixels
         self.force_mobile = False
         self.force_desktop = False

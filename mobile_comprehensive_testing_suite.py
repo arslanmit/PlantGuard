@@ -2237,7 +2237,7 @@ class MobileComprehensiveTestingSuite:
             logger.error(f"Failed to save test results: {e}")
 
 
-def main():
+def main() -> None:
     """Main function to run the comprehensive testing suite."""
     st.set_page_config(page_title="Mobile PlantGuard Comprehensive Testing", page_icon="[TEST]", layout="wide")
 

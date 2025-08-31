@@ -1,4 +1,4 @@
-def test_offline_placeholder():
+def test_offline_placeholder() -> None:
     """Minimal offline test file to satisfy checker existence check."""
     # Include tokens for checker: network, disconnection
     network_state = "network"

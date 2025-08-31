@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class MobileChatInterface(MobileBaseComponent):
     """Mobile-optimized chat interface component with conversational interaction."""
 
-    def __init__(self, component_id: str, title: str = "Plant Care Assistant", **kwargs):
+    def __init__(self, component_id: str, title: str = "Plant Care Assistant", **kwargs) -> None:
         """
         Initialize mobile chat interface component.
 

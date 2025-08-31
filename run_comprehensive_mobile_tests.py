@@ -282,7 +282,7 @@ class ComprehensiveMobileTestRunner:
         print("=" * 100)
 
 
-def main():
+def main() -> None:
     """Main function to run comprehensive mobile tests."""
     runner = ComprehensiveMobileTestRunner()
 

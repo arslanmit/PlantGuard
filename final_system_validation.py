@@ -445,7 +445,7 @@ class FinalSystemValidator:
         return final_report
 
 
-def main():
+def main() -> None:
     """Main execution function."""
     validator = FinalSystemValidator()
 

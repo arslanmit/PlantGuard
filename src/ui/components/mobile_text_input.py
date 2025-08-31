@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class MobileTextInput(MobileBaseComponent):
     """Mobile-optimized text input component with chat interface."""
 
-    def __init__(self, component_id: str, title: str = "Text Input", **kwargs):
+    def __init__(self, component_id: str, title: str = "Text Input", **kwargs) -> None:
         """
         Initialize mobile text input component.
 

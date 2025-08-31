@@ -23,8 +23,8 @@ import streamlit as st
 # no-op wrappers when running under pytest.
 if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
 
-    def _noop_cache(*args, **kwargs):
-        def _wrap(f):
+    def _noop_cache(*args, **kwargs) -> Callable:
+        def _wrap(f: Callable) -> Callable:
             return f
 
         return _wrap
@@ -1266,7 +1266,7 @@ class VisionAdapter:
             "has_plant_types": bool(self.plant_types),
         }
 
-    def __del__(self):
+    def __del__(self) -> None:
         """Attempt to free large resources when the adapter is deleted.
 
         Tests expect memory to be reclaimed after adapter/registry teardown.

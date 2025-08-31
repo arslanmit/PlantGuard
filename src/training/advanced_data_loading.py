@@ -65,7 +65,7 @@ class AdvancedDataLoadingConfig:
 class IntelligentPrefetcher:
     """Intelligent prefetching system that adapts to training patterns."""
 
-    def __init__(self, config: AdvancedDataLoadingConfig):
+    def __init__(self, config: AdvancedDataLoadingConfig) -> None:
         """Initialize intelligent prefetcher.
 
         Args:
@@ -187,7 +187,7 @@ class IntelligentPrefetcher:
 class SimplePredictionModel:
     """Simple model for predicting data access patterns."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize prediction model."""
         self.access_history: list[int] = []
         self.pattern_cache: dict[tuple[int, ...], float] = {}
@@ -235,7 +235,7 @@ class SimplePredictionModel:
 class GPUPreprocessor:
     """GPU-accelerated preprocessing pipeline."""
 
-    def __init__(self, config: AdvancedDataLoadingConfig):
+    def __init__(self, config: AdvancedDataLoadingConfig) -> None:
         """Initialize GPU preprocessor.
 
         Args:

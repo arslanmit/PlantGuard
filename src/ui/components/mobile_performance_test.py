@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class MobilePerformanceTest:
     """Test suite for mobile performance optimizations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize performance test suite."""
         self.test_results: list[dict[str, Any]] = []
         self.test_start_time = None

@@ -108,7 +108,7 @@ class SchedulerFactory:
             scheduler_type = str(getattr(scheduler_config, "type", "")).lower()
 
         # Helper to safely read configuration fields whether scheduler_config is a dict or an object
-        def _cfg(field: str, default=None):
+        def _cfg(field: str, default=None) -> Any:
             if isinstance(scheduler_config, dict):
                 return scheduler_config.get(field, default)
             return getattr(scheduler_config, field, default)

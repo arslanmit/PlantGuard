@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class MobileVoiceInput(MobileBaseComponent):
     """Mobile-optimized voice input component with audio recording."""
 
-    def __init__(self, component_id: str, title: str = "Voice Input", **kwargs):
+    def __init__(self, component_id: str, title: str = "Voice Input", **kwargs) -> None:
         """
         Initialize mobile voice input component.
 

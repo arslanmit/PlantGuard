@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class MobileMemoryManager:
     """Memory manager optimized for mobile devices."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._tracked_objects: dict[str, weakref.ref] = {}
         self._memory_thresholds = {
             "warning": 50 * 1024 * 1024,  # 50MB
@@ -181,7 +181,7 @@ mobile_memory_manager = MobileMemoryManager()
 
 
 # Auto-cleanup decorator for components
-def auto_cleanup(func):
+def auto_cleanup(func) -> Callable:
     """Decorator to automatically check memory pressure after function execution."""
 
     def wrapper(*args, **kwargs):

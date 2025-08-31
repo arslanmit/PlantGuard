@@ -706,7 +706,7 @@ class TrainingMonitor:
 
                 if open_browser:
                     # Open browser in a separate thread to avoid blocking
-                    def open_browser_delayed():
+                    def open_browser_delayed() -> None:
                         time.sleep(1)
                         webbrowser.open(f"http://localhost:{self.tensorboard_port}")
 
@@ -739,11 +739,11 @@ class TrainingMonitor:
         self.stop_tensorboard()
         logger.info("Training monitor closed")
 
-    def __enter__(self):
+    def __enter__(self) -> "TrainingMonitor":
         """Context manager entry."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Context manager exit."""
         self.close()
 

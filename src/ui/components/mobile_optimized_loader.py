@@ -166,6 +166,6 @@ mobile_optimized_loader = MobileOptimizedLoader()
 
 # Streamlit caching for component instances
 @st.cache_resource
-def get_cached_component(component_type: str, component_id: str, **kwargs):
+def get_cached_component(component_type: str, component_id: str, **kwargs) -> Any:
     """Get cached component instance."""
     return mobile_optimized_loader.load_component(component_type, component_id, **kwargs)

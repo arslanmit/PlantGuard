@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class MobileAnalysisDisplay(MobileBaseComponent):
     """Mobile-optimized analysis results display component."""
 
-    def __init__(self, component_id: str, title: str = "Analysis Results", **kwargs):
+    def __init__(self, component_id: str, title: str = "Analysis Results", **kwargs) -> None:
         """
         Initialize mobile analysis display component.
 

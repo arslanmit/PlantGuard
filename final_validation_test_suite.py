@@ -508,7 +508,7 @@ class FinalValidationTestSuite:
         return summary
 
 
-def main():
+def main() -> None:
     """Run the final validation test suite."""
     print("PlantGuard Mobile-Only Refactoring - Final Validation Test Suite")
     print("=" * 70)

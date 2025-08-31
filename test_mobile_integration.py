@@ -18,7 +18,7 @@ from datetime import datetime  # noqa: E402
 import streamlit as st  # noqa: E402
 
 
-def test_component_imports():
+def test_component_imports() -> bool:
     """Test that all components can be imported successfully."""
     import importlib.util
 
@@ -58,7 +58,7 @@ def test_component_imports():
         return False
 
 
-def test_component_initialization():
+def test_component_initialization() -> bool:
     """Test that components can be initialized without errors."""
     try:
         from ui.components.mobile_history_view import MobileHistoryView
@@ -75,7 +75,7 @@ def test_component_initialization():
         return False
 
 
-def test_state_management():
+def test_state_management() -> bool:
     """Test state management functionality."""
     try:
         from ui.components.mobile_state_manager import MobileStateManager
@@ -100,7 +100,7 @@ def test_state_management():
         return False
 
 
-def test_model_switcher_integration():
+def test_model_switcher_integration() -> bool:
     """Test model switcher integration."""
     try:
         from ui.components.model_switcher import ModelSwitcher
@@ -124,7 +124,7 @@ def test_model_switcher_integration():
         return False
 
 
-def test_history_functionality():
+def test_history_functionality() -> bool:
     """Test history view functionality."""
     try:
         from ui.components.mobile_history_view import MobileHistoryView
@@ -151,7 +151,7 @@ def test_history_functionality():
         return False
 
 
-def test_settings_functionality():
+def test_settings_functionality() -> bool:
     """Test settings card functionality."""
     try:
         from ui.components.mobile_settings_card import MobileSettingsCard
@@ -177,7 +177,7 @@ def test_settings_functionality():
         return False
 
 
-def test_css_compatibility():
+def test_css_compatibility() -> bool:
     """Test CSS compatibility with mobile layout."""
     try:
         from ui.components.mobile_history_view import MobileHistoryView
@@ -202,7 +202,7 @@ def test_css_compatibility():
         return False
 
 
-def main():
+def main() -> None:
     """Main integration test."""
     st.set_page_config(page_title="Mobile Integration Test", page_icon="[TEST]", layout="wide")
 

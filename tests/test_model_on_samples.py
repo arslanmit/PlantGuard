@@ -14,7 +14,8 @@ import numpy as np
 import pytest
 import torch
 from PIL import Image
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import (accuracy_score, classification_report,
+                             confusion_matrix)
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -398,7 +399,7 @@ def _create_temp_samples(tmp_path):
     return str(images_dir), str(metadata_path)
 
 
-def test_evaluate_model_with_temp_samples(tmp_path):
+def test_evaluate_model_with_temp_samples(tmp_path) -> None:
     """Pytest wrapper: create temp samples and call evaluate_model.
 
     This test will skip if the required model checkpoint (`data/models/vision_resnet50.pt`) is not present.

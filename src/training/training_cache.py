@@ -69,7 +69,7 @@ class CacheEntry:
 class CacheManager:
     """Manages training cache operations and lifecycle."""
 
-    def __init__(self, config: CacheConfig):
+    def __init__(self, config: CacheConfig) -> None:
         """Initialize cache manager.
 
         Args:
@@ -471,11 +471,11 @@ class CacheManager:
         # In practice, you'd track hits vs misses separately
         return min(1.0, total_accesses / len(self.cache_index))
 
-    def __enter__(self):
+    def __enter__(self) -> "CacheManager":
         """Context manager entry."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Context manager exit - save cache index."""
         self._save_cache_index()
 
@@ -483,7 +483,7 @@ class CacheManager:
 class ModelStateCache:
     """Specialized cache for model states and checkpoints."""
 
-    def __init__(self, cache_manager: CacheManager):
+    def __init__(self, cache_manager: CacheManager) -> None:
         """Initialize model state cache.
 
         Args:
@@ -595,7 +595,7 @@ class ModelStateCache:
 class DatasetCache:
     """Specialized cache for processed datasets and features."""
 
-    def __init__(self, cache_manager: CacheManager):
+    def __init__(self, cache_manager: CacheManager) -> None:
         """Initialize dataset cache.
 
         Args:

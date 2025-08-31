@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 
-def test_error_handler_imports():
+def test_error_handler_imports() -> bool:
     """Test that error handler modules can be imported."""
     import importlib.util
 
@@ -30,7 +30,7 @@ def test_error_handler_imports():
         return False
 
 
-def test_offline_manager_imports():
+def test_offline_manager_imports() -> bool:
     """Test that offline manager modules can be imported."""
     import importlib.util
 
@@ -47,7 +47,7 @@ def test_offline_manager_imports():
         return False
 
 
-def test_integration_imports():
+def test_integration_imports() -> bool:
     """Test that integration module can be imported."""
     import importlib.util
 
@@ -64,7 +64,7 @@ def test_integration_imports():
         return False
 
 
-def test_error_handler_functionality():
+def test_error_handler_functionality() -> bool:
     """Test error handler functionality without Streamlit context."""
     try:
         from src.ui.mobile_error_handler import ErrorCategory, ErrorSeverity
@@ -94,7 +94,7 @@ def test_error_handler_functionality():
         return False
 
 
-def test_offline_manager_functionality():
+def test_offline_manager_functionality() -> bool:
     """Test offline manager functionality without Streamlit context."""
     try:
         from src.ui.mobile_offline_manager import NetworkStatus, OfflineCapability
@@ -122,7 +122,7 @@ def test_offline_manager_functionality():
         return False
 
 
-def test_integration_functionality():
+def test_integration_functionality() -> bool:
     """Test integration functionality."""
     try:
         from src.ui.mobile_error_recovery_integration import create_resilient_mobile_component, handle_mobile_operation
@@ -150,7 +150,7 @@ def test_integration_functionality():
         return False
 
 
-def test_error_categories_and_severities():
+def test_error_categories_and_severities() -> bool:
     """Test that all error categories and severities are properly defined."""
     try:
         from src.ui.mobile_error_handler import ErrorCategory, ErrorSeverity
@@ -179,7 +179,7 @@ def test_error_categories_and_severities():
         return False
 
 
-def test_network_status_and_capabilities():
+def test_network_status_and_capabilities() -> bool:
     """Test network status and offline capabilities."""
     try:
         from src.ui.mobile_offline_manager import NetworkStatus, OfflineCapability
@@ -200,7 +200,7 @@ def test_network_status_and_capabilities():
         return False
 
 
-def test_class_instantiation():
+def test_class_instantiation() -> bool:
     """Test that main classes can be instantiated."""
     try:
         from src.ui.mobile_error_handler import MobileErrorBoundary
@@ -222,7 +222,7 @@ def test_class_instantiation():
         return False
 
 
-def test_file_structure():
+def test_file_structure() -> bool:
     """Test that all required files exist."""
     required_files = ["src/ui/mobile_error_handler.py", "src/ui/mobile_offline_manager.py", "src/ui/mobile_error_recovery_integration.py"]
 
@@ -239,7 +239,7 @@ def test_file_structure():
     return True
 
 
-def run_all_tests():
+def run_all_tests() -> bool:
     """Run all tests and report results."""
     print("[TEST] Testing Mobile Error Recovery System")
     print("=" * 50)

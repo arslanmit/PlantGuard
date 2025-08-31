@@ -182,7 +182,7 @@ mobile_lazy_loader = MobileLazyLoader()
 
 
 # Decorators for lazy loading
-def lazy_load(component_id: str):
+def lazy_load(component_id: str) -> Callable:
     """Decorator for lazy loading components."""
 
     def decorator(func):
@@ -195,7 +195,7 @@ def lazy_load(component_id: str):
     return decorator
 
 
-def defer_execution(operation_id: str, delay: float = 0.1):
+def defer_execution(operation_id: str, delay: float = 0.1) -> Callable:
     """Decorator for deferring operation execution."""
 
     def decorator(func):
@@ -212,7 +212,7 @@ def defer_execution(operation_id: str, delay: float = 0.1):
 
 
 # Streamlit component helpers
-def lazy_streamlit_component(component_func: Callable, component_id: str, *args, **kwargs):
+def lazy_streamlit_component(component_func: Callable, component_id: str, *args, **kwargs) -> Any:
     """Helper for lazy loading Streamlit components."""
     return mobile_lazy_loader.lazy_component(component_id, lambda: component_func(*args, **kwargs))
 

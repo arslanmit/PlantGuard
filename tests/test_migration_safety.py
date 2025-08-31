@@ -385,7 +385,7 @@ class TestMigrationSafetyFramework:
             os.chdir(original_cwd)
 
 
-def test_integration_workflow():
+def test_integration_workflow() -> None:
     """Test complete integration workflow."""
     temp_dir = Path(tempfile.mkdtemp())
     

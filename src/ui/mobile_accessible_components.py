@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class AccessibleMobileCameraInput(MobileComponent):
     """Accessible mobile camera input component with ARIA support."""
 
-    def __init__(self, component_id: str, title: str):
+    def __init__(self, component_id: str, title: str) -> None:
         """Initialize accessible camera input component."""
         super().__init__(component_id, title)
         self.accessibility_manager = initialize_mobile_accessibility()
@@ -35,7 +35,10 @@ class AccessibleMobileCameraInput(MobileComponent):
 
         # Accessible heading
         heading_html = self.accessibility_manager.create_accessible_heading(
-            text="[CAMERA] Camera Input", level=2, heading_id=f"{self.component_id}-heading", aria_label="Camera input section for plant image capture"
+            text="[CAMERA] Camera Input",
+            level=2,
+            heading_id=f"{self.component_id}-heading",
+            aria_label="Camera input section for plant image capture",
         )
         st.markdown(heading_html, unsafe_allow_html=True)
 
@@ -143,7 +146,7 @@ class AccessibleMobileCameraInput(MobileComponent):
 class AccessibleMobileUploadInput(MobileComponent):
     """Accessible mobile file upload component with ARIA support."""
 
-    def __init__(self, component_id: str, title: str):
+    def __init__(self, component_id: str, title: str) -> None:
         """Initialize accessible upload input component."""
         super().__init__(component_id, title)
         self.accessibility_manager = initialize_mobile_accessibility()
@@ -249,7 +252,7 @@ class AccessibleMobileUploadInput(MobileComponent):
 class AccessibleMobileAnalysisDisplay(MobileComponent):
     """Accessible mobile analysis results display with ARIA support."""
 
-    def __init__(self, component_id: str, title: str):
+    def __init__(self, component_id: str, title: str) -> None:
         """Initialize accessible analysis display component."""
         super().__init__(component_id, title)
         self.accessibility_manager = initialize_mobile_accessibility()
@@ -262,7 +265,10 @@ class AccessibleMobileAnalysisDisplay(MobileComponent):
 
         # Accessible heading
         heading_html = self.accessibility_manager.create_accessible_heading(
-            text="[MICROSCOPE] Analysis Results", level=2, heading_id=f"{self.component_id}-heading", aria_label="Plant disease analysis results section"
+            text="[MICROSCOPE] Analysis Results",
+            level=2,
+            heading_id=f"{self.component_id}-heading",
+            aria_label="Plant disease analysis results section",
         )
         st.markdown(heading_html, unsafe_allow_html=True)
 
@@ -435,7 +441,7 @@ class AccessibleMobileAnalysisDisplay(MobileComponent):
 class AccessibleMobileSettingsCard(MobileComponent):
     """Accessible mobile settings component with ARIA support."""
 
-    def __init__(self, component_id: str, title: str):
+    def __init__(self, component_id: str, title: str) -> None:
         """Initialize accessible settings component."""
         super().__init__(component_id, title)
         self.accessibility_manager = initialize_mobile_accessibility()
@@ -448,7 +454,10 @@ class AccessibleMobileSettingsCard(MobileComponent):
 
         # Accessible heading
         heading_html = self.accessibility_manager.create_accessible_heading(
-            text="[SETTINGS] Settings", level=2, heading_id=f"{self.component_id}-heading", aria_label="Application settings and accessibility options"
+            text="[SETTINGS] Settings",
+            level=2,
+            heading_id=f"{self.component_id}-heading",
+            aria_label="Application settings and accessibility options",
         )
         st.markdown(heading_html, unsafe_allow_html=True)
 

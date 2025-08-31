@@ -765,7 +765,7 @@ class MobileOfflineManager:
 # Utility functions for easy integration
 
 
-def with_offline_support(operation_id: str, operation_func: Callable, fallback_func: Callable | None = None, cache_result: bool = True):
+def with_offline_support(operation_id: str, operation_func: Callable, fallback_func: Callable | None = None, cache_result: bool = True) -> Callable:
     """
     Decorator to add offline support to operations.
 
@@ -823,7 +823,7 @@ def with_offline_support(operation_id: str, operation_func: Callable, fallback_f
     return decorator
 
 
-def ensure_offline_capability(component_id: str, required_resources: list[str] | None = None):
+def ensure_offline_capability(component_id: str, required_resources: list[str] | None = None) -> Callable:
     """
     Ensure a component has the necessary offline capabilities.
 

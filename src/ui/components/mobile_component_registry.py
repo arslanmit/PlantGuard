@@ -78,7 +78,7 @@ class MobileComponent:
         )
 
 
-def register_mobile_component(component_class):
+def register_mobile_component(component_class) -> Callable:
     """Decorator to register a mobile component class."""
 
     def wrapper(*args, **kwargs):
@@ -105,7 +105,7 @@ def register_mobile_component(component_class):
 class MobileComponentRegistry:
     """Registry for managing mobile components with AI agent support."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize component registry with base components."""
         self._components: dict[str, type] = {}
         self._component_metadata: dict[str, dict[str, Any]] = {}

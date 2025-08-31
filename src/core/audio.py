@@ -19,8 +19,8 @@ import streamlit as st
 # Disable Streamlit caching during pytest to avoid large in-memory caches
 if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
 
-    def _noop_cache(*args, **kwargs):
-        def _wrap(f):
+    def _noop_cache(*args, **kwargs) -> Callable:
+        def _wrap(f: Callable) -> Callable:
             return f
 
         return _wrap
@@ -122,7 +122,7 @@ class AudioAdapter:
                 logger.error("Failed to load Whisper pipeline: %s", e)
                 raise RuntimeError(f"Failed to initialize Whisper model: {e}") from e
 
-    def _timeout_handler(self, signum, frame):
+    def _timeout_handler(self, signum: int, frame: Any) -> None:
         """Handle processing timeout."""
         raise TimeoutError("Audio processing timeout exceeded")
 

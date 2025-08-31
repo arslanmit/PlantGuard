@@ -1329,7 +1329,7 @@ class MobileTestingOptimizationSuite:
         return "\n".join(f"{i + 1}. {step}" for i, step in enumerate(next_steps))
 
 
-def main():
+def main() -> None:
     """Main execution function."""
     print("[TEST] Mobile PlantGuard Testing & Optimization Suite")
     print("=" * 50)

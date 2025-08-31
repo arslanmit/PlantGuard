@@ -39,7 +39,7 @@ st.markdown(
 )
 
 
-def create_sample_history():
+def create_sample_history() -> None:
     """Create sample analysis history for testing."""
     if "analysis_history" not in st.session_state:
         st.session_state.analysis_history = [
@@ -81,7 +81,7 @@ def create_sample_history():
         ]
 
 
-def main():
+def main() -> None:
     """Main test application."""
     st.title("[TEST] Mobile History & Settings Test")
 

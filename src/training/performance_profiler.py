@@ -85,7 +85,7 @@ class PerformanceProfile:
 class TrainingProfiler:
     """Comprehensive training pipeline profiler."""
 
-    def __init__(self, config: ProfilerConfig):
+    def __init__(self, config: ProfilerConfig) -> None:
         """Initialize training profiler.
 
         Args:
@@ -488,7 +488,7 @@ class TrainingProfiler:
 class DataLoaderProfiler:
     """Specialized profiler for data loading performance."""
 
-    def __init__(self, config: ProfilerConfig):
+    def __init__(self, config: ProfilerConfig) -> None:
         """Initialize data loader profiler."""
         self.config = config
 

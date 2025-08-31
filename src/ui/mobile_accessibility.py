@@ -43,7 +43,7 @@ class FontScale(Enum):
 class MobileAccessibilityManager:
     """Comprehensive accessibility manager for mobile interface."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize accessibility manager with default settings."""
         self.config = {
             "accessibility_level": AccessibilityLevel.ENHANCED,

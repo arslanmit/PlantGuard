@@ -23,7 +23,7 @@ from ui.components.mobile_voice_input import MobileVoiceInput
 logger = logging.getLogger(__name__)
 
 
-def load_mobile_css():
+def load_mobile_css() -> None:
     """Load mobile-optimized CSS styles."""
     css = """
     <style>
@@ -136,7 +136,7 @@ def load_mobile_css():
     st.markdown(css, unsafe_allow_html=True)
 
 
-def render_demo_header():
+def render_demo_header() -> None:
     """Render demo application header."""
     st.markdown(
         """
@@ -151,7 +151,7 @@ def render_demo_header():
     )
 
 
-def render_input_grid():
+def render_input_grid() -> None:
     """Render the main input grid with all components."""
     st.markdown("### [MOBILE] Choose Your Input Method")
 
@@ -159,7 +159,9 @@ def render_input_grid():
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("[CAMERA] Camera\nTake Photo", key="camera_grid_btn", help="Use device camera to capture plant images", use_container_width=True):
+        if st.button(
+            "[CAMERA] Camera\nTake Photo", key="camera_grid_btn", help="Use device camera to capture plant images", use_container_width=True
+        ):
             st.session_state.selected_input = "camera"
 
         if st.button("[VOICE] Voice\nAsk Question", key="voice_grid_btn", help="Record voice question about plant care", use_container_width=True):
@@ -173,7 +175,7 @@ def render_input_grid():
             st.session_state.selected_input = "text"
 
 
-def render_selected_component():
+def render_selected_component() -> None:
     """Render the selected input component."""
     selected = st.session_state.get("selected_input")
 
@@ -212,7 +214,7 @@ def render_selected_component():
         components["text"].render()
 
 
-def render_analysis_results():
+def render_analysis_results() -> None:
     """Render analysis results if available."""
     if "analysis_results" in st.session_state and st.session_state.analysis_results:
         st.markdown("---")
@@ -244,7 +246,7 @@ def render_analysis_results():
                 st.error("[RED] Low confidence result")
 
 
-def render_chat_history():
+def render_chat_history() -> None:
     """Render chat history if available."""
     if "chat_history" in st.session_state and st.session_state.chat_history:
         st.markdown("---")
@@ -280,7 +282,7 @@ def render_chat_history():
                 )
 
 
-def render_demo_footer():
+def render_demo_footer() -> None:
     """Render demo footer with additional information."""
     st.markdown("---")
 
@@ -332,7 +334,7 @@ def render_demo_footer():
                     st.write(f"ID: {component.component_id}")
 
 
-def main():
+def main() -> None:
     """Main demo application."""
     # Configure Streamlit page
     st.set_page_config(page_title="PlantGuard Mobile Input Demo", page_icon="[LEAF]", layout="wide", initial_sidebar_state="collapsed")

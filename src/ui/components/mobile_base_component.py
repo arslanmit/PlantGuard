@@ -26,7 +26,7 @@ class MobileBaseComponent(ABC):
     consistent error handling across all mobile components.
     """
 
-    def __init__(self, component_id: str, title: str, **kwargs):
+    def __init__(self, component_id: str, title: str, **kwargs) -> None:
         """
         Initialize base mobile component.
 

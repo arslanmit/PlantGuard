@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 
-def test_basic_functionality():
+def test_basic_functionality() -> bool:
     """Test basic functionality without Streamlit context."""
     print("Testing mobile layout and design system...")
 

@@ -56,7 +56,7 @@ class MockStreamlit:
         pass
 
 
-def test_mobile_component_imports():
+def test_mobile_component_imports() -> None:
     """Test that all mobile components can be imported."""
     import importlib.util
 
@@ -93,7 +93,7 @@ def test_mobile_component_imports():
         assert False, f"Import error: {e}"
 
 
-def test_mobile_app_integration():
+def test_mobile_app_integration() -> None:
     """Test mobile app integration."""
     import importlib.util
 
@@ -135,7 +135,7 @@ def test_mobile_app_integration():
         assert False, f"Mobile app import error: {e}"
 
 
-def test_adapter_integration():
+def test_adapter_integration() -> None:
     """Test that adapters work with mobile components."""
     import importlib.util
 
@@ -169,7 +169,7 @@ def test_adapter_integration():
         # Don't fail the test for adapter import warnings - they may be optional
 
 
-def run_comprehensive_tests():
+def run_comprehensive_tests() -> None:
     """Run all comprehensive tests."""
     st.title("[TEST] Mobile Comprehensive Testing Suite")
 

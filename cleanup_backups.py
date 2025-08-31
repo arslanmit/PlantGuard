@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 
-def cleanup_backups(root_path: str, dry_run: bool = False):
+def cleanup_backups(root_path: str, dry_run: bool = False) -> None:
     """Remove all .backup files in the directory tree."""
     root = Path(root_path)
     backup_files = list(root.rglob("*.backup"))
@@ -44,7 +44,7 @@ def cleanup_backups(root_path: str, dry_run: bool = False):
     print(f"\n[SUCCESS] Successfully deleted {deleted_count} backup files!")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Clean up backup files created by replace_emojis.py")
 
     parser.add_argument("--path", default=".", help="Root path to search for backup files (default: current dir)")
