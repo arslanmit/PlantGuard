@@ -35,7 +35,7 @@ class MobileVoiceInput(MobileBaseComponent):
         super().__init__(component_id, title, **kwargs)
 
         # Voice recording configuration
-        self.voice_config = {
+        self.voice_config: dict[str, Any] = {
             "audio_constraints": {
                 "sampleRate": 16000,  # Optimal for Whisper
                 "channelCount": 1,  # Mono audio
@@ -123,7 +123,11 @@ class MobileVoiceInput(MobileBaseComponent):
             if voice_data.get("recording"):
                 # Stop recording button
                 if st.button(
-                    "[HALT] Stop Recording", key=f"{self.component_id}_stop_btn", help="Stop voice recording", use_container_width=True, type="secondary"
+                    "[HALT] Stop Recording",
+                    key=f"{self.component_id}_stop_btn",
+                    help="Stop voice recording",
+                    use_container_width=True,
+                    type="secondary",
                 ):
                     self._stop_recording()
             else:

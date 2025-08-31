@@ -49,7 +49,7 @@ class MobileUploadInput(MobileBaseComponent):
 
     def _initialize_upload_state(self) -> None:
         """Initialize upload-specific state."""
-        upload_state = {
+        upload_state: dict[str, Any] = {
             "uploaded_files": [],
             "current_file": None,
             "upload_progress": 0,
