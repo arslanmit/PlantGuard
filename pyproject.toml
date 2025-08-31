@@ -419,8 +419,9 @@ exclude = [
   "runs/",
   "data/",
   "notebooks/",
-  "tests/",         # Ignore all linter rules for tests folder
+  "tests/",         # [IGNORE] Completely ignore tests folder from ALL linters
   "**/tests/**",    # Also exclude tests in any subdirectory
+  "tests/**/*.py",  # Explicitly ignore all Python files in tests
 ]
 
 # [SEARCH] What Ruff checks for (focused on essential rules)
@@ -961,25 +962,23 @@ check-typed-exception = true # Check exception handling
 # [FOLDER] Per-file ignores - Different rules for different file types
 [tool.ruff.lint.per-file-ignores]
 # [TEST] Test files - Ignore ALL common linter rules that typically apply to tests
+# [IGNORE] Tests don't need to follow production code standards - they have different purposes
 "tests/**/*.py" = [
-  "S101",   # Allow assert statements in tests
-  "S102",   # Allow use of exec detected
-  "S110",   # Allow try-except-pass detected
-  "T201",   # Allow print statements in tests for debugging
-  "E402",   # Allow module-level imports after sys.path manipulation in tests
-  "PTH108", # Allow os.unlink() instead of Path.unlink()
-  "SIM117", # Allow nested with statements instead of single with
-  "PT017",  # Allow assertion on exception in except block
-  "UP038",  # Allow isinstance calls with tuples
-  "PT015",  # Allow assertion always fails patterns
-  "B011",   # Allow assert False calls
-  "F841",   # Allow unused local variables
-  "B007",   # Allow unused loop variables
-  "SIM102", # Allow nested if statements
-  "C408",   # Allow unnecessary dict calls
-  "RUF012", # Allow mutable class attributes
-  "E501",   # Allow long lines
-  "COM812", # Allow missing trailing commas
+  # [IGNORE] Ignore ALL common linting rules for test files
+  "E",      # Ignore all pycodestyle errors
+  "F",      # Ignore all pyflakes errors  
+  "I",      # Ignore all isort errors
+  "W",      # Ignore all pycodestyle warnings
+  "B",      # Ignore all flake8-bugbear errors
+  "C4",     # Ignore all flake8-comprehensions errors
+  "UP",     # Ignore all pyupgrade errors
+  "S",      # Ignore all flake8-bandit security errors
+  "PTH",    # Ignore all flake8-use-pathlib errors
+  "SIM",    # Ignore all flake8-simplify errors
+  "RUF",    # Ignore all ruff-specific errors
+  "PT",     # Ignore all flake8-pytest-style errors
+  "T201",   # Ignore print statements in tests
+  "COM812", # Ignore missing trailing commas
 ]
 
 # [NOTEBOOK] Scripts and notebooks - Allow subprocess calls and missing docstrings
