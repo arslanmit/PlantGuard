@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This spec addresses the comprehensive code quality issues identified by mypy type checking and ruff linting in the PlantGuard project. The issues include type annotation problems, import organization, security concerns, and code style violations that need systematic resolution to maintain code quality standards.
+This spec addresses the comprehensive code quality issues identified by mypy type checking and ruff linting in the PlantGuard project. The issues include type annotation problems, import organization, security concerns, and code style violations that need systematic resolution to maintain code quality standards and ensure compliance with PlantGuard's local-only ML inference requirements.
 
 ## Requirements
 
@@ -27,6 +27,7 @@ This spec addresses the comprehensive code quality issues identified by mypy typ
 2. WHEN ruff checks imports THEN there SHALL be no unused import warnings
 3. WHEN examining module imports THEN they SHALL follow the order: standard library, third-party, first-party
 4. WHEN imports are conditional THEN they SHALL use proper importlib.util.find_spec patterns
+5. WHEN examining typing imports THEN they SHALL use modern syntax (dict instead of typing.Dict)
 
 ### Requirement 3: Security and Best Practices
 
@@ -34,10 +35,11 @@ This spec addresses the comprehensive code quality issues identified by mypy typ
 
 #### Acceptance Criteria
 
-1. WHEN subprocess calls are made THEN they SHALL use full executable paths or proper validation
+1. WHEN subprocess calls are made THEN they SHALL use full executable paths with shutil.which() validation
 2. WHEN file operations are performed THEN they SHALL use pathlib.Path instead of os.path
 3. WHEN network requests are made THEN they SHALL include appropriate timeouts
 4. WHEN exception handling is used THEN it SHALL log exceptions instead of silent continues
+5. WHEN temporary files are created THEN they SHALL use tempfile module and clean up immediately
 
 ### Requirement 4: Code Style and Formatting
 
@@ -46,9 +48,10 @@ This spec addresses the comprehensive code quality issues identified by mypy typ
 #### Acceptance Criteria
 
 1. WHEN examining variable names THEN they SHALL not use ambiguous single letters
-2. WHEN examining string literals THEN they SHALL not contain ambiguous Unicode characters
+2. WHEN examining string literals THEN they SHALL not contain ambiguous Unicode characters like ℹ
 3. WHEN examining exception handling THEN it SHALL use contextlib.suppress for simple pass cases
 4. WHEN examining file paths THEN they SHALL use Path operations consistently
+5. WHEN examining line length THEN it SHALL not exceed 100 characters per PlantGuard standards
 
 ### Requirement 5: Mobile Component Integration Fixes
 
@@ -71,3 +74,15 @@ This spec addresses the comprehensive code quality issues identified by mypy typ
 2. WHEN mobile tests execute THEN they SHALL properly mock Streamlit session state
 3. WHEN adapter tests run THEN they SHALL have proper fixture setup and teardown
 4. WHEN integration tests execute THEN they SHALL handle missing model files gracefully
+5. WHEN tests complete THEN they SHALL clean up temporary files using tempfile module
+
+### Requirement 7: Mypy Strict Mode Compliance
+
+**User Story:** As a developer, I want the codebase to pass mypy strict mode validation so that type safety is guaranteed across all components.
+
+#### Acceptance Criteria
+
+1. WHEN mypy --strict runs THEN it SHALL report zero errors (currently 535 errors)
+2. WHEN examining function definitions THEN they SHALL have complete return type annotations
+3. WHEN examining generic types THEN they SHALL have proper type parameters (dict[K, V] not dict)
+4. WHEN examining Any types THEN they SHALL be replaced with specific type annotations

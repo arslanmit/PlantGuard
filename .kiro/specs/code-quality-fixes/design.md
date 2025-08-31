@@ -2,16 +2,16 @@
 
 ## Overview
 
-This design addresses systematic code quality improvements across the PlantGuard codebase, focusing on type safety, import organization, security best practices, and test reliability. The approach prioritizes fixing critical type errors first, then addressing import and style issues, and finally improving test infrastructure.
+This design addresses systematic code quality improvements across the PlantGuard codebase, focusing on type safety, import organization, security best practices, and test reliability. The approach prioritizes achieving mypy strict mode compliance (zero errors from current 535), then addressing import and style issues, and finally improving test infrastructure to support PlantGuard's local-only ML inference requirements.
 
 ## Architecture
 
 ### Fix Priority Levels
 
-1. **Critical**: Type errors that break mypy validation
-2. **High**: Security issues and import organization
-3. **Medium**: Code style and formatting issues
-4. **Low**: Test infrastructure improvements
+1. **Critical**: Mypy strict mode compliance (535 errors → 0 errors)
+2. **High**: Security issues and import organization (187 ruff issues)
+3. **Medium**: Code style and formatting issues (Unicode characters, line length)
+4. **Low**: Test infrastructure improvements and cleanup
 
 ### Component Categories
 
@@ -28,10 +28,10 @@ This design addresses systematic code quality improvements across the PlantGuard
 ```python
 class MobileTestingFramework:
     def __init__(self) -> None:
-        self.performance_metrics: Dict[str, float] = {}
-        self.test_results: List[Dict[str, Any]] = []
+        self.performance_metrics: dict[str, float] = {}
+        self.test_results: list[dict[str, Any]] = []
         
-    def validate_performance(self, metrics: Dict[str, float]) -> bool:
+    def validate_performance(self, metrics: dict[str, float]) -> bool:
         # Fix comparison operations with proper typing
         return all(isinstance(v, (int, float)) for v in metrics.values())
 ```
@@ -56,7 +56,7 @@ class MobileAdapterIntegration:
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional, Any
 
 # Third-party imports
 import streamlit as st
@@ -138,7 +138,7 @@ class MobileLayoutManager:
         """
     
     @property
-    def performance_optimizer(self) -> Dict[str, Any]:
+    def performance_optimizer(self) -> dict[str, Any]:
         return getattr(self, '_performance_optimizer', {})
 ```
 
@@ -239,27 +239,33 @@ def temp_model_file():
 
 ## Implementation Phases
 
-### Phase 1: Critical Type Fixes
-- Fix mobile_testing_framework.py type errors
+### Phase 1: Critical Import and Type Fixes
+- Fix F404 `from __future__` imports placement
+- Move E402 module-level imports to file tops
+- Remove F401 unused imports
+- Update UP035 deprecated typing imports (Dict → dict)
+- Add missing return type annotations (535 mypy errors)
+
+### Phase 2: Security and Unicode Issues
+- Replace S607 subprocess calls with secure shutil.which() validation
+- Fix RUF001 ambiguous Unicode characters (ℹ → i)
+- Convert os.path operations to pathlib.Path
+- Add subprocess timeouts and proper validation
+
+### Phase 3: Type Parameter and Generic Fixes
+- Fix type-arg errors for generic dict/list usage
+- Replace Any return types with specific type annotations
+- Add proper type parameters to all generic types
+- Fix no-untyped-def and no-untyped-call errors
+
+### Phase 4: Mobile Component Integration
 - Add proper type annotations to adapter properties
-- Fix Collection type usage
+- Fix mobile testing framework type safety
+- Implement proper mock interfaces for testing
+- Complete missing methods in layout managers
 
-### Phase 2: Import Organization
-- Move all imports to file tops
-- Remove unused imports
-- Implement conditional import patterns
-
-### Phase 3: Security and Best Practices
-- Replace subprocess calls with secure versions
-- Convert os.path to pathlib.Path
-- Add request timeouts and proper exception logging
-
-### Phase 4: Test Infrastructure
-- Fix mobile component mocking
-- Add proper session state fixtures
-- Implement graceful model file handling
-
-### Phase 5: Code Style Cleanup
-- Fix ambiguous variable names
-- Replace Unicode characters
-- Implement contextlib.suppress patterns
+### Phase 5: Final Validation and Cleanup
+- Achieve mypy --strict zero errors (from 535)
+- Resolve all ruff linting issues (from 187)
+- Ensure all tests pass with proper mocking
+- Generate final quality report
