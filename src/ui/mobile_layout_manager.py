@@ -1,5 +1,3 @@
-from typing import Any
-
 """
 Mobile Layout Manager for PlantGuard UI.
 
@@ -7,8 +5,8 @@ This module provides the core mobile layout management system with responsive de
 touch optimization, and AI agent-friendly component architecture.
 """
 
-
 import logging
+from typing import Any
 
 import streamlit as st
 

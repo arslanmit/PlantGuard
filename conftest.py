@@ -1,5 +1,14 @@
+from __future__ import annotations
+
+import sys
+import tempfile
 from collections.abc import Generator
+from pathlib import Path
 from typing import Any
+from unittest.mock import Mock, patch
+
+import pytest
+from PIL import Image
 
 """Pytest configuration helpers.
 
@@ -8,17 +17,6 @@ early during test collection so tests that import `src.*` succeed.
 
 This is a minimal, non-invasive helper intended only for the test runtime.
 """
-
-
-from __future__ import annotations
-
-import sys
-import tempfile
-from pathlib import Path
-from unittest.mock import Mock, patch
-
-import pytest
-from PIL import Image
 
 # Import mobile test fixtures
 try:

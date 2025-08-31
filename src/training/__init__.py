@@ -1,6 +1,3 @@
-from collections.abc import Generator
-from typing import Any, Dict, List, Optional, Tuple, Union
-
 """Training module for PlantGuard production pipeline."""
 
 from .evaluator import ModelEvaluator, ModelMetrics, ValidationResult

@@ -1,5 +1,3 @@
-from typing import Any
-
 """Enhanced Gesture Handler Component for PlantGuard Mobile Interface.
 
 
@@ -14,6 +12,7 @@ Provides comprehensive touch gesture support for mobile devices including:
 
 import logging
 from collections.abc import Callable
+from typing import Any
 
 import streamlit as st
 

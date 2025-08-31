@@ -1,5 +1,3 @@
-from typing import Any
-
 """
 Mobile Header Component for PlantGuard
 
@@ -7,6 +5,7 @@ Sticky header with title, model switching, and system status.
 Optimized for mobile touch interactions.
 """
 
+from typing import Any
 
 import streamlit as st
 

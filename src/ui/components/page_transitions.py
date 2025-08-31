@@ -1,14 +1,12 @@
-from typing import Any
-
 """Page Transitions Component for PlantGuard Redesigned UI.
 
 Handles page transition animations, loading states, and smooth navigation
 between different pages in the application.
 """
 
-
 import logging
 import time
+from typing import Any
 
 import streamlit as st
 

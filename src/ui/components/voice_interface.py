@@ -1,5 +1,3 @@
-from typing import Any
-
 """Voice and Audio Processing Interface for PlantGuard.
 
 This module provides comprehensive voice and audio processing capabilities
@@ -7,10 +5,10 @@ including microphone capture, file upload, transcription, and audio analysis
 for the PlantGuard multimodal plant disease detection system.
 """
 
-
 import logging
 import tempfile
 from pathlib import Path
+from typing import Any
 
 import av
 import librosa

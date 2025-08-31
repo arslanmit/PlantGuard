@@ -1,5 +1,3 @@
-from typing import Any
-
 """Navigation Header Component for PlantGuard Redesigned UI.
 
 
@@ -8,6 +6,7 @@ Provides multi-page navigation with responsive design and accessibility features
 
 import contextlib
 import logging
+from typing import Any
 
 import streamlit as st
 

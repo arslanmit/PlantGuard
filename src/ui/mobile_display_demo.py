@@ -1,5 +1,3 @@
-from typing import Any
-
 """
 Mobile Display Components Demo for PlantGuard UI.
 
@@ -7,10 +5,10 @@ This module demonstrates the mobile display components including
 MobileAnalysisDisplay, MobileRecommendations, and MobileChatInterface.
 """
 
-
 import logging
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import streamlit as st
 
