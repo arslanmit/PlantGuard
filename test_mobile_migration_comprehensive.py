@@ -8,7 +8,6 @@ and that all mobile functionality continues to work as expected.
 Requirements covered: 7.1, 7.2, 7.3, 7.4, 7.5
 """
 
-
 import json
 import logging
 import subprocess
@@ -24,7 +23,7 @@ logger = logging.getLogger(__name__)
 class MobileMigrationTester:
     """Comprehensive test suite for mobile-only migration validation."""
 
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
         self.test_results = []
         self.workspace_root = Path.cwd()
 
@@ -385,7 +384,7 @@ class MobileMigrationTester:
         except Exception as e:
             return {"status": "failed", "details": f"Mobile app startup test failed: {e!s}"}
 
-    def save_results(self, results: dict[str, Any], filename: str = "mobile_migration_test_results.json") -> Any:
+    def save_results(self, results: dict[str, Any], filename: str = "mobile_migration_test_results.json") -> None:
         """Save test results to a JSON file."""
         try:
             results_path = self.workspace_root / filename
@@ -395,7 +394,7 @@ class MobileMigrationTester:
         except Exception as e:
             logger.error(f"Failed to save test results: {e}")
 
-    def print_summary(self, results: dict[str, Any]) -> Any:
+    def print_summary(self, results: dict[str, Any]) -> None:
         """Print a formatted summary of test results."""
         print("\n" + "=" * 80)
         print("MOBILE-ONLY MIGRATION TEST RESULTS")

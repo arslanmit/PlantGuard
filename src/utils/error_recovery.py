@@ -7,6 +7,7 @@ utilities to replace silent exception handling throughout the PlantGuard codebas
 
 import importlib
 import logging
+import types
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, TypeVar
@@ -119,7 +120,7 @@ class ImportErrorRecovery:
     """Import error recovery mechanisms with proper fallback handling."""
 
     @staticmethod
-    def safe_import(module_name: str, logger_name: str | None = None) -> Any | None:
+    def safe_import(module_name: str, logger_name: str | None = None) -> types.ModuleType | None:
         """
         Safely import a module with proper error logging.
 
@@ -172,7 +173,7 @@ class ImportErrorRecovery:
             return fallback
 
     @staticmethod
-    def create_import_fallback(module_name: str, fallback_class: type[T], logger_name: str | None = None) -> Any | T:
+    def create_import_fallback(module_name: str, fallback_class: type[T], logger_name: str | None = None) -> types.ModuleType | T:
         """
         Create a fallback class if module import fails.
 
@@ -429,7 +430,7 @@ def safe_str(value: Any, default: str = "") -> str:
     return SafeTypeConverter.safe_str(value, default)
 
 
-def safe_import(module_name: str) -> Any | None:
+def safe_import(module_name: str) -> types.ModuleType | None:
     """Convenience function for safe module import."""
     return ImportErrorRecovery.safe_import(module_name)
 

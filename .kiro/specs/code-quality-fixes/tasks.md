@@ -42,7 +42,7 @@
   - Ensure all public API methods have complete type annotations
   - _Requirements: 1.1, 7.1, 7.2, 7.4_
 
-- [ ] 7. Fix no-any-return Errors in Core Components
+- [x] 7. Fix no-any-return Errors in Core Components
   - Fix Any return type in run_all_type_fixes.py main function (currently returns bool but should return None)
   - Review and fix any other functions returning Any when specific types expected
   - Ensure all public APIs have complete, specific type annotations

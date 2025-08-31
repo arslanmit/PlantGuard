@@ -371,7 +371,7 @@ class MobileLayoutManager:
         """
 
     @property
-    def performance_optimizer(self) -> Any:
+    def performance_optimizer(self) -> dict[str, Any]:
         """Get performance optimizer instance or fallback configuration."""
         if hasattr(self, "_performance_optimizer") and self._performance_optimizer is not None:
             return self._performance_optimizer

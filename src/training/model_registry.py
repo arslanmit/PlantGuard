@@ -159,7 +159,7 @@ class ModelComparison:
         return report
 
     def sort_models(self, by: str = "accuracy", ascending: bool = False) -> list[ModelInfo]:
-        def key_fn(mi: ModelInfo) -> Any:
+        def key_fn(mi: ModelInfo) -> float | str | int:
             if by in mi.metadata.performance_metrics:
                 return mi.metadata.performance_metrics.get(by, 0.0)
             if hasattr(mi.metadata, by):
@@ -182,7 +182,7 @@ class ModelComparison:
                 return m
         return None
 
-    def to_dataframe(self) -> Any:
+    def to_dataframe(self) -> pd.DataFrame | None:
         try:
             import pandas as pd
 

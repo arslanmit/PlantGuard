@@ -8,6 +8,7 @@ to address task 17 from the code-quality-fixes spec.
 
 import json
 import logging
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -256,8 +257,6 @@ def main() -> None:
         print("  1. Review the generated reports")
         print("  2. Manually fix remaining complex cases")
         print("  3. Re-run this script")
-
-    return success
 
 
 if __name__ == "__main__":

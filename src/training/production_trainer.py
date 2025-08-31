@@ -592,7 +592,6 @@ class ProductionTrainer:
             # Use cast to tell MyPy that dataset has __len__ method
             from collections.abc import Sized
 
-
             train_dataset = cast(Sized, self.train_loader.dataset)
             val_dataset = cast(Sized, self.val_loader.dataset)
             logger.info(f"Train dataset: {len(train_dataset)} samples")
@@ -612,7 +611,7 @@ class ProductionTrainer:
             logger.exception("Failed to setup optimized data loaders")
             return False
 
-    def _get_train_transforms(self) -> Any:
+    def _get_train_transforms(self) -> "transforms.Compose":
         """Get training data transforms."""
         from torchvision import transforms
 
@@ -659,7 +658,7 @@ class ProductionTrainer:
 
         return transforms.Compose(transform_list)
 
-    def _get_val_transforms(self) -> Any:
+    def _get_val_transforms(self) -> "transforms.Compose":
         """Get validation data transforms."""
         from torchvision import transforms
 
