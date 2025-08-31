@@ -9,6 +9,7 @@ and maintain functionality across different screen sizes.
 import sys
 import unittest
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 # Add src to Python path

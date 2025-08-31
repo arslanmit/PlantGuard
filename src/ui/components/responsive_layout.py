@@ -6,7 +6,7 @@ Follows ADHD-friendly design principles with clear visual hierarchy and touch-fr
 
 import logging
 from collections.abc import Callable
-from typing import Literal
+from typing import Any, Literal
 
 import streamlit as st
 import torch

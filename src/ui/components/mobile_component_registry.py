@@ -6,6 +6,7 @@ for AI agent navigation and dynamic component creation.
 """
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
