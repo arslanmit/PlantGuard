@@ -32,10 +32,10 @@ class UntypedCallFixer:
             "setup_method": "(self) -> None",
             "teardown_method": "(self) -> None",
             # Property getters/setters
-            "get_config": "(self) -> Dict[str, Any]",
-            "set_config": "(self, config: Dict[str, Any]) -> None",
-            "get_state": "(self) -> Dict[str, Any]",
-            "set_state": "(self, state: Dict[str, Any]) -> None",
+            "get_config": "(self) -> dict[str, Any]",
+            "set_config": "(self, config: dict[str, Any]) -> None",
+            "get_state": "(self) -> dict[str, Any]",
+            "set_state": "(self, state: dict[str, Any]) -> None",
             # Mobile UI methods
             "render_mobile_layout": "(self) -> None",
             "display_mobile_content": "(self) -> None",
@@ -43,12 +43,12 @@ class UntypedCallFixer:
             "handle_mobile_input": "(self, input_data: Any) -> None",
             # Validation methods
             "validate_input": "(self, data: Any) -> bool",
-            "validate_config": "(self, config: Dict[str, Any]) -> bool",
+            "validate_config": "(self, config: dict[str, Any]) -> bool",
             "check_requirements": "(self) -> bool",
             "verify_setup": "(self) -> bool",
             # Performance and optimization
             "optimize_performance": "(self) -> None",
-            "measure_performance": "(self) -> Dict[str, float]",
+            "measure_performance": "(self) -> dict[str, float]",
             "cleanup_resources": "(self) -> None",
             "initialize_components": "(self) -> None",
             # File operations
@@ -58,7 +58,7 @@ class UntypedCallFixer:
             "create_directory": "(self, path: str) -> None",
             # Testing utilities
             "mock_adapter": "(self) -> Any",
-            "create_test_data": "(self) -> Dict[str, Any]",
+            "create_test_data": "(self) -> dict[str, Any]",
             "run_test_suite": "(self) -> None",
             "assert_results": "(self, expected: Any, actual: Any) -> None",
         }

@@ -188,7 +188,7 @@ class MobileOfflineManager:
                 st.info(f"[DETAILS] {len(offline_queue)} operations queued for when connection returns")
 
     @staticmethod
-    def cache_resource(key: str, data: Any, expiry_hours: int | None = None, metadata: dict | None = None) -> bool:
+    def cache_resource(key: str, data: Any, expiry_hours: int | None = None, metadata: dict[str, Any] | None = None) -> bool:
         """
         Cache a resource for offline use.
 

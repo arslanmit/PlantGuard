@@ -208,7 +208,7 @@ class ModelSwitcher:
 
             st.table(comparison_data)
 
-    def render(self, available_models: dict | None = None) -> None:
+    def render(self, available_models: dict[str, Any] | None = None) -> None:
         """Compatibility render method used by legacy callers.
 
         If `available_models` is provided, use it to populate selectors; otherwise

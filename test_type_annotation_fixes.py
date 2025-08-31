@@ -96,7 +96,7 @@ def process_data(data) -> Any:
         return None
     return [item.upper() for item in data]
 
-def calculate_metrics(values) -> Dict[str, Any]:
+def calculate_metrics(values) -> dict[str, Any]:
     """Calculate performance metrics."""
     if not values:
         return {}

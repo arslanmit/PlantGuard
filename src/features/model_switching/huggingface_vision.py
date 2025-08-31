@@ -4,8 +4,6 @@ This module contains the HuggingFaceVisionAdapter class for plant disease detect
 using pre-trained models from Hugging Face Hub.
 """
 
-
-
 import logging
 
 import torch
@@ -266,7 +264,7 @@ class HuggingFaceVisionAdapter:
 
         return raw_class, readable_name, confidence, plant_type
 
-    def get_model_info(self) -> dict:
+    def get_model_info(self) -> dict[str, Any]:
         """Get information about the loaded model.
 
         Returns:

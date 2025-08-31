@@ -158,7 +158,7 @@ class StateManager:
         # For now, we just log it
         logger.debug(f"Would persist preference: {key} = {value}")
 
-    def add_message(self, role: str, content: str, metadata: dict | None = None) -> Any:
+    def add_message(self, role: str, content: str, metadata: dict[str, Any] | None = None) -> Any:
         """Add message to chat history."""
         message = {
             "role": role,

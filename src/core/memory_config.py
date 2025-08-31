@@ -4,13 +4,14 @@ This module provides centralized memory limits and configuration
 to ensure consistent 4GB memory usage across all systems.
 """
 
+from typing import Any
+
 # Global Memory Configuration
 # =========================
 # All memory limits in the PlantGuard project are set to 4GB maximum
 # to ensure consistent performance across different hardware configurations.
 
 # Memory limits in different units
-
 
 MEMORY_LIMIT_GB = 4.0  # 4 GB maximum memory usage
 MEMORY_LIMIT_MB = MEMORY_LIMIT_GB * 1024  # 4096 MB
@@ -41,7 +42,7 @@ PERSISTENT_WORKERS = False  # Disabled to save memory
 DEFAULT_NUM_WORKERS = 2  # Limited workers to save memory
 
 
-def get_memory_config() -> dict:
+def get_memory_config() -> dict[str, Any]:
     """Get complete memory configuration dictionary.
 
     Returns:

@@ -3,13 +3,12 @@
 Summary report of the emoji replacement task completed in PlantGuard codebase.
 """
 
-
-
 import json
 from datetime import datetime
+from typing import Any
 
 
-def create_summary_report() -> str:
+def create_summary_report() -> tuple[str, dict[str, Any]]:
     """Create a summary report of the emoji replacement task."""
 
     # Data from the script execution
@@ -144,7 +143,7 @@ code readability and maintaining professional documentation standards.
     return report, replacement_stats
 
 
-def save_report(report: str, stats: dict) -> None:
+def save_report(report: str, stats: dict[str, Any]) -> None:
     """Save the report to files."""
 
     # Save markdown report

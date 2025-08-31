@@ -869,7 +869,7 @@ class EnhancedGestureHandler:
 
         return st.session_state.swipe_image_index
 
-    def handle_gesture_event(self, gesture_type: str, data: dict | None = None) -> Any:
+    def handle_gesture_event(self, gesture_type: str, data: dict[str, Any] | None = None) -> Any:
         """Handle gesture events and trigger callbacks.
 
         Args:

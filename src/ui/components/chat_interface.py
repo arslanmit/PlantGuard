@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class ChatMessage:
     """Represents a single chat message with metadata."""
 
-    def __init__(self, role: str, content: str, timestamp: datetime | None = None, metadata: dict | None = None) -> None:
+    def __init__(self, role: str, content: str, timestamp: datetime | None = None, metadata: dict[str, Any] | None = None) -> None:
         """Initialize a chat message.
 
         Args:
@@ -73,7 +73,7 @@ class ChatInterface:
         if self.session_key not in st.session_state:
             st.session_state[self.session_key] = []
 
-    def add_message(self, role: str, content: str, metadata: dict | None = None) -> None:
+    def add_message(self, role: str, content: str, metadata: dict[str, Any] | None = None) -> None:
         """Add a new message to the conversation.
 
         Args:

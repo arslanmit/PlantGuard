@@ -18,13 +18,12 @@ Emoji mappings:
 📋 -> [DETAILS]
 """
 
-
-
 import argparse
 import re
 import shutil
 import sys
 from pathlib import Path
+from typing import Any
 
 # Emoji to text mappings
 EMOJI_MAPPINGS = {
@@ -209,7 +208,7 @@ class EmojiReplacer:
         self.root_path = Path(root_path)
         self.backup = backup
         self.dry_run = dry_run
-        self.changes_made: list[dict] = []
+        self.changes_made: list[dict[str, Any]] = []
         self.files_processed = 0
         self.files_changed = 0
 

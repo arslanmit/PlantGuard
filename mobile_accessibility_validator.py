@@ -227,7 +227,7 @@ class MobileAriaHelper:
         """
         st.markdown(announcement_html, unsafe_allow_html=True)
     
-    def create_accessible_navigation(self, nav_items: List[Dict[str, str]]) -> None:
+    def create_accessible_navigation(self, nav_items: list[dict[str, str]]) -> None:
         """Create accessible navigation menu."""
         nav_html = """
         <nav role="navigation" aria-label="Main navigation">
@@ -456,7 +456,7 @@ class MobileSemanticHelper:
         """
         st.markdown(article_html, unsafe_allow_html=True)
     
-    def create_navigation(self, nav_title: str, nav_items: List[Dict[str, str]]) -> None:
+    def create_navigation(self, nav_title: str, nav_items: list[dict[str, str]]) -> None:
         """Create semantic navigation."""
         nav_html = f"""
         <nav aria-label="{nav_title}" role="navigation">
@@ -511,7 +511,7 @@ class MobileSemanticHelper:
         """
         st.markdown(status_html, unsafe_allow_html=True)
     
-    def create_breadcrumb_navigation(self, breadcrumbs: List[Dict[str, str]]) -> None:
+    def create_breadcrumb_navigation(self, breadcrumbs: list[dict[str, str]]) -> None:
         """Create semantic breadcrumb navigation."""
         breadcrumb_html = """
         <nav aria-label="Breadcrumb" role="navigation">

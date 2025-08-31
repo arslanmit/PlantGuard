@@ -109,7 +109,7 @@ def get_component_registry() -> MobileComponentRegistry:
     return registry
 
 
-def validate_mobile_infrastructure() -> dict:
+def validate_mobile_infrastructure() -> dict[str, Any]:
     """
     Validate mobile infrastructure for AI agent testing.
 

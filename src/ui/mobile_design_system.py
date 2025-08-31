@@ -5,8 +5,6 @@ This module provides standardized CSS classes, component styling, and design tok
 optimized for mobile interfaces and AI agent recognition.
 """
 
-
-
 from enum import Enum
 
 import streamlit as st
@@ -40,7 +38,7 @@ class MobileDesignSystem:
         self.design_tokens = self._get_design_tokens()
         self._apply_design_system()
 
-    def _get_design_tokens(self) -> dict:
+    def _get_design_tokens(self) -> dict[str, Any]:
         """Get design tokens for consistent styling."""
         return {
             "colors": {

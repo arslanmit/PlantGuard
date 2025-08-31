@@ -560,7 +560,7 @@ class MobilePlantGuardApp:
             logger.error(f"Voice processing failed: {e}")
             return f"Voice processing error: {e}"
 
-    def process_text_query(self, query: str, context: dict | None = None) -> str:
+    def process_text_query(self, query: str, context: dict[str, Any] | None = None) -> str:
         """Process text query using NLP adapter."""
         try:
             if not self.text_adapter:

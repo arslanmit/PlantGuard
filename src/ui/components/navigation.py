@@ -365,7 +365,7 @@ class NavigationHeader:
 
         return selected_page
 
-    def get_page_info(self, page_name: str) -> dict:
+    def get_page_info(self, page_name: str) -> dict[str, Any]:
         """Get information about a specific page."""
         return self.pages.get(page_name, {})
 

@@ -261,7 +261,7 @@ def create_image_transform(img_size: tuple[int, int]) -> transforms.Compose:
 
 
 @st.cache_data(show_spinner=False, ttl=3600)
-def load_cached_checkpoint(checkpoint_path: str) -> dict:
+def load_cached_checkpoint(checkpoint_path: str) -> dict[str, Any]:
     """Load and cache model checkpoint with safe loading.
 
     Args:

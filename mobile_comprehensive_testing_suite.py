@@ -11,7 +11,6 @@ This script implements task 11.2: Perform comprehensive testing and optimization
 Requirements addressed: 1.1, 1.3, 6.4, 7.1
 """
 
-
 import logging
 import sys
 import time
@@ -951,7 +950,7 @@ class MobileComprehensiveTestingSuite:
         else:
             return "D (Needs Improvement)"
 
-    def get_performance_recommendations(self, performance_tests: Dict[str, Any]) -> List[str]:
+    def get_performance_recommendations(self, performance_tests: dict[str, Any]) -> list[str]:
         """Get performance optimization recommendations."""
         recommendations = []
 
@@ -1276,7 +1275,7 @@ class MobileComprehensiveTestingSuite:
         else:
             return "Below WCAG Standards"
 
-    def get_accessibility_recommendations(self, accessibility_tests: Dict[str, Any]) -> List[str]:
+    def get_accessibility_recommendations(self, accessibility_tests: dict[str, Any]) -> list[str]:
         """Get accessibility improvement recommendations."""
         recommendations = []
 
@@ -1543,7 +1542,7 @@ class MobileComprehensiveTestingSuite:
         else:
             return "Limited Browser Support"
 
-    def get_compatibility_recommendations(self, browser_tests: Dict[str, Any]) -> List[str]:
+    def get_compatibility_recommendations(self, browser_tests: dict[str, Any]) -> list[str]:
         """Get compatibility improvement recommendations."""
         recommendations = []
 
@@ -1805,7 +1804,7 @@ class MobileComprehensiveTestingSuite:
         else:
             return "Poor Integration"
 
-    def get_integration_recommendations(self, integration_tests: Dict[str, Any]) -> List[str]:
+    def get_integration_recommendations(self, integration_tests: dict[str, Any]) -> list[str]:
         """Get integration improvement recommendations."""
         recommendations = []
 
@@ -2044,7 +2043,7 @@ class MobileComprehensiveTestingSuite:
         else:
             return "Needs UX Improvement"
 
-    def get_usability_recommendations(self, usability_tests: Dict[str, Any]) -> List[str]:
+    def get_usability_recommendations(self, usability_tests: dict[str, Any]) -> list[str]:
         """Get usability improvement recommendations."""
         recommendations = []
 
@@ -2110,7 +2109,7 @@ class MobileComprehensiveTestingSuite:
 
         return recommendations
 
-    def generate_comprehensive_summary(self, results: Dict[str, Any]) -> Dict[str, Any]:
+    def generate_comprehensive_summary(self, results: dict[str, Any]) -> dict[str, Any]:
         """Generate comprehensive test summary."""
         logger.info("Generating comprehensive test summary")
 
@@ -2223,7 +2222,7 @@ class MobileComprehensiveTestingSuite:
 
         return summary
 
-    def save_test_results(self, results: Dict[str, Any]) -> None:
+    def save_test_results(self, results: dict[str, Any]) -> None:
         """Save test results to file."""
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

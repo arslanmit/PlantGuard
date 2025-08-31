@@ -137,7 +137,7 @@ class FileManager:
             logger.warning(f"Error checking model file {model_path}: {e}")
             return False
 
-    def get_fallback_model_config(self) -> dict:
+    def get_fallback_model_config(self) -> dict[str, Any]:
         """Get fallback configuration when model files are missing.
 
         Returns:
