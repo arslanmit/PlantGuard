@@ -1,394 +1,785 @@
-"""
-Mobile Input Ribbon Component for PlantGuard
+"""Input Ribbon Component for PlantGuard Redesigned UI.
 
-Touch-friendly input method selection with vertical stacking on mobile.
-Provides access to all PlantGuard input modes: Text, Voice, Camera, Upload.
+Provides unified access to all input modalities (Text, Voice, Camera, Upload)
+with clear visual hierarchy and responsive design.
 """
 
-from collections.abc import Callable
+import contextlib
+import logging
+from pathlib import Path
 from typing import Any
 
 import streamlit as st
 
-from .mobile_component_registry import ComponentMetadata, MobileComponent, register_mobile_component
+from .mobile_base_component import MobileBaseComponent
+
+logger = logging.getLogger(__name__)
 
 
-@register_mobile_component
-class MobileInputRibbon(MobileComponent):
-    """Mobile input ribbon with always-visible touch-optimized buttons.
+class MobileInputRibbon(MobileBaseComponent):
+    """Input ribbon component with multimodal input support."""
 
-    Always-Visible Features:
-    - Large prominent action buttons for all input types (min 44px touch targets)
-    - Icon + text labels for clear identification
-    - Always-visible status indicators for each input method
-    - No hidden menus, dropdowns, or collapsible elements
-    - 2x2 grid layout with all controls immediately accessible
-    - Real-time status overview showing readiness of each input method
-    - Touch-friendly design with visual feedback
-    - AI agent testable and self-healing
-    """
-
-    def __init__(self, component_id: str = "mobile_input_ribbon", **kwargs) -> None:
+    def __init__(self, component_id: str, layout_style: str = "grid", **kwargs) -> None:
         super().__init__(component_id, **kwargs)
-        self.layout_style = kwargs.get("layout_style", "grid")  # 'grid' or 'vertical'
-        self.show_labels = kwargs.get("show_labels", True)
-        self.button_style = kwargs.get("button_style", "elevated")  # 'elevated' or 'flat'
-
-    def _get_component_metadata(self) -> ComponentMetadata:
-        """Return component metadata for AI agent understanding."""
-        return ComponentMetadata(
-            component_id=self.component_id,
-            component_type="input_ribbon",
-            display_name="Mobile Input Ribbon - Always Visible",
-            description="Always-visible touch-friendly input method selection buttons with status indicators",
-            ai_agent_friendly_description=(
-                "Always-visible input ribbon component providing direct access to all PlantGuard input modes "
-                "with large prominent buttons, icon + text labels, and always-visible status indicators. "
-                "No hidden menus or collapsible elements."
-            ),
-            interactive_elements=[
-                {
-                    "id": "text_input_button_always_visible",
-                    "type": "button",
-                    "key": f"{self.component_id}_text_always_visible",
-                    "description": "Text chat input button - always visible with status",
-                    "testable": True,
-                    "touch_target": True,
-                    "always_visible": True,
-                },
-                {
-                    "id": "voice_input_button_always_visible",
-                    "type": "button",
-                    "key": f"{self.component_id}_voice_always_visible",
-                    "description": "Voice recording button - always visible with status",
-                    "testable": True,
-                    "touch_target": True,
-                    "always_visible": True,
-                },
-                {
-                    "id": "camera_button_always_visible",
-                    "type": "button",
-                    "key": f"{self.component_id}_camera_always_visible",
-                    "description": "Camera capture button - always visible with status",
-                    "testable": True,
-                    "touch_target": True,
-                    "always_visible": True,
-                },
-                {
-                    "id": "upload_button_always_visible",
-                    "type": "button",
-                    "key": f"{self.component_id}_upload_always_visible",
-                    "description": "File upload button - always visible with status",
-                    "testable": True,
-                    "touch_target": True,
-                    "always_visible": True,
-                },
-            ],
-            state_dependencies=["active_input_mode", "input_ribbon_initialized", "camera_available", "microphone_available"],
-            css_classes=["mobile-input-ribbon-always-visible", "mobile-input-section-header", "mobile-input-status-overview"],
-            test_scenarios=[
-                {
-                    "name": "always_visible_buttons",
-                    "description": "Test all input buttons are always visible with proper labels",
-                    "expected_outcome": "Four input buttons visible with icon + text + status indicators",
-                },
-                {
-                    "name": "status_indicators",
-                    "description": "Test status indicators are always visible and accurate",
-                    "expected_outcome": "Status overview shows current state of all input methods",
-                },
-                {
-                    "name": "touch_accessibility",
-                    "description": "Test buttons meet touch accessibility requirements (min 44px)",
-                    "expected_outcome": "All buttons are touch-friendly and clearly labeled",
-                },
-                {
-                    "name": "no_hidden_elements",
-                    "description": "Test no elements are hidden or require expansion",
-                    "expected_outcome": "All controls and status visible simultaneously",
-                },
-            ],
-            ai_agent_instructions={
-                "testing": "Verify always-visible design, status indicators, touch targets, no hidden elements",
-                "fixing": "Ensure all elements visible, proper status updates, touch accessibility",
-                "monitoring": "Check button visibility, status accuracy, no collapsed states",
+        self.input_modes = {
+            "text": {
+                "icon": "⌨️",
+                "label": "Text",
+                "description": "Type your questions about plant diseases",
+                "color": "#22C55E",
+                "shortcut": "T",
+                "supports_multiple": True,
             },
-            version="2.0.0",
-            ai_agent_testable=True,
-            auto_fix_enabled=True,
+            "voice": {
+                "icon": "[MICROPHONE]️",
+                "label": "Voice",
+                "description": "Record voice questions or describe symptoms",
+                "color": "#10B981",
+                "shortcut": "V",
+                "supports_multiple": True,
+            },
+            "camera": {
+                "icon": "[CAMERA]",
+                "label": "Camera",
+                "description": "Take photos directly with your device camera",
+                "color": "#0EA5E9",
+                "shortcut": "C",
+                "supports_multiple": False,
+            },
+            "upload": {
+                "icon": "[IMAGE]",
+                "label": "Upload",
+                "description": "Upload plant images from your device",
+                "color": "#8B5CF6",
+                "shortcut": "U",
+                "supports_multiple": True,
+            },
+        }
+        self._initialize_state_management()
+
+    def _initialize_state_management(self) -> Any:
+        """Initialize state management for input modes."""
+        if "input_modes" not in st.session_state:
+            st.session_state["input_modes"] = dict.fromkeys(self.input_modes.keys(), False)
+
+        if "active_inputs" not in st.session_state:
+            st.session_state["active_inputs"] = {}
+
+        if "input_validation" not in st.session_state:
+            st.session_state["input_validation"] = {}
+
+        if "input_mode_settings" not in st.session_state:
+            st.session_state["input_mode_settings"] = {
+                "allow_multiple_modes": True,
+                "auto_validate": True,
+                "persist_inputs": True,
+                "show_mode_help": True,
+            }
+
+        # Ensure messages array exists
+        if "messages" not in st.session_state:
+            st.session_state["messages"] = []
+
+    def render(self) -> dict[str, bool]:
+        """Render input ribbon and return active modes."""
+        current_modes = st.session_state.get("input_modes", {})
+
+        # Render ribbon header
+        self._render_ribbon_header()
+
+        # Render input mode buttons
+        active_modes = self._render_input_buttons(current_modes)
+
+        # Render clear all button
+        if any(active_modes.values()):
+            self._render_clear_button()
+
+        # Update session state
+        st.session_state["input_modes"] = active_modes
+
+        return active_modes
+
+    def _render_ribbon_header(self) -> Any:
+        """Render the ribbon header with instructions."""
+        st.markdown(
+            """
+            <div style='text-align: center; margin-bottom: 1rem;'>
+                <h3 style='color: #22C55E; margin: 0;'>[PROGRESS] Choose Your Input Method</h3>
+                <p style='color: #64748B; margin: 0.5rem 0;'>
+                    Select one or more ways to interact with PlantGuard
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-    def initialize_input_ribbon_state(self) -> None:
-        """Initialize input ribbon session state."""
-        if "active_input_mode" not in st.session_state:
-            st.session_state.active_input_mode = None
+    def _render_input_buttons(self, current_modes: dict[str, bool]) -> dict[str, bool]:
+        """Render input mode buttons with enhanced visual feedback and color-coded states."""
+        if st.session_state.get("mobile_view", False):
+            col1, col2 = st.columns(2)
+            cols = [col1, col2, col1, col2]
+        else:
+            col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 1])
+            cols = [col1, col2, col3, col4]
 
-        if "input_ribbon_initialized" not in st.session_state:
-            st.session_state.input_ribbon_initialized = True
+        active_modes: dict[str, bool] = {}
 
-        if "camera_available" not in st.session_state:
-            st.session_state.camera_available = True  # Assume available
+        for i, (mode_name, mode_info) in enumerate(self.input_modes.items()):
+            with cols[i]:
+                is_active = current_modes.get(mode_name, False)
 
-        if "microphone_available" not in st.session_state:
-            st.session_state.microphone_available = True  # Assume available
+                if is_active:
+                    button_key = f"input_mode_{mode_name}_active"
+                    if st.button(
+                        f"Deactivate {mode_info['label']}",
+                        key=button_key,
+                        help=f"Click to deactivate {mode_info['description']}",
+                        type="secondary",
+                        use_container_width=True,
+                    ):
+                        active_modes[mode_name] = False
+                        self._handle_mode_activation(mode_name, False)
+                    else:
+                        active_modes[mode_name] = True
+                else:
+                    button_key = f"input_mode_{mode_name}_inactive"
+                    if st.button(
+                        f"{mode_info['icon']} {mode_info['label']}",
+                        key=button_key,
+                        help=f"{mode_info['description']} (Shortcut: {mode_info['shortcut']})",
+                        type="secondary",
+                        use_container_width=True,
+                    ):
+                        active_modes[mode_name] = True
+                        self._handle_mode_activation(mode_name, True)
+                    else:
+                        active_modes[mode_name] = False
 
-        # Input method callbacks
-        if "input_callbacks" not in st.session_state:
-            st.session_state.input_callbacks = {}
+        return active_modes
 
-    def get_input_methods(self) -> list[dict[str, Any]]:
-        """Get available input methods configuration with always-visible status indicators."""
-        return [
-            {
-                "id": "text",
-                "title": "Text Chat",
-                "icon": "[CHAT]",
-                "description": "Ask questions about plant care",
-                "enabled": True,
-                "primary": True,
-                "status": "ready",
-                "status_icon": "[DONE]",
-            },
-            {
-                "id": "voice",
-                "title": "Voice",
-                "icon": "[VOICE]",
-                "description": "Record voice questions",
-                "enabled": st.session_state.get("microphone_available", True),
-                "primary": True,
-                "status": "ready" if st.session_state.get("microphone_available", True) else "disabled",
-                "status_icon": "[DONE]" if st.session_state.get("microphone_available", True) else "[TODO]",
-            },
-            {
-                "id": "camera",
-                "title": "Camera",
-                "icon": "[CAMERA]",
-                "description": "Take photo of plant",
-                "enabled": st.session_state.get("camera_available", True),
-                "primary": True,
-                "status": "ready" if st.session_state.get("camera_available", True) else "disabled",
-                "status_icon": "[DONE]" if st.session_state.get("camera_available", True) else "[TODO]",
-            },
-            {
-                "id": "upload",
-                "title": "Upload",
-                "icon": "[ATTACH]",
-                "description": "Upload image file",
-                "enabled": True,
-                "primary": False,
-                "status": "ready",
-                "status_icon": "[DONE]",
-            },
+    def _render_clear_button(self) -> Any:
+        """Render clear all button with enhanced styling."""
+        if st.session_state.get("mobile_view", False):
+            st.markdown("---")
+            if st.button(
+                "Clear All Inputs",
+                key="clear_all_inputs_mobile",
+                help="Clear all active inputs and reset temporary data",
+                type="secondary",
+                use_container_width=True,
+            ):
+                self._clear_all_inputs()
+        else:
+            col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 1])
+            with col5:
+                if st.button(
+                    "Clear",
+                    key="clear_all_inputs_desktop",
+                    help="Clear all active inputs and reset temporary data",
+                    type="secondary",
+                    use_container_width=True,
+                ):
+                    self._clear_all_inputs()
+
+    def _handle_mode_activation(self, mode_name: str, is_active: bool) -> Any:
+        """Handle mode activation/deactivation with multiple mode support."""
+        current_modes = st.session_state.get("input_modes", {})
+        settings = st.session_state.get("input_mode_settings", {})
+
+        if is_active:
+            if not settings.get("allow_multiple_modes", True):
+                for other_mode in current_modes:
+                    if other_mode != mode_name and current_modes[other_mode]:
+                        current_modes[other_mode] = False
+                        self._clear_mode_data(other_mode)
+                        with contextlib.suppress(Exception):
+                            st.toast(f"[TODO] {other_mode.title()} mode deactivated (single mode only)", icon="[TODO]")
+
+            current_modes[mode_name] = True
+            st.session_state["input_modes"] = current_modes
+
+            self._initialize_mode_data(mode_name)
+
+            if settings.get("allow_multiple_modes", True) and sum(current_modes.values()) > 1:
+                with contextlib.suppress(Exception):
+                    st.toast(f"[DONE] {mode_name.title()} mode added (multimodal input)", icon="[DONE]")
+            else:
+                with contextlib.suppress(Exception):
+                    st.toast(f"[DONE] {mode_name.title()} mode activated", icon="[DONE]")
+
+            logger.info(f"Activated input mode: {mode_name}")
+
+        else:
+            current_modes[mode_name] = False
+            st.session_state["input_modes"] = current_modes
+
+            self._clear_mode_data(mode_name)
+
+            with contextlib.suppress(Exception):
+                st.toast(f"[TODO] {mode_name.title()} mode deactivated", icon="[TODO]")
+            logger.info(f"Deactivated input mode: {mode_name}")
+
+        if settings.get("auto_validate", True):
+            self._update_validation_state()
+
+    def _initialize_mode_data(self, mode_name: str) -> Any:
+        """Initialize data storage for a specific mode."""
+        active_inputs = st.session_state.get("active_inputs", {})
+
+        if mode_name not in active_inputs:
+            if mode_name == "text":
+                if "messages" not in st.session_state:
+                    st.session_state["messages"] = []
+            elif mode_name == "voice":
+                active_inputs[mode_name] = {"recordings": [], "transcriptions": []}
+            elif mode_name == "camera":
+                active_inputs[mode_name] = {"images": [], "current_image": None}
+            elif mode_name == "upload":
+                active_inputs[mode_name] = {"files": [], "processed_images": []}
+
+        st.session_state["active_inputs"] = active_inputs
+
+    def _update_validation_state(self) -> Any:
+        """Update validation state for all active modes."""
+        validation_state: dict[str, dict] = {}
+        active_modes = self.get_active_modes()
+
+        for mode in active_modes:
+            validation_state[mode] = {
+                "status": self._validate_mode_input(mode),
+                "timestamp": st.session_state.get("current_time", ""),
+                "has_data": self._has_mode_data(mode),
+            }
+
+        st.session_state["input_validation"] = validation_state
+
+    def _has_mode_data(self, mode_name: str) -> bool:
+        """Check if mode has any input data."""
+        active_inputs = st.session_state.get("active_inputs", {})
+
+        if mode_name == "text":
+            messages = st.session_state.get("messages", [])
+            return len(messages) > 0 and any(msg.get("role") == "user" for msg in messages)
+        elif mode_name == "voice":
+            # voice data may be stored under active_inputs['voice'] with 'recordings'
+            if mode_name in active_inputs:
+                return bool(active_inputs[mode_name].get("recordings") or active_inputs[mode_name].get("uploaded_audio"))
+            # or top-level uploaded_audio key
+            if "uploaded_audio" in active_inputs:
+                return True
+            # or check temp audio files
+            return bool(st.session_state.get("temp_audio_files"))
+        elif mode_name == "camera":
+            if st.session_state.get("camera_image"):
+                return True
+            return bool(active_inputs.get(mode_name, {}).get("images"))
+        elif mode_name == "upload":
+            # uploads stored under active_inputs['upload']['files']
+            if mode_name in active_inputs and active_inputs[mode_name].get("files"):
+                return True
+            # or check top-level uploaded_images
+            return bool(active_inputs.get("uploaded_images"))
+
+        return False
+
+    def _clear_mode_data(self, mode_name: str) -> Any:
+        """Clear data for a specific input mode."""
+        active_inputs = st.session_state.get("active_inputs", {})
+        if mode_name in active_inputs:
+            del active_inputs[mode_name]
+            st.session_state["active_inputs"] = active_inputs
+
+    def _clear_all_inputs(self) -> Any:
+        """Clear all input modes and data."""
+        st.session_state["input_modes"] = dict.fromkeys(self.input_modes.keys(), False)
+        st.session_state["active_inputs"] = {}
+
+        self._cleanup_temporary_data()
+
+        with contextlib.suppress(Exception):
+            st.toast("[CLEAN] All inputs cleared", icon="[CLEAN]")
+        logger.info("Cleared all input modes and data")
+
+        # Update state without page refresh
+        with contextlib.suppress(Exception):
+            st.session_state.inputs_cleared = True
+
+    def _cleanup_temporary_data(self) -> Any:
+        """Clean up temporary files and data."""
+        temp_audio_files = st.session_state.get("temp_audio_files", [])
+        for file_path in temp_audio_files:
+            try:
+                p = Path(file_path)
+                if p.exists():
+                    p.unlink()
+            except Exception as e:
+                logger.warning(f"Could not delete temp file {file_path}: {e}")
+
+        st.session_state["temp_audio_files"] = []
+
+        temp_keys = [
+            "uploaded_images",
+            "camera_image",
+            "recorded_audio",
+            "transcribed_text",
+            "current_analysis",
+            "analysis_requested",
+            "analysis_modes",
         ]
 
-    def render_input_button(self, method: dict[str, Any], button_key: str) -> bool:
-        """Render individual input method button with always-visible status.
+        for key in temp_keys:
+            if key in st.session_state:
+                del st.session_state[key]
 
-        Returns:
-            bool: True if button was clicked
-        """
-        is_active = st.session_state.get("active_input_mode") == method["id"]
-        is_enabled = method.get("enabled", True)
-        status = method.get("status", "unknown")
-        status_icon = method.get("status_icon", "⚪")
+    def render_mode_status(self) -> None:
+        """Render enhanced status of active input modes with input validation."""
+        active_modes = st.session_state.get("input_modes", {})
+        active_count = sum(1 for active in active_modes.values() if active)
 
-        # Button styling based on state
-        button_type = "primary" if is_active else "secondary"
+        if active_count > 0:
+            st.markdown("### [SUMMARY] Active Input Modes")
 
-        # Always show icon + text label + status indicator
-        button_label = f"{method['icon']} {method['title']} {status_icon}"
+            if st.session_state.get("mobile_view", False):
+                for mode_name, is_active in active_modes.items():
+                    if is_active:
+                        self._render_mode_status_card(mode_name)
+            else:
+                cols = st.columns(min(active_count, 4))
+                col_idx = 0
 
-        # Add status to help text
-        help_text = f"{method['description']} | Status: {status.title()}"
+                for mode_name, is_active in active_modes.items():
+                    if is_active:
+                        with cols[col_idx % len(cols)]:
+                            self._render_mode_status_card(mode_name)
+                        col_idx += 1
 
-        # Use Streamlit button with always-visible elements
-        button_clicked = st.button(
-            label=button_label, key=button_key, help=help_text, disabled=not is_enabled, use_container_width=True, type=button_type
+            self._render_input_validation_status()
+
+    def _render_mode_status_card(self, mode_name: str) -> Any:
+        """Render individual mode status card with validation."""
+        mode_info = self.input_modes[mode_name]
+        validation_status = self._validate_mode_input(mode_name)
+
+        if validation_status == "valid":
+            status_color = "#22C55E"
+            status_icon = "[DONE]"
+            status_text = "Ready"
+        elif validation_status == "missing_input":
+            status_color = "#F59E0B"
+            status_icon = "[WARNING]"
+            status_text = "Input Needed"
+        else:
+            status_color = "#64748B"
+            status_icon = "⚪"
+            status_text = "Waiting"
+
+        st.markdown(
+            f"""
+            <div style='
+                background: {mode_info["color"]}15;
+                border: 2px solid {mode_info["color"]};
+                border-radius: 12px;
+                padding: 1rem;
+                text-align: center;
+                margin-bottom: 0.5rem;
+                position: relative;
+            '>
+                <div style='font-size: 2.5rem; margin-bottom: 0.5rem;'>{mode_info["icon"]}</div>
+                <div style='font-weight: 700; color: {mode_info["color"]}; font-size: 1.1rem;'>
+                    {mode_info["label"]}
+                </div>
+                <div style='
+                    font-size: 0.75rem;
+                    color: {status_color};
+                    font-weight: 600;
+                    margin-top: 0.5rem;
+                    padding: 0.25rem 0.5rem;
+                    background: {status_color}20;
+                    border-radius: 20px;
+                    display: inline-block;
+                '>
+                    {status_icon} {status_text}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-        # Show additional status below button (always visible)
-        if is_active:
-            st.success(f"Active: {method['title']}")
-        elif not is_enabled:
-            st.error(f"Disabled: {method['title']}")
-        else:
-            st.info(f"Ready: {method['title']}")
+    def _render_input_validation_status(self) -> Any:
+        """Render overall input validation status."""
+        validation_results: dict[str, str] = {}
+        active_modes = self.get_active_modes()
 
-        return button_clicked
+        if not active_modes:
+            return
 
-    def render_always_visible_layout(self) -> str:
-        """Render input buttons in always-visible 2x2 grid layout."""
-        methods = self.get_input_methods()
-        selected_method = None
+        for mode in active_modes:
+            validation_results[mode] = self._validate_mode_input(mode)
 
-        # Simple section header
-        st.markdown("## [MOBILE] Plant Analysis Input")
-        st.markdown("Choose how you want to analyze your plant:")
+        valid_modes = [mode for mode, status in validation_results.items() if status == "valid"]
+        invalid_modes = [mode for mode, status in validation_results.items() if status != "valid"]
 
-        # Always-visible 2x2 grid for all input types
-        col1, col2 = st.columns(2, gap="medium")
+        if valid_modes and not invalid_modes:
+            st.success(f"[DONE] **Ready to analyze:** All {len(valid_modes)} input mode(s) have valid data")
+        elif valid_modes and invalid_modes:
+            st.warning(f"[WARNING] **Partial input:** {len(valid_modes)} ready, {len(invalid_modes)} need input")
+        elif invalid_modes:
+            st.info(f"[TIP] **Input needed:** Please provide input for {', '.join(invalid_modes)}")
 
-        # First row: Camera and Upload
-        with col1:
-            camera_method = next(m for m in methods if m["id"] == "camera")
-            button_key = f"{self.component_id}_camera_always_visible"
-            if self.render_input_button(camera_method, button_key):
-                selected_method = "camera"
-                st.session_state.active_input_mode = selected_method
+        if valid_modes:
+            if st.button("[LAUNCH] Analyze Now", key="analyze_from_ribbon", type="primary", use_container_width=True):
+                self._trigger_analysis(valid_modes)
 
-        with col2:
-            upload_method = next(m for m in methods if m["id"] == "upload")
-            button_key = f"{self.component_id}_upload_always_visible"
-            if self.render_input_button(upload_method, button_key):
-                selected_method = "upload"
-                st.session_state.active_input_mode = selected_method
+    def get_active_modes(self) -> list[str]:
+        """Get list of currently active input modes."""
+        active_modes = st.session_state.get("input_modes", {})
+        return [mode for mode, active in active_modes.items() if active]
 
-        # Second row: Voice and Text
-        col3, col4 = st.columns(2, gap="medium")
+    def is_mode_active(self, mode_name: str) -> bool:
+        """Check if a specific input mode is active."""
+        active_modes = st.session_state.get("input_modes", {})
+        return active_modes.get(mode_name, False)
 
-        with col3:
-            voice_method = next(m for m in methods if m["id"] == "voice")
-            button_key = f"{self.component_id}_voice_always_visible"
-            if self.render_input_button(voice_method, button_key):
-                selected_method = "voice"
-                st.session_state.active_input_mode = selected_method
+    def set_mode_active(self, mode_name: str, active: bool) -> Any:
+        """Programmatically set a mode as active/inactive."""
+        if mode_name in self.input_modes:
+            input_modes = st.session_state.get("input_modes", {})
+            input_modes[mode_name] = active
+            st.session_state["input_modes"] = input_modes
 
-        with col4:
-            text_method = next(m for m in methods if m["id"] == "text")
-            button_key = f"{self.component_id}_text_always_visible"
-            if self.render_input_button(text_method, button_key):
-                selected_method = "text"
-                st.session_state.active_input_mode = selected_method
+            self._handle_mode_activation(mode_name, active)
 
-        return selected_method
+    def render_keyboard_shortcuts(self) -> None:
+        """Render keyboard shortcuts help."""
+        with st.expander("⌨️ Keyboard Shortcuts", expanded=True):
+            st.markdown("**Input Mode Shortcuts:**")
 
-    def render_status_overview(self) -> None:
-        """Render always-visible status overview for all input methods."""
-        methods = self.get_input_methods()
+            for mode_info in self.input_modes.values():
+                st.markdown(f"- **{mode_info['shortcut']}** - {mode_info['icon']} {mode_info['label']}")
 
-        st.markdown("### Input Status Overview")
+            st.markdown("**Other Shortcuts:**")
+            st.markdown("- **Ctrl + K** - Clear all inputs")
+            st.markdown("- **Ctrl + Enter** - Analyze (when inputs are ready)")
+            st.markdown("- **Esc** - Cancel current operation")
 
-        # Status indicators in horizontal layout
-        cols = st.columns(len(methods))
+    def render_input_mode_settings(self) -> None:
+        """Render input mode settings and configuration options."""
+        with st.expander("[SETTINGS] Input Mode Settings", expanded=True):
+            settings = st.session_state.get("input_mode_settings", {})
 
-        for i, method in enumerate(methods):
-            with cols[i]:
-                status_color = "[GREEN]" if method["enabled"] else "[RED]"
-                st.markdown(f"{status_color} **{method['title']}**")
-                st.markdown(f"{method['status_icon']} {method['status'].title()}")
+            col1, col2 = st.columns(2)
 
-    def render(self, **kwargs) -> str:
-        """Render the input ribbon component with always-visible controls.
+            with col1:
+                allow_multiple = st.checkbox(
+                    "Allow Multiple Input Modes",
+                    value=settings.get("allow_multiple_modes", True),
+                    help="Enable using multiple input methods simultaneously",
+                )
 
-        Returns:
-            str: Selected input method ID or None
-        """
-        # Initialize state
-        self.initialize_input_ribbon_state()
+                auto_validate = st.checkbox(
+                    "Auto-validate Inputs",
+                    value=settings.get("auto_validate", True),
+                    help="Automatically validate inputs as they're added",
+                )
 
-        # Always show status overview at top
-        self.render_status_overview()
+            with col2:
+                persist_inputs = st.checkbox(
+                    "Persist Inputs",
+                    value=settings.get("persist_inputs", True),
+                    help="Keep input data when switching between modes",
+                )
 
-        # Always-visible input buttons (no hidden/compact layouts)
-        selected_method = self.render_always_visible_layout()
+                show_mode_help = st.checkbox(
+                    "Show Mode Help",
+                    value=settings.get("show_mode_help", True),
+                    help="Display helpful tips for each input mode",
+                )
 
-        # Handle selection
-        if selected_method:
-            self._handle_input_method_selection(selected_method)
+            # Update settings
+            new_settings = {
+                "allow_multiple_modes": allow_multiple,
+                "auto_validate": auto_validate,
+                "persist_inputs": persist_inputs,
+                "show_mode_help": show_mode_help,
+            }
 
-        return selected_method
+            if new_settings != settings:
+                st.session_state["input_mode_settings"] = new_settings
 
-    def render_with_actions(self, **kwargs) -> str:
-        """Render input ribbon with action callbacks."""
-        selected_method = self.render(**kwargs)
+                # Handle multiple mode setting change
+                if not allow_multiple and settings.get("allow_multiple_modes", True):
+                    self.toggle_multiple_mode_support(False)
 
-        if selected_method:
-            # Execute callback if registered
-            callback = st.session_state.input_callbacks.get(selected_method)
-            if callback and callable(callback):
+    def handle_keyboard_shortcuts(self) -> Any:
+        """Handle keyboard shortcuts (placeholder for future implementation)."""
+        pass
+
+    def render_input_validation(self) -> dict[str, str]:
+        """Render input validation messages and return validation status."""
+        validation_results: dict[str, str] = {}
+        active_modes = self.get_active_modes()
+
+        if not active_modes:
+            st.info("[TIP] **Tip:** Select at least one input method above to get started!")
+            return validation_results
+
+        for mode in active_modes:
+            validation_results[mode] = self._validate_mode_input(mode)
+
+        valid_modes = [mode for mode, status in validation_results.items() if status == "valid"]
+        invalid_modes = [mode for mode, status in validation_results.items() if status != "valid"]
+
+        if invalid_modes:
+            st.warning(f"[WARNING] **Input needed:** Please provide input for {', '.join(invalid_modes)}")
+
+        if valid_modes:
+            st.success(f"[DONE] **Ready to analyze:** {', '.join(valid_modes)} input(s) available")
+
+        return validation_results
+
+    def _validate_mode_input(self, mode_name: str) -> str:
+        """Validate input for a specific mode."""
+        active_inputs = st.session_state.get("active_inputs", {})
+
+        if mode_name == "text":
+            messages = st.session_state.get("messages", [])
+            if messages and messages[-1].get("role") == "user":
+                return "valid"
+            # Also check if there are any user messages at all
+            if any(msg.get("role") == "user" for msg in messages):
+                return "valid"
+            return "missing_input"
+
+        elif mode_name == "voice":
+            # Accept either top-level keys or nested under active_inputs['voice']
+            if "recorded_audio" in active_inputs or "uploaded_audio" in active_inputs:
+                return "valid"
+            if "voice" in active_inputs and active_inputs["voice"].get("recordings"):
+                return "valid"
+            # Check session state directly for temp audio files
+            if st.session_state.get("temp_audio_files"):
+                return "valid"
+            return "missing_input"
+
+        elif mode_name == "camera":
+            if st.session_state.get("camera_image"):
+                return "valid"
+            if "camera" in active_inputs and active_inputs["camera"].get("images"):
+                return "valid"
+            return "missing_input"
+
+        elif mode_name == "upload":
+            # Accept either active_inputs['upload']['files'] or top-level uploaded_images
+            if active_inputs.get("uploaded_images"):
+                return "valid"
+            if "upload" in active_inputs and active_inputs["upload"].get("files"):
+                return "valid"
+            return "missing_input"
+
+        return "unknown_mode"
+
+    def can_analyze(self) -> bool:
+        """Check if analysis can be performed with current inputs."""
+        active_modes = self.get_active_modes()
+        if not active_modes:
+            return False
+
+        return any(self._validate_mode_input(mode) == "valid" for mode in active_modes)
+
+    def _trigger_analysis(self, valid_modes: list[str]) -> Any:
+        """Trigger analysis for valid input modes."""
+        st.session_state["analysis_requested"] = True
+        st.session_state["analysis_modes"] = valid_modes
+
+        try:
+            with contextlib.suppress(Exception):
+                st.toast(f"[LAUNCH] Starting analysis with {', '.join(valid_modes)} input(s)", icon="[LAUNCH]")
+        except Exception:
+            logger.exception("Unexpected error while showing toast")
+        logger.info(f"Analysis triggered for modes: {valid_modes}")
+
+        try:
+            with contextlib.suppress(Exception):
+                # Update state without page refresh
+                st.session_state.analysis_triggered = True
+        except Exception:
+            logger.exception("Unexpected error while updating state")
+
+    def get_input_data(self, mode_name: str) -> dict[str, Any]:
+        """Get input data for a specific mode."""
+        active_inputs = st.session_state.get("active_inputs", {})
+
+        if mode_name == "text":
+            messages = st.session_state.get("messages", [])
+            if messages and messages[-1].get("role") == "user":
+                return {"type": "text", "content": messages[-1].get("content", "")}
+            # Also check for any user message
+            for msg in reversed(messages):
+                if msg.get("role") == "user":
+                    return {"type": "text", "content": msg.get("content", "")}
+
+        elif mode_name == "voice":
+            if "recorded_audio" in active_inputs:
+                return {"type": "audio", "content": active_inputs["recorded_audio"]}
+            elif "uploaded_audio" in active_inputs:
+                return {"type": "audio", "content": active_inputs["uploaded_audio"]}
+            elif st.session_state.get("temp_audio_files"):
+                return {"type": "audio", "content": st.session_state["temp_audio_files"][0]}
+
+        elif mode_name == "camera":
+            if st.session_state.get("camera_image"):
+                return {"type": "image", "content": st.session_state.get("camera_image")}
+            elif active_inputs.get("camera", {}).get("images"):
+                return {"type": "image", "content": active_inputs["camera"]["images"][0]}
+
+        elif mode_name == "upload":
+            if active_inputs.get("uploaded_images"):
+                return {"type": "images", "content": active_inputs.get("uploaded_images")}
+            elif active_inputs.get("upload", {}).get("files"):
+                return {"type": "images", "content": active_inputs["upload"]["files"]}
+
+        return {}
+
+    def set_input_data(self, mode_name: str, data: Any) -> Any:
+        """Set input data for a specific mode."""
+        active_inputs = st.session_state.get("active_inputs", {})
+
+        if mode_name == "voice":
+            active_inputs["uploaded_audio"] = data
+        elif mode_name == "upload":
+            active_inputs["uploaded_images"] = data
+        elif mode_name == "camera":
+            st.session_state["camera_image"] = data
+
+        st.session_state["active_inputs"] = active_inputs
+
+    def toggle_multiple_mode_support(self, allow_multiple: bool) -> Any:
+        """Toggle support for multiple simultaneous input modes."""
+        settings = st.session_state.get("input_mode_settings", {})
+        settings["allow_multiple_modes"] = allow_multiple
+        st.session_state["input_mode_settings"] = settings
+
+        if not allow_multiple:
+            active_modes = self.get_active_modes()
+            if len(active_modes) > 1:
+                for mode in active_modes[1:]:
+                    self.set_mode_active(mode, False)
+
                 try:
-                    callback()
-                except Exception as e:
-                    st.error(f"Error executing {selected_method} callback: {e}")
+                    with contextlib.suppress(Exception):
+                        st.toast(f"[PARTIAL] Multiple modes disabled. Kept {active_modes[0]} mode only.", icon="[PARTIAL]")
+                except Exception:
+                    logger.exception("Unexpected error while showing toast for multiple mode toggle")
 
-        return selected_method
+    def get_multimodal_input_summary(self) -> dict[str, Any]:
+        """Get summary of all active input modes and their data."""
+        active_modes = self.get_active_modes()
+        # Use typed locals to keep mypy happy about indexed assignments
+        input_data_map: dict[str, Any] = {}
+        validation_status_map: dict[str, str] = {}
 
-    def _handle_input_method_selection(self, method_id: str) -> None:
-        """Handle input method selection."""
-        # Update session state
-        st.session_state.active_input_mode = method_id
-
-        # Show feedback
-        method_names = {"text": "Text Chat", "voice": "Voice Recording", "camera": "Camera Capture", "upload": "File Upload"}
-
-        method_name = method_names.get(method_id, method_id.title())
-        st.success(f"Selected: {method_name}")
-
-        # Log for AI agent monitoring
-        print(f"Mobile Input Ribbon: Selected {method_id}")
-
-    def register_callback(self, method_id: str, callback: Callable) -> None:
-        """Register callback for input method selection."""
-        if "input_callbacks" not in st.session_state:
-            st.session_state.input_callbacks = {}
-
-        st.session_state.input_callbacks[method_id] = callback
-
-    def get_active_input_mode(self) -> str | None:
-        """Get currently active input mode."""
-        return st.session_state.get("active_input_mode")
-
-    def set_active_input_mode(self, method_id: str) -> None:
-        """Programmatically set active input mode."""
-        st.session_state.active_input_mode = method_id
-
-    def clear_active_input_mode(self) -> None:
-        """Clear active input mode selection."""
-        st.session_state.active_input_mode = None
-
-    def get_ribbon_status(self) -> dict[str, Any]:
-        """Get input ribbon status for AI agent monitoring."""
-        methods = self.get_input_methods()
-
-        return {
-            "component_id": self.component_id,
-            "initialized": st.session_state.get("input_ribbon_initialized", False),
-            "active_input_mode": st.session_state.get("active_input_mode"),
-            "available_methods": [m["id"] for m in methods if m.get("enabled", True)],
-            "disabled_methods": [m["id"] for m in methods if not m.get("enabled", True)],
-            "total_methods": len(methods),
-            "camera_available": st.session_state.get("camera_available", False),
-            "microphone_available": st.session_state.get("microphone_available", False),
-            "layout_style": self.layout_style,
-            "show_labels": self.show_labels,
+        summary = {
+            "active_modes": active_modes,
+            "mode_count": len(active_modes),
+            "has_valid_input": False,
+            "input_data": input_data_map,
+            "validation_status": validation_status_map,
         }
 
-    def enable_method(self, method_id: str) -> None:
-        """Enable specific input method."""
-        if method_id == "camera":
-            st.session_state.camera_available = True
-        elif method_id == "voice":
-            st.session_state.microphone_available = True
+        for mode in active_modes:
+            input_data = self.get_input_data(mode)
+            if input_data:
+                input_data_map[mode] = input_data
 
-    def disable_method(self, method_id: str) -> None:
-        """Disable specific input method."""
-        if method_id == "camera":
-            st.session_state.camera_available = False
-        elif method_id == "voice":
-            st.session_state.microphone_available = False
+            validation_status = self._validate_mode_input(mode)
+            validation_status_map[mode] = validation_status
 
-        # Clear active mode if it's the disabled method
-        if st.session_state.get("active_input_mode") == method_id:
-            self.clear_active_input_mode()
+            if validation_status == "valid":
+                summary["has_valid_input"] = True
 
+        return summary
 
-# Utility functions
-def create_mobile_input_ribbon(layout_style: str = "grid", show_labels: bool = True, button_style: str = "elevated") -> MobileInputRibbon:
-    """Create and return a MobileInputRibbon instance."""
-    return MobileInputRibbon(component_id="mobile_input_ribbon", layout_style=layout_style, show_labels=show_labels, button_style=button_style)
+    def render_multimodal_input_preview(self) -> None:
+        """Render preview of all active input modes and their data."""
+        summary = self.get_multimodal_input_summary()
 
+        if summary["mode_count"] == 0:
+            return
 
-def render_input_selection_widget() -> str:
-    """Convenience function to render input selection widget."""
-    ribbon = create_mobile_input_ribbon()
-    return ribbon.render()
+        st.markdown("### [LINK] Multimodal Input Preview")
+
+        if summary["mode_count"] > 1:
+            st.info(f"[PROGRESS] **Multimodal Analysis Ready:** {summary['mode_count']} input modes active")
+
+        for mode in summary["active_modes"]:
+            with st.expander(f"{self.input_modes[mode]['icon']} {self.input_modes[mode]['label']} Input", expanded=True):
+                self._render_mode_input_preview(mode, summary["input_data"].get(mode, {}))
+
+    def _render_mode_input_preview(self, mode_name: str, input_data: dict) -> Any:
+        """Render preview for a specific input mode."""
+        if not input_data:
+            st.warning(f"No input data for {mode_name} mode")
+            return
+
+        if mode_name == "text":
+            st.markdown("**Latest Message:**")
+            content = input_data.get("content", "No message")
+            display_content = content[:200] + "..." if len(content) > 200 else content
+            st.code(display_content)
+
+        elif mode_name == "voice":
+            st.markdown("**Audio Input:**")
+            if "content" in input_data:
+                st.audio(input_data["content"])
+                st.caption("Audio file ready for transcription")
+
+        elif mode_name == "camera":
+            st.markdown("**Camera Image:**")
+            if "content" in input_data:
+                st.image(input_data["content"], width=200, caption="Captured image")
+
+        elif mode_name == "upload":
+            st.markdown("**Uploaded Files:**")
+            if "content" in input_data:
+                files = input_data["content"]
+                if isinstance(files, list):
+                    st.write(f"[FOLDER] {len(files)} file(s) uploaded")
+                    for i, file in enumerate(files[:3]):
+                        st.image(file, width=150, caption=f"Image {i + 1}")
+                    if len(files) > 3:
+                        st.caption(f"... and {len(files) - 3} more files")
+
+    def validate_all_inputs(self) -> dict[str, str]:
+        """Validate all active input modes and return detailed results."""
+        active_modes = self.get_active_modes()
+        validation_results: dict[str, str] = {}
+
+        for mode in active_modes:
+            validation_results[mode] = self._validate_mode_input(mode)
+
+        st.session_state["input_validation"] = validation_results
+
+        return validation_results
+
+    def get_combined_input_for_analysis(self) -> dict[str, Any]:
+        """Get combined input data from all valid modes for analysis."""
+        validation_results = self.validate_all_inputs()
+        valid_modes = [mode for mode, status in validation_results.items() if status == "valid"]
+
+        combined_data_map: dict[str, Any] = {}
+        combined_input = {
+            "modes": valid_modes,
+            "data": combined_data_map,
+            "metadata": {
+                "timestamp": st.session_state.get("current_time", ""),
+                "session_id": st.session_state.get("session_id", ""),
+                "multimodal": len(valid_modes) > 1,
+            },
+        }
+
+        for mode in valid_modes:
+            input_data = self.get_input_data(mode)
+            if input_data:
+                combined_data_map[mode] = input_data
+
+        return combined_input

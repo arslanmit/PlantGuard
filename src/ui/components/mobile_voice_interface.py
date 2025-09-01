@@ -14,7 +14,7 @@ import streamlit as st
 
 from utils.error_recovery import ImportErrorRecovery
 
-from .mobile_component_registry import ComponentMetadata, MobileComponent, register_mobile_component
+from .mobile_component_registry import ComponentMetadata, MobileComponent
 
 # Configure logger for this module
 logger = logging.getLogger(__name__)
@@ -35,7 +35,6 @@ TextAdapter = ImportErrorRecovery.safe_import_from(
 )
 
 
-@register_mobile_component
 class MobileVoiceInterface(MobileComponent):
     """Mobile-optimized voice recording and processing interface.
 

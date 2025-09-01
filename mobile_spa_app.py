@@ -265,7 +265,7 @@ class MobilePlantGuardApp:
             self.content_tabs.register_tab_content("voice_assistant", self.render_voice_assistant_tab)
             self.content_tabs.register_tab_content("chat_interface", self.render_chat_interface_tab)
             self.content_tabs.register_tab_content("history_settings", self.render_history_settings_tab)
-            self.content_tabs.register_tab_content("comparison", self.render_comparison_tab)
+    
 
             # Initialize advanced state management
             if "mobile_app_initialized" not in st.session_state:
@@ -489,8 +489,7 @@ class MobilePlantGuardApp:
         # Register history & settings tab
         self.content_tabs.register_tab_content("history_settings", self.render_history_settings_tab)
 
-        # Register comparison tab
-        self.content_tabs.register_tab_content("comparison", self.render_comparison_tab)
+
 
     def _load_core_adapters(self) -> None:
         """Load core PlantGuard adapters for enhanced mobile functionality."""
@@ -1167,29 +1166,7 @@ class MobilePlantGuardApp:
         for status in status_items:
             st.write(status)
 
-    def render_comparison_tab(self) -> None:
-        """Render comparison tab content."""
-        st.markdown("### [COMPARE] Plant Comparison")
 
-        st.info("[INFO] Advanced comparison features coming soon!")
-
-        # Placeholder comparison interface
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.markdown("**Plant A**")
-            img1 = st.file_uploader("Upload first image", type=["jpg", "jpeg", "png"], key="comparison_img1")
-            if img1:
-                st.image(img1, use_container_width=True)
-
-        with col2:
-            st.markdown("**Plant B**")
-            img2 = st.file_uploader("Upload second image", type=["jpg", "jpeg", "png"], key="comparison_img2")
-            if img2:
-                st.image(img2, use_container_width=True)
-
-        if img1 and img2:
-            st.success("Both images uploaded - comparison ready!")
 
     def get_session_duration(self) -> str:
         """Get formatted session duration."""

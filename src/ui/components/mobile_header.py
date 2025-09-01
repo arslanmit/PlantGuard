@@ -12,7 +12,6 @@ import streamlit as st
 from .mobile_component_registry import ComponentMetadata, MobileComponent, register_mobile_component
 
 
-@register_mobile_component
 class MobileHeader(MobileComponent):
     """Mobile header with model management and status display.
 

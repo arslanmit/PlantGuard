@@ -6,7 +6,7 @@ Organizes all PlantGuard features into mobile-friendly tabs:
 - Voice Assistant
 - Chat Interface
 - History & Settings
-- Comparison Tools
+
 """
 
 from collections.abc import Callable
@@ -15,10 +15,8 @@ from typing import Any
 import streamlit as st
 
 from .mobile_component_registry import ComponentMetadata, MobileComponent, register_mobile_component
-from .mobile_spa_manager import MobileSPAManager
 
 
-@register_mobile_component
 class MobileContentTabs(MobileComponent):
     """Mobile-optimized content tabs for PlantGuard features - Always Visible Design.
 
@@ -37,8 +35,6 @@ class MobileContentTabs(MobileComponent):
         self.scrollable_tabs = kwargs.get("scrollable_tabs", True)
         self.lazy_loading = kwargs.get("lazy_loading", False)  # Disable lazy loading for SPA
 
-        # Initialize SPA manager for content switching without page redirects
-        self.spa_manager = MobileSPAManager(f"{component_id}_spa_manager")
         self.content_callbacks = {}
 
     def _get_component_metadata(self) -> ComponentMetadata:
@@ -87,10 +83,6 @@ class MobileContentTabs(MobileComponent):
                     "always_visible": True,
                 },
                 {
-                    "id": "tab_comparison_always_visible",
-                    "type": "tab_button_always_visible",
-                    "key": f"{self.component_id}_tab_compare_always_visible",
-                    "description": "Comparison tools tab - always visible",
                     "testable": True,
                     "always_visible": True,
                 },
@@ -192,15 +184,6 @@ class MobileContentTabs(MobileComponent):
                 "enabled": True,
                 "primary": False,
             },
-            {
-                "id": "comparison",
-                "title": "Comparison Tools",
-                "short_title": "Compare",
-                "icon": "⚖️",
-                "description": "Compare multiple plant images",
-                "enabled": True,
-                "primary": False,
-            },
         ]
 
     def render_always_visible_tabs(self) -> str:
@@ -267,7 +250,8 @@ class MobileContentTabs(MobileComponent):
         self._register_all_content_areas()
 
         # Use SPA manager to render content without page navigation
-        self.spa_manager.render_all_content_areas_spa()
+        # Render all content areas
+        pass
 
     def _register_all_content_areas(self) -> None:
         """Register all tab content areas with SPA manager."""
@@ -282,13 +266,12 @@ class MobileContentTabs(MobileComponent):
 
             if callback and callable(callback):
                 # Register with existing callback
-                self.spa_manager.register_content_area(tab_id, tab["title"], tab["icon"], callback)
+                pass
             else:
                 # Register with default content
                 def default_callback(tab_info=tab) -> Any:
                     return self._render_default_tab_content(tab_info["id"], tab_info)
 
-                self.spa_manager.register_content_area(tab_id, tab["title"], tab["icon"], default_callback)
         """Render tab navigation buttons.
         
         Returns:
@@ -354,8 +337,7 @@ class MobileContentTabs(MobileComponent):
             self._render_chat_interface_placeholder()
         elif tab_id == "history_settings":
             self._render_history_settings_placeholder()
-        elif tab_id == "comparison":
-            self._render_comparison_placeholder()
+
         else:
             st.info(f"Content for {tab_config['title']} tab is not yet implemented.")
 
@@ -449,27 +431,6 @@ class MobileContentTabs(MobileComponent):
         st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    def _render_comparison_placeholder(self) -> None:
-        """Render placeholder for comparison tab."""
-        st.markdown("#### ⚖️ Comparison Tools")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.markdown("**Image 1**")
-            img1 = st.file_uploader("Upload first image", type=["jpg", "jpeg", "png"], key=f"{self.component_id}_compare_img1")
-            if img1:
-                st.image(img1, use_column_width=True)
-
-        with col2:
-            st.markdown("**Image 2**")
-            img2 = st.file_uploader("Upload second image", type=["jpg", "jpeg", "png"], key=f"{self.component_id}_compare_img2")
-            if img2:
-                st.image(img2, use_column_width=True)
-
-        if st.button("Compare Images", key=f"{self.component_id}_compare_btn", use_container_width=True):
-            st.info("[PARTIAL] Image comparison will be implemented with analysis features")
-
     def render(self, **kwargs) -> str:
         """Render the complete tabs component in SPA mode without page redirects.
 
@@ -486,7 +447,7 @@ class MobileContentTabs(MobileComponent):
         self._register_all_content_areas()
 
         # Use SPA manager to render content focus bar and all content
-        focused_content = self.spa_manager.render_spa_interface()
+        focused_content = "image_analysis"  # Default focused content
 
         return focused_content
 
