@@ -588,7 +588,7 @@ validate-mobile: check-venv
 	@$(PY) -c "from ui.components.mobile_component_registry import mobile_component_registry; print('[DONE] Mobile components available')" || { \
 		echo "$(YELLOW)[WARNING]  Mobile components not fully available$(NC)"; \
 	}
-	@$(PY) -c "from ui.components.ai_agent_testing import get_ai_testing_framework; print('[DONE] AI testing framework available')" || { \
+	@$(PY) -c "from ui.components.mobile_testing_framework import MobileTestingFramework; print('[DONE] AI testing framework available')" || { \
 		echo "$(YELLOW)[WARNING]  AI testing framework not available$(NC)"; \
 	}
 	@echo "$(GREEN)[DONE] Mobile PlantGuard ready!$(NC)"

@@ -42,7 +42,7 @@ class MobileImageAnalysis(MobileComponent):
     """
 
     def __init__(self, component_id: str = "mobile_image_analysis", **kwargs) -> None:
-        super().__init__(component_id, **kwargs)
+        super().__init__(component_id)
         self.vision_adapter = None
         self.model_manager = kwargs.get("model_manager")
         self.max_image_size = kwargs.get("max_image_size", (1024, 1024))
@@ -213,13 +213,13 @@ class MobileImageAnalysis(MobileComponent):
             analyze_clicked = st.button(
                 "[SEARCH] Analyze Plant",
                 key=f"{self.component_id}_analyze",
-                use_container_width=True,
+                width="stretch",
                 disabled=st.session_state.get("analysis_in_progress", False),
                 type="primary",
             )
 
         with col2:
-            clear_clicked = st.button("[DELETE] Clear", key=f"{self.component_id}_clear", use_container_width=True)
+            clear_clicked = st.button("[DELETE] Clear", key=f"{self.component_id}_clear", width="stretch")
 
         if clear_clicked:
             self.clear_analysis()

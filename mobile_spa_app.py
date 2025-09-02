@@ -122,9 +122,9 @@ def get_model_status() -> dict[str, str]:
     try:
         vision_adapter, audio_adapter, text_adapter = load_core_adapters()
         return {
-            "vision": vision_adapter.model_name if vision_adapter else "Not Loaded",
-            "audio": audio_adapter.model_name if audio_adapter else "Not Loaded",
-            "text": text_adapter.model_name if text_adapter else "Not Loaded",
+            "vision": getattr(vision_adapter, "current_model_id", "ResNet50") if vision_adapter else "Not Loaded",
+            "audio": getattr(audio_adapter, "model_name", "Whisper-tiny") if audio_adapter else "Not Loaded",
+            "text": "Knowledge Base" if text_adapter else "Not Loaded",
         }
     except Exception as e:
         logger.error(f"Failed to get model status: {e}")
@@ -295,7 +295,7 @@ class MobilePlantGuardApp:
                 st.markdown("### :herb: PlantGuard Mobile - Loading...")
                 st.info("Some components are still initializing. Please refresh if issues persist.")
 
-                if st.button(":arrows_counterclockwise: Refresh App", use_container_width=True):
+                if st.button(":arrows_counterclockwise: Refresh App", width="stretch"):
                     # Clear initialization state to force re-init
                     st.session_state.mobile_app_initialized = False
                     # Update state without page refresh
@@ -666,14 +666,14 @@ class MobilePlantGuardApp:
                         col1, col2 = st.columns(2)
 
                         with col1:
-                            if st.button(":broom: Clean Memory", use_container_width=True, key="perf_clean_memory"):
+                            if st.button(":broom: Clean Memory", width="stretch", key="perf_clean_memory"):
                                 with st.spinner("Cleaning memory..."):
                                     cleanup_stats = self.performance_optimizer.memory_manager.cleanup_memory(force=True)
                                     freed_mb = cleanup_stats.get("freed_mb", 0)
                                     st.success(f"Freed {freed_mb:.1f}MB")
 
                         with col2:
-                            if st.button(":arrows_counterclockwise: Clear Cache", use_container_width=True, key="perf_clear_cache"):
+                            if st.button(":arrows_counterclockwise: Clear Cache", width="stretch", key="perf_clear_cache"):
                                 self.performance_optimizer.cache.clear()
                                 st.success("Cache cleared")
                                 # Update cache status without page refresh
@@ -722,7 +722,7 @@ class MobilePlantGuardApp:
 
                     # Quick analysis button for uploaded images
                     if st.session_state.get("uploaded_image"):
-                        if st.button(":rocket: Quick Analysis with AI", use_container_width=True, type="primary"):
+                        if st.button(":rocket: Quick Analysis with AI", width="stretch", type="primary"):
                             with st.spinner("Analyzing with AI..."):
                                 result = self.analyze_image_with_adapters(st.session_state.uploaded_image)
 
@@ -763,7 +763,7 @@ class MobilePlantGuardApp:
 
                     # Voice input processing
                     if st.session_state.get("recorded_audio"):
-                        if st.button(":speaker: Process Voice with AI", use_container_width=True, type="primary"):
+                        if st.button(":speaker: Process Voice with AI", width="stretch", type="primary"):
                             with st.spinner("Processing voice..."):
                                 response = self.process_voice_input(st.session_state.recorded_audio)
 
@@ -789,12 +789,12 @@ class MobilePlantGuardApp:
                     col1, col2 = st.columns(2)
 
                     with col1:
-                        if st.button(":herb: 'What's wrong with my plant?'", use_container_width=True):
+                        if st.button(":herb: 'What's wrong with my plant?'", width="stretch"):
                             response = self.process_text_query("What's wrong with my plant?")
                             st.write(response)
 
                     with col2:
-                        if st.button(":pill: 'How do I treat this disease?'", use_container_width=True):
+                        if st.button(":pill: 'How do I treat this disease?'", width="stretch"):
                             response = self.process_text_query("How do I treat this disease?")
                             st.write(response)
 
@@ -831,7 +831,7 @@ class MobilePlantGuardApp:
                     col1, col2 = st.columns([3, 1])
 
                     with col1:
-                        if st.button(":speech_balloon: Send Message", use_container_width=True, type="primary"):
+                        if st.button(":speech_balloon: Send Message", width="stretch", type="primary"):
                             if user_input.strip():
                                 with st.spinner("Generating AI response..."):
                                     # Get context from recent analysis
@@ -858,7 +858,7 @@ class MobilePlantGuardApp:
                                     st.session_state.chat_updated = True
 
                     with col2:
-                        if st.button(":wastebasket: Clear", use_container_width=True):
+                        if st.button(":wastebasket: Clear", width="stretch"):
                             st.session_state.chat_history.clear()
                             # Update chat display without page refresh
                             st.session_state.chat_cleared = True
@@ -889,7 +889,7 @@ class MobilePlantGuardApp:
                     cols = st.columns(2)
                     for i, question in enumerate(quick_questions):
                         with cols[i % 2]:
-                            if st.button(f":question: {question}", use_container_width=True, key=f"quick_q_{i}"):
+                            if st.button(f":question: {question}", width="stretch", key=f"quick_q_{i}"):
                                 # Get context from recent analysis
                                 context = None
                                 if st.session_state.mobile_analysis_history:
@@ -1032,7 +1032,7 @@ class MobilePlantGuardApp:
             else:
                 st.error("[ERROR] Adapters not loaded")
 
-                if st.button("[RELOAD] Reload Adapters", use_container_width=True):
+                if st.button("[RELOAD] Reload Adapters", width="stretch"):
                     with st.spinner("Reloading adapters..."):
                         self._load_core_adapters()
                         # Update adapter status without page refresh
@@ -1041,7 +1041,7 @@ class MobilePlantGuardApp:
             # AI Agent controls
             st.markdown("**[AI] AI Agent**")
 
-            if st.button("Run Component Tests", use_container_width=True):
+            if st.button("Run Component Tests", width="stretch"):
                 with st.spinner("Running AI agent tests..."):
                     test_results = get_ai_testing_framework().test_all_components()
                     if test_results:
@@ -1214,12 +1214,12 @@ class MobilePlantGuardApp:
             if st.session_state.get("ai_agent_active", False):
                 st.success("AI Agent Active")
 
-                if st.button("Run Tests", use_container_width=True, key="spa_ai_tests"):
+                if st.button("Run Tests", width="stretch", key="spa_ai_tests"):
                     with st.spinner("Running tests..."):
                         results = get_ai_testing_framework().test_all_components()
                         st.json(results)
             else:
-                if st.button("Activate AI Agent", use_container_width=True, key="spa_activate_ai"):
+                if st.button("Activate AI Agent", width="stretch", key="spa_activate_ai"):
                     st.session_state.ai_agent_active = True
                     st.success("AI Agent activated!")
 
@@ -1299,13 +1299,13 @@ class MobilePlantGuardApp:
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("Reinitialize App", use_container_width=True, key="spa_reinitialize"):
+                if st.button("Reinitialize App", width="stretch", key="spa_reinitialize"):
                     st.session_state.mobile_app_initialized = False
                     st.success("Reinitializing...")
                     st.session_state.force_reinit = True
 
             with col2:
-                if st.button("Clear Cache & Restart", use_container_width=True, key="spa_clear_restart"):
+                if st.button("Clear Cache & Restart", width="stretch", key="spa_clear_restart"):
                     with contextlib.suppress(builtins.BaseException):
                         self.performance_optimizer.cache.clear()
 
@@ -1405,12 +1405,12 @@ class MobilePlantGuardApp:
             # Quick Actions
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("Reload Models", use_container_width=True):
+                if st.button("Reload Models", width="stretch"):
                     st.cache_resource.clear()
                     st.success("Models reloaded!")
 
             with col2:
-                if st.button("Quick Test", use_container_width=True):
+                if st.button("Quick Test", width="stretch"):
                     st.info("Use Model Management tab for testing")
 
             # Plant Analysis Tools
@@ -1423,9 +1423,9 @@ class MobilePlantGuardApp:
 
                 if img_file is not None:
                     img = PILImage.open(img_file)
-                    st.image(img, use_container_width=True)
+                    st.image(img, width="stretch")
 
-                    if st.button("Analyze Plant", key="img", type="primary", use_container_width=True):
+                    if st.button("Analyze Plant", key="img", type="primary", width="stretch"):
                         with st.spinner("Analyzing..."):
                             try:
                                 if hasattr(self, "vision_adapter") and self.vision_adapter:
@@ -1479,7 +1479,7 @@ class MobilePlantGuardApp:
 
                     if audio_file is not None:
                         st.audio(audio_file, format="audio/wav")
-                        if st.button("Process File", key="file_analyze", type="primary", use_container_width=True):
+                        if st.button("Process File", key="file_analyze", type="primary", width="stretch"):
                             with st.spinner("Processing..."):
                                 try:
                                     if hasattr(self, "audio_adapter") and self.audio_adapter:
@@ -1556,7 +1556,7 @@ class MobilePlantGuardApp:
             st.markdown("### [EMERGENCY] PlantGuard Unified - Emergency Mode")
             st.markdown("The app is running in emergency mode. Some features may not be available.")
 
-            if st.button("[RESTART] Try Full Restart", use_container_width=True, key="spa_full_restart"):
+            if st.button("[RESTART] Try Full Restart", width="stretch", key="spa_full_restart"):
                 # Clear all mobile app state
                 keys_to_clear = [key for key in st.session_state if key.startswith("mobile_")]
                 for key in keys_to_clear:
@@ -1600,14 +1600,14 @@ class MobilePlantGuardApp:
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("[REFRESH] Refresh Components", use_container_width=True, key="spa_refresh_components"):
+                if st.button("[REFRESH] Refresh Components", width="stretch", key="spa_refresh_components"):
                     st.session_state.mobile_app_initialized = False
                     st.success("Refreshing components - no page refresh needed!")
                     # Update state without page refresh
                     st.session_state.components_refreshed = True
 
             with col2:
-                if st.button("[TEST] Run AI Tests", use_container_width=True, key="spa_run_tests"):
+                if st.button("[TEST] Run AI Tests", width="stretch", key="spa_run_tests"):
                     with st.spinner("Testing all components..."):
                         test_results = get_ai_testing_framework().test_all_components()
                         if test_results.get("components_tested", 0) > 0:

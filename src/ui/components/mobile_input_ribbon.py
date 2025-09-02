@@ -135,7 +135,7 @@ class MobileInputRibbon(MobileBaseComponent):
                         key=button_key,
                         help=f"Click to deactivate {mode_info['description']}",
                         type="secondary",
-                        use_container_width=True,
+                        width="stretch",
                     ):
                         active_modes[mode_name] = False
                         self._handle_mode_activation(mode_name, False)
@@ -148,7 +148,7 @@ class MobileInputRibbon(MobileBaseComponent):
                         key=button_key,
                         help=f"{mode_info['description']} (Shortcut: {mode_info['shortcut']})",
                         type="secondary",
-                        use_container_width=True,
+                        width="stretch",
                     ):
                         active_modes[mode_name] = True
                         self._handle_mode_activation(mode_name, True)
@@ -166,7 +166,7 @@ class MobileInputRibbon(MobileBaseComponent):
                 key="clear_all_inputs_mobile",
                 help="Clear all active inputs and reset temporary data",
                 type="secondary",
-                use_container_width=True,
+                width="stretch",
             ):
                 self._clear_all_inputs()
         else:
@@ -177,7 +177,7 @@ class MobileInputRibbon(MobileBaseComponent):
                     key="clear_all_inputs_desktop",
                     help="Clear all active inputs and reset temporary data",
                     type="secondary",
-                    use_container_width=True,
+                    width="stretch",
                 ):
                     self._clear_all_inputs()
 
@@ -427,7 +427,7 @@ class MobileInputRibbon(MobileBaseComponent):
             st.info(f"[TIP] **Input needed:** Please provide input for {', '.join(invalid_modes)}")
 
         if valid_modes:
-            if st.button("[LAUNCH] Analyze Now", key="analyze_from_ribbon", type="primary", use_container_width=True):
+            if st.button("[LAUNCH] Analyze Now", key="analyze_from_ribbon", type="primary", width="stretch"):
                 self._trigger_analysis(valid_modes)
 
     def get_active_modes(self) -> list[str]:

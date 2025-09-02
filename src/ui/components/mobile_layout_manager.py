@@ -485,6 +485,18 @@ class MobileLayoutManager:
             self._bundle_optimizer = None
             self._performance_optimizer = None
 
+    def get_layout_status(self) -> dict[str, Any]:
+        """Get current layout status and configuration."""
+        return {
+            "layout_type": self.config.get("layout_type", "unknown"),
+            "touch_target_size": self.config.get("touch_target_size", 0),
+            "spacing_unit": self.config.get("spacing_unit", 0),
+            "max_width": self.config.get("max_width", "unknown"),
+            "grid_columns": self.config.get("grid_columns", 0),
+            "bundle_optimizer_available": self._bundle_optimizer is not None,
+            "performance_optimizer_available": self._performance_optimizer is not None,
+        }
+
 
 # Utility functions for mobile layout
 def initialize_mobile_layout(component_id: str = "mobile_layout") -> MobileLayoutManager:

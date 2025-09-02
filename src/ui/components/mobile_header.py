@@ -24,7 +24,7 @@ class MobileHeader(MobileComponent):
     """
 
     def __init__(self, component_id: str = "mobile_header", **kwargs) -> None:
-        super().__init__(component_id, **kwargs)
+        super().__init__(component_id)
         self.title = kwargs.get("title", "PlantGuard AI")
         self.subtitle = kwargs.get("subtitle", "Mobile Plant Disease Detection")
         self.show_model_switcher = kwargs.get("show_model_switcher", True)
@@ -146,7 +146,7 @@ class MobileHeader(MobileComponent):
                 if st.button(
                     f"{button_icon} {display_name}",
                     key=f"{self.component_id}_model_{model_key}",
-                    use_container_width=True,
+                    width="stretch",
                     type=button_style,
                     disabled=is_current,
                     help=f"{model_info['name']} - {model_info['accuracy']} accuracy",
@@ -241,7 +241,7 @@ class MobileHeader(MobileComponent):
             if self.show_model_switcher:
                 current_model = st.session_state.current_vision_model
                 model_name = st.session_state.available_models.get(current_model, current_model)
-                if st.button(f"[AI] {model_name}", key=f"{self.component_id}_compact_model", use_container_width=True):
+                if st.button(f"[AI] {model_name}", key=f"{self.component_id}_compact_model", width="stretch"):
                     self._show_model_switcher_modal()
 
         with col3:
@@ -293,7 +293,7 @@ class MobileHeader(MobileComponent):
 
                 button_text = f"{'[DONE]' if is_current else '⚪'} {model_info['name']}"
 
-                if st.button(button_text, key=f"{self.component_id}_modal_{model_key}", use_container_width=True, disabled=is_current):
+                if st.button(button_text, key=f"{self.component_id}_modal_{model_key}", width="stretch", disabled=is_current):
                     if not is_current:
                         st.session_state.current_vision_model = model_key
                         self._handle_model_change(model_key)

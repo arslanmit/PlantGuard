@@ -48,7 +48,7 @@ class MobileVoiceInterface(MobileComponent):
     """
 
     def __init__(self, component_id: str = "mobile_voice_interface", **kwargs) -> None:
-        super().__init__(component_id, **kwargs)
+        super().__init__(component_id)
         self.audio_adapter = None
         self.text_adapter = None
         self.max_recording_duration = kwargs.get("max_recording_duration", 60)  # seconds
@@ -247,18 +247,18 @@ class MobileVoiceInterface(MobileComponent):
             transcribe_clicked = st.button(
                 "[TEXT] Transcribe Audio",
                 key=f"{self.component_id}_transcribe",
-                use_container_width=True,
+                width="stretch",
                 disabled=st.session_state.get("transcription_in_progress", False),
                 type="primary",
             )
 
         with col2:
-            clear_clicked = st.button("[DELETE] Clear Audio", key=f"{self.component_id}_clear_audio", use_container_width=True)
+            clear_clicked = st.button("[DELETE] Clear Audio", key=f"{self.component_id}_clear_audio", width="stretch")
 
         if clear_clicked:
             self.clear_audio_data()
             # Clear voice history
-            if st.button("Clear Voice History", key=f"{self.component_id}_clear_history", use_container_width=True):
+            if st.button("Clear Voice History", key=f"{self.component_id}_clear_history", width="stretch"):
                 st.session_state.voice_history = []
                 st.session_state.voice_input_text = ""
                 # Update state without page refresh
@@ -373,7 +373,7 @@ class MobileVoiceInterface(MobileComponent):
         st.info(f"[CHAT] {transcribed_text}")
 
         # Ask question button
-        ask_clicked = st.button("[PLANT] Get Plant Care Answer", key=f"{self.component_id}_ask_question", use_container_width=True, type="primary")
+        ask_clicked = st.button("[PLANT] Get Plant Care Answer", key=f"{self.component_id}_ask_question", width="stretch", type="primary")
 
         response = st.session_state.get("voice_response", "")
 

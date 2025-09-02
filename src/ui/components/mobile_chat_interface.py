@@ -280,12 +280,12 @@ class MobileChatInterface(MobileBaseComponent):
             st.markdown("<br>", unsafe_allow_html=True)  # Spacing
 
             send_button = st.button(
-                "[UPLOAD]\nSend", key=f"{self.component_id}_send", use_container_width=True, type="primary", disabled=not user_input.strip()
+                "[UPLOAD]\nSend", key=f"{self.component_id}_send", width="stretch", type="primary", disabled=not user_input.strip()
             )
 
             # Voice input button (if enabled)
             if self.chat_config["enable_voice_input"]:
-                voice_button = st.button("[VOICE]\nVoice", key=f"{self.component_id}_voice", use_container_width=True, help="Use voice input")
+                voice_button = st.button("[VOICE]\nVoice", key=f"{self.component_id}_voice", width="stretch", help="Use voice input")
 
                 if voice_button:
                     self._handle_voice_input()
@@ -304,15 +304,15 @@ class MobileChatInterface(MobileBaseComponent):
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            if st.button("[PLANT] Plant Care", key=f"{self.component_id}_quick_care", use_container_width=True):
+            if st.button("[PLANT] Plant Care", key=f"{self.component_id}_quick_care", width="stretch"):
                 self._handle_user_message("How do I take care of my plant?")
 
         with col2:
-            if st.button("[SEARCH] Symptoms", key=f"{self.component_id}_quick_symptoms", use_container_width=True):
+            if st.button("[SEARCH] Symptoms", key=f"{self.component_id}_quick_symptoms", width="stretch"):
                 self._handle_user_message("What do these symptoms mean?")
 
         with col3:
-            if st.button("[TREATMENT] Treatment", key=f"{self.component_id}_quick_treatment", use_container_width=True):
+            if st.button("[TREATMENT] Treatment", key=f"{self.component_id}_quick_treatment", width="stretch"):
                 self._handle_user_message("How should I treat this disease?")
 
     def _render_chat_controls(self) -> None:
@@ -320,19 +320,19 @@ class MobileChatInterface(MobileBaseComponent):
         col1, col2, col3, col4 = st.columns(4)
 
         with col1:
-            if st.button("[DETAILS] History", key=f"{self.component_id}_history", use_container_width=True):
+            if st.button("[DETAILS] History", key=f"{self.component_id}_history", width="stretch"):
                 self._show_chat_history()
 
         with col2:
-            if st.button("[UPLOAD] Export", key=f"{self.component_id}_export", use_container_width=True):
+            if st.button("[UPLOAD] Export", key=f"{self.component_id}_export", width="stretch"):
                 self._export_chat()
 
         with col3:
-            if st.button("[SETTINGS] Settings", key=f"{self.component_id}_settings", use_container_width=True):
+            if st.button("[SETTINGS] Settings", key=f"{self.component_id}_settings", width="stretch"):
                 self._show_chat_settings()
 
         with col4:
-            if st.button("[UNKNOWN] Help", key=f"{self.component_id}_help", use_container_width=True):
+            if st.button("[UNKNOWN] Help", key=f"{self.component_id}_help", width="stretch"):
                 self._show_chat_help()
 
     def _handle_user_message(self, message: str) -> None:

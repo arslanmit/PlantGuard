@@ -30,7 +30,7 @@ class MobileContentTabs(MobileComponent):
     """
 
     def __init__(self, component_id: str = "mobile_content_tabs", **kwargs) -> None:
-        super().__init__(component_id, **kwargs)
+        super().__init__(component_id)
         self.tab_style = kwargs.get("tab_style", "pills")  # 'pills' or 'underline'
         self.scrollable_tabs = kwargs.get("scrollable_tabs", True)
         self.lazy_loading = kwargs.get("lazy_loading", False)  # Disable lazy loading for SPA
@@ -225,7 +225,7 @@ class MobileContentTabs(MobileComponent):
                     label=tab_label,
                     key=button_key,
                     help=tab["description"],
-                    use_container_width=True,
+                    width="stretch",
                     type=button_type,
                     disabled=False,  # Never disable - always interactive
                 ):
@@ -316,7 +316,7 @@ class MobileContentTabs(MobileComponent):
                 tab_label = f"{tab['icon']} {tab_title}"
 
                 # Render tab button
-                if st.button(label=tab_label, key=button_key, help=tab["description"], use_container_width=True, disabled=is_active):
+                if st.button(label=tab_label, key=button_key, help=tab["description"], width="stretch", disabled=is_active):
                     selected_tab = tab["id"]
                     st.session_state.active_tab = selected_tab
                     self._update_tab_history(selected_tab)
@@ -362,7 +362,7 @@ class MobileContentTabs(MobileComponent):
         """Render placeholder for voice assistant tab."""
         st.markdown("#### [VOICE] Voice Assistant")
 
-        if st.button("[MICROPHONE]️ Start Recording", key=f"{self.component_id}_voice_record", use_container_width=True):
+        if st.button("[MICROPHONE]️ Start Recording", key=f"{self.component_id}_voice_record", width="stretch"):
             st.info("[PARTIAL] Voice recording will be integrated with AudioAdapter")
 
         st.markdown("**How to use:**")
@@ -395,7 +395,7 @@ class MobileContentTabs(MobileComponent):
 
         # History card header
         st.markdown('<div class="mobile-expandable-card-header">', unsafe_allow_html=True)
-        if st.button("[CHART] Recent Analysis History", key=f"{self.component_id}_history_card", use_container_width=True):
+        if st.button("[CHART] Recent Analysis History", key=f"{self.component_id}_history_card", width="stretch"):
             st.session_state.history_expanded = not st.session_state.get("history_expanded", True)
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -411,7 +411,7 @@ class MobileContentTabs(MobileComponent):
 
         # Settings card header
         st.markdown('<div class="mobile-expandable-card-header">', unsafe_allow_html=True)
-        if st.button("[SETTINGS] App Settings & Preferences", key=f"{self.component_id}_settings_card", use_container_width=True):
+        if st.button("[SETTINGS] App Settings & Preferences", key=f"{self.component_id}_settings_card", width="stretch"):
             st.session_state.settings_expanded = not st.session_state.get("settings_expanded", True)
         st.markdown("</div>", unsafe_allow_html=True)
 
