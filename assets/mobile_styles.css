@@ -41,15 +41,15 @@ AI Agent friendly with clear component classes and semantic naming
     /* Mobile Touch Targets & Spacing (Consolidated) */
     --mobile-touch-target: 44px;
     --mobile-touch-target-large: 56px;
-    --mobile-space: 16px;
+    --mobile-space: 8px;
     /* Base spacing unit */
-    --mobile-space-xs: 4px;
+    --mobile-space-xs: 2px;
     /* 0.25x */
-    --mobile-space-sm: 8px;
+    --mobile-space-sm: 4px;
     /* 0.5x */
-    --mobile-space-lg: 24px;
+    --mobile-space-lg: 12px;
     /* 1.5x */
-    --mobile-space-xl: 32px;
+    --mobile-space-xl: 16px;
     /* 2x */
 
     /* Mobile Typography */
@@ -90,8 +90,10 @@ AI Agent friendly with clear component classes and semantic naming
 
 /* Adjust main content area when sidebar is hidden */
 .main .block-container {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+    padding-left: 0.25rem !important;
+        padding-right: 0.25rem !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
     max-width: 428px !important;
     margin: 0 auto !important;
 }

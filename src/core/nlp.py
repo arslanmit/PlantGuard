@@ -34,7 +34,6 @@ if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
         logger.debug("Could not override st.cache_data during pytest: %s", e, exc_info=True)
 
 
-@st.cache_data(show_spinner=False, ttl=3600)
 def load_knowledge_base(knowledge_base_path: str) -> tuple[dict[str, Any], dict[str, str], dict[str, float]]:
     """Load and cache knowledge base data.
 
@@ -67,7 +66,6 @@ def load_knowledge_base(knowledge_base_path: str) -> tuple[dict[str, Any], dict[
         return {}, {}, {}
 
 
-@st.cache_data(show_spinner=False, ttl=1800)
 def get_cached_disease_info(disease_class: str, disease_info: dict[str, Any]) -> dict[str, Any]:
     """Get cached disease information with fallback handling.
 

@@ -208,11 +208,11 @@ class MobileHeader(MobileComponent):
         """Render header actions in always-visible layout."""
         # Always-visible layout: Direct rendering without containers
         if self.show_model_switcher:
-            st.markdown("**AI Models:**")
+            st.markdown("**AI Models:**", help=None)
             self.render_model_switcher()
 
         if self.show_status:
-            st.markdown("**Status:**")
+            st.markdown("**Status:**", help=None)
             self.render_status_indicator()
 
     def render(self, **kwargs) -> None:
@@ -220,9 +220,9 @@ class MobileHeader(MobileComponent):
         # Initialize state
         self.initialize_header_state()
 
-        # Title section - streamlined
-        st.markdown(f"## [LEAF] {self.title}")
-        st.markdown(f"*{self.subtitle}*")
+        # Title section - streamlined with minimal spacing
+        st.markdown(f"## [LEAF] {self.title}", help=None)
+        st.markdown(f"*{self.subtitle}*", help=None)
 
         # Actions section - direct rendering
         self.render_actions_section()

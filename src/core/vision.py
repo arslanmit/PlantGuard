@@ -148,7 +148,6 @@ def get_optimal_device() -> torch.device:
         return torch.device("cpu")
 
 
-@st.cache_resource(show_spinner=True, ttl=3600)
 def load_vision_model(model_path: str | None = None, num_classes: int = 38, device: str | None = None) -> tuple[PlantDiseaseResNet50, torch.device]:
     """Load and cache vision model with optimizations.
 
@@ -213,7 +212,6 @@ def load_vision_model(model_path: str | None = None, num_classes: int = 38, devi
         raise RuntimeError(f"Vision model loading failed: {e}") from e
 
 
-@st.cache_data(show_spinner=False, ttl=1800)
 def load_class_mapping(mapping_path: str) -> tuple[list[str], dict[str, str], dict[str, list[str]]]:
     """Load and cache class mapping data.
 
@@ -241,7 +239,6 @@ def load_class_mapping(mapping_path: str) -> tuple[list[str], dict[str, str], di
         return [], {}, {}
 
 
-@st.cache_data(show_spinner=False)
 def create_image_transform(img_size: tuple[int, int]) -> transforms.Compose:
     """Create and cache image preprocessing transform.
 
@@ -260,7 +257,6 @@ def create_image_transform(img_size: tuple[int, int]) -> transforms.Compose:
     )
 
 
-@st.cache_data(show_spinner=False, ttl=3600)
 def load_cached_checkpoint(checkpoint_path: str) -> dict[str, Any]:
     """Load and cache model checkpoint with safe loading.
 

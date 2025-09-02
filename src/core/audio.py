@@ -36,7 +36,6 @@ from transformers import Pipeline, pipeline
 logger = logging.getLogger(__name__)
 
 
-@st.cache_resource(show_spinner=False)
 def load_whisper_pipeline(model_name: str = "openai/whisper-tiny") -> Pipeline:
     """Load and cache Whisper pipeline for speech-to-text.
 
@@ -63,7 +62,6 @@ def load_whisper_pipeline(model_name: str = "openai/whisper-tiny") -> Pipeline:
         raise RuntimeError(f"Failed to initialize Whisper model: {e}") from e
 
 
-@st.cache_data(show_spinner=False, ttl=300)
 def get_audio_info(file_path: str) -> tuple[float, int, bool]:
     """Get and cache audio file information.
 
