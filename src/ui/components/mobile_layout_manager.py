@@ -10,6 +10,8 @@ from typing import Any
 
 import streamlit as st
 
+from utils.error_recovery import ImportErrorRecovery
+
 logger = logging.getLogger(__name__)
 
 

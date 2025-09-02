@@ -14,7 +14,7 @@ from typing import Any
 
 import streamlit as st
 
-from .mobile_component_registry import ComponentMetadata, MobileComponent, register_mobile_component
+from .mobile_component_registry import ComponentMetadata, MobileComponent
 
 
 class MobileContentTabs(MobileComponent):

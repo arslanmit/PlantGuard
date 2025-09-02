@@ -465,6 +465,10 @@ show-fixes = true         # [WRITE] Show what was fixed
 output-format = "grouped" # [SUMMARY] Group similar issues together
 force-exclude = true      # [FORCE] Enforce exclusions even for direct file paths
 
+# [EXTENSIONS] Include all file types for E501 checking and ignoring
+include = ["**/*"]        # [ALL] Check ALL file types, not just Python
+extend-include = ["**/*"] # [ALL] Include ALL file extensions for linting
+
 # [FOLDER] Folders to completely exclude from all linting
 exclude = [
   "build",
@@ -531,6 +535,7 @@ ignore = [
   # ============================================================================
   # [AI] ML/AI Specific Exceptions - Allow common ML patterns
   # ============================================================================
+  "E501",   # Allow long lines - ML code often has long function calls and imports
   "S101",   # Allow assert statements - essential for ML tensor shape validation
   "S301",   # Allow pickle usage - standard for ML model serialization
   "S603",   # Allow subprocess calls - needed for ML preprocessing tools
@@ -1019,6 +1024,9 @@ check-typed-exception = true # Check exception handling
 
 # [FOLDER] Per-file ignores - Different rules for different file types
 [tool.ruff.lint.per-file-ignores]
+# [ALL] Global ignore for E501 and W293 across ALL file extensions
+"**/*" = ["E501", "W293"]  # [IGNORE] Ignore line length and blank line whitespace violations for ALL file types
+
 # [TEST] Test files - Ignore ALL common linter rules that typically apply to tests
 # [IGNORE] Tests don't need to follow production code standards - they have different purposes
 "tests/**/*.py" = [

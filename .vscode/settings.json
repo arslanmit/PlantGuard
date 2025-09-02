@@ -168,5 +168,28 @@
     "python.analysis.stubPath": "typings",
     "python.analysis.extraPaths": [
         "src"
-    ]
+    ],
+    "cursorpyright.analysis.autoSearchPaths": true,
+    "cursorpyright.analysis.exclude": [
+        "**/tests/**",
+        "**/build/**",
+        "**/dist/**",
+        "**/.venv/**",
+        "**/__pycache__/**",
+        "**/.pytest_cache/**",
+        "**/.mypy_cache/**",
+        "**/.ruff_cache/**",
+        "**/logs/**",
+        "**/runs/**",
+        "**/data/**",
+        "**/notebooks/**"
+    ],
+    "cursorpyright.analysis.extraPaths": [
+        "src"
+    ],
+    "cursorpyright.analysis.include": [
+        "src/**"
+    ],
+    "cursorpyright.analysis.stubPath": "typings",
+    "makefile.configureOnOpen": false
 }

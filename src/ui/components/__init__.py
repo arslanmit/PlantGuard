@@ -6,7 +6,6 @@ and comprehensive error handling for the PlantGuard plant disease detection syst
 """
 
 import logging
-from typing import Any
 
 # Version information
 __version__ = "1.0.0"
@@ -40,4 +39,4 @@ __all__ = [
 
 # Initialize logging for the mobile components package
 logger = logging.getLogger(__name__)
-logger.info(f"Mobile Components Package v{__version__} initialized")
+logger.info("Mobile Components Package v%s initialized", __version__)

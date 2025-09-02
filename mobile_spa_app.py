@@ -1166,7 +1166,10 @@ class MobilePlantGuardApp:
         for status in status_items:
             st.write(status)
 
-
+    def render_comparison_tab(self) -> None:
+        """Render model comparison tab content."""
+        st.markdown("### Model Comparison")
+        st.info("Model comparison functionality would be implemented here")
 
     def get_session_duration(self) -> str:
         """Get formatted session duration."""

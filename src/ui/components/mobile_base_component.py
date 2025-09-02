@@ -6,7 +6,7 @@ essential state management and error handling capabilities.
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 import streamlit as st
 
@@ -28,10 +28,10 @@ class MobileBaseComponent:
         self.component_id = component_id
         self.title = title
         self.config = kwargs.get("config", {})
-        
+
         # Initialize component state
         self._initialize_component_state()
-        
+
         logger.debug("MobileBaseComponent initialized: %s", component_id)
 
     def _initialize_component_state(self) -> None:
@@ -43,14 +43,14 @@ class MobileBaseComponent:
                     "created_at": st.session_state.get("app_start_time", 0),
                     "last_updated": st.session_state.get("app_start_time", 0),
                     "component_type": self.__class__.__name__,
-                }
+                },
             }
 
-    def get_state(self) -> Dict[str, Any]:
+    def get_state(self) -> dict[str, Any]:
         """Get current component state."""
         return st.session_state.get(f"mobile_{self.component_id}_state", {"data": {}, "metadata": {}})
 
-    def set_state(self, state: Dict[str, Any]) -> None:
+    def set_state(self, state: dict[str, Any]) -> None:
         """Set component state."""
         if "metadata" not in state:
             state["metadata"] = {}
@@ -79,7 +79,7 @@ class MobileBaseComponent:
         """Render the component. Override in subclasses."""
         st.write(f"Component: {self.component_id}")
 
-    def get_component_info(self) -> Dict[str, Any]:
+    def get_component_info(self) -> dict[str, Any]:
         """Get component information."""
         return {
             "component_id": self.component_id,

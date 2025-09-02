@@ -1,0 +1,21 @@
+[flake8]
+max-line-length = 150
+extend-ignore = E501,W293
+# [PYTHON] Only check Python files to avoid syntax errors on other file types
+filename = *.py
+# [PYTHON] Also check files without extension that might be Python scripts
+# filename = *
+exclude =
+    .venv,
+    __pycache__,
+    .git,
+    build,
+    dist,
+    .pytest_cache,
+    .mypy_cache,
+    .ruff_cache,
+    logs,
+    runs,
+    data,
+    notebooks,
+    tests

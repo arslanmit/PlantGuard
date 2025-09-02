@@ -7,6 +7,7 @@ and provides detailed performance metrics.
 
 import json
 import sys
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -190,8 +191,11 @@ def _calculate_metrics(
 
     # Detailed classification report
     try:
-        # Use string literal to satisfy some type stubs that expect str for zero_division
-        class_report = classification_report(ground_truths, predictions, output_dict=True, zero_division="warn")
+        # Suppress sklearn warnings about undefined metrics
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
+            # Use string literal to satisfy some type stubs that expect str for zero_division
+            class_report = classification_report(ground_truths, predictions, output_dict=True, zero_division="warn")
     except ValueError as e:
         logger.warning("Could not generate classification report: %s", e)
         class_report = {}
