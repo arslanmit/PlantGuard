@@ -137,15 +137,22 @@ def _load_adapters_safely() -> None:
         vision_adapter, audio_adapter, text_adapter = load_core_adapters()
         if vision_adapter and audio_adapter and text_adapter:
             st.session_state.adapters_loaded = True
-            st.session_state.vision_adapter = vision_adapter
-            st.session_state.audio_adapter = audio_adapter
-            st.session_state.text_adapter = text_adapter
+            # Store adapter status instead of objects to avoid serialization issues
+            st.session_state.vision_adapter_status = "loaded"
+            st.session_state.audio_adapter_status = "loaded"
+            st.session_state.text_adapter_status = "loaded"
             logger.info("All adapters loaded successfully")
         else:
             st.session_state.adapters_loaded = False
+            st.session_state.vision_adapter_status = "failed"
+            st.session_state.audio_adapter_status = "failed"
+            st.session_state.text_adapter_status = "failed"
             logger.warning("Some adapters failed to load")
     except Exception as e:
         st.session_state.adapters_loaded = False
+        st.session_state.vision_adapter_status = "error"
+        st.session_state.audio_adapter_status = "error"
+        st.session_state.text_adapter_status = "error"
         logger.error(f"Failed to load adapters: {e}")
 
 
@@ -348,30 +355,52 @@ class MobilePlantGuardApp:
         if "mobile_offline_mode" not in st.session_state:
             st.session_state.mobile_offline_mode = False
 
-        # Initialize performance optimization state
-        if "mobile_performance" not in st.session_state:
-            st.session_state.mobile_performance = {"optimization_level": "balanced", "memory_usage": 0, "cache_stats": {"hit_rate": 0, "size_mb": 0}}
-
-        # Initialize offline manager state
-        if "mobile_offline" not in st.session_state:
-            st.session_state.mobile_offline = {"enabled": False, "connection_status": "online", "cached_resources": 0, "cache_size_mb": 0}
-
         # Initialize bundle optimizer state
-        if "mobile_bundles" not in st.session_state:
-            st.session_state.mobile_bundles = {"loaded_bundles": [], "total_size_mb": 0, "optimization_enabled": True}
+        if "mobile_bundle_optimization" not in st.session_state:
+            st.session_state.mobile_bundle_optimization = True
+
+        # Initialize feature usage statistics
+        if "feature_usage_image_analysis" not in st.session_state:
+            st.session_state.feature_usage_image_analysis = 0
+        if "feature_usage_voice_assistant" not in st.session_state:
+            st.session_state.feature_usage_voice_assistant = 0
+        if "feature_usage_chat_interface" not in st.session_state:
+            st.session_state.feature_usage_chat_interface = 0
+        if "feature_usage_history_settings" not in st.session_state:
+            st.session_state.feature_usage_history_settings = 0
+
+        # Initialize interaction counters
+        if "interaction_count" not in st.session_state:
+            st.session_state.interaction_count = 0
+
+        if "touch_interactions" not in st.session_state:
+            st.session_state.touch_interactions = 0
+
+        # Initialize AI agent state
+        if "ai_agent_active" not in st.session_state:
+            st.session_state.ai_agent_active = False
+
+        if "ai_agent_test_results" not in st.session_state:
+            st.session_state.ai_agent_test_results = {}
+
+        # Initialize error logging
+        if "component_error_log" not in st.session_state:
+            st.session_state.component_error_log = []
+
+        # Initialize analysis history
+        if "analysis_history" not in st.session_state:
+            st.session_state.analysis_history = []
 
     def _setup_state_persistence(self) -> None:
         """Setup state persistence for mobile session continuity."""
         # Create state backup for critical data
-        critical_state_keys = ["analysis_history", "user_preferences", "feature_usage_stats", "ai_agent_test_results"]
+        critical_state_keys = ["analysis_history", "user_preferences", "ai_agent_test_results"]
 
-        if "state_backup" not in st.session_state:
-            st.session_state.state_backup = {}
+        if "state_backup_created" not in st.session_state:
+            st.session_state.state_backup_created = True
 
-        # Backup critical state
-        for key in critical_state_keys:
-            if key in st.session_state:
-                st.session_state.state_backup[key] = st.session_state[key]
+        # Note: Complex state backup disabled to prevent serialization issues
+        # State persistence handled through individual session keys
 
     def _setup_state_validation(self) -> None:
         """Setup state validation for data integrity."""
@@ -384,6 +413,9 @@ class MobilePlantGuardApp:
             st.session_state.analysis_history = valid_history
 
         # Validate user preferences
+        if "user_preferences" not in st.session_state:
+            st.session_state.user_preferences = {}
+
         if "user_preferences" in st.session_state:
             default_prefs = {
                 "theme": "auto",
@@ -399,8 +431,9 @@ class MobilePlantGuardApp:
 
     def update_feature_usage(self, feature: str) -> None:
         """Update feature usage statistics."""
-        if feature in st.session_state.feature_usage_stats:
-            st.session_state.feature_usage_stats[feature] += 1
+        feature_key = f"feature_usage_{feature}"
+        if feature_key in st.session_state:
+            st.session_state[feature_key] += 1
             st.session_state.interaction_count += 1
 
     def track_tab_navigation(self, new_tab: str) -> None:
@@ -410,12 +443,17 @@ class MobilePlantGuardApp:
             # Update previous tab
             st.session_state.previous_tab = st.session_state.current_tab
 
-            # Add to tab history
-            st.session_state.tab_history.append({"from_tab": st.session_state.current_tab, "to_tab": new_tab, "timestamp": time.time()})
+            # Add to navigation history (separate from tab_history used by content tabs)
+            if "navigation_history" not in st.session_state:
+                st.session_state.navigation_history = []
+
+            # Store as simple string to avoid serialization issues
+            nav_record = f"{st.session_state.current_tab}->{new_tab}@{time.time()}"
+            st.session_state.navigation_history.append(nav_record)
 
             # Limit history size
-            if len(st.session_state.tab_history) > 50:
-                st.session_state.tab_history = st.session_state.tab_history[-50:]
+            if len(st.session_state.navigation_history) > 50:
+                st.session_state.navigation_history = st.session_state.navigation_history[-50:]
 
             # Update current tab
             st.session_state.current_tab = new_tab
@@ -426,13 +464,8 @@ class MobilePlantGuardApp:
     def save_analysis_result(self, result: dict[str, Any], analysis_type: str = "unknown") -> None:
         """Save analysis result to history with metadata."""
 
-        analysis_record = {
-            "timestamp": time.time(),
-            "analysis_type": analysis_type,
-            "result": result,
-            "session_id": f"session_{int(st.session_state.app_start_time)}",
-            "tab_context": st.session_state.current_tab,
-        }
+        # Store as simple string to avoid serialization issues
+        analysis_record = f"{time.time()},{analysis_type},{st.session_state.current_tab}"
 
         st.session_state.analysis_history.append(analysis_record)
 
@@ -450,9 +483,14 @@ class MobilePlantGuardApp:
             "session_duration": session_duration,
             "interactions": st.session_state.interaction_count,
             "touch_interactions": st.session_state.touch_interactions,
-            "feature_usage": st.session_state.feature_usage_stats.copy(),
+            "feature_usage": {
+                "image_analysis": st.session_state.get("feature_usage_image_analysis", 0),
+                "voice_assistant": st.session_state.get("feature_usage_voice_assistant", 0),
+                "chat_interface": st.session_state.get("feature_usage_chat_interface", 0),
+                "history_settings": st.session_state.get("feature_usage_history_settings", 0),
+            },
             "analyses_performed": len(st.session_state.analysis_history),
-            "tab_switches": len(st.session_state.tab_history),
+            "tab_switches": len(st.session_state.get("navigation_history", [])),
             "current_tab": st.session_state.current_tab,
             "ai_agent_active": st.session_state.ai_agent_active,
             "component_errors": len(st.session_state.component_error_log),
@@ -540,7 +578,7 @@ class MobilePlantGuardApp:
                 response = self.text_adapter.generate_response(disease_class, "What should I do about this disease?", confidence)
                 recommendations = response.split("\n") if response else []
 
-            # Save to analysis history
+            # Save to analysis history (simplified to avoid serialization issues)
             analysis_result = {
                 "timestamp": st.session_state.get("app_start_time", 0),
                 "disease": disease_class,
@@ -549,7 +587,9 @@ class MobilePlantGuardApp:
                 "recommendations": recommendations,
             }
 
-            st.session_state.mobile_analysis_history.append(analysis_result)
+            # Store as simple string to avoid serialization issues
+            history_record = f"{st.session_state.get('app_start_time', 0)},{disease_class},{confidence}"
+            st.session_state.mobile_analysis_history.append(history_record)
 
             # Limit history size
             if len(st.session_state.mobile_analysis_history) > 50:
@@ -755,15 +795,9 @@ class MobilePlantGuardApp:
                                     st.markdown("**AI Response:**")
                                     st.write(response)
 
-                                    # Save to chat history
-                                    st.session_state.chat_history.append(
-                                        {
-                                            "type": "voice",
-                                            "input": "Voice input processed",
-                                            "response": response,
-                                            "timestamp": st.session_state.get("app_start_time", 0),
-                                        }
-                                    )
+                                    # Save to chat history (simplified to avoid serialization issues)
+                                    chat_record = f"voice,{st.session_state.get('app_start_time', 0)},Voice input processed,{response[:100]}..."
+                                    st.session_state.chat_history.append(chat_record)
                                 else:
                                     st.error(f":x: Voice processing failed: {response}")
 
@@ -850,13 +884,23 @@ class MobilePlantGuardApp:
                     if st.session_state.chat_history:
                         st.markdown("### :memo: Chat History")
 
-                        for i, chat in enumerate(reversed(st.session_state.chat_history[-10:])):
-                            with st.expander(f":speech_balloon: {chat['input'][:50]}...", expanded=i == 0):
-                                st.markdown(f"**You:** {chat['input']}")
-                                st.markdown(f"**AI:** {chat['response']}")
-
-                                if chat.get("context") and chat["context"] != "general":
-                                    st.caption(f"Context: {chat['context']}")
+                        for i, chat_record in enumerate(reversed(st.session_state.chat_history[-10:])):
+                            try:
+                                # Parse simplified chat record: type,timestamp,input,response
+                                parts = chat_record.split(",", 3)
+                                if len(parts) >= 4:
+                                    chat_type, timestamp, input_text, response_text = parts
+                                    with st.expander(f":speech_balloon: {input_text[:50]}...", expanded=i == 0):
+                                        st.markdown(f"**You:** {input_text}")
+                                        st.markdown(f"**AI:** {response_text}")
+                                else:
+                                    # Fallback for malformed records
+                                    with st.expander(f":speech_balloon: Chat {i+1}", expanded=i == 0):
+                                        st.write(chat_record)
+                            except Exception:
+                                # Fallback for any parsing errors
+                                with st.expander(f":speech_balloon: Chat {i+1}", expanded=i == 0):
+                                    st.write(chat_record)
 
                     # Quick question buttons
                     st.markdown("### :question: Quick Questions")
@@ -881,15 +925,8 @@ class MobilePlantGuardApp:
                                 with st.spinner("Generating response..."):
                                     response = self.process_text_query(question, context)
 
-                                    # Add to chat history
-                                    chat_entry = {
-                                        "type": "quick_question",
-                                        "input": question,
-                                        "response": response,
-                                        "timestamp": st.session_state.get("app_start_time", 0),
-                                        "context": context.get("disease", "general") if context else "general",
-                                    }
-
+                                    # Add to chat history (simplified to avoid serialization issues)
+                                    chat_entry = f"quick,{st.session_state.get('app_start_time', 0)},{question},{response[:100]}..."
                                     st.session_state.chat_history.append(chat_entry)
                                     # Update chat display without page refresh
                                     st.session_state.quick_question_added = True
@@ -914,43 +951,43 @@ class MobilePlantGuardApp:
             st.markdown(f"**Total Analyses:** {len(all_history)}")
 
             # Show recent analyses with enhanced display
-            for i, analysis in enumerate(all_history[-5:]):
+            for i, analysis_record in enumerate(all_history[-5:]):
                 analysis_num = len(all_history) - i
 
-                # Determine analysis type and create appropriate title
-                if "disease" in analysis:
-                    title = f":microscope: Analysis {analysis_num}: {analysis.get('disease', 'Unknown')}"
-                    confidence = analysis.get("confidence", 0)
-                    if confidence > 0:
-                        title += f" ({confidence:.1%})"
-                else:
-                    title = f":bar_chart: Analysis {analysis_num}"
+                try:
+                    # Parse simplified analysis record: timestamp,disease,confidence
+                    parts = analysis_record.split(",", 2)
+                    if len(parts) >= 3:
+                        timestamp, disease, confidence_str = parts
+                        try:
+                            confidence = float(confidence_str)
+                        except ValueError:
+                            confidence = 0.0
 
-                with st.expander(title, expanded=True):
-                    if "disease" in analysis:
-                        # Enhanced mobile analysis display
-                        col1, col2 = st.columns(2)
-
-                        with col1:
-                            st.metric("Disease", analysis.get("disease", "Unknown"))
-                            st.metric("Confidence", f"{analysis.get('confidence', 0):.1%}")
-
-                        with col2:
-                            disease_info = analysis.get("disease_info", {})
-                            if disease_info:
-                                st.write(f"**Plant Type:** {disease_info.get('plant_type', 'Unknown')}")
-                                st.write(f"**Severity:** {disease_info.get('severity', 'Unknown')}")
-
-                        # Show recommendations if available
-                        recommendations = analysis.get("recommendations", [])
-                        if recommendations:
-                            st.markdown("**Key Recommendations:**")
-                            for recommendation in recommendations[:3]:
-                                if recommendation.strip():
-                                    st.write(f"- {recommendation.strip()}")
+                        title = f":microscope: Analysis {analysis_num}: {disease}"
+                        if confidence > 0:
+                            title += f" ({confidence:.1%})"
                     else:
-                        # Regular analysis display
-                        st.json(analysis)
+                        title = f":bar_chart: Analysis {analysis_num}"
+
+                    with st.expander(title, expanded=True):
+                        if len(parts) >= 3:
+                            # Enhanced mobile analysis display
+                            col1, col2 = st.columns(2)
+
+                            with col1:
+                                st.metric("Disease", disease)
+                                st.metric("Confidence", f"{confidence:.1%}")
+
+                            with col2:
+                                st.metric("Timestamp", timestamp)
+                        else:
+                            # Fallback for malformed records
+                            st.write(f"Analysis record: {analysis_record}")
+                except Exception:
+                    # Fallback for any parsing errors
+                    with st.expander(f":bar_chart: Analysis {analysis_num}", expanded=True):
+                        st.write(f"Analysis record: {analysis_record}")
         else:
             st.info("No analysis history yet. Analyze some plants to see results here!")
 

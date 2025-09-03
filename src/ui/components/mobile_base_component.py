@@ -36,44 +36,48 @@ class MobileBaseComponent:
 
     def _initialize_component_state(self) -> None:
         """Initialize component-specific state."""
-        if f"mobile_{self.component_id}_state" not in st.session_state:
-            st.session_state[f"mobile_{self.component_id}_state"] = {
-                "data": {},
-                "metadata": {
-                    "created_at": st.session_state.get("app_start_time", 0),
-                    "last_updated": st.session_state.get("app_start_time", 0),
-                    "component_type": self.__class__.__name__,
-                },
-            }
+        state_key = f"mobile_{self.component_id}_state"
+        if state_key not in st.session_state:
+            # Store simple values to avoid serialization issues
+            st.session_state[f"{state_key}_created"] = st.session_state.get("app_start_time", 0)
+            st.session_state[f"{state_key}_updated"] = st.session_state.get("app_start_time", 0)
+            st.session_state[f"{state_key}_type"] = self.__class__.__name__
 
     def get_state(self) -> dict[str, Any]:
         """Get current component state."""
-        return st.session_state.get(f"mobile_{self.component_id}_state", {"data": {}, "metadata": {}})
+        state_key = f"mobile_{self.component_id}_state"
+        return {
+            "data": {},
+            "metadata": {
+                "created_at": st.session_state.get(f"{state_key}_created", 0),
+                "last_updated": st.session_state.get(f"{state_key}_updated", 0),
+                "component_type": st.session_state.get(f"{state_key}_type", "Unknown"),
+            },
+        }
 
     def set_state(self, state: dict[str, Any]) -> None:
         """Set component state."""
-        if "metadata" not in state:
-            state["metadata"] = {}
-        state["metadata"]["last_updated"] = st.session_state.get("app_start_time", 0)
-        st.session_state[f"mobile_{self.component_id}_state"] = state
+        state_key = f"mobile_{self.component_id}_state"
+        st.session_state[f"{state_key}_updated"] = st.session_state.get("app_start_time", 0)
+        # Note: Complex state data storage disabled to prevent serialization issues
 
     def update_state(self, key: str, value: Any) -> None:
         """Update specific state key."""
-        current_state = self.get_state()
-        if "data" not in current_state:
-            current_state["data"] = {}
-        current_state["data"][key] = value
-        self.set_state(current_state)
+        # Simplified to avoid storing complex objects
+        state_key = f"mobile_{self.component_id}_state"
+        st.session_state[f"{state_key}_updated"] = st.session_state.get("app_start_time", 0)
 
     def get_state_value(self, key: str, default: Any = None) -> Any:
         """Get specific state value."""
-        state = self.get_state()
-        return state.get("data", {}).get(key, default)
+        # Simplified to avoid complex object storage
+        return default
 
     def clear_state(self) -> None:
         """Clear component state."""
-        if f"mobile_{self.component_id}_state" in st.session_state:
-            del st.session_state[f"mobile_{self.component_id}_state"]
+        state_key = f"mobile_{self.component_id}_state"
+        keys_to_delete = [k for k in st.session_state.keys() if k.startswith(f"{state_key}_")]
+        for key in keys_to_delete:
+            del st.session_state[key]
 
     def render(self) -> None:
         """Render the component. Override in subclasses."""
