@@ -69,6 +69,43 @@ AI Agent friendly with clear component classes and semantic naming
     --mobile-max-width: 428px;
     --mobile-container-padding: var(--mobile-space);
     --mobile-safe-area: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+/* Legacy variable names for compatibility */
+    --primary-color: var(--mobile-primary);
+    --primary-hover: var(--mobile-primary-dark);
+    --accent-color: var(--mobile-primary-light);
+    --background-color: var(--mobile-bg-primary);
+    --surface-color: var(--mobile-bg-card);
+    --text-primary: var(--mobile-text-primary);
+    --text-secondary: var(--mobile-text-secondary);
+    --border-color: var(--mobile-border-color);
+    --shadow-light: var(--mobile-shadow-sm);
+    --shadow-medium: var(--mobile-shadow-md);
+    --shadow-heavy: var(--mobile-shadow-lg);
+
+    /* Mobile spacing system (legacy names) */
+    --spacing-xs: var(--mobile-space-xs);
+    --spacing-sm: var(--mobile-space-sm);
+    --spacing-md: var(--mobile-space);
+    --spacing-lg: var(--mobile-space-lg);
+    --spacing-xl: var(--mobile-space-xl);
+
+    /* Touch targets (legacy names) */
+    --touch-target-min: var(--mobile-touch-target);
+    --touch-target-comfortable: var(--mobile-touch-target-large);
+
+    /* Typography (legacy names) */
+    --font-size-xs: var(--mobile-font-size-xs);
+    --font-size-sm: var(--mobile-font-size-sm);
+    --font-size-base: var(--mobile-font-size-base);
+    --font-size-lg: var(--mobile-font-size-lg);
+    --font-size-xl: var(--mobile-font-size-xl);
+    --font-size-2xl: var(--mobile-font-size-2xl);
+
+    /* Border radius (legacy names) */
+    --radius-sm: var(--mobile-border-radius-small);
+    --radius-md: var(--mobile-border-radius);
+    --radius-lg: var(--mobile-border-radius-large);
+    --radius-xl: 20px;
 }
 
 /* ===== GLOBAL MOBILE RESET ===== */
@@ -1780,4 +1817,34 @@ select:focus-visible,
             box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.1);
         }
     }
+}
+/* PlantGuard Header Styles */
+.mobile-app-header {
+    text-align: center;
+    padding: 1rem 0;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.mobile-app-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.mobile-app-header p {
+    margin: 0.2rem 0 0 0;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* Mobile Model Info Component */
+.mobile-model-info-always-visible {
+    background: #F0FDF4;
+    border: 1px solid #16A34A;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
 }

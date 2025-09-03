@@ -270,9 +270,7 @@ class MobileHeader(MobileComponent):
         # Always-visible model info
         st.markdown(
             f"""
-        <div class="mobile-model-info-always-visible" 
-             style="background: #F0FDF4; border: 1px solid #16A34A; 
-                    border-radius: 8px; padding: 12px; margin: 8px 0;">
+        <div class="mobile-model-info-always-visible">
             <strong>Current Model:</strong> {model_info["name"]}<br>
             <strong>Accuracy:</strong> {model_info["accuracy"]} | 
             <strong>Speed:</strong> {model_info["speed"]}<br>

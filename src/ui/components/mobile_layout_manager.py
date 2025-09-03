@@ -6,6 +6,7 @@ touch optimization, and AI agent-friendly component architecture.
 """
 
 import logging
+from pathlib import Path
 from typing import Any
 
 import streamlit as st
@@ -52,9 +53,27 @@ class MobileLayoutManager:
         st.markdown(viewport_meta, unsafe_allow_html=True)
 
     def _apply_base_mobile_styles(self) -> None:
-        """Apply core mobile-first CSS styles with touch optimization."""
-        mobile_css = self._get_mobile_base_css()
-        st.markdown(mobile_css, unsafe_allow_html=True)
+        """Apply core mobile-first CSS styles by loading external CSS file."""
+        try:
+            css_file_path = Path(__file__).parent.parent.parent.parent / "assets" / "mobile_styles.css"
+            with open(css_file_path, encoding='utf-8') as f:
+                css_content = f.read()
+            
+            # Wrap in style tags
+            full_css = f"<style>{css_content}</style>"
+            st.markdown(full_css, unsafe_allow_html=True)
+            st.session_state.mobile_css_loaded = True
+            logger.debug("External mobile CSS loaded successfully")
+        except FileNotFoundError:
+            logger.warning(f"CSS file not found at {css_file_path}, falling back to inline CSS")
+            # Fallback to inline CSS if file not found
+            mobile_css = self._get_mobile_base_css()
+            st.markdown(mobile_css, unsafe_allow_html=True)
+        except Exception as e:
+            logger.error(f"Failed to load external CSS: {e}, falling back to inline CSS")
+            # Fallback to inline CSS on any error
+            mobile_css = self._get_mobile_base_css()
+            st.markdown(mobile_css, unsafe_allow_html=True)
 
     def _get_mobile_base_css(self) -> str:
         """Generate mobile-optimized base CSS with CSS variables."""

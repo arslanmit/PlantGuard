@@ -162,25 +162,8 @@ st.set_page_config(
     },
 )
 
-# Hide sidebar completely with CSS
-st.markdown(
-    """
-<style>
-    .stSidebar {
-        display: none;
-    }
-    
-    /* Adjust main content to fill space */
-    .main .block-container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-        max-width: 428px;
-        margin: 0 auto;
-    }
-</style>
-""",
-    unsafe_allow_html=True,
-)
+# Mobile CSS is now loaded from external file in mobile_layout_manager.py
+# The sidebar hiding and main content adjustments are handled by assets/mobile_styles.css
 
 
 class MobilePlantGuardApp:
@@ -1281,8 +1264,11 @@ class MobilePlantGuardApp:
         """Run the main app logic without page redirects."""
         # Apply performance optimizations at startup
         with contextlib.suppress(Exception):
-            # Load optimized CSS
-            st.markdown(self.performance_optimizer.get_optimized_css(), unsafe_allow_html=True)
+            # Load optimized CSS (only if performance optimizer exists and external CSS not loaded)
+            if (hasattr(self, 'performance_optimizer') and 
+                self.performance_optimizer and 
+                not st.session_state.get("mobile_css_loaded", False)):
+                st.markdown(self.performance_optimizer.get_optimized_css(), unsafe_allow_html=True)
 
         # Initialize components if not done
         if not st.session_state.get("mobile_app_initialized", False):
@@ -1332,9 +1318,9 @@ class MobilePlantGuardApp:
             # Header
             st.markdown(
                 """
-            <div style="text-align: center; padding: 1rem 0; background: linear-gradient(90deg, #4CAF50, #45a049); color: white; border-radius: 10px; margin-bottom: 1rem;">
-                <h1 style="margin: 0; font-size: 2rem;">PlantGuard</h1>
-                <p style="margin: 0.2rem 0 0 0; font-size: 1rem; opacity: 0.9;">AI Plant Disease Detection</p>
+            <div class="mobile-app-header">
+                <h1>PlantGuard</h1>
+                <p>AI Plant Disease Detection</p>
             </div>
             """,
                 unsafe_allow_html=True,
