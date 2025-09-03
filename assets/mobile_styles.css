@@ -238,9 +238,6 @@ body {
     box-shadow: var(--mobile-shadow-sm);
 
     /* AI Agent Friendly: Always-visible component identification */
-    /* data-component: "mobile-header" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-header-always-visible {
@@ -250,9 +247,6 @@ body {
     margin-bottom: var(--mobile-space-lg);
 
     /* AI Agent Friendly: Always-visible header identification */
-    /* data-component: "mobile-header-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-model-switcher-always-visible {
@@ -262,9 +256,6 @@ body {
     margin: var(--mobile-space) 0;
 
     /* AI Agent Friendly: Always-visible model switcher */
-    /* data-element-type: "model-switcher-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-status-always-visible {
@@ -278,9 +269,6 @@ body {
     margin: var(--mobile-space-sm) 0;
 
     /* AI Agent Friendly: Always-visible status */
-    /* data-element-type: "status-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-status-ready {
@@ -308,9 +296,6 @@ body {
     margin-bottom: var(--mobile-space-lg);
 
     /* AI Agent Friendly: Always-visible navigation */
-    /* data-component: "mobile-navigation-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-nav-button-always-visible {
@@ -338,9 +323,6 @@ body {
     user-select: none;
 
     /* AI Agent Friendly: Always-visible nav button */
-    /* data-element-type: "nav-button-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-nav-button-always-visible:hover {
@@ -373,9 +355,6 @@ body {
     margin-bottom: var(--mobile-space-lg);
 
     /* AI Agent Friendly: Always-visible tabs */
-    /* data-component: "mobile-tabs-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-tab-bar-always-visible {
@@ -388,9 +367,6 @@ body {
     margin-bottom: var(--mobile-space-md);
 
     /* AI Agent Friendly: Always-visible tab bar */
-    /* data-element-type: "tab-bar-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-tab-button-always-visible {
@@ -415,9 +391,6 @@ body {
     user-select: none;
 
     /* AI Agent Friendly: Always-visible tab button */
-    /* data-element-type: "tab-button-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-tab-button-always-visible.active {
@@ -473,9 +446,6 @@ body {
     margin-bottom: var(--mobile-space-lg);
 
     /* AI Agent Friendly: Always-visible component identification */
-    /* data-component: "mobile-input-ribbon-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-input-section-header {
@@ -538,9 +508,6 @@ body {
     user-select: none;
 
     /* AI Agent Friendly: Always-visible button identification */
-    /* data-element-type: "button-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-input-button-always-visible:hover,
@@ -574,8 +541,6 @@ body {
     width: 100%;
 
     /* AI Agent Friendly: Component identification */
-    /* data-component: "mobile-content-tabs" */
-        /* data-testable: "true" */
 }
 
 .mobile-tab-navigation {
@@ -614,8 +579,6 @@ body {
     user-select: none;
 
     /* AI Agent Friendly: Interactive element identification */
-    /* data-element-type: "tab-button" */
-        /* data-testable: "true" */
 }
 
 .mobile-tab-button.active {
@@ -638,8 +601,6 @@ body {
     box-shadow: var(--mobile-shadow-sm);
 
     /* AI Agent Friendly: Content area identification */
-    /* data-element-type: "tab-content" */
-        /* data-testable: "true" */
 }
 
 /* ===== MOBILE FORM COMPONENTS ===== */
@@ -676,8 +637,6 @@ body {
     appearance: none;
 
     /* AI Agent Friendly: Input element identification */
-    /* data-element-type: "input" */
-        /* data-testable: "true" */
 }
 
 .mobile-form-input:focus {
@@ -713,8 +672,6 @@ body {
     -webkit-tap-highlight-color: transparent;
 
     /* AI Agent Friendly: Button identification */
-    /* data-element-type: "button" */
-        /* data-testable: "true" */
 }
 
 .mobile-button-primary {
@@ -771,8 +728,6 @@ body {
     border-radius: var(--mobile-border-radius-small);
 
     /* AI Agent Friendly: Status identification */
-    /* data-element-type: "status" */
-        /* data-testable: "true" */
 }
 
 .mobile-status-success {
@@ -805,8 +760,6 @@ body {
     transition: all var(--mobile-transition);
 
     /* AI Agent Friendly: Card identification */
-    /* data-element-type: "card" */
-        /* data-testable: "true" */
 }
 
 .mobile-card:hover {
@@ -850,8 +803,6 @@ body {
     padding: var(--mobile-space-2xl);
 
     /* AI Agent Friendly: Loading state identification */
-    /* data-element-type: "loading" */
-        /* data-testable: "true" */
 }
 
 .mobile-loading-spinner {
@@ -1445,7 +1396,6 @@ select:focus-visible,
     overflow: visible !important;
 
     /* AI Agent Friendly: Always-visible enforcement */
-    /* data-visibility: "always-visible" */
 }
 
 /* Ensure no elements can be hidden via common hiding patterns */
@@ -1492,9 +1442,6 @@ select:focus-visible,
     font-weight: 600;
 
     /* AI Agent Friendly: Always-visible status */
-    /* data-element-type: "status-always-visible" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 /* Grid layouts for always-visible components */
@@ -1528,9 +1475,6 @@ select:focus-visible,
     transition: all var(--mobile-transition);
 
     /* AI Agent Friendly: Expandable card */
-    /* data-element-type: "expandable-card" */
-        /* data-testable: "true" */
-        /* data-design: "always-visible" */
 }
 
 .mobile-expandable-card-header {
