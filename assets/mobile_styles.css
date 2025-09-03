@@ -10,7 +10,6 @@ AI Agent friendly with clear component classes and semantic naming
     --mobile-primary: #16A34A;
     --mobile-primary-light: #22C55E;
     --mobile-primary-dark: #15803D;
-    --mobile-accent: #84CC16;
     --mobile-success: #059669;
     --mobile-warning: #F59E0B;
     --mobile-error: #DC2626;
@@ -21,7 +20,6 @@ AI Agent friendly with clear component classes and semantic naming
     --mobile-bg-secondary: #F8FAF8;
     --mobile-bg-tertiary: #F0F9F0;
     --mobile-bg-card: #FFFFFF;
-    --mobile-bg-overlay: rgba(0, 0, 0, 0.5);
 
     /* Mobile Text Colors */
     --mobile-text-primary: #1F2937;
