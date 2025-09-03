@@ -78,7 +78,7 @@ endif
 
 .DEFAULT_GOAL := help
 
-.PHONY: help start setup mobile dev test clean
+.PHONY: help start setup mobile dev test clean clean-python clean-test clean-all
 .PHONY: format lint check fix train monitor notebook benchmark evaluate
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
@@ -107,6 +107,9 @@ help:
 	@echo "  $(BLUE)deps$(NC)               - Install Python dependencies only"
 	@echo "  $(BLUE)update$(NC)             - Update all dependencies to latest versions"
 	@echo "  $(BLUE)clean$(NC)              - Clean temporary files and caches"
+	@echo "  $(BLUE)clean-python$(NC)       - Clean Python cache files only"
+	@echo "  $(BLUE)clean-test$(NC)         - Clean test artifacts only"
+	@echo "  $(BLUE)clean-all$(NC)          - Deep clean (venv, models - preserves data)"
 	@echo "  $(BLUE)reset$(NC)              - Complete environment reset"
 	@echo ""
 	@echo "$(GREEN)💻 Development Workflow$(NC)"
@@ -935,3 +938,67 @@ dataset-download: download-dataset
 dataset-prepare: setup-dataset
 dataset-validate: validate-dataset
 dataset-analyze: analyze-dataset
+
+# ========== Cleanup & Maintenance ==========
+
+# Clean temporary files and caches
+clean:
+	@echo "$(BLUE)[CLEAN] Cleaning temporary files and caches...$(NC)"
+	@echo "$(YELLOW)[INFO] Removing Python cache files...$(NC)"
+	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyo" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyd" -delete 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing tool caches...$(NC)"
+	@rm -rf .mypy_cache/ 2>/dev/null || true
+	@rm -rf .pytest_cache/ 2>/dev/null || true
+	@rm -rf .ruff_cache/ 2>/dev/null || true
+	@rm -rf .streamlit/ 2>/dev/null || true
+	@rm -rf .coverage/ 2>/dev/null || true
+	@find . -type f -name ".coverage" -delete 2>/dev/null || true
+	@find . -type f -name "coverage.xml" -delete 2>/dev/null || true
+	@find . -type f -name ".coverage.*" -delete 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing log files...$(NC)"
+	@find . -type f -name "*.log" -delete 2>/dev/null || true
+	@rm -rf logs/ 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing temporary files...$(NC)"
+	@find . -type f -name "*.tmp" -delete 2>/dev/null || true
+	@find . -type f -name "*.temp" -delete 2>/dev/null || true
+	@find . -type f -name "*~" -delete 2>/dev/null || true
+	@find . -type f -name ".DS_Store" -delete 2>/dev/null || true
+	@echo "$(GREEN)[DONE] Cleanup completed$(NC)"
+
+# Deep clean including virtual environment (but preserving data folder)
+clean-all: clean
+	@echo "$(RED)[WARNING] Performing deep clean (venv and training artifacts only - data folder preserved)$(NC)"
+	@echo "$(YELLOW)[INFO] Removing virtual environment...$(NC)"
+	@rm -rf .venv/ 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing training artifacts...$(NC)"
+	@rm -rf runs/ 2>/dev/null || true
+	@rm -rf notebooks/ 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing model cache files (but preserving data folder)...$(NC)"
+	@find . -type f -name "*.pt" -not -path "./data/*" -delete 2>/dev/null || true
+	@find . -type f -name "*.pth" -not -path "./data/*" -delete 2>/dev/null || true
+	@echo "$(GREEN)[DONE] Deep clean completed - data folder preserved$(NC)"
+
+# Clean only Python-related files
+clean-python:
+	@echo "$(BLUE)[CLEAN] Cleaning Python cache files...$(NC)"
+	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyo" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyd" -delete 2>/dev/null || true
+	@rm -rf .mypy_cache/ 2>/dev/null || true
+	@rm -rf .pytest_cache/ 2>/dev/null || true
+	@rm -rf .ruff_cache/ 2>/dev/null || true
+	@echo "$(GREEN)[DONE] Python cleanup completed$(NC)"
+
+# Clean only test artifacts
+clean-test:
+	@echo "$(BLUE)[CLEAN] Cleaning test artifacts...$(NC)"
+	@rm -rf .pytest_cache/ 2>/dev/null || true
+	@find . -type f -name ".coverage" -delete 2>/dev/null || true
+	@find . -type f -name "coverage.xml" -delete 2>/dev/null || true
+	@find . -type f -name ".coverage.*" -delete 2>/dev/null || true
+	@find . -type f -name "test_*.log" -delete 2>/dev/null || true
+	@echo "$(GREEN)[DONE] Test cleanup completed$(NC)"
