@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Model switching utilities for PlantGuard.
 

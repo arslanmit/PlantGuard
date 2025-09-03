@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Improved training script for PlantGuard vision model with better hyperparameters."""
 
 import argparse
