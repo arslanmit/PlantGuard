@@ -271,6 +271,7 @@ class MobileContentTabs(MobileComponent):
                 # Register with default content
                 def default_callback(tab_info=tab) -> Any:
                     return self._render_default_tab_content(tab_info["id"], tab_info)
+
                 self.register_tab_content(tab_id, default_callback)
 
         """Render tab navigation buttons.

@@ -75,7 +75,7 @@ class MobileBaseComponent:
     def clear_state(self) -> None:
         """Clear component state."""
         state_key = f"mobile_{self.component_id}_state"
-        keys_to_delete = [k for k in st.session_state.keys() if k.startswith(f"{state_key}_")]
+        keys_to_delete = [k for k in st.session_state if k.startswith(f"{state_key}_")]
         for key in keys_to_delete:
             del st.session_state[key]
 
@@ -89,5 +89,5 @@ class MobileBaseComponent:
             "component_id": self.component_id,
             "title": self.title,
             "class_name": self.__class__.__name__,
-            "state_keys": list(self.get_state().get("data", {}).keys()),
+            "state_keys": list(self.get_state().get("data", {})),
         }

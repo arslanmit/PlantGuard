@@ -425,6 +425,29 @@ health-check:
 	fi
 	@echo "$(GREEN)[DONE] Health check complete$(NC)"
 
+status: ## Print a concise project/environment status summary
+	@echo "$(CYAN)[STATUS] PlantGuard project status summary$(NC)"
+	@echo "Platform: $(UNAME_S) $(UNAME_M)"
+	@echo "Python (system): $(shell $(PYTHON) --version 2>/dev/null || echo 'Not found')"
+	@echo "Checking virtualenv and packages..."
+	@if [ -x $(PY) ]; then \
+		echo "Virtualenv: .venv (available) -> $$($(PY) --version 2>/dev/null)"; \
+		PYTORCH_VER=$$($(PY) -c "import importlib,importlib.util; spec=importlib.util.find_spec('torch'); print('<not-installed>' if spec is None else __import__('torch').__version__)" 2>/dev/null || echo "<not-installed>"); \
+		echo "PyTorch: $$PYTORCH_VER"; \
+		STREAMLIT_VER=$$($(PY) -c "import importlib,importlib.util; spec=importlib.util.find_spec('streamlit'); print('<not-installed>' if spec is None else __import__('streamlit').__version__)" 2>/dev/null || echo "<not-installed>"); \
+		echo "Streamlit: $$STREAMLIT_VER"; \
+		if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+			MPS=$$($(PY) -c "import importlib,importlib.util; spec=importlib.util.find_spec('torch'); print('unknown' if spec is None else str(__import__('torch').backends.mps.is_available()))" 2>/dev/null || echo "unknown"); \
+			echo "MPS available: $$MPS"; \
+		fi; \
+	else \
+		echo "Virtualenv: .venv not active or missing"; \
+	fi
+	@echo "Models in data/models: $(shell [ -d data/models ] && ls -1 data/models | wc -l || echo 0)"
+	@echo "Processed dataset files (depth<=2): $(shell [ -d data/processed ] && find data/processed -maxdepth 2 -type f | wc -l || echo 0)"
+	@echo "Knowledge base: $(shell [ -f data/knowledge_base/disease_info.json ] && echo 'present' || echo 'missing')"
+	@echo "$(GREEN)[DONE] Status summary complete$(NC)"
+
 # ========== Comprehensive Validation Commands ==========
 
 # Validate all system components

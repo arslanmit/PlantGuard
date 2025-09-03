@@ -56,9 +56,9 @@ class MobileLayoutManager:
         """Apply core mobile-first CSS styles by loading external CSS file."""
         try:
             css_file_path = Path(__file__).parent.parent.parent.parent / "assets" / "mobile_styles.css"
-            with open(css_file_path, encoding='utf-8') as f:
+            with open(css_file_path, encoding="utf-8") as f:
                 css_content = f.read()
-            
+
             # Wrap in style tags
             full_css = f"<style>{css_content}</style>"
             st.markdown(full_css, unsafe_allow_html=True)
