@@ -994,12 +994,16 @@ class MobilePlantGuardApp:
         if all_history:
             st.markdown(f"**Total Analyses:** {len(all_history)}")
 
-            # Show recent analyses with enhanced display. Support structured dict records
-            for i, analysis_record in enumerate(all_history[-5:]):
-                analysis_num = len(all_history) - i
+            # Prepare window of recent records (up to 5) and compute numbering
+            recent_window = all_history[-5:]
+            total = len(all_history)
+            start_index = total - len(recent_window) + 1
+
+            for idx, analysis_record in enumerate(recent_window, start=start_index):
+                analysis_num = idx
 
                 try:
-                    # If record is a dict (new structured format), read fields directly
+                    # Structured dict records (preferred)
                     if isinstance(analysis_record, dict):
                         timestamp = analysis_record.get("timestamp")
                         disease = analysis_record.get("disease") or analysis_record.get("analysis_type") or "Unknown"
@@ -1023,41 +1027,57 @@ class MobilePlantGuardApp:
                                 st.metric("Confidence", f"{confidence_val:.1%}")
 
                             with col2:
-                                st.metric("Timestamp", timestamp)
-
-                    else:
-                        # Legacy string format fallback: timestamp,disease,confidence
-                        try:
-                            parts = str(analysis_record).split(",", 2)
-                            if len(parts) >= 3:
-                                timestamp, disease, confidence_str = parts
+                                # Format timestamp if numeric, otherwise show raw
                                 try:
-                                    confidence = float(confidence_str)
-                                except ValueError:
-                                    confidence = 0.0
+                                    if isinstance(timestamp, int | float):
+                                        import datetime
 
-                                title = f":microscope: Analysis {analysis_num}: {disease}"
-                                if confidence > 0:
-                                    title += f" ({confidence:.1%})"
-                            else:
-                                title = f":bar_chart: Analysis {analysis_num}"
+                                        ts_str = datetime.datetime.fromtimestamp(float(timestamp)).isoformat()
+                                        st.metric("Timestamp", ts_str)
+                                    else:
+                                        st.metric("Timestamp", str(timestamp))
+                                except Exception:
+                                    st.metric("Timestamp", str(timestamp))
+
+                    # Legacy string format fallback: safely handle strings only
+                    elif isinstance(analysis_record, str):
+                        try:
+                            parts = analysis_record.split(",", 2)
+                        except Exception:
+                            parts = [analysis_record]
+
+                        if len(parts) >= 3:
+                            timestamp, disease, confidence_str = parts
+                            try:
+                                confidence_val = float(confidence_str)
+                            except Exception:
+                                confidence_val = 0.0
+
+                            title = f":microscope: Analysis {analysis_num}: {disease}"
+                            if confidence_val > 0:
+                                title += f" ({confidence_val:.1%})"
 
                             with st.expander(title, expanded=True):
-                                if len(parts) >= 3:
-                                    col1, col2 = st.columns(2)
+                                col1, col2 = st.columns(2)
 
-                                    with col1:
-                                        st.metric("Disease", disease)
-                                        st.metric("Confidence", f"{confidence:.1%}")
+                                with col1:
+                                    st.metric("Disease", disease)
+                                    st.metric("Confidence", f"{confidence_val:.1%}")
 
-                                    with col2:
-                                        st.metric("Timestamp", timestamp)
-                                else:
-                                    st.write(f"Analysis record: {analysis_record}")
-                        except Exception:
-                            # Fallback for malformed legacy records
+                                with col2:
+                                    st.metric("Timestamp", timestamp)
+                        else:
                             with st.expander(f":bar_chart: Analysis {analysis_num}", expanded=True):
                                 st.write(f"Analysis record: {analysis_record}")
+
+                    # Other types (list/tuple/others) - show a readable representation
+                    else:
+                        with st.expander(f":bar_chart: Analysis {analysis_num}", expanded=True):
+                            try:
+                                st.write(analysis_record)
+                            except Exception:
+                                st.write(str(analysis_record))
+
                 except Exception:
                     # Generic fallback for any parsing/display errors
                     with st.expander(f":bar_chart: Analysis {analysis_num}", expanded=True):
