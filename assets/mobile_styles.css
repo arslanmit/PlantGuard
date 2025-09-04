@@ -186,11 +186,12 @@ body {
     touch-action: manipulation;
     -webkit-overflow-scrolling: touch;
     /* Allow text selection for accessibility; avoid blanket disabling */
-        -webkit-user-select: text;
+    -webkit-user-select: text;
         -moz-user-select: text;
         -ms-user-select: text;
         user-select: text;
 
+}
 /* ===== MOBILE LAYOUT FOUNDATION ===== */
 
     
@@ -1826,5 +1827,4 @@ select:focus-visible,
     border-radius: 8px;
     padding: 12px;
     margin: 8px 0;
-}
 }

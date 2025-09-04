@@ -980,7 +980,13 @@ clean-all: clean
 	@rm -rf .venv/ 2>/dev/null || true
 	@echo "$(YELLOW)[INFO] Removing training artifacts...$(NC)"
 	@rm -rf runs/ 2>/dev/null || true
-	@rm -rf notebooks/ 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Preserving top-level notebooks/ directory to avoid deleting user experiments; removing only known generated artifacts$(NC)"
+	# Remove Jupyter checkpoint directories created during execution
+	@rm -rf notebooks/.ipynb_checkpoints 2>/dev/null || true
+	# Remove nbconvert produced notebooks (common generated filenames)
+	@rm -f notebooks/*.nbconvert.ipynb 2>/dev/null || true
+	# Remove any temporary notebook exports matching *.tmp.ipynb
+	@find notebooks -type f -name "*.tmp.ipynb" -delete 2>/dev/null || true
 	@echo "$(YELLOW)[INFO] Removing model cache files (but preserving data folder)...$(NC)"
 	@find . -type f -name "*.pt" -not -path "./data/*" -delete 2>/dev/null || true
 	@find . -type f -name "*.pth" -not -path "./data/*" -delete 2>/dev/null || true

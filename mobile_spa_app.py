@@ -464,14 +464,24 @@ class MobilePlantGuardApp:
     def save_analysis_result(self, result: dict[str, Any], analysis_type: str = "unknown") -> None:
         """Save analysis result to history with metadata."""
 
-        # Store as simple string to avoid serialization issues
-        analysis_record = f"{time.time()},{analysis_type},{st.session_state.current_tab}"
+        # Store structured record (dict) to avoid issues with commas in text
+        try:
+            analysis_record = {
+                "timestamp": time.time(),
+                "analysis_type": analysis_type,
+                "tab": st.session_state.get("current_tab", "unknown"),
+                "disease": result.get("disease") if isinstance(result, dict) else None,
+                "confidence": result.get("confidence") if isinstance(result, dict) else None,
+                "details": result,
+            }
 
-        st.session_state.analysis_history.append(analysis_record)
+            st.session_state.analysis_history.append(analysis_record)
 
-        # Limit history size (keep last 100 analyses)
-        if len(st.session_state.analysis_history) > 100:
-            st.session_state.analysis_history = st.session_state.analysis_history[-100:]
+            # Limit history size (keep last 100 analyses)
+            if len(st.session_state.analysis_history) > 100:
+                st.session_state.analysis_history = st.session_state.analysis_history[-100:]
+        except Exception as e:
+            logger.error(f"Failed to save structured analysis result: {e}")
 
     def get_session_analytics(self) -> dict[str, Any]:
         """Get comprehensive session analytics."""
@@ -587,13 +597,22 @@ class MobilePlantGuardApp:
                 "recommendations": recommendations,
             }
 
-            # Store as simple string to avoid serialization issues
-            history_record = f"{st.session_state.get('app_start_time', 0)},{disease_class},{confidence}"
-            st.session_state.mobile_analysis_history.append(history_record)
+            # Store structured mobile analysis history to avoid comma parsing issues
+            try:
+                history_record = {
+                    "timestamp": time.time(),
+                    "disease": disease_class,
+                    "confidence": float(confidence) if isinstance(confidence, int | float) else None,
+                    "disease_info": disease_info,
+                }
 
-            # Limit history size
-            if len(st.session_state.mobile_analysis_history) > 50:
-                st.session_state.mobile_analysis_history = st.session_state.mobile_analysis_history[-50:]
+                st.session_state.mobile_analysis_history.append(history_record)
+
+                # Limit history size
+                if len(st.session_state.mobile_analysis_history) > 50:
+                    st.session_state.mobile_analysis_history = st.session_state.mobile_analysis_history[-50:]
+            except Exception as e:
+                logger.error(f"Failed to append mobile analysis history record: {e}")
 
             return analysis_result
 
@@ -795,9 +814,17 @@ class MobilePlantGuardApp:
                                     st.markdown("**AI Response:**")
                                     st.write(response)
 
-                                    # Save to chat history (simplified to avoid serialization issues)
-                                    chat_record = f"voice,{st.session_state.get('app_start_time', 0)},Voice input processed,{response[:100]}..."
-                                    st.session_state.chat_history.append(chat_record)
+                                    # Save to chat history using a structured record to avoid comma issues
+                                    try:
+                                        chat_record = {
+                                            "type": "voice",
+                                            "timestamp": time.time(),
+                                            "input": "<voice_input>",
+                                            "response": response,
+                                        }
+                                        st.session_state.chat_history.append(chat_record)
+                                    except Exception as e:
+                                        logger.error(f"Failed to save voice chat record: {e}")
                                 else:
                                     st.error(f":x: Voice processing failed: {response}")
 
@@ -886,15 +913,23 @@ class MobilePlantGuardApp:
 
                         for i, chat_record in enumerate(reversed(st.session_state.chat_history[-10:])):
                             try:
-                                # Parse simplified chat record: type,timestamp,input,response
-                                parts = chat_record.split(",", 3)
-                                if len(parts) >= 4:
-                                    chat_type, timestamp, input_text, response_text = parts
-                                    with st.expander(f":speech_balloon: {input_text[:50]}...", expanded=i == 0):
-                                        st.markdown(f"**You:** {input_text}")
+                                # Support structured dict records for chat history
+                                if isinstance(chat_record, dict):
+                                    chat_type = chat_record.get("type", "text")
+                                    timestamp = chat_record.get("timestamp")
+                                    input_text = chat_record.get("input") or chat_record.get("question") or ""
+                                    response_text = chat_record.get("response", "")
+
+                                    title = input_text if input_text else f"Chat {i + 1}"
+                                    with st.expander(f":speech_balloon: {title[:50]}...", expanded=i == 0):
+                                        if input_text:
+                                            st.markdown(f"**You:** {input_text}")
+                                        else:
+                                            st.markdown("**You:** (no input recorded)")
+
                                         st.markdown(f"**AI:** {response_text}")
                                 else:
-                                    # Fallback for malformed records
+                                    # Fallback for legacy or malformed records
                                     with st.expander(f":speech_balloon: Chat {i+1}", expanded=i == 0):
                                         st.write(chat_record)
                             except Exception:
@@ -925,9 +960,18 @@ class MobilePlantGuardApp:
                                 with st.spinner("Generating response..."):
                                     response = self.process_text_query(question, context)
 
-                                    # Add to chat history (simplified to avoid serialization issues)
-                                    chat_entry = f"quick,{st.session_state.get('app_start_time', 0)},{question},{response[:100]}..."
-                                    st.session_state.chat_history.append(chat_entry)
+                                    # Add to chat history using structured record
+                                    try:
+                                        chat_entry = {
+                                            "type": "quick",
+                                            "timestamp": time.time(),
+                                            "input": question,
+                                            "response": response,
+                                            "context": context,
+                                        }
+                                        st.session_state.chat_history.append(chat_entry)
+                                    except Exception as e:
+                                        logger.error(f"Failed to save quick question chat record: {e}")
                                     # Update chat display without page refresh
                                     st.session_state.quick_question_added = True
 
