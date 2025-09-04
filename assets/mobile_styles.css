@@ -193,7 +193,7 @@ body {
 
 /* ===== MOBILE LAYOUT FOUNDATION ===== */
 
-/* AI Agent Friendly: Mobile Container System - Fixed 428px for All Screens */
+    
 .mobile-app-container {
     width: 100%;
     max-width: var(--mobile-max-width);
@@ -219,7 +219,7 @@ body {
     width: 100%;
     padding: var(--mobile-space-md);
 
-    /* AI Agent Friendly: Clear semantic structure */
+    
     display: flex;
     flex-direction: column;
     gap: var(--mobile-space);
@@ -235,7 +235,7 @@ body {
     border-bottom: 1px solid var(--mobile-border-color);
     box-shadow: var(--mobile-shadow-sm);
 
-    /* AI Agent Friendly: Always-visible component identification */
+    
 }
 
 .mobile-header-always-visible {
@@ -244,7 +244,7 @@ body {
     border-bottom: 2px solid var(--mobile-border-color);
     margin-bottom: var(--mobile-space-lg);
 
-    /* AI Agent Friendly: Always-visible header identification */
+    
 }
 
 .mobile-model-switcher-always-visible {
@@ -253,7 +253,7 @@ body {
     gap: var(--mobile-space-sm);
     margin: var(--mobile-space) 0;
 
-    /* AI Agent Friendly: Always-visible model switcher */
+    
 }
 
 .mobile-status-always-visible {
@@ -266,7 +266,7 @@ body {
     border: 1px solid var(--mobile-border-color);
     margin: var(--mobile-space-sm) 0;
 
-    /* AI Agent Friendly: Always-visible status */
+    
 }
 
 .mobile-status-ready {
@@ -293,7 +293,7 @@ body {
     box-shadow: var(--mobile-shadow-md);
     margin-bottom: var(--mobile-space-lg);
 
-    /* AI Agent Friendly: Always-visible navigation */
+    
 }
 
 .mobile-nav-button-always-visible {
@@ -320,7 +320,7 @@ body {
     touch-action: manipulation;
     user-select: none;
 
-    /* AI Agent Friendly: Always-visible nav button */
+    
 }
 
 .mobile-nav-button-always-visible:hover {
@@ -352,7 +352,7 @@ body {
     box-shadow: var(--mobile-shadow-md);
     margin-bottom: var(--mobile-space-lg);
 
-    /* AI Agent Friendly: Always-visible tabs */
+    
 }
 
 .mobile-tab-bar-always-visible {
@@ -364,7 +364,7 @@ body {
     padding: var(--mobile-space-xs);
     margin-bottom: var(--mobile-space-md);
 
-    /* AI Agent Friendly: Always-visible tab bar */
+    
 }
 
 .mobile-tab-button-always-visible {
@@ -388,7 +388,7 @@ body {
     touch-action: manipulation;
     user-select: none;
 
-    /* AI Agent Friendly: Always-visible tab button */
+    
 }
 
 .mobile-tab-button-always-visible.active {
@@ -416,7 +416,7 @@ body {
     color: var(--mobile-primary);
     margin: 0;
 
-    /* AI Agent Friendly: Semantic text sizing */
+    
     line-height: 1.3;
     letter-spacing: -0.02em;
 }
@@ -443,7 +443,7 @@ body {
     box-shadow: var(--mobile-shadow-md);
     margin-bottom: var(--mobile-space-lg);
 
-    /* AI Agent Friendly: Always-visible component identification */
+    
 }
 
 .mobile-input-section-header {
@@ -505,7 +505,7 @@ body {
     touch-action: manipulation;
     user-select: none;
 
-    /* AI Agent Friendly: Always-visible button identification */
+    
 }
 
 .mobile-input-button-always-visible:hover,
@@ -538,7 +538,7 @@ body {
 .mobile-content-tabs {
     width: 100%;
 
-    /* AI Agent Friendly: Component identification */
+    
 }
 
 .mobile-tab-navigation {
@@ -576,7 +576,7 @@ body {
     touch-action: manipulation;
     user-select: none;
 
-    /* AI Agent Friendly: Interactive element identification */
+    
 }
 
 .mobile-tab-button.active {
@@ -598,7 +598,7 @@ body {
     padding: var(--mobile-space-lg);
     box-shadow: var(--mobile-shadow-sm);
 
-    /* AI Agent Friendly: Content area identification */
+    
 }
 
 /* ===== MOBILE FORM COMPONENTS ===== */
@@ -634,7 +634,7 @@ body {
     -moz-appearance: none;
     appearance: none;
 
-    /* AI Agent Friendly: Input element identification */
+    
 }
 
 .mobile-form-input:focus {
@@ -669,7 +669,7 @@ body {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
 
-    /* AI Agent Friendly: Button identification */
+    
 }
 
 .mobile-button-primary {
@@ -725,7 +725,7 @@ body {
     font-weight: 600;
     border-radius: var(--mobile-border-radius-small);
 
-    /* AI Agent Friendly: Status identification */
+    
 }
 
 .mobile-status-success {
@@ -757,7 +757,7 @@ body {
     overflow: hidden;
     transition: all var(--mobile-transition);
 
-    /* AI Agent Friendly: Card identification */
+    
 }
 
 .mobile-card:hover {
@@ -800,7 +800,7 @@ body {
     justify-content: center;
     padding: var(--mobile-space-2xl);
 
-    /* AI Agent Friendly: Loading state identification */
+    
 }
 
 .mobile-loading-spinner {
@@ -1393,7 +1393,7 @@ select:focus-visible,
     max-height: none !important;
     overflow: visible !important;
 
-    /* AI Agent Friendly: Always-visible enforcement */
+    
 }
 
 /* Ensure no elements can be hidden via common hiding patterns */
@@ -1439,7 +1439,7 @@ select:focus-visible,
     font-size: var(--mobile-font-size-sm);
     font-weight: 600;
 
-    /* AI Agent Friendly: Always-visible status */
+    
 }
 
 /* Grid layouts for always-visible components */
@@ -1472,7 +1472,7 @@ select:focus-visible,
     margin-bottom: var(--mobile-space-md);
     transition: all var(--mobile-transition);
 
-    /* AI Agent Friendly: Expandable card */
+    
 }
 
 .mobile-expandable-card-header {

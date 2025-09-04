@@ -471,9 +471,6 @@ validate-environment:
 # Validate dependencies
 
 validate-dependencies: check-venv
-
-
-validate-dependencies:
 	@echo "$(BLUE)📦 Validating dependencies...$(NC)"
 	@$(PY) -c "import torch; print('[DONE] PyTorch')" || { echo "$(RED)[TODO] PyTorch missing$(NC)"; exit 1; }
 	@$(PY) -c "import streamlit; print('[DONE] Streamlit')" || { echo "$(RED)[TODO] Streamlit missing$(NC)"; exit 1; }
