@@ -45,5 +45,6 @@ mobile_component_registry = type(
         "register_component": lambda self, component_id, component_class: None,
         "get_component": lambda self, component_id: None,
         "list_components": lambda self: [],
+        "get_all_components": lambda self: {comp.component_id: comp for comp in self.list_components()},
     },
 )()

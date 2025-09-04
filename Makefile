@@ -78,7 +78,7 @@ endif
 
 .DEFAULT_GOAL := help
 
-.PHONY: help start setup mobile dev test clean
+.PHONY: help start setup mobile dev test clean clean-python clean-test clean-all
 .PHONY: format lint check fix train monitor notebook benchmark evaluate
 .PHONY: deps update status info logs models
 .PHONY: security coverage docs build deploy
@@ -107,6 +107,9 @@ help:
 	@echo "  $(BLUE)deps$(NC)               - Install Python dependencies only"
 	@echo "  $(BLUE)update$(NC)             - Update all dependencies to latest versions"
 	@echo "  $(BLUE)clean$(NC)              - Clean temporary files and caches"
+	@echo "  $(BLUE)clean-python$(NC)       - Clean Python cache files only"
+	@echo "  $(BLUE)clean-test$(NC)         - Clean test artifacts only"
+	@echo "  $(BLUE)clean-all$(NC)          - Deep clean (venv, models - preserves data)"
 	@echo "  $(BLUE)reset$(NC)              - Complete environment reset"
 	@echo ""
 	@echo "$(GREEN)💻 Development Workflow$(NC)"
@@ -364,13 +367,13 @@ setup-knowledge-base:
 	# If file missing, generate complete knowledge base
 	@if [ ! -f $(KB_DIR)/disease_info.json ]; then \
 		echo "$(YELLOW)Creating knowledge base...$(NC)"; \
-		$(PY) $(SCRIPTS_DIR)/complete_knowledge_base.py || echo "$(YELLOW)[WARNING]  Knowledge base generation failed$(NC)"; \
+		$(PY) $(SCRIPTS_DIR)/knowledge/generate_disease_knowledge_base.py || echo "$(YELLOW)[WARNING]  Knowledge base generation failed$(NC)"; \
 	fi
 	# Validate and auto-fix if invalid
 	@if [ -f $(KB_DIR)/disease_info.json ]; then \
 		if ! $(PY) $(SCRIPTS_DIR)/validate_knowledge_base.py >/dev/null 2>&1; then \
 			echo "$(YELLOW)[WARNING]  Knowledge base invalid. Regenerating...$(NC)"; \
-			$(PY) $(SCRIPTS_DIR)/complete_knowledge_base.py || true; \
+			$(PY) $(SCRIPTS_DIR)/knowledge/generate_disease_knowledge_base.py || true; \
 		else \
 			echo "$(GREEN)[DONE] Knowledge base validated$(NC)"; \
 		fi; \
@@ -400,7 +403,7 @@ deps-reinstall:
 update:
 	@echo "$(BLUE)[PARTIAL] Updating dependencies...$(NC)"
 	@$(PIP) install --upgrade pip setuptools wheel
-	@$(PIP) install --upgrade -r requirements.txt
+	@$(PIP) install --upgrade -r requirements.txt --quiet
 	@$(PIP) install -e . --no-deps --quiet --disable-pip-version-check
 	@echo "$(GREEN)[DONE] Dependencies updated$(NC)"
 	@echo "$(CYAN)[TIP] Run 'make test' to ensure everything still works$(NC)"
@@ -421,6 +424,29 @@ health-check:
 		echo "$(CYAN)[TIP] Run 'make setup-environment' to fix$(NC)"; \
 	fi
 	@echo "$(GREEN)[DONE] Health check complete$(NC)"
+
+status: ## Print a concise project/environment status summary
+	@echo "$(CYAN)[STATUS] PlantGuard project status summary$(NC)"
+	@echo "Platform: $(UNAME_S) $(UNAME_M)"
+	@echo "Python (system): $(shell $(PYTHON) --version 2>/dev/null || echo 'Not found')"
+	@echo "Checking virtualenv and packages..."
+	@if [ -x $(PY) ]; then \
+		echo "Virtualenv: .venv (available) -> $$($(PY) --version 2>/dev/null)"; \
+		PYTORCH_VER=$$($(PY) -c "import importlib,importlib.util; spec=importlib.util.find_spec('torch'); print('<not-installed>' if spec is None else __import__('torch').__version__)" 2>/dev/null || echo "<not-installed>"); \
+		echo "PyTorch: $$PYTORCH_VER"; \
+		STREAMLIT_VER=$$($(PY) -c "import importlib,importlib.util; spec=importlib.util.find_spec('streamlit'); print('<not-installed>' if spec is None else __import__('streamlit').__version__)" 2>/dev/null || echo "<not-installed>"); \
+		echo "Streamlit: $$STREAMLIT_VER"; \
+		if [ $(IS_APPLE_SILICON) -eq 1 ]; then \
+			MPS=$$($(PY) -c "import importlib,importlib.util; spec=importlib.util.find_spec('torch'); print('unknown' if spec is None else str(__import__('torch').backends.mps.is_available()))" 2>/dev/null || echo "unknown"); \
+			echo "MPS available: $$MPS"; \
+		fi; \
+	else \
+		echo "Virtualenv: .venv not active or missing"; \
+	fi
+	@echo "Models in data/models: $(shell [ -d data/models ] && ls -1 data/models | wc -l || echo 0)"
+	@echo "Processed dataset files (depth<=2): $(shell [ -d data/processed ] && find data/processed -maxdepth 2 -type f | wc -l || echo 0)"
+	@echo "Knowledge base: $(shell [ -f data/knowledge_base/disease_info.json ] && echo 'present' || echo 'missing')"
+	@echo "$(GREEN)[DONE] Status summary complete$(NC)"
 
 # ========== Comprehensive Validation Commands ==========
 
@@ -443,7 +469,8 @@ validate-environment:
 	@echo "$(GREEN)[DONE] Environment validation passed$(NC)"
 
 # Validate dependencies
-validate-dependencies:
+
+validate-dependencies: check-venv
 	@echo "$(BLUE)📦 Validating dependencies...$(NC)"
 	@$(PY) -c "import torch; print('[DONE] PyTorch')" || { echo "$(RED)[TODO] PyTorch missing$(NC)"; exit 1; }
 	@$(PY) -c "import streamlit; print('[DONE] Streamlit')" || { echo "$(RED)[TODO] Streamlit missing$(NC)"; exit 1; }
@@ -570,6 +597,7 @@ mobile-performance: check-venv
 # validate-spa: → validate-mobile (see above)
 
 # Validate Mobile SPA setup and dependencies
+
 validate-mobile: check-venv
 	@echo "$(YELLOW)[MOBILE] Validating Mobile SPA setup...$(NC)"
 	@if [ ! -f mobile_spa_app.py ]; then \
@@ -610,7 +638,11 @@ mobile-config: check-venv
 # Mobile Memory Optimization
 mobile-optimize: check-venv
 	@echo "$(BLUE)[DETAILS] Optimizing Mobile PlantGuard for current system$(NC)"
-	@$(PY) $(SCRIPTS_DIR)/optimize_performance.py --json-output --mobile-mode
+	@if [ -f $(SCRIPTS_DIR)/utils/optimize_performance.py ]; then \
+		$(PY) $(SCRIPTS_DIR)/utils/optimize_performance.py --json-output --mobile-mode; \
+	else \
+		echo "$(YELLOW)[INFO] No optimization script found at $(SCRIPTS_DIR)/utils/optimize_performance.py - skipping (no-op)$(NC)"; \
+	fi
 
 # Mobile API Documentation Generation
 mobile-docs: check-venv
@@ -644,35 +676,7 @@ mobile-docs: check-venv
 # ========== Deprecated Command Handlers ==========
 # These targets provide helpful guidance when users try deprecated commands
 
-run:
-	@echo "$(RED)[TODO] Desktop command 'run' has been removed$(NC)"
-	@echo "$(YELLOW)[MOBILE] PlantGuard is now mobile-only$(NC)"
-	@echo "$(CYAN)[TIP] Use: make mobile$(NC)"
-	@echo "$(YELLOW)[WARNING]  Please run 'make mobile' manually to start the application$(NC)"
 
-spa-dev:
-	@echo "$(RED)[TODO] Desktop command 'spa-dev' has been removed$(NC)"
-	@echo "$(YELLOW)[MOBILE] PlantGuard is now mobile-only$(NC)"
-	@echo "$(CYAN)[TIP] Use: make mobile-dev$(NC)"
-	@echo "$(YELLOW)[WARNING]  Please run 'make mobile-dev' manually to start development mode$(NC)"
-
-spa-prod:
-	@echo "$(RED)[TODO] Desktop command 'spa-prod' has been removed$(NC)"
-	@echo "$(YELLOW)[MOBILE] PlantGuard is now mobile-only$(NC)"
-	@echo "$(CYAN)[TIP] Use: make mobile-prod$(NC)"
-	@echo "$(YELLOW)[WARNING]  Please run 'make mobile-prod' manually to start production mode$(NC)"
-
-spa-test:
-	@echo "$(RED)[TODO] Desktop command 'spa-test' has been removed$(NC)"
-	@echo "$(YELLOW)[MOBILE] PlantGuard is now mobile-only$(NC)"
-	@echo "$(CYAN)[TIP] Use: make mobile-test$(NC)"
-	@echo "$(YELLOW)[WARNING]  Please run 'make mobile-test' manually to run tests$(NC)"
-
-spa-performance:
-	@echo "$(RED)[TODO] Desktop command 'spa-performance' has been removed$(NC)"
-	@echo "$(YELLOW)[MOBILE] PlantGuard is now mobile-only$(NC)"
-	@echo "$(CYAN)[TIP] Use: make mobile-performance$(NC)"
-	@echo "$(YELLOW)[WARNING]  Please run 'make mobile-performance' manually to run performance tests$(NC)"
 
 # ========== Quality Assurance & Development Tools ==========
 
@@ -721,13 +725,13 @@ fix: check-venv
 # Core training commands (Task 9.1)
 train-production: check-venv
 	@echo "$(BLUE)[LAUNCH] Starting production training pipeline...$(NC)"
-	@if [ ! -f scripts/production_training_workflow.py ]; then \
+	@if [ ! -f scripts/production/production_training_workflow.py ]; then \
 		echo "$(RED)[TODO] Production training script not found$(NC)"; \
-		echo "$(CYAN)[TIP] Expected: scripts/production_training_workflow.py$(NC)"; \
+		echo "$(CYAN)[TIP] Expected: scripts/production/production_training_workflow.py$(NC)"; \
 		exit 1; \
 	fi
 	@echo "$(YELLOW)🔍 Validating training prerequisites...$(NC)"
-	@$(PY) scripts/production_training_workflow.py
+	@$(PY) scripts/production/production_training_workflow.py
 	@echo "$(GREEN)[DONE] Production training complete$(NC)"
 
 # Production training with template
@@ -750,7 +754,7 @@ train-production-template: check-venv
 		exit 1; \
 	fi; \
 	echo "$(YELLOW)[DETAILS] Using template: $$TEMPLATE_PATH$(NC)"; \
-	$(PY) scripts/production_training_workflow.py --config "$$TEMPLATE_PATH"
+	$(PY) scripts/production/production_training_workflow.py --config "$$TEMPLATE_PATH"
 	@echo "$(GREEN)[DONE] Template-based training complete$(NC)"
 
 # Production training with custom config
@@ -765,7 +769,7 @@ train-production-config: check-venv
 		exit 1; \
 	fi
 	@echo "$(BLUE)[LAUNCH] Starting production training with config: $(CONFIG)$(NC)"
-	@$(PY) scripts/production_training_workflow.py --config "$(CONFIG)"
+	@$(PY) scripts/production/production_training_workflow.py --config "$(CONFIG)"
 	@echo "$(GREEN)[DONE] Custom config training complete$(NC)"
 
 # List available training templates
@@ -808,29 +812,29 @@ monitor-training: check-venv
 # Evaluate trained models
 evaluate-model: check-venv
 	@echo "$(BLUE)🔍 Evaluating trained models...$(NC)"
-	@if [ ! -f scripts/evaluate_model.py ]; then \
+	@if [ ! -f scripts/evaluation/evaluate_model.py ]; then \
 		echo "$(RED)[TODO] Model evaluation script not found$(NC)"; \
-		echo "$(CYAN)[TIP] Expected: scripts/evaluate_model.py$(NC)"; \
+		echo "$(CYAN)[TIP] Expected: scripts/evaluation/evaluate_model.py$(NC)"; \
 		exit 1; \
 	fi
 	@if [ -n "$(MODEL)" ]; then \
 		echo "$(YELLOW)[SUMMARY] Evaluating specific model: $(MODEL)$(NC)"; \
-		$(PY) scripts/evaluate_model.py --model "$(MODEL)"; \
+		$(PY) scripts/evaluation/evaluate_model.py --model "$(MODEL)"; \
 	else \
 		echo "$(YELLOW)[SUMMARY] Evaluating all available models...$(NC)"; \
-		$(PY) scripts/evaluate_model.py; \
+		$(PY) scripts/evaluation/evaluate_model.py; \
 	fi
 	@echo "$(GREEN)[DONE] Model evaluation complete$(NC)"
 
 # List available models
 list-models: check-venv
 	@echo "$(BLUE)[DETAILS] Listing available models...$(NC)"
-	@if [ ! -f scripts/list_models.py ]; then \
+	@if [ ! -f scripts/models/list_models.py ]; then \
 		echo "$(RED)[TODO] Model listing script not found$(NC)"; \
-		echo "$(CYAN)[TIP] Expected: scripts/list_models.py$(NC)"; \
+		echo "$(CYAN)[TIP] Expected: scripts/models/list_models.py$(NC)"; \
 		exit 1; \
 	fi
-	@$(PY) scripts/list_models.py
+	@$(PY) scripts/models/list_models.py
 	@echo "$(GREEN)[DONE] Model listing complete$(NC)"
 
 # Compare multiple models
@@ -839,61 +843,65 @@ compare-models: check-venv
 		echo "$(RED)[TODO] MODELS parameter required$(NC)"; \
 		echo "$(CYAN)[TIP] Usage: make compare-models MODELS=model1,model2$(NC)"; \
 		echo "$(CYAN)[TIP] Available models:$(NC)"; \
-		$(PY) scripts/list_models.py --brief 2>/dev/null || echo "  Run 'make list-models' to see available models"; \
+		$(PY) scripts/models/list_models.py --brief 2>/dev/null || echo "  Run 'make list-models' to see available models"; \
 		exit 1; \
 	fi
 	@echo "$(BLUE)[SUMMARY] Comparing models: $(MODELS)$(NC)"
-	@if [ ! -f scripts/evaluate_model.py ]; then \
+	@if [ ! -f scripts/evaluation/evaluate_model.py ]; then \
 		echo "$(RED)[TODO] Model evaluation script not found$(NC)"; \
 		exit 1; \
 	fi
-	@$(PY) scripts/evaluate_model.py --compare "$(MODELS)"
+	@$(PY) scripts/evaluation/evaluate_model.py --compare "$(MODELS)"
 	@echo "$(GREEN)[DONE] Model comparison complete$(NC)"
 
 # Dataset management commands (Task 9.3)
 setup-dataset: check-venv
 	@echo "$(BLUE)📂 Setting up dataset for training...$(NC)"
-	@if [ ! -f scripts/prepare_dataset.py ]; then \
+	@if [ -f scripts/data/prepare_dataset.py ]; then \
+		SCRIPT_TO_RUN=scripts/data/prepare_dataset.py; \
+	elif [ -f scripts/data/prepare_dataset_new.py ]; then \
+		SCRIPT_TO_RUN=scripts/data/prepare_dataset_new.py; \
+	else \
 		echo "$(RED)[TODO] Dataset preparation script not found$(NC)"; \
-		echo "$(CYAN)[TIP] Expected: scripts/prepare_dataset.py$(NC)"; \
+		echo "$(CYAN)[TIP] Expected: scripts/data/prepare_dataset.py or scripts/data/prepare_dataset_new.py$(NC)"; \
 		exit 1; \
-	fi
-	@echo "$(YELLOW)🔍 Preparing and validating dataset...$(NC)"
-	@$(PY) scripts/prepare_dataset.py
+	fi; \
+	@echo "$(YELLOW)🔍 Preparing and validating dataset using $$SCRIPT_TO_RUN...$(NC)"; \
+	@$(PY) $$SCRIPT_TO_RUN
 	@echo "$(GREEN)[DONE] Dataset setup complete$(NC)"
 
 # Download PlantVillage dataset
 download-dataset: check-venv
 	@echo "$(BLUE)⬇️  Downloading PlantVillage dataset...$(NC)"
-	@if [ ! -f scripts/download_dataset.py ]; then \
+	@if [ ! -f scripts/data/download_dataset.py ]; then \
 		echo "$(RED)[TODO] Dataset download script not found$(NC)"; \
-		echo "$(CYAN)[TIP] Expected: scripts/download_dataset.py$(NC)"; \
+		echo "$(CYAN)[TIP] Expected: scripts/data/download_dataset.py$(NC)"; \
 		exit 1; \
 	fi
 	@echo "$(YELLOW)📥 Starting dataset download...$(NC)"
-	@$(PY) scripts/download_dataset.py
+	@$(PY) scripts/data/download_dataset.py
 	@echo "$(GREEN)[DONE] Dataset download complete$(NC)"
 
 # Validate dataset integrity
 validate-dataset: check-venv
 	@echo "$(BLUE)[DONE] Validating dataset integrity...$(NC)"
-	@if [ ! -f scripts/validate_dataset.py ]; then \
+	@if [ ! -f scripts/data/validate_dataset.py ]; then \
 		echo "$(RED)[TODO] Dataset validation script not found$(NC)"; \
-		echo "$(CYAN)[TIP] Expected: scripts/validate_dataset.py$(NC)"; \
+		echo "$(CYAN)[TIP] Expected: scripts/data/validate_dataset.py$(NC)"; \
 		exit 1; \
 	fi
-	@$(PY) scripts/validate_dataset.py
+	@$(PY) scripts/data/validate_dataset.py
 	@echo "$(GREEN)[DONE] Dataset validation complete$(NC)"
 
 # Analyze dataset statistics
 analyze-dataset: check-venv
 	@echo "$(BLUE)[SUMMARY] Analyzing dataset statistics...$(NC)"
-	@if [ ! -f scripts/analyze_dataset.py ]; then \
+	@if [ ! -f scripts/data/analyze_dataset.py ]; then \
 		echo "$(RED)[TODO] Dataset analysis script not found$(NC)"; \
-		echo "$(CYAN)[TIP] Expected: scripts/analyze_dataset.py$(NC)"; \
+		echo "$(CYAN)[TIP] Expected: scripts/data/analyze_dataset.py$(NC)"; \
 		exit 1; \
 	fi
-	@$(PY) scripts/analyze_dataset.py
+	@$(PY) scripts/data/analyze_dataset.py
 	@echo "$(GREEN)[DONE] Dataset analysis complete$(NC)"
 
 # Legacy training commands for backward compatibility
@@ -935,3 +943,73 @@ dataset-download: download-dataset
 dataset-prepare: setup-dataset
 dataset-validate: validate-dataset
 dataset-analyze: analyze-dataset
+
+# ========== Cleanup & Maintenance ==========
+
+# Clean temporary files and caches
+clean:
+	@echo "$(BLUE)[CLEAN] Cleaning temporary files and caches...$(NC)"
+	@echo "$(YELLOW)[INFO] Removing Python cache files...$(NC)"
+	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyo" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyd" -delete 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing tool caches...$(NC)"
+	@rm -rf .mypy_cache/ 2>/dev/null || true
+	@rm -rf .pytest_cache/ 2>/dev/null || true
+	@rm -rf .ruff_cache/ 2>/dev/null || true
+	@rm -rf .streamlit/ 2>/dev/null || true
+	@rm -rf .coverage/ 2>/dev/null || true
+	@find . -type f -name ".coverage" -delete 2>/dev/null || true
+	@find . -type f -name "coverage.xml" -delete 2>/dev/null || true
+	@find . -type f -name ".coverage.*" -delete 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing log files...$(NC)"
+	@find . -type f -name "*.log" -delete 2>/dev/null || true
+	@rm -rf logs/ 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing temporary files...$(NC)"
+	@find . -type f -name "*.tmp" -delete 2>/dev/null || true
+	@find . -type f -name "*.temp" -delete 2>/dev/null || true
+	@find . -type f -name "*~" -delete 2>/dev/null || true
+	@find . -type f -name ".DS_Store" -delete 2>/dev/null || true
+	@echo "$(GREEN)[DONE] Cleanup completed$(NC)"
+
+# Deep clean including virtual environment (but preserving data folder)
+clean-all: clean
+	@echo "$(RED)[WARNING] Performing deep clean (venv and training artifacts only - data folder preserved)$(NC)"
+	@echo "$(YELLOW)[INFO] Removing virtual environment...$(NC)"
+	@rm -rf .venv/ 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing training artifacts...$(NC)"
+	@rm -rf runs/ 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Preserving top-level notebooks/ directory to avoid deleting user experiments; removing only known generated artifacts$(NC)"
+	# Remove Jupyter checkpoint directories created during execution
+	@rm -rf notebooks/.ipynb_checkpoints 2>/dev/null || true
+	# Remove nbconvert produced notebooks (common generated filenames)
+	@rm -f notebooks/*.nbconvert.ipynb 2>/dev/null || true
+	# Remove any temporary notebook exports matching *.tmp.ipynb
+	@find notebooks -type f -name "*.tmp.ipynb" -delete 2>/dev/null || true
+	@echo "$(YELLOW)[INFO] Removing model cache files (but preserving data folder)...$(NC)"
+	@find . -type f -name "*.pt" -not -path "./data/*" -delete 2>/dev/null || true
+	@find . -type f -name "*.pth" -not -path "./data/*" -delete 2>/dev/null || true
+	@echo "$(GREEN)[DONE] Deep clean completed - data folder preserved$(NC)"
+
+# Clean only Python-related files
+clean-python:
+	@echo "$(BLUE)[CLEAN] Cleaning Python cache files...$(NC)"
+	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyo" -delete 2>/dev/null || true
+	@find . -type f -name "*.pyd" -delete 2>/dev/null || true
+	@rm -rf .mypy_cache/ 2>/dev/null || true
+	@rm -rf .pytest_cache/ 2>/dev/null || true
+	@rm -rf .ruff_cache/ 2>/dev/null || true
+	@echo "$(GREEN)[DONE] Python cleanup completed$(NC)"
+
+# Clean only test artifacts
+clean-test:
+	@echo "$(BLUE)[CLEAN] Cleaning test artifacts...$(NC)"
+	@rm -rf .pytest_cache/ 2>/dev/null || true
+	@find . -type f -name ".coverage" -delete 2>/dev/null || true
+	@find . -type f -name "coverage.xml" -delete 2>/dev/null || true
+	@find . -type f -name ".coverage.*" -delete 2>/dev/null || true
+	@find . -type f -name "test_*.log" -delete 2>/dev/null || true
+	@echo "$(GREEN)[DONE] Test cleanup completed$(NC)"

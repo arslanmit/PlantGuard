@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Production Training Workflow for PlantGuard.
 
 This script orchestrates the complete production training pipeline including:

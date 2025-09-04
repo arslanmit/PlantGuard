@@ -10,7 +10,6 @@ AI Agent friendly with clear component classes and semantic naming
     --mobile-primary: #16A34A;
     --mobile-primary-light: #22C55E;
     --mobile-primary-dark: #15803D;
-    --mobile-accent: #84CC16;
     --mobile-success: #059669;
     --mobile-warning: #F59E0B;
     --mobile-error: #DC2626;
@@ -21,7 +20,6 @@ AI Agent friendly with clear component classes and semantic naming
     --mobile-bg-secondary: #F8FAF8;
     --mobile-bg-tertiary: #F0F9F0;
     --mobile-bg-card: #FFFFFF;
-    --mobile-bg-overlay: rgba(0, 0, 0, 0.5);
 
     /* Mobile Text Colors */
     --mobile-text-primary: #1F2937;
@@ -47,10 +45,14 @@ AI Agent friendly with clear component classes and semantic naming
     /* 0.25x */
     --mobile-space-sm: 8px;
     /* 0.5x */
+    --mobile-space-md: 16px;
+        /* main spacing alias (used by components) */
     --mobile-space-lg: 24px;
     /* 1.5x */
     --mobile-space-xl: 32px;
     /* 2x */
+    --mobile-space-2xl: 40px;
+        /* extra large spacing for big containers */
 
     /* Mobile Typography */
     --mobile-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -64,13 +66,71 @@ AI Agent friendly with clear component classes and semantic naming
 
     /* Mobile Transitions */
     --mobile-transition: 0.2s ease-in-out;
+    --mobile-transition-fast: 0.12s ease-in-out;
 
     /* Mobile Layout (Fixed 428px) */
     --mobile-max-width: 428px;
     --mobile-container-padding: var(--mobile-space);
     --mobile-safe-area: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+/* Legacy variable names for compatibility */
+    --primary-color: var(--mobile-primary);
+    --primary-hover: var(--mobile-primary-dark);
+    --accent-color: var(--mobile-primary-light);
+    --background-color: var(--mobile-bg-primary);
+    --surface-color: var(--mobile-bg-card);
+    --text-primary: var(--mobile-text-primary);
+    --text-secondary: var(--mobile-text-secondary);
+    --border-color: var(--mobile-border-color);
+    --shadow-light: var(--mobile-shadow-sm);
+    --shadow-medium: var(--mobile-shadow-md);
+    --shadow-heavy: var(--mobile-shadow-lg);
+
+    /* Mobile spacing system (legacy names) */
+    --spacing-xs: var(--mobile-space-xs);
+    --spacing-sm: var(--mobile-space-sm);
+    --spacing-md: var(--mobile-space);
+    --spacing-lg: var(--mobile-space-lg);
+    --spacing-xl: var(--mobile-space-xl);
+
+    /* Touch targets (legacy names) */
+    --touch-target-min: var(--mobile-touch-target);
+    --touch-target-comfortable: var(--mobile-touch-target-large);
+
+    /* Small touch target for compact controls */
+        --mobile-touch-target-small: 40px;
+    /* Typography (legacy names) */
+    --font-size-xs: var(--mobile-font-size-xs);
+    --font-size-sm: var(--mobile-font-size-sm);
+    --font-size-base: var(--mobile-font-size-base);
+    --font-size-lg: var(--mobile-font-size-lg);
+    --font-size-xl: var(--mobile-font-size-xl);
+    --font-size-2xl: var(--mobile-font-size-2xl);
+
+    /* Border radius (legacy names) */
+    --radius-sm: var(--mobile-border-radius-small);
+    --radius-md: var(--mobile-border-radius);
+    --radius-lg: var(--mobile-border-radius-large);
+    --radius-xl: 20px;
 }
 
+/* Dark Mode Palette (prefers-color-scheme) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mobile-bg-primary: #0B1220;
+        --mobile-bg-secondary: #0F1724;
+        --mobile-bg-tertiary: #0B1220;
+        --mobile-bg-card: #0B1220;
+
+        --mobile-text-primary: #E6F7EA;
+        --mobile-text-secondary: #A7D9B6;
+        --mobile-text-muted: #8CAF96;
+
+        --mobile-border-color: rgba(255, 255, 255, 0.06);
+        --mobile-shadow-sm: none;
+        --mobile-shadow-md: none;
+        --mobile-shadow-lg: none;
+    }
+}
 /* ===== GLOBAL MOBILE RESET ===== */
 * {
     box-sizing: border-box;
@@ -117,6 +177,7 @@ body {
     /* Prevent horizontal scroll */
 
     /* Mobile optimizations */
+/* Touch optimizations for both Chrome and Safari */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -124,15 +185,16 @@ body {
     /* Touch optimizations for both Chrome and Safari */
     touch-action: manipulation;
     -webkit-overflow-scrolling: touch;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
+    /* Allow text selection for accessibility; avoid blanket disabling */
+    -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
 
+}
 /* ===== MOBILE LAYOUT FOUNDATION ===== */
 
-/* AI Agent Friendly: Mobile Container System - Fixed 428px for All Screens */
+    
 .mobile-app-container {
     width: 100%;
     max-width: var(--mobile-max-width);
@@ -158,7 +220,7 @@ body {
     width: 100%;
     padding: var(--mobile-space-md);
 
-    /* AI Agent Friendly: Clear semantic structure */
+    
     display: flex;
     flex-direction: column;
     gap: var(--mobile-space);
@@ -174,10 +236,7 @@ body {
     border-bottom: 1px solid var(--mobile-border-color);
     box-shadow: var(--mobile-shadow-sm);
 
-    /* AI Agent Friendly: Always-visible component identification */
-    data-component: "mobile-header";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-header-always-visible {
@@ -186,10 +245,7 @@ body {
     border-bottom: 2px solid var(--mobile-border-color);
     margin-bottom: var(--mobile-space-lg);
 
-    /* AI Agent Friendly: Always-visible header identification */
-    data-component: "mobile-header-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-model-switcher-always-visible {
@@ -198,10 +254,7 @@ body {
     gap: var(--mobile-space-sm);
     margin: var(--mobile-space) 0;
 
-    /* AI Agent Friendly: Always-visible model switcher */
-    data-element-type: "model-switcher-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-status-always-visible {
@@ -214,10 +267,7 @@ body {
     border: 1px solid var(--mobile-border-color);
     margin: var(--mobile-space-sm) 0;
 
-    /* AI Agent Friendly: Always-visible status */
-    data-element-type: "status-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-status-ready {
@@ -244,10 +294,7 @@ body {
     box-shadow: var(--mobile-shadow-md);
     margin-bottom: var(--mobile-space-lg);
 
-    /* AI Agent Friendly: Always-visible navigation */
-    data-component: "mobile-navigation-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-nav-button-always-visible {
@@ -274,10 +321,7 @@ body {
     touch-action: manipulation;
     user-select: none;
 
-    /* AI Agent Friendly: Always-visible nav button */
-    data-element-type: "nav-button-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-nav-button-always-visible:hover {
@@ -309,10 +353,7 @@ body {
     box-shadow: var(--mobile-shadow-md);
     margin-bottom: var(--mobile-space-lg);
 
-    /* AI Agent Friendly: Always-visible tabs */
-    data-component: "mobile-tabs-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-tab-bar-always-visible {
@@ -324,10 +365,7 @@ body {
     padding: var(--mobile-space-xs);
     margin-bottom: var(--mobile-space-md);
 
-    /* AI Agent Friendly: Always-visible tab bar */
-    data-element-type: "tab-bar-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-tab-button-always-visible {
@@ -351,10 +389,7 @@ body {
     touch-action: manipulation;
     user-select: none;
 
-    /* AI Agent Friendly: Always-visible tab button */
-    data-element-type: "tab-button-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-tab-button-always-visible.active {
@@ -382,7 +417,7 @@ body {
     color: var(--mobile-primary);
     margin: 0;
 
-    /* AI Agent Friendly: Semantic text sizing */
+    
     line-height: 1.3;
     letter-spacing: -0.02em;
 }
@@ -409,10 +444,7 @@ body {
     box-shadow: var(--mobile-shadow-md);
     margin-bottom: var(--mobile-space-lg);
 
-    /* AI Agent Friendly: Always-visible component identification */
-    data-component: "mobile-input-ribbon-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-input-section-header {
@@ -474,10 +506,7 @@ body {
     touch-action: manipulation;
     user-select: none;
 
-    /* AI Agent Friendly: Always-visible button identification */
-    data-element-type: "button-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-input-button-always-visible:hover,
@@ -510,9 +539,7 @@ body {
 .mobile-content-tabs {
     width: 100%;
 
-    /* AI Agent Friendly: Component identification */
-    data-component: "mobile-content-tabs";
-    data-testable: "true";
+    
 }
 
 .mobile-tab-navigation {
@@ -550,9 +577,7 @@ body {
     touch-action: manipulation;
     user-select: none;
 
-    /* AI Agent Friendly: Interactive element identification */
-    data-element-type: "tab-button";
-    data-testable: "true";
+    
 }
 
 .mobile-tab-button.active {
@@ -574,9 +599,7 @@ body {
     padding: var(--mobile-space-lg);
     box-shadow: var(--mobile-shadow-sm);
 
-    /* AI Agent Friendly: Content area identification */
-    data-element-type: "tab-content";
-    data-testable: "true";
+    
 }
 
 /* ===== MOBILE FORM COMPONENTS ===== */
@@ -612,9 +635,7 @@ body {
     -moz-appearance: none;
     appearance: none;
 
-    /* AI Agent Friendly: Input element identification */
-    data-element-type: "input";
-    data-testable: "true";
+    
 }
 
 .mobile-form-input:focus {
@@ -649,9 +670,7 @@ body {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
 
-    /* AI Agent Friendly: Button identification */
-    data-element-type: "button";
-    data-testable: "true";
+    
 }
 
 .mobile-button-primary {
@@ -707,9 +726,7 @@ body {
     font-weight: 600;
     border-radius: var(--mobile-border-radius-small);
 
-    /* AI Agent Friendly: Status identification */
-    data-element-type: "status";
-    data-testable: "true";
+    
 }
 
 .mobile-status-success {
@@ -741,9 +758,7 @@ body {
     overflow: hidden;
     transition: all var(--mobile-transition);
 
-    /* AI Agent Friendly: Card identification */
-    data-element-type: "card";
-    data-testable: "true";
+    
 }
 
 .mobile-card:hover {
@@ -786,9 +801,7 @@ body {
     justify-content: center;
     padding: var(--mobile-space-2xl);
 
-    /* AI Agent Friendly: Loading state identification */
-    data-element-type: "loading";
-    data-testable: "true";
+    
 }
 
 .mobile-loading-spinner {
@@ -1105,19 +1118,23 @@ select:focus-visible,
 
 /* Landmark Regions */
 .mobile-landmark-main {
-    role: main;
+    /* role: main */
+        display: block;
 }
 
 .mobile-landmark-navigation {
-    role: navigation;
+    /* role: navigation */
+        display: block;
 }
 
 .mobile-landmark-banner {
-    role: banner;
+    /* role: banner */
+        display: block;
 }
 
 .mobile-landmark-contentinfo {
-    role: contentinfo;
+    /* role: contentinfo */
+        display: block;
 }
 
 /* Live Regions for Dynamic Content */
@@ -1130,11 +1147,15 @@ select:focus-visible,
 }
 
 .mobile-live-region[aria-live="polite"] {
-    /* Polite announcements */
+    /* Polite announcements - handled dynamically via JS/ARIA */
+        /* keeps ruleset non-empty for linters */
+        content: none;
 }
 
 .mobile-live-region[aria-live="assertive"] {
-    /* Urgent announcements */
+    /* Urgent announcements - handled dynamically via JS/ARIA */
+        /* keeps ruleset non-empty for linters */
+        content: none;
 }
 
 /* Touch Target Enhancements */
@@ -1178,8 +1199,11 @@ select:focus-visible,
 /* Voice-Over Compatibility */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
     .mobile-voiceover-optimized {
-        -webkit-user-select: none;
-        -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    -webkit-touch-callout: none;
     }
 
     .mobile-voiceover-optimized:focus {
@@ -1209,8 +1233,8 @@ select:focus-visible,
     padding: var(--mobile-space-md);
     border-radius: var(--mobile-border-radius);
     margin-bottom: var(--mobile-space-md);
-    role: alert;
-    aria-live: assertive;
+    /* role: alert; */
+        /* aria-live: assertive; */
 }
 
 .mobile-success-announcement {
@@ -1219,8 +1243,8 @@ select:focus-visible,
     padding: var(--mobile-space-md);
     border-radius: var(--mobile-border-radius);
     margin-bottom: var(--mobile-space-md);
-    role: status;
-    aria-live: polite;
+    /* role: status; */
+        /* aria-live: polite; */
 }
 
 .mobile-info-announcement {
@@ -1229,8 +1253,8 @@ select:focus-visible,
     padding: var(--mobile-space-md);
     border-radius: var(--mobile-border-radius);
     margin-bottom: var(--mobile-space-md);
-    role: status;
-    aria-live: polite;
+    /* role: status; */
+        /* aria-live: polite; */
 }
 
 /* Loading State Accessibility */
@@ -1276,8 +1300,8 @@ select:focus-visible,
     color: var(--mobile-error);
     font-size: var(--mobile-font-size-sm);
     margin-top: var(--mobile-space-xs);
-    role: alert;
-    aria-live: assertive;
+    /* role: alert */
+        /* aria-live: assertive */
 }
 
 /* Keyboard Navigation Support */
@@ -1370,8 +1394,7 @@ select:focus-visible,
     max-height: none !important;
     overflow: visible !important;
 
-    /* AI Agent Friendly: Always-visible enforcement */
-    data-visibility: "always-visible";
+    
 }
 
 /* Ensure no elements can be hidden via common hiding patterns */
@@ -1417,10 +1440,7 @@ select:focus-visible,
     font-size: var(--mobile-font-size-sm);
     font-weight: 600;
 
-    /* AI Agent Friendly: Always-visible status */
-    data-element-type: "status-always-visible";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 /* Grid layouts for always-visible components */
@@ -1453,10 +1473,7 @@ select:focus-visible,
     margin-bottom: var(--mobile-space-md);
     transition: all var(--mobile-transition);
 
-    /* AI Agent Friendly: Expandable card */
-    data-element-type: "expandable-card";
-    data-testable: "true";
-    data-design: "always-visible";
+    
 }
 
 .mobile-expandable-card-header {
@@ -1780,4 +1797,34 @@ select:focus-visible,
             box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.1);
         }
     }
+}
+/* PlantGuard Header Styles */
+.mobile-app-header {
+    text-align: center;
+    padding: 1rem 0;
+    background: linear-gradient(90deg, var(--mobile-primary), var(--mobile-primary-dark));
+        color: var(--mobile-text-inverse);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.mobile-app-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.mobile-app-header p {
+    margin: 0.2rem 0 0 0;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* Mobile Model Info Component */
+.mobile-model-info-always-visible {
+    background: #F0FDF4;
+    border: 1px solid #16A34A;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
 }

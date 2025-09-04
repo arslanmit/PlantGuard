@@ -36,8 +36,14 @@ class MobileBaseComponent:
 
     def _initialize_component_state(self) -> None:
         """Initialize component-specific state."""
-        if f"mobile_{self.component_id}_state" not in st.session_state:
-            st.session_state[f"mobile_{self.component_id}_state"] = {
+        state_key = f"mobile_{self.component_id}_state"
+        # Ensure top-level component_states dict exists for structured storage
+        if "component_states" not in st.session_state:
+            st.session_state["component_states"] = {}
+
+        if state_key not in st.session_state["component_states"]:
+            # Initialize structured state with metadata and empty data dict
+            st.session_state["component_states"][state_key] = {
                 "data": {},
                 "metadata": {
                     "created_at": st.session_state.get("app_start_time", 0),
@@ -48,32 +54,63 @@ class MobileBaseComponent:
 
     def get_state(self) -> dict[str, Any]:
         """Get current component state."""
-        return st.session_state.get(f"mobile_{self.component_id}_state", {"data": {}, "metadata": {}})
+        state_key = f"mobile_{self.component_id}_state"
+
+        # Prefer structured storage under component_states
+        comp_states = st.session_state.get("component_states", {})
+        return comp_states.get(state_key, {"data": {}, "metadata": {}})
 
     def set_state(self, state: dict[str, Any]) -> None:
         """Set component state."""
-        if "metadata" not in state:
-            state["metadata"] = {}
-        state["metadata"]["last_updated"] = st.session_state.get("app_start_time", 0)
-        st.session_state[f"mobile_{self.component_id}_state"] = state
+        state_key = f"mobile_{self.component_id}_state"
+        # Ensure structured storage exists
+        if "component_states" not in st.session_state:
+            st.session_state["component_states"] = {}
+
+        # Normalize incoming state
+        stored = {
+            "data": state.get("data", {}) if isinstance(state, dict) else {},
+            "metadata": state.get("metadata", {}),
+        }
+        # Update metadata timestamps
+        stored["metadata"]["last_updated"] = st.session_state.get("app_start_time", 0)
+
+        st.session_state["component_states"][state_key] = stored
 
     def update_state(self, key: str, value: Any) -> None:
         """Update specific state key."""
-        current_state = self.get_state()
-        if "data" not in current_state:
-            current_state["data"] = {}
-        current_state["data"][key] = value
-        self.set_state(current_state)
+        state_key = f"mobile_{self.component_id}_state"
+        if "component_states" not in st.session_state:
+            st.session_state["component_states"] = {}
+
+        if state_key not in st.session_state["component_states"]:
+            self._initialize_component_state()
+
+        st.session_state["component_states"][state_key]["data"][key] = value
+        st.session_state["component_states"][state_key]["metadata"]["last_updated"] = st.session_state.get("app_start_time", 0)
 
     def get_state_value(self, key: str, default: Any = None) -> Any:
         """Get specific state value."""
-        state = self.get_state()
-        return state.get("data", {}).get(key, default)
+        state_key = f"mobile_{self.component_id}_state"
+        comp_states = st.session_state.get("component_states", {})
+        if state_key in comp_states:
+            return comp_states[state_key].get("data", {}).get(key, default)
+
+        # Backwards compatibility: check legacy flat keys
+        legacy_key = f"{state_key}_{key}"
+        return st.session_state.get(legacy_key, default)
 
     def clear_state(self) -> None:
         """Clear component state."""
-        if f"mobile_{self.component_id}_state" in st.session_state:
-            del st.session_state[f"mobile_{self.component_id}_state"]
+        state_key = f"mobile_{self.component_id}_state"
+        # Remove structured component state if present
+        if "component_states" in st.session_state and state_key in st.session_state["component_states"]:
+            del st.session_state["component_states"][state_key]
+
+        # Also remove legacy flat keys for backward compatibility
+        keys_to_delete = [k for k in list(st.session_state.keys()) if k.startswith(f"{state_key}_")]
+        for key in keys_to_delete:
+            del st.session_state[key]
 
     def render(self) -> None:
         """Render the component. Override in subclasses."""
@@ -85,5 +122,5 @@ class MobileBaseComponent:
             "component_id": self.component_id,
             "title": self.title,
             "class_name": self.__class__.__name__,
-            "state_keys": list(self.get_state().get("data", {}).keys()),
+            "state_keys": list(self.get_state().get("data", {})),
         }

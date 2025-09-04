@@ -1394,6 +1394,73 @@ streamlit run scripts/model_switching/model_switcher_ui.py --server.port 8502
 
 ---
 
+## Appended documentation from other non-dot README files
+
+----
+Source: src/data/README.md
+----
+
+````markdown
+# PlantGuard Data Pipeline
+
+This module provides comprehensive data loading, preprocessing, validation, and analysis utilities for the PlantGuard multimodal plant disease detection system.
+
+## Overview
+
+The data pipeline is designed to handle the PlantVillage dataset with the following key features:
+
+- **Dataset Loading**: ImageFolder-based loading with automatic class discovery
+- **Data Preprocessing**: Configurable transforms for training, validation, and inference
+- **Stratified Splitting**: Maintains class distribution across train/validation splits
+- **Data Validation**: Comprehensive image format and corruption detection
+- **Quality Analysis**: Dataset statistics and class distribution analysis
+- **Integrity Checking**: Ensures data pipeline reliability
+
+... (full content from src/data/README.md preserved in backup)
+````
+
+----
+Source: data/raw/README.md
+----
+
+````markdown
+# Raw Dataset Directory
+
+This directory contains raw, unprocessed datasets for PlantGuard training.
+
+## PlantVillage Dataset
+
+### Manual Installation
+If you have the PlantVillage dataset, place it in `plantvillage/` directory:
+
+```
+data/raw/plantvillage/
+├── Potato___Early_blight/
+├── Potato___Late_blight/
+├── Potato___healthy/
+├── Tomato___Early_blight/
+├── Tomato___Late_blight/
+├── Tomato___healthy/
+└── ... (other plant disease classes)
+```
+
+### Automatic Download
+Run `make download-dataset` to download from Kaggle (requires API credentials).
+
+### Dataset Sources
+- **PlantVillage**: https://www.kaggle.com/datasets/abdallahalidev/plantvillage-dataset
+- **Original Paper**: https://arxiv.org/abs/1511.08060
+
+### Next Steps
+After placing the raw dataset:
+1. `make prepare-dataset` - Create train/val splits
+2. `make validate-dataset` - Check dataset integrity
+3. `make analyze-dataset` - View dataset statistics
+4. `make train` - Train models
+
+````
+
+
 ## [LIBRARY] Documentation
 
 ### Complete Mobile Guide
