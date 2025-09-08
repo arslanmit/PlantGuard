@@ -95,7 +95,15 @@ def get_ai_testing_framework() -> Any:
     """Get or create the global AI testing framework instance."""
     global _mobile_testing_framework
     if _mobile_testing_framework is None:
-        _mobile_testing_framework = MobileTestingFramework()
+        # Try to reuse instance across reruns
+        session_key = "_mobile_testing_framework_instance"
+        inst = st.session_state.get(session_key)
+        if inst is None:
+            _mobile_testing_framework = MobileTestingFramework()
+            # Store in session to prevent duplicate construction on reruns
+            st.session_state[session_key] = _mobile_testing_framework
+        else:
+            _mobile_testing_framework = inst
     return _mobile_testing_framework
 
 
@@ -108,7 +116,8 @@ def load_core_adapters() -> tuple[Any, Any, Any]:
         audio_adapter = AudioAdapter()
         text_adapter = TextAdapter()
 
-        logger.info("Core adapters loaded successfully for mobile app")
+        # Avoid double INFO spam; detailed status handled by caller
+        logger.debug("Core adapters loaded successfully for mobile app")
         return vision_adapter, audio_adapter, text_adapter
     except Exception as e:
         logger.error(f"Failed to load core adapters: {e}")
@@ -232,6 +241,10 @@ class MobilePlantGuardApp:
 
     def initialize_components(self) -> None:
         """Initialize all mobile components."""
+        # Prevent re-entrant initialization across reruns
+        if st.session_state.get("mobile_initializing", False):
+            return
+        st.session_state.mobile_initializing = True
         try:
             # Initialize layout manager
             self.layout_manager = MobileLayoutManager("main_layout")
@@ -272,6 +285,8 @@ class MobilePlantGuardApp:
             logger.error(f"Failed to initialize mobile components: {e}")
             # Create fallback components to prevent empty containers
             self._create_fallback_components()
+        finally:
+            st.session_state.mobile_initializing = False
 
     def _create_fallback_components(self) -> None:
         """Create minimal fallback components if initialization fails."""
@@ -525,14 +540,21 @@ class MobilePlantGuardApp:
     def _load_core_adapters(self) -> None:
         """Load core PlantGuard adapters for enhanced mobile functionality."""
         try:
+            # Always fetch (cached) adapters to ensure instance fields are populated
             self.vision_adapter, self.audio_adapter, self.text_adapter = load_core_adapters()
 
-            if self.vision_adapter and self.audio_adapter and self.text_adapter:
-                logger.info("Core adapters loaded successfully for mobile app")
-                st.session_state.mobile_adapters_loaded = True
-            else:
-                logger.warning("Some core adapters failed to load")
-                st.session_state.mobile_adapters_loaded = False
+            # Determine loaded status
+            loaded_ok = bool(self.vision_adapter and self.audio_adapter and self.text_adapter)
+
+            # Only log when status changes or first time
+            prev_status = st.session_state.get("mobile_adapters_loaded", None)
+            if prev_status is None or prev_status != loaded_ok:
+                if loaded_ok:
+                    logger.info("Core adapters loaded successfully for mobile app")
+                else:
+                    logger.warning("Some core adapters failed to load")
+
+            st.session_state.mobile_adapters_loaded = loaded_ok
 
         except Exception as e:
             logger.error(f"Failed to load core adapters: {e}")
@@ -541,6 +563,9 @@ class MobilePlantGuardApp:
     def _initialize_performance_optimization(self) -> None:
         """Initialize performance optimization for mobile app."""
         try:
+            # Avoid repeated re-initialization on Streamlit reruns
+            if st.session_state.get("mobile_performance_optimized", False):
+                return
             # Set optimization level based on device capabilities
             self.performance_optimizer.set_optimization_level("auto")
 
@@ -553,6 +578,7 @@ class MobilePlantGuardApp:
             self.performance_optimizer.preload_critical_components(critical_components)
 
             logger.info("Performance optimization initialized for mobile app")
+            st.session_state.mobile_performance_optimized = True
 
         except Exception as e:
             logger.error(f"Failed to initialize performance optimization: {e}")
@@ -1303,19 +1329,40 @@ class MobilePlantGuardApp:
     def render_input_ribbon_integration(self) -> None:
         """Render input ribbon with SPA tab integration - no page redirects."""
         # Render input ribbon
-        selected_input = self.input_ribbon.render()
+        active_modes = self.input_ribbon.render()
+
+        # Determine selected input mode from returned active modes dict
+        selected_mode: str | None = None
+        if isinstance(active_modes, dict):
+            # Priority order for mapping to tabs
+            priority = ["text", "voice", "camera", "upload"]
+            for mode in priority:
+                if active_modes.get(mode):
+                    selected_mode = mode
+                    break
+            # Fallback: first active mode if none matched priority
+            if selected_mode is None:
+                for mode, is_active in active_modes.items():
+                    if is_active:
+                        selected_mode = mode
+                        break
 
         # Handle input method selection WITHOUT st.rerun()
-        if selected_input:
-            input_to_tab_mapping = {"text": "chat_interface", "voice": "voice_assistant", "camera": "image_analysis", "upload": "image_analysis"}
+        if selected_mode:
+            input_to_tab_mapping = {
+                "text": "chat_interface",
+                "voice": "voice_assistant",
+                "camera": "image_analysis",
+                "upload": "image_analysis",
+            }
 
-            target_tab = input_to_tab_mapping.get(selected_input)
+            target_tab = input_to_tab_mapping.get(selected_mode)
             if target_tab:
                 # Track tab navigation
                 self.track_tab_navigation(target_tab)
 
                 # Update input mode timestamp
-                st.session_state.current_input_mode = selected_input
+                st.session_state.current_input_mode = selected_mode
                 st.session_state.last_input_timestamp = time.time()
 
                 # Set active tab and focus content WITHOUT st.rerun()
