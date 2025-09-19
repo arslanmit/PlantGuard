@@ -4,8 +4,6 @@
 import argparse
 import json
 import logging
-
-# Add src to path for imports
 import sys
 import time
 from pathlib import Path
@@ -16,11 +14,17 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 from tqdm import tqdm
 
-sys.path.append(str(Path(__file__).parent.parent / "src"))
-
-from plantguard.core.models import PlantDiseaseResNet50
-from plantguard.training.memory_limit import enforce_memory_limit
-from plantguard.training.monitor import TrainingMonitor
+try:
+    from plantguard.core.models import PlantDiseaseResNet50
+    from plantguard.training.memory_limit import enforce_memory_limit
+    from plantguard.training.monitor import TrainingMonitor
+except ModuleNotFoundError:
+    project_root = Path(__file__).resolve().parents[2]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from plantguard.core.models import PlantDiseaseResNet50
+    from plantguard.training.memory_limit import enforce_memory_limit
+    from plantguard.training.monitor import TrainingMonitor
 
 logger = logging.getLogger(__name__)
 

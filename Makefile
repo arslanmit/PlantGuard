@@ -20,6 +20,7 @@ PYTEST := $(PY) -m pytest
 JUPYTER := $(PY) -m jupyter
 BANDIT := $(PY) -m bandit
 STREAMLIT := $(PY) -m streamlit
+STREAMLIT_WARN_FILTER := ignore:No runtime found, using MemoryCacheStorageManager:UserWarning:streamlit.runtime.caching.cache_data_api,ignore:Thread 'MainThread': UserWarning:streamlit.runtime.scriptrunner_utils.script_run_context
 
 # ========== Project Structure ==========
 SRC_DIR := src
@@ -543,7 +544,7 @@ mobile: check-venv validate-mobile
 		sleep 2; \
 	fi
 	@echo "$(GREEN)[LAUNCH] Starting Mobile PlantGuard...$(NC)"
-	@$(STREAMLIT) run mobile_spa_app.py \
+	@PYTHONWARNINGS="$(STREAMLIT_WARN_FILTER)" $(STREAMLIT) run mobile_spa_app.py \
 		--server.port 8502 \
 		--server.headless true \
 		--server.enableCORS false \
@@ -561,7 +562,7 @@ mobile: check-venv validate-mobile
 # Mobile Development mode with hot reload
 mobile-dev: check-venv validate-mobile
 	@echo "$(BLUE)🛠️ Starting Mobile PlantGuard in development mode$(NC)"
-	@$(STREAMLIT) run mobile_spa_app.py \
+	@PYTHONWARNINGS="$(STREAMLIT_WARN_FILTER)" $(STREAMLIT) run mobile_spa_app.py \
 		--server.port 8502 \
 		--server.runOnSave true \
 		--server.fileWatcherType auto \
@@ -572,7 +573,7 @@ mobile-dev: check-venv validate-mobile
 # Mobile Production mode
 mobile-prod: check-venv validate-mobile
 	@echo "$(GREEN)[LAUNCH] Starting Mobile PlantGuard in production mode$(NC)"
-	@$(STREAMLIT) run mobile_spa_app.py \
+	@PYTHONWARNINGS="$(STREAMLIT_WARN_FILTER)" $(STREAMLIT) run mobile_spa_app.py \
 		--server.port 8502 \
 		--server.headless true \
 		--server.enableCORS false \
@@ -605,18 +606,18 @@ validate-mobile: check-venv
 		echo "$(CYAN)[TIP] Mobile app not found at mobile_spa_app.py$(NC)"; \
 		exit 1; \
 	fi
-	@$(PY) -c "import mobile_spa_app; print('[DONE] Mobile SPA imports successful')" || { \
+	@$(PY) -c "import logging, warnings; logging.basicConfig(level=logging.ERROR); logging.getLogger().setLevel(logging.ERROR); [logging.getLogger(name).setLevel(logging.ERROR) for name in ('streamlit', 'streamlit.runtime', 'streamlit.runtime.caching.cache_data_api', 'streamlit.runtime.scriptrunner_utils.script_run_context')]; warnings.filterwarnings('ignore', message='No runtime found, using MemoryCacheStorageManager'); warnings.filterwarnings('ignore', message=\"Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\"); import mobile_spa_app; print('[DONE] Mobile SPA imports successful')" || { \
 		echo "$(RED)[TODO] Mobile SPA validation failed$(NC)"; \
 		echo "$(CYAN)[TIP] Check mobile component dependencies$(NC)"; \
 		exit 1; \
 	}
-	@$(PY) -c "import streamlit; print('[DONE] Streamlit available')" || { echo "$(RED)[TODO] Streamlit not found$(NC)"; exit 1; }
-	@$(PY) -c "import torch; print(f'[DONE] PyTorch available: {torch.__version__}')" || { echo "$(RED)[TODO] PyTorch not found$(NC)"; exit 1; }
-	@$(PY) -c "import PIL; print('[DONE] PIL available')" || { echo "$(RED)[TODO] PIL not found$(NC)"; exit 1; }
-	@$(PY) -c "from plantguard.ui.components.mobile_component_registry import mobile_component_registry; print('[DONE] Mobile components available')" || { \
+	@$(PY) -c "import logging, warnings; logging.basicConfig(level=logging.ERROR); logging.getLogger().setLevel(logging.ERROR); [logging.getLogger(name).setLevel(logging.ERROR) for name in ('streamlit', 'streamlit.runtime', 'streamlit.runtime.caching.cache_data_api', 'streamlit.runtime.scriptrunner_utils.script_run_context')]; warnings.filterwarnings('ignore', message='No runtime found, using MemoryCacheStorageManager'); warnings.filterwarnings('ignore', message=\"Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\"); import streamlit; print('[DONE] Streamlit available')" || { echo "$(RED)[TODO] Streamlit not found$(NC)"; exit 1; }
+	@$(PY) -c "import logging, warnings; logging.basicConfig(level=logging.ERROR); logging.getLogger().setLevel(logging.ERROR); [logging.getLogger(name).setLevel(logging.ERROR) for name in ('streamlit', 'streamlit.runtime', 'streamlit.runtime.caching.cache_data_api', 'streamlit.runtime.scriptrunner_utils.script_run_context')]; warnings.filterwarnings('ignore', message='No runtime found, using MemoryCacheStorageManager'); warnings.filterwarnings('ignore', message=\"Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\"); import torch; print(f'[DONE] PyTorch available: {torch.__version__}')" || { echo "$(RED)[TODO] PyTorch not found$(NC)"; exit 1; }
+	@$(PY) -c "import logging, warnings; logging.basicConfig(level=logging.ERROR); logging.getLogger().setLevel(logging.ERROR); [logging.getLogger(name).setLevel(logging.ERROR) for name in ('streamlit', 'streamlit.runtime', 'streamlit.runtime.caching.cache_data_api', 'streamlit.runtime.scriptrunner_utils.script_run_context')]; warnings.filterwarnings('ignore', message='No runtime found, using MemoryCacheStorageManager'); warnings.filterwarnings('ignore', message=\"Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\"); import PIL; print('[DONE] PIL available')" || { echo "$(RED)[TODO] PIL not found$(NC)"; exit 1; }
+	@$(PY) -c "import logging, warnings; logging.basicConfig(level=logging.ERROR); logging.getLogger().setLevel(logging.ERROR); [logging.getLogger(name).setLevel(logging.ERROR) for name in ('streamlit', 'streamlit.runtime', 'streamlit.runtime.caching.cache_data_api', 'streamlit.runtime.scriptrunner_utils.script_run_context')]; warnings.filterwarnings('ignore', message='No runtime found, using MemoryCacheStorageManager'); warnings.filterwarnings('ignore', message=\"Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\"); from plantguard.ui.components.mobile_component_registry import mobile_component_registry; print('[DONE] Mobile components available')" || { \
 		echo "$(YELLOW)[WARNING]  Mobile components not fully available$(NC)"; \
 	}
-	@$(PY) -c "from plantguard.ui.components.mobile_testing_framework import MobileTestingFramework; print('[DONE] AI testing framework available')" || { \
+	@$(PY) -c "import logging, warnings; logging.basicConfig(level=logging.ERROR); logging.getLogger().setLevel(logging.ERROR); [logging.getLogger(name).setLevel(logging.ERROR) for name in ('streamlit', 'streamlit.runtime', 'streamlit.runtime.caching.cache_data_api', 'streamlit.runtime.scriptrunner_utils.script_run_context')]; warnings.filterwarnings('ignore', message='No runtime found, using MemoryCacheStorageManager'); warnings.filterwarnings('ignore', message=\"Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\"); from plantguard.ui.components.mobile_testing_framework import MobileTestingFramework; print('[DONE] AI testing framework available')" || { \
 		echo "$(YELLOW)[WARNING]  AI testing framework not available$(NC)"; \
 	}
 	@echo "$(GREEN)[DONE] Mobile PlantGuard ready!$(NC)"

@@ -21,15 +21,23 @@ from pathlib import Path
 import psutil
 import torch
 
-# Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-
-from plantguard.training.config import TrainingConfig, load_config
-from plantguard.training.dataset_manager import DatasetManager
-from plantguard.training.model_registry import ModelRegistry
-from plantguard.training.monitor import TrainingMonitor
-from plantguard.training.production_trainer import ProductionTrainer
-from plantguard.utils.logging_config import setup_logging
+try:
+    from plantguard.training.config import TrainingConfig, load_config
+    from plantguard.training.dataset_manager import DatasetManager
+    from plantguard.training.model_registry import ModelRegistry
+    from plantguard.training.monitor import TrainingMonitor
+    from plantguard.training.production_trainer import ProductionTrainer
+    from plantguard.utils.logging_config import setup_logging
+except ModuleNotFoundError:
+    project_root = Path(__file__).resolve().parents[2]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from plantguard.training.config import TrainingConfig, load_config
+    from plantguard.training.dataset_manager import DatasetManager
+    from plantguard.training.model_registry import ModelRegistry
+    from plantguard.training.monitor import TrainingMonitor
+    from plantguard.training.production_trainer import ProductionTrainer
+    from plantguard.utils.logging_config import setup_logging
 
 
 class ProductionWorkflow:

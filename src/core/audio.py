@@ -33,7 +33,7 @@ if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:
         st.cache_data = _noop_cache  # type: ignore[assignment]
 from transformers import Pipeline, pipeline
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("plantguard.core.audio")
 
 
 @st.cache_resource(show_spinner=False)

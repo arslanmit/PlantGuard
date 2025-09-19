@@ -14,10 +14,13 @@ from pathlib import Path
 
 import torch
 
-# Add project root to Python path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from plantguard.core.models import PlantDiseaseResNet50
+try:
+    from plantguard.core.models import PlantDiseaseResNet50
+except ModuleNotFoundError:
+    project_root = Path(__file__).resolve().parents[2]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from plantguard.core.models import PlantDiseaseResNet50
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

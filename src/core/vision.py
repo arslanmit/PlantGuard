@@ -40,7 +40,7 @@ from torchvision import transforms
 
 from .models import PlantDiseaseResNet50
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("plantguard.core.vision")
 
 
 def clear_global_model_caches() -> None:

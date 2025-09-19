@@ -37,6 +37,7 @@ for _name in _EXPORTS:
         module = importlib.import_module(f"src.{_name}")
     except ModuleNotFoundError:
         continue
+    sys.modules.setdefault(_name, module)
     sys.modules[f"{__name__}.{_name}"] = module
     if _name not in globals():
         globals()[_name] = module

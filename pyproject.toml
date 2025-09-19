@@ -170,8 +170,8 @@ full-dev = ["plantguard[dev,docs,jupyter]"]     # Development without ML extras
 
 # [DESKTOP] Command Line Tools - Run PlantGuard from terminal
 [project.scripts]
-plantguard = "src.plantguard_bot:main"                    # Main CLI interface
-plantguard-train = "src.training.production_trainer:main" # Training CLI
+plantguard = "plantguard.plantguard_bot:main"                    # Main CLI interface
+plantguard-train = "plantguard.training.production_trainer:main" # Training CLI
 
 # ============================================================================
 # 4️⃣ CODE QUALITY - Keep code clean and consistent

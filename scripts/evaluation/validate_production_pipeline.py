@@ -13,6 +13,15 @@ import time
 from pathlib import Path
 from typing import Any
 
+try:
+    import plantguard  # noqa: F401
+except ModuleNotFoundError:
+    project_root = Path(__file__).resolve().parents[2]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+
+    import plantguard  # noqa: F401
+
 import torch
 from PIL import Image
 

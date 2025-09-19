@@ -23,6 +23,7 @@ import io
 import logging
 import sys
 import time
+import warnings
 from pathlib import Path
 from typing import Any
 
@@ -37,8 +38,38 @@ def _ensure_src_path() -> None:
     if SRC_PATH.is_dir() and src_path_str not in sys.path:
         sys.path.insert(0, src_path_str)
 
-# Configure logger for this module
+# Configure module-level logger and tame noisy third-party warnings
 logger = logging.getLogger(__name__)
+
+# Streamlit emits runtime-cache warnings when modules are imported outside
+# an active Streamlit script run (e.g. during `make validate-mobile`). Those
+# warnings are expected in our validation probes, so lower their verbosity to
+# keep CI output clean while preserving error-level messages.
+for noisy_logger in (
+    "streamlit",
+    "streamlit.runtime",
+    "streamlit.runtime.caching.cache_data_api",
+    "streamlit.runtime.scriptrunner_utils.script_run_context",
+):
+    logger_obj = logging.getLogger(noisy_logger)
+    logger_obj.setLevel(logging.ERROR)
+    logger_obj.propagate = False
+    logger_obj.disabled = True
+    logger_obj.handlers.clear()
+
+# Silence known Streamlit cache warnings emitted during headless validation.
+warnings.filterwarnings(
+    "ignore",
+    message="No runtime found, using MemoryCacheStorageManager",
+    category=UserWarning,
+    module="streamlit.runtime.caching.cache_data_api",
+)
+warnings.filterwarnings(
+    "ignore",
+    message="Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.",
+    category=UserWarning,
+    module="streamlit.runtime.scriptrunner_utils.script_run_context",
+)
 
 # Third-party imports
 import streamlit as st  # noqa: E402

@@ -12,11 +12,15 @@ import json
 import sys
 from pathlib import Path
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
-from plantguard.core.vision import VisionAdapter
-from plantguard.training.model_registry import ModelRegistry
+try:
+    from plantguard.core.vision import VisionAdapter
+    from plantguard.training.model_registry import ModelRegistry
+except ModuleNotFoundError:
+    project_root = Path(__file__).resolve().parents[2]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from plantguard.core.vision import VisionAdapter
+    from plantguard.training.model_registry import ModelRegistry
 
 
 def scan_for_legacy_models() -> list[Path]:

@@ -15,7 +15,7 @@ from typing import Any
 import streamlit as st
 
 # Create module logger early so we can safely log during test-time overrides
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("plantguard.core.nlp")
 
 # Disable Streamlit caching during pytest to avoid large in-memory caches
 if "PYTEST_CURRENT_TEST" in os.environ or "pytest" in sys.modules:

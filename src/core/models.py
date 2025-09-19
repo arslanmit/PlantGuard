@@ -10,7 +10,7 @@ from torch import nn
 from torchvision import models
 from torchvision.models import ResNet50_Weights
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("plantguard.core.models")
 
 
 class PlantDiseaseResNet50(nn.Module):
