@@ -40,9 +40,7 @@ __all__ = [
 
 # Make key submodules available as direct attributes for compatibility with
 # dotted import paths used by the testing fixtures (e.g. patch targets).
-mobile_component_registry = importlib.import_module(
-    f"{__name__}.mobile_component_registry"
-)
+mobile_component_registry = importlib.import_module(f"{__name__}.mobile_component_registry")
 
 # Initialize logging for the mobile components package
 logger = logging.getLogger(__name__)
