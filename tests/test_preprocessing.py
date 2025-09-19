@@ -15,7 +15,7 @@ from torchvision import transforms
 # Add src to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.core.vision import VisionAdapter
+from plantguard.core.vision import VisionAdapter
 
 
 def test_different_preprocessing() -> None:

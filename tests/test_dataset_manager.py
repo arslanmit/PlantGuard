@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch
 import pytest
 from PIL import Image
 
-from src.training.dataset_manager import (
+from plantguard.training.dataset_manager import (
     DatasetConfig,
     DatasetInfo,
     DatasetManager,

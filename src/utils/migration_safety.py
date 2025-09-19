@@ -402,7 +402,11 @@ class MigrationValidator:
                 return {"test": "mobile_functionality", "status": "failed", "details": "Cannot load mobile_spa_app.py"}
 
             # Check core adapters can be imported
-            core_modules = ["src.core.vision", "src.core.audio", "src.core.nlp"]
+            core_modules = [
+                "plantguard.core.vision",
+                "plantguard.core.audio",
+                "plantguard.core.nlp",
+            ]
 
             failed_imports = []
             for module in core_modules:

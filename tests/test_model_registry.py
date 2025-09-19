@@ -9,7 +9,7 @@ import pytest
 import torch
 import torch.nn as nn
 
-from src.training.model_registry import ModelMetadata, ModelRegistry
+from plantguard.training.model_registry import ModelMetadata, ModelRegistry
 from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 

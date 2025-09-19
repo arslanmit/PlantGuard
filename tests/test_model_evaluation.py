@@ -15,11 +15,11 @@ def test_evaluator_imports() -> None:
     """Test that evaluation modules can be imported."""
 
     try:
-        from training.evaluator import (ModelEvaluator, ModelMetrics,
+        from plantguard.training.evaluator import (ModelEvaluator, ModelMetrics,
                                         ValidationResult)
-        from training.model_comparison import (BenchmarkResult,
+        from plantguard.training.model_comparison import (BenchmarkResult,
                                                ModelComparator, ModelRanking)
-        from training.model_validator import (AutomatedModelValidator,
+        from plantguard.training.model_validator import (AutomatedModelValidator,
                                               ValidationConfig)
 
         # Test that classes can be instantiated (without dependencies)
@@ -39,7 +39,7 @@ def test_evaluator_imports() -> None:
 def test_validation_config() -> None:
     """Test ValidationConfig creation and validation."""
     try:
-        from training.model_validator import ValidationConfig
+        from plantguard.training.model_validator import ValidationConfig
 
         # Test default config
         config = ValidationConfig()
@@ -60,7 +60,7 @@ def test_validation_config() -> None:
 def test_model_metrics_structure() -> None:
     """Test ModelMetrics dataclass structure."""
     try:
-        from training.evaluator import ClassMetrics, ModelMetrics
+        from plantguard.training.evaluator import ClassMetrics, ModelMetrics
 
         # Test that we can create a basic metrics object
         class_metrics = [

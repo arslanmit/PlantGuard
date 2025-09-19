@@ -12,7 +12,7 @@ from typing import Any
 import streamlit as st
 from PIL import Image
 
-from utils.error_recovery import ImportErrorRecovery
+from plantguard.utils.error_recovery import ImportErrorRecovery
 
 from .mobile_component_registry import ComponentMetadata, MobileComponent
 
@@ -23,7 +23,11 @@ logger = logging.getLogger(__name__)
 VisionAdapter = ImportErrorRecovery.safe_import_from(
     "core.vision",
     "VisionAdapter",
-    fallback=ImportErrorRecovery.safe_import_from("src.adapters_compat", "VisionAdapter", logger_name="mobile_image_analysis"),
+    fallback=ImportErrorRecovery.safe_import_from(
+        "plantguard.adapters_compat",
+        "VisionAdapter",
+        logger_name="mobile_image_analysis",
+    ),
     logger_name="mobile_image_analysis",
 )
 

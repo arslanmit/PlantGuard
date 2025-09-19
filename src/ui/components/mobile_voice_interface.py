@@ -12,7 +12,7 @@ from typing import Any
 
 import streamlit as st
 
-from utils.error_recovery import ImportErrorRecovery
+from plantguard.utils.error_recovery import ImportErrorRecovery
 
 from .mobile_component_registry import ComponentMetadata, MobileComponent
 
@@ -23,14 +23,22 @@ logger = logging.getLogger(__name__)
 AudioAdapter = ImportErrorRecovery.safe_import_from(
     "core.audio",
     "AudioAdapter",
-    fallback=ImportErrorRecovery.safe_import_from("src.adapters_compat", "AudioAdapter", logger_name="mobile_voice_interface"),
+    fallback=ImportErrorRecovery.safe_import_from(
+        "plantguard.adapters_compat",
+        "AudioAdapter",
+        logger_name="mobile_voice_interface",
+    ),
     logger_name="mobile_voice_interface",
 )
 
 TextAdapter = ImportErrorRecovery.safe_import_from(
     "core.nlp",
     "TextAdapter",
-    fallback=ImportErrorRecovery.safe_import_from("src.adapters_compat", "TextAdapter", logger_name="mobile_voice_interface"),
+    fallback=ImportErrorRecovery.safe_import_from(
+        "plantguard.adapters_compat",
+        "TextAdapter",
+        logger_name="mobile_voice_interface",
+    ),
     logger_name="mobile_voice_interface",
 )
 

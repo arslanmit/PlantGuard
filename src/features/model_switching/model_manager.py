@@ -164,7 +164,7 @@ class PlantGuardModelManager:
 
         # Check for registry models and add them
         try:
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             # Prefer a registry directory colocated in the temporary workspace used by tests
             candidate = self.config_path.parent.parent / "models"
@@ -301,7 +301,7 @@ class PlantGuardModelManager:
         try:
             # Import the higher-level adapter implemented in the repo which
             # already implements the UI-friendly helpers.
-            from src.features.model_switching.huggingface_vision import HuggingFaceVisionAdapter
+            from plantguard.features.model_switching.huggingface_vision import HuggingFaceVisionAdapter
 
             device_str = config.device_preference if config.device_preference != "auto" else str(self.device)
             # HuggingFaceVisionAdapter expects a device string (e.g. 'cpu', 'cuda')
@@ -374,7 +374,7 @@ class PlantGuardModelManager:
 
         # Ensure project root is on sys.path to import the src package
         sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-        from src.core.vision import VisionAdapter
+        from plantguard.core.vision import VisionAdapter
 
         device_str = config.device_preference if config.device_preference != "auto" else str(self.device)
         adapter = VisionAdapter(device=device_str)
@@ -619,7 +619,7 @@ class PlantGuardModelManager:
     def compare_models(self, model_ids: list[str]) -> dict[str, Any] | None:
         """Compare a list of models using the model registry and return a serializable result."""
         try:
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             candidate = self.config_path.parent.parent / "models"
             registry = ModelRegistry(candidate) if candidate.exists() else ModelRegistry()
@@ -802,7 +802,7 @@ class PlantGuardModelManager:
             True if sync successful, False otherwise
         """
         try:
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             # Prefer a registry directory colocated in the temporary workspace used by tests
             candidate = self.config_path.parent.parent / "models"
@@ -918,8 +918,8 @@ class PlantGuardModelManager:
         migrated_models = []
 
         try:
-            from src.core.vision import VisionAdapter
-            from src.training.model_registry import ModelRegistry
+            from plantguard.core.vision import VisionAdapter
+            from plantguard.training.model_registry import ModelRegistry
 
             registry = ModelRegistry()
             adapter = VisionAdapter()
@@ -985,7 +985,7 @@ class PlantGuardModelManager:
             List of registry model information
         """
         try:
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             registry = ModelRegistry()
             registry_models = registry.list_models()

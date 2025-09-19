@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
-from src.core.vision import VisionAdapter
+from plantguard.core.vision import VisionAdapter
 
 
 def test_vision_adapter_get_model_info() -> None:

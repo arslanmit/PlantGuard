@@ -13,7 +13,7 @@ from PIL import Image
 """Pytest configuration helpers.
 
 Ensure the repository root and the `src/` package directory are on sys.path
-early during test collection so tests that import `src.*` succeed.
+early during test collection so tests that import `plantguard.*` succeed.
 
 This is a minimal, non-invasive helper intended only for the test runtime.
 """

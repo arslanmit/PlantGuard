@@ -10,6 +10,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Generator, List, Optional
+from contextlib import ExitStack
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -246,7 +247,7 @@ def mock_streamlit_components() -> Any:
 def mock_all_adapters(mock_vision_adapter: Any, mock_audio_adapter: Any, mock_text_adapter: Any) -> Any:
     """Provide all mock adapters with proper patching."""
     with patch.multiple(
-        'src.ui.components.mobile_adapter_integration',
+        'plantguard.ui.components.mobile_adapter_integration',
         VisionAdapter=lambda **kwargs: mock_vision_adapter,
         AudioAdapter=lambda **kwargs: mock_audio_adapter,
         TextAdapter=lambda **kwargs: mock_text_adapter
@@ -346,7 +347,7 @@ def sample_chat_history() -> List[Any]:
 @pytest.fixture
 def mobile_adapter_integration_with_mocks(mock_streamlit_session: Any, mock_all_adapters: Any) -> Any:
     """Provide MobileAdapterIntegration with all mocks configured."""
-    from src.ui.components.mobile_adapter_integration import \
+    from plantguard.ui.components.mobile_adapter_integration import \
         MobileAdapterIntegration
     
     integration = MobileAdapterIntegration()
@@ -373,20 +374,33 @@ def mock_mobile_component_registry() -> Any:
     mock_registry.register_component = Mock()
     mock_registry.get_component = Mock()
     
-    with patch('src.ui.components.mobile_component_registry.mobile_component_registry', mock_registry):
+    with ExitStack() as stack:
+        stack.enter_context(
+            patch(
+                'plantguard.ui.components.mobile_component_registry.mobile_component_registry',
+                mock_registry,
+            )
+        )
         yield mock_registry
 
 
 @pytest.fixture
 def mock_mobile_testing_framework_dependencies() -> Any:
     """Mock all dependencies for MobileTestingFramework."""
-    with patch.multiple(
-        'src.ui.components.mobile_testing_framework',
-        MobileComponentTester=Mock,
-        MobileAIAgentTester=Mock,
-        MobileSpecificTester=Mock,
-        MobileStateManager=Mock
-    ):
+    from plantguard.ui.components.mobile_testing_framework import (
+        MobileTestingFramework as _MobileTestingFramework,
+    )
+
+    original_init = _MobileTestingFramework.__init__
+
+    def _mock_init(self) -> None:
+        original_init(self)
+        self.component_tester = Mock(name="component_tester")
+        self.ai_agent_tester = Mock(name="ai_agent_tester")
+        self.mobile_specific_tester = Mock(name="mobile_specific_tester")
+        self.state_manager = Mock(name="state_manager")
+
+    with patch.object(_MobileTestingFramework, "__init__", _mock_init):
         yield
 
 

@@ -14,9 +14,9 @@ def test_basic_functionality() -> None:
 
     try:
         # Test imports
-        from src.ui.components.mobile_component_registry import \
+        from plantguard.ui.components.mobile_component_registry import \
             mobile_component_registry as MobileComponentRegistry
-        from src.ui.components.mobile_layout_manager import MobileLayoutManager
+        from plantguard.ui.components.mobile_layout_manager import MobileLayoutManager
 
         print("[OK] Imports successful")
 
@@ -26,7 +26,7 @@ def test_basic_functionality() -> None:
         print("[OK] Layout manager initialized")
 
         # Test component registry
-        from src.ui.components.mobile_component_registry import \
+        from plantguard.ui.components.mobile_component_registry import \
             mobile_component_registry
         components = mobile_component_registry.list_components()
         assert isinstance(components, list)  # Should return a list

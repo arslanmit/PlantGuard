@@ -613,10 +613,10 @@ validate-mobile: check-venv
 	@$(PY) -c "import streamlit; print('[DONE] Streamlit available')" || { echo "$(RED)[TODO] Streamlit not found$(NC)"; exit 1; }
 	@$(PY) -c "import torch; print(f'[DONE] PyTorch available: {torch.__version__}')" || { echo "$(RED)[TODO] PyTorch not found$(NC)"; exit 1; }
 	@$(PY) -c "import PIL; print('[DONE] PIL available')" || { echo "$(RED)[TODO] PIL not found$(NC)"; exit 1; }
-	@$(PY) -c "from ui.components.mobile_component_registry import mobile_component_registry; print('[DONE] Mobile components available')" || { \
+	@$(PY) -c "from plantguard.ui.components.mobile_component_registry import mobile_component_registry; print('[DONE] Mobile components available')" || { \
 		echo "$(YELLOW)[WARNING]  Mobile components not fully available$(NC)"; \
 	}
-	@$(PY) -c "from ui.components.mobile_testing_framework import MobileTestingFramework; print('[DONE] AI testing framework available')" || { \
+	@$(PY) -c "from plantguard.ui.components.mobile_testing_framework import MobileTestingFramework; print('[DONE] AI testing framework available')" || { \
 		echo "$(YELLOW)[WARNING]  AI testing framework not available$(NC)"; \
 	}
 	@echo "$(GREEN)[DONE] Mobile PlantGuard ready!$(NC)"
@@ -633,7 +633,7 @@ mobile-config: check-venv
 	@echo "Memory: $(shell $(PY) -c 'import psutil; print(f"{psutil.virtual_memory().total/(1024**3):.1f}GB total")')" 
 	@echo "Models available: $(shell ls -1 data/models/ | wc -l | tr -d ' ')"
 	@echo "Config files: $(shell ls -1 config/*.json | wc -l | tr -d ' ')"
-	@echo "Mobile components: $(shell $(PY) -c 'from src.ui.components.mobile_component_registry import mobile_component_registry; print(len(mobile_component_registry._components))' 2>/dev/null || echo 'N/A')"
+	@echo "Mobile components: $(shell $(PY) -c 'from plantguard.ui.components.mobile_component_registry import mobile_component_registry; print(len(mobile_component_registry._components))' 2>/dev/null || echo 'N/A')"
 
 # Mobile Memory Optimization
 mobile-optimize: check-venv

@@ -17,7 +17,7 @@ import pytest
 import streamlit as st
 from PIL import Image
 
-from src.ui.components.mobile_adapter_integration import \
+from plantguard.ui.components.mobile_adapter_integration import \
     MobileAdapterIntegration
 from tests.fixtures.mobile_test_fixtures import (MockAudioAdapter,
                                                  MockTextAdapter,

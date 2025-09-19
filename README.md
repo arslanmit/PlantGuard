@@ -632,10 +632,10 @@ make list-models
 # Model: plantguard_v1.1.0 | Accuracy: 96.2% | Size: 97.8MB | Date: 2024-08-14
 
 # Export model for deployment
-python -m src.training.model_registry export plantguard_v1.1.0 --format=onnx
+python -m plantguard.training.model_registry export plantguard_v1.1.0 --format=onnx
 
 # Compare model performance
-python -m src.training.model_registry compare plantguard_v1.0.0 plantguard_v1.1.0
+python -m plantguard.training.model_registry compare plantguard_v1.0.0 plantguard_v1.1.0
 ```
 
 #### **[TOOL] Integration with Existing Pipeline**
@@ -782,7 +782,7 @@ data/
 The enhanced dataset commands use the new `DatasetManager` class:
 
 ```python
-from src.training.dataset_manager import DatasetManager, DatasetConfig
+from plantguard.training.dataset_manager import DatasetManager, DatasetConfig
 
 # Initialize dataset manager
 dm = DatasetManager()
@@ -1323,7 +1323,7 @@ Example configuration:
 ### [TOOL] Integration in Your Code
 
 ```python
-from src.core.model_manager import PlantGuardModelManager
+from plantguard.core.model_manager import PlantGuardModelManager
 
 # Initialize manager
 manager = PlantGuardModelManager()

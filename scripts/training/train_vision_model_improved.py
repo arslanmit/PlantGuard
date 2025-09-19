@@ -18,9 +18,9 @@ from tqdm import tqdm
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-from core.models import PlantDiseaseResNet50
-from training.memory_limit import enforce_memory_limit
-from training.monitor import TrainingMonitor
+from plantguard.core.models import PlantDiseaseResNet50
+from plantguard.training.memory_limit import enforce_memory_limit
+from plantguard.training.monitor import TrainingMonitor
 
 logger = logging.getLogger(__name__)
 

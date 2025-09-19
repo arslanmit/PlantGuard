@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.training.resource_manager import (
+from plantguard.training.resource_manager import (
     ResourceInfo,
     ResourceManager,
     detect_optimal_config,

@@ -24,12 +24,12 @@ import torch
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from training.config import TrainingConfig, load_config
-from training.dataset_manager import DatasetManager
-from training.model_registry import ModelRegistry
-from training.monitor import TrainingMonitor
-from training.production_trainer import ProductionTrainer
-from utils.logging_config import setup_logging
+from plantguard.training.config import TrainingConfig, load_config
+from plantguard.training.dataset_manager import DatasetManager
+from plantguard.training.model_registry import ModelRegistry
+from plantguard.training.monitor import TrainingMonitor
+from plantguard.training.production_trainer import ProductionTrainer
+from plantguard.utils.logging_config import setup_logging
 
 
 class ProductionWorkflow:

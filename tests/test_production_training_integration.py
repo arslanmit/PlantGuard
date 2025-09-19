@@ -8,9 +8,9 @@ from unittest.mock import MagicMock, patch
 import torch
 from PIL import Image
 
-from src.core.model_manager import PlantGuardModelManager
-from src.core.vision import VisionAdapter
-from src.training.model_registry import ModelRegistry
+from plantguard.core.model_manager import PlantGuardModelManager
+from plantguard.core.vision import VisionAdapter
+from plantguard.training.model_registry import ModelRegistry
 from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
@@ -256,7 +256,7 @@ class TestProductionTrainingIntegration:
         assert isinstance(registry_models, list)
 
     def test_complete_workflow_integration(self) -> None:
-        """Test complete workflow from training to UI integration."""
+        """Test complete workflow from plantguard.training to UI integration."""
         registry = ModelRegistry(self.registry_dir)
 
         model_path = self.temp_dir / "workflow_model.pt"

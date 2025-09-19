@@ -383,7 +383,7 @@ class ProductionTrainer:
             # Assign to self.model now that setup is complete
             self.model = model
 
-            # Ensure classifier matches discovered class count from data loaders
+            # Ensure classifier matches discovered class count from plantguard.data loaders
             try:
                 discovered_classes = getattr(self, "class_names", None)
                 if discovered_classes and isinstance(discovered_classes, list | tuple):
@@ -829,7 +829,7 @@ class ProductionTrainer:
         try:
             logger.info("Running comprehensive performance optimization...")
 
-            # Extract dataset from data loader
+            # Extract dataset from plantguard.data loader
             if self.train_loader is None:
                 raise ValueError("Train loader not initialized")
             dataset = self.train_loader.dataset
@@ -1934,10 +1934,10 @@ class ProductionTrainer:
                 recovery_successful = self.error_handler.handle_error(e, context, self.state.epoch, self.state.step)
 
                 if not recovery_successful and retry_count >= max_retries:
-                    logger.error("Failed to recover from training epoch error after all retries")
+                    logger.error("Failed to recover from plantguard.training epoch error after all retries")
                     raise
                 elif recovery_successful:
-                    logger.info("Recovered from training epoch error, retrying...")
+                    logger.info("Recovered from plantguard.training epoch error, retrying...")
                     continue
                 else:
                     logger.info(f"Recovery attempted, retrying ({retry_count}/{max_retries})")

@@ -16,7 +16,7 @@ import pytest
 import streamlit as st
 from PIL import Image
 
-from src.utils.error_recovery import (ExceptionRecovery, FileCleanupRecovery,
+from plantguard.utils.error_recovery import (ExceptionRecovery, FileCleanupRecovery,
                                       SessionStateRecovery)
 from tests.fixtures.mobile_test_fixtures import (MockAudioAdapter,
                                                  MockChatModel,
@@ -336,7 +336,7 @@ def mock_mobile_component_registry() -> Any:
 @pytest.fixture
 def mock_mobile_adapter_integration(mock_streamlit_session: Any, all_mock_adapters: Any) -> Any:
     """Provide mobile adapter integration with all mocks configured."""
-    from src.ui.components.mobile_adapter_integration import \
+    from plantguard.ui.components.mobile_adapter_integration import \
         MobileAdapterIntegration
     
     integration = MobileAdapterIntegration()
@@ -402,7 +402,7 @@ def error_simulation() -> Any:
 def mock_mobile_testing_framework() -> Any:
     """Mock mobile testing framework with comprehensive functionality."""
     with patch.multiple(
-        'src.ui.components.mobile_testing_framework',
+        'plantguard.ui.components.mobile_testing_framework',
         MobileComponentTester=Mock,
         MobileAIAgentTester=Mock,
         MobileSpecificTester=Mock,

@@ -21,7 +21,7 @@ The data pipeline is designed to handle the PlantVillage dataset with the follow
 Custom PyTorch dataset class for loading PlantVillage images with labels.
 
 ```python
-from src.data import PlantVillageDataset, DataTransforms
+from plantguard.data import PlantVillageDataset, DataTransforms
 
 # Create dataset with transforms
 dataset = PlantVillageDataset(
@@ -53,7 +53,7 @@ inference_transforms = DataTransforms.get_inference_transforms()
 One-stop function to create train/validation data loaders:
 
 ```python
-from src.data import create_data_loaders
+from plantguard.data import create_data_loaders
 
 train_loader, val_loader, class_names = create_data_loaders(
     data_dir="data/PlantVillage",
@@ -70,7 +70,7 @@ train_loader, val_loader, class_names = create_data_loaders(
 Validates image files for format, corruption, and size constraints:
 
 ```python
-from src.data import ImageValidator
+from plantguard.data import ImageValidator
 
 validator = ImageValidator(strict_mode=False)
 
@@ -87,7 +87,7 @@ print(f"Validation rate: {dataset_results['validation_rate']:.1%}")
 Analyzes dataset statistics and properties:
 
 ```python
-from src.data import DatasetAnalyzer
+from plantguard.data import DatasetAnalyzer
 
 analyzer = DatasetAnalyzer()
 
@@ -105,7 +105,7 @@ print(f"Average dimensions: {image_analysis['dimensions']['width_stats']['mean']
 Ensures data pipeline integrity:
 
 ```python
-from src.data import DataIntegrityChecker
+from plantguard.data import DataIntegrityChecker
 
 checker = DataIntegrityChecker()
 
@@ -120,7 +120,7 @@ print(f"Overall valid: {results['overall_valid']}")
 Creates detailed data quality reports:
 
 ```python
-from src.data import generate_data_report
+from plantguard.data import generate_data_report
 
 # Generate and save comprehensive report
 report = generate_data_report(
@@ -138,7 +138,7 @@ print(f"Balance: {'balanced' if report['class_distribution']['is_balanced'] else
 ### Basic Dataset Loading
 
 ```python
-from src.data import create_data_loaders
+from plantguard.data import create_data_loaders
 
 # Create data loaders for training
 train_loader, val_loader, classes = create_data_loaders(
@@ -157,7 +157,7 @@ for batch_idx, (images, labels) in enumerate(train_loader):
 ### Data Quality Assessment
 
 ```python
-from src.data import ImageValidator, DatasetAnalyzer
+from plantguard.data import ImageValidator, DatasetAnalyzer
 
 # Quick validation check
 validator = ImageValidator()
@@ -179,7 +179,7 @@ if not analysis['is_balanced']:
 ### Complete Pipeline Setup
 
 ```python
-from src.data import (
+from plantguard.data import (
     create_data_loaders,
     generate_data_report,
     DataIntegrityChecker

@@ -7,7 +7,7 @@ and analysis utilities for the PlantVillage dataset.
 import logging
 from pathlib import Path
 
-from src.data import (
+from plantguard.data import (
     DataIntegrityChecker,
     DatasetAnalyzer,
     ImageValidator,

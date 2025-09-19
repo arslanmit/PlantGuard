@@ -15,8 +15,8 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.core.vision import VisionAdapter
-from src.training.model_registry import ModelRegistry
+from plantguard.core.vision import VisionAdapter
+from plantguard.training.model_registry import ModelRegistry
 
 
 def scan_for_legacy_models() -> list[Path]:
@@ -124,7 +124,7 @@ def update_model_manager_config(migrated_models: list[str]) -> None:
         migrated_models: List of migrated model IDs
     """
     try:
-        from src.features.model_switching.model_manager import PlantGuardModelManager
+        from plantguard.features.model_switching.model_manager import PlantGuardModelManager
 
         manager = PlantGuardModelManager(autoload_default=False)
 

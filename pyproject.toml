@@ -1069,10 +1069,20 @@ line-ending = "auto"   # Auto-detect line endings (Windows/Mac/Linux)
 
 # [PACKAGE] Hatchling - Modern Python packaging tool
 [tool.hatch.build.targets.wheel]
-packages = ["src/plantguard"]
+packages = [
+  "plantguard",
+  "src",
+]
 
 [tool.hatch.build.targets.sdist]
-include = ["/src", "/config", "/requirements.txt", "/README.md", "/LICENSE"]
+include = [
+  "/plantguard",
+  "/src",
+  "/config",
+  "/requirements.txt",
+  "/README.md",
+  "/LICENSE",
+]
 exclude = [
   "/.git",
   "/.venv",

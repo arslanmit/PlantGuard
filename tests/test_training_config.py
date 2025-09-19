@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.training.config import (
+from plantguard.training.config import (
     ConfigTemplates,
     DataAugmentationConfig,
     EarlyStoppingConfig,
@@ -192,7 +192,7 @@ class TestTrainingConfig:
         finally:
             json_path.unlink()
 
-    @patch("src.training.config.YAML_AVAILABLE", True)
+    @patch("plantguard.training.config.YAML_AVAILABLE", True)
     def test_yaml_serialization(self) -> None:
         """Test YAML serialization and deserialization."""
         config = TrainingConfig(experiment_name="test", epochs=50)
@@ -210,7 +210,7 @@ class TestTrainingConfig:
 
     def test_yaml_not_available(self) -> None:
         """Test YAML operations when PyYAML is not available."""
-        with patch("src.training.config.YAML_AVAILABLE", False):
+        with patch("plantguard.training.config.YAML_AVAILABLE", False):
             config = TrainingConfig()
 
             with pytest.raises(ImportError, match="PyYAML is required"):

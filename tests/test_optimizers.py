@@ -13,8 +13,8 @@ from torch.optim.lr_scheduler import (
     StepLR,
 )
 
-from src.training.config import EarlyStoppingConfig, SchedulerConfig, TrainingConfig
-from src.training.optimizers import (
+from plantguard.training.config import EarlyStoppingConfig, SchedulerConfig, TrainingConfig
+from plantguard.training.optimizers import (
     EarlyStopping,
     OptimizerFactory,
     SchedulerFactory,

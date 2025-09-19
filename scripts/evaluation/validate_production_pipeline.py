@@ -83,7 +83,7 @@ class ProductionPipelineValidator:
         logger.info("Testing DatasetManager...")
 
         try:
-            from src.training.dataset_manager import DatasetManager
+            from plantguard.training.dataset_manager import DatasetManager
 
             # Create test dataset
             test_dataset = self.create_test_dataset()
@@ -119,7 +119,7 @@ class ProductionPipelineValidator:
         logger.info("Testing ModelRegistry...")
 
         try:
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             # Initialize registry
             registry = ModelRegistry(self.temp_dir / "models")
@@ -171,13 +171,13 @@ class ProductionPipelineValidator:
         logger.info("Testing VisionAdapter registry integration...")
 
         try:
-            from src.core.vision import VisionAdapter
+            from plantguard.core.vision import VisionAdapter
 
             # Initialize VisionAdapter
             adapter = VisionAdapter()
 
             # Test registry format compatibility check
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             registry = ModelRegistry(self.temp_dir / "models")
             model_info = registry.get_model(model_id)
@@ -232,7 +232,7 @@ class ProductionPipelineValidator:
         logger.info("Testing PlantGuardModelManager integration...")
 
         try:
-            from src.features.model_switching.model_manager import PlantGuardModelManager
+            from plantguard.features.model_switching.model_manager import PlantGuardModelManager
 
             # Create model manager config
             config_path = self.temp_dir / "models.json"
@@ -280,7 +280,7 @@ class ProductionPipelineValidator:
         logger.info("Testing backward compatibility...")
 
         try:
-            from src.core.vision import VisionAdapter
+            from plantguard.core.vision import VisionAdapter
 
             # Create a legacy model file (without registry metadata)
             legacy_path = self.temp_dir / "legacy_model.pt"
@@ -322,7 +322,7 @@ class ProductionPipelineValidator:
         logger.info("Testing training configuration system...")
 
         try:
-            from src.training.config import TrainingConfig
+            from plantguard.training.config import TrainingConfig
 
             # Test default configuration
             config = TrainingConfig()
@@ -354,9 +354,9 @@ class ProductionPipelineValidator:
         logger.info("Testing ProductionTrainer setup...")
 
         try:
-            from src.training.config import TrainingConfig
-            from src.training.dataset_manager import DatasetManager
-            from src.training.production_trainer import ProductionTrainer
+            from plantguard.training.config import TrainingConfig
+            from plantguard.training.dataset_manager import DatasetManager
+            from plantguard.training.production_trainer import ProductionTrainer
 
             # Create minimal config
             config = TrainingConfig(experiment_name="validation_test", epochs=1, batch_size=2, num_classes=3)

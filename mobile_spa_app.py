@@ -26,9 +26,16 @@ import time
 from pathlib import Path
 from typing import Any
 
-# Add src to Python path (must be before first-party imports)
-src_path = Path(__file__).parent / "src"
-sys.path.insert(0, str(src_path))
+ROOT_DIR = Path(__file__).resolve().parent
+SRC_PATH = ROOT_DIR / "src"
+
+
+def _ensure_src_path() -> None:
+    """Add the local ``src`` directory to ``sys.path`` if missing."""
+
+    src_path_str = str(SRC_PATH)
+    if SRC_PATH.is_dir() and src_path_str not in sys.path:
+        sys.path.insert(0, src_path_str)
 
 # Configure logger for this module
 logger = logging.getLogger(__name__)
@@ -37,23 +44,38 @@ logger = logging.getLogger(__name__)
 import streamlit as st  # noqa: E402
 from PIL import Image as PILImage  # noqa: E402
 
-# First-party imports - Core adapters
-from core.audio import AudioAdapter  # noqa: E402
-from core.nlp import TextAdapter  # noqa: E402
-from core.vision import VisionAdapter  # noqa: E402
-
-# First-party imports - Mobile components
-from ui.components.mobile_chat_interface import MobileChatInterface  # noqa: E402
-from ui.components.mobile_component_registry import mobile_component_registry  # noqa: E402
-from ui.components.mobile_content_tabs import MobileContentTabs  # noqa: E402
-from ui.components.mobile_header import MobileHeader  # noqa: E402
-from ui.components.mobile_image_analysis import MobileImageAnalysis  # noqa: E402
-from ui.components.mobile_input_ribbon import MobileInputRibbon  # noqa: E402
-from ui.components.mobile_layout_manager import MobileLayoutManager  # noqa: E402
-from ui.components.mobile_voice_interface import MobileVoiceInterface  # noqa: E402
-
-# Import error recovery utilities
-from utils.error_recovery import ImportErrorRecovery  # noqa: E402
+# First-party imports - resolved via the canonical PlantGuard package
+try:
+    from plantguard.core import AudioAdapter, TextAdapter, VisionAdapter  # noqa: E402
+    from plantguard.ui.components.mobile_chat_interface import MobileChatInterface  # noqa: E402
+    from plantguard.ui.components.mobile_component_registry import (  # noqa: E402
+        mobile_component_registry,
+    )
+    from plantguard.ui.components.mobile_content_tabs import MobileContentTabs  # noqa: E402
+    from plantguard.ui.components.mobile_header import MobileHeader  # noqa: E402
+    from plantguard.ui.components.mobile_image_analysis import MobileImageAnalysis  # noqa: E402
+    from plantguard.ui.components.mobile_input_ribbon import MobileInputRibbon  # noqa: E402
+    from plantguard.ui.components.mobile_layout_manager import MobileLayoutManager  # noqa: E402
+    from plantguard.ui.components.mobile_voice_interface import MobileVoiceInterface  # noqa: E402
+    from plantguard.utils.error_recovery import ImportErrorRecovery  # noqa: E402
+except ModuleNotFoundError as import_error:
+    if import_error.name is None or not import_error.name.startswith("plantguard"):
+        raise
+    _ensure_src_path()
+    from core.audio import AudioAdapter  # type: ignore  # noqa: E402
+    from core.nlp import TextAdapter  # type: ignore  # noqa: E402
+    from core.vision import VisionAdapter  # type: ignore  # noqa: E402
+    from ui.components.mobile_chat_interface import MobileChatInterface  # type: ignore  # noqa: E402
+    from ui.components.mobile_component_registry import (  # type: ignore  # noqa: E402
+        mobile_component_registry,
+    )
+    from ui.components.mobile_content_tabs import MobileContentTabs  # type: ignore  # noqa: E402
+    from ui.components.mobile_header import MobileHeader  # type: ignore  # noqa: E402
+    from ui.components.mobile_image_analysis import MobileImageAnalysis  # type: ignore  # noqa: E402
+    from ui.components.mobile_input_ribbon import MobileInputRibbon  # type: ignore  # noqa: E402
+    from ui.components.mobile_layout_manager import MobileLayoutManager  # type: ignore  # noqa: E402
+    from ui.components.mobile_voice_interface import MobileVoiceInterface  # type: ignore  # noqa: E402
+    from utils.error_recovery import ImportErrorRecovery  # type: ignore  # noqa: E402
 
 # Conditional imports with proper error handling and logging
 MobileTestingFramework = ImportErrorRecovery.safe_import_from(

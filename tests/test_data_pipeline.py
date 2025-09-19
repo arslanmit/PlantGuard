@@ -16,7 +16,7 @@ import pytest
 import torch
 from PIL import Image
 
-from src.data import (
+from plantguard.data import (
     DataIntegrityChecker,
     DatasetAnalyzer,
     DataTransforms,

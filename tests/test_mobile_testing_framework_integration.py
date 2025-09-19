@@ -9,6 +9,7 @@ and dependency injection for comprehensive testing infrastructure.
 
 
 from datetime import datetime
+from contextlib import ExitStack
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -26,14 +27,27 @@ class TestMobileTestingFrameworkIntegration:
     @pytest.fixture
     def mock_testing_framework_dependencies(self) -> Generator[Any, None, None]:
         """Mock all testing framework dependencies."""
-        with patch.multiple(
-            'src.ui.components.mobile_testing_framework',
-            MobileComponentTester=Mock,
-            MobileAIAgentTester=Mock,
-            MobileSpecificTester=Mock,
-            MobileStateManager=Mock
-        ) as mocks:
-            yield mocks
+        from plantguard.ui.components.mobile_testing_framework import (
+            MobileTestingFramework as _MobileTestingFramework,
+        )
+
+        original_init = _MobileTestingFramework.__init__
+        created_mocks: dict[str, Mock] = {}
+
+        def _mock_init(self) -> None:
+            original_init(self)
+            created_mocks["component_tester"] = Mock(name="component_tester")
+            created_mocks["ai_agent_tester"] = Mock(name="ai_agent_tester")
+            created_mocks["mobile_specific_tester"] = Mock(name="mobile_specific_tester")
+            created_mocks["state_manager"] = Mock(name="state_manager")
+            self.component_tester = created_mocks["component_tester"]
+            self.ai_agent_tester = created_mocks["ai_agent_tester"]
+            self.mobile_specific_tester = created_mocks["mobile_specific_tester"]
+            self.state_manager = created_mocks["state_manager"]
+
+        with patch.object(_MobileTestingFramework, "__init__", _mock_init):
+            yield created_mocks
+        created_mocks.clear()
 
     @pytest.fixture
     def mock_component_registry(self) -> Generator[Any, None, None]:
@@ -47,12 +61,15 @@ class TestMobileTestingFrameworkIntegration:
             "mobile_analysis_display_test": Mock,
         }
         
-        with patch('src.ui.components.mobile_component_registry.mobile_component_registry', mock_registry):
+        with patch(
+            'plantguard.ui.components.mobile_component_registry.mobile_component_registry',
+            mock_registry,
+        ):
             yield mock_registry
 
     def test_framework_initialization_with_mocks(self, mock_testing_framework_dependencies: Any) -> None:
         """Test framework initialization with proper dependency mocking."""
-        from src.ui.components.mobile_testing_framework import \
+        from plantguard.ui.components.mobile_testing_framework import \
             MobileTestingFramework
         
         framework = MobileTestingFramework()
@@ -71,7 +88,7 @@ class TestMobileTestingFrameworkIntegration:
 
     def test_component_validation_with_mocked_adapters(self, mock_testing_framework_dependencies: Any, mock_component_registry: Any) -> None:
         """Test component validation with mocked adapters."""
-        from src.ui.components.mobile_testing_framework import \
+        from plantguard.ui.components.mobile_testing_framework import \
             MobileTestingFramework
         
         framework = MobileTestingFramework()
@@ -126,7 +143,7 @@ class TestMobileTestingFrameworkIntegration:
 
     def test_continuous_monitoring_with_mocks(self, mock_testing_framework_dependencies: Any) -> None:
         """Test continuous monitoring with proper mocking."""
-        from src.ui.components.mobile_testing_framework import \
+        from plantguard.ui.components.mobile_testing_framework import \
             MobileTestingFramework
         
         framework = MobileTestingFramework()
@@ -183,7 +200,7 @@ class TestMobileTestingFrameworkIntegration:
 
     def test_comprehensive_report_generation(self, mock_testing_framework_dependencies: Any) -> None:
         """Test comprehensive report generation with mocks."""
-        from src.ui.components.mobile_testing_framework import \
+        from plantguard.ui.components.mobile_testing_framework import \
             MobileTestingFramework
         
         framework = MobileTestingFramework()
@@ -239,7 +256,7 @@ class TestMobileTestingFrameworkIntegration:
 
     def test_auto_healing_with_mocks(self, mock_testing_framework_dependencies: Any) -> None:
         """Test auto-healing functionality with proper mocking."""
-        from src.ui.components.mobile_testing_framework import \
+        from plantguard.ui.components.mobile_testing_framework import \
             MobileTestingFramework
         
         framework = MobileTestingFramework()
@@ -272,7 +289,7 @@ class TestMobileTestingFrameworkIntegration:
 
     def test_framework_status_reporting(self, mock_testing_framework_dependencies: Any) -> None:
         """Test framework status reporting with mocks."""
-        from src.ui.components.mobile_testing_framework import \
+        from plantguard.ui.components.mobile_testing_framework import \
             MobileTestingFramework
         
         framework = MobileTestingFramework()
@@ -309,24 +326,22 @@ class TestMobileTestingFrameworkWithRealAdapters:
     @pytest.fixture
     def framework_with_adapter_mocks(self, mock_streamlit_session: Any) -> Generator[Any, None, None]:
         """Create framework with adapter mocks."""
-        from src.ui.components.mobile_testing_framework import \
-            MobileTestingFramework
-        
-        with patch.multiple(
-            'src.ui.components.mobile_testing_framework',
-            MobileComponentTester=Mock,
-            MobileAIAgentTester=Mock,
-            MobileSpecificTester=Mock,
-            MobileStateManager=Mock
-        ):
-            framework = MobileTestingFramework()
-            
-            # Set up adapter mocks in session state
-            mock_streamlit_session["vision_adapter"] = MockVisionAdapter()
-            mock_streamlit_session["audio_adapter"] = MockAudioAdapter()
-            mock_streamlit_session["text_adapter"] = MockTextAdapter()
-            
-            yield framework
+        from plantguard.ui.components.mobile_testing_framework import (
+            MobileTestingFramework,
+        )
+
+        framework = MobileTestingFramework()
+        framework.component_tester = Mock(name="component_tester")
+        framework.ai_agent_tester = Mock(name="ai_agent_tester")
+        framework.mobile_specific_tester = Mock(name="mobile_specific_tester")
+        framework.state_manager = Mock(name="state_manager")
+
+        # Set up adapter mocks in session state
+        mock_streamlit_session["vision_adapter"] = MockVisionAdapter()
+        mock_streamlit_session["audio_adapter"] = MockAudioAdapter()
+        mock_streamlit_session["text_adapter"] = MockTextAdapter()
+
+        yield framework
 
     def test_framework_with_adapter_integration(self, framework_with_adapter_mocks: Any, mock_streamlit_session: Any) -> None:
         """Test framework integration with adapter mocks."""

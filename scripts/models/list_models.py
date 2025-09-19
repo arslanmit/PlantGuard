@@ -7,7 +7,7 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from training.model_registry import ModelRegistry
+from plantguard.training.model_registry import ModelRegistry
 
 
 def main() -> None:

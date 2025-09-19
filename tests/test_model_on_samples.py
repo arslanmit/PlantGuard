@@ -20,8 +20,8 @@ from sklearn.metrics import (accuracy_score, classification_report,
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from src.core.vision import VisionAdapter
-from src.utils.logging import setup_logger
+from plantguard.core.vision import VisionAdapter
+from plantguard.utils.logging import setup_logger
 
 # Setup logging
 logger = setup_logger("test_model", log_file="logs/test_model.log")

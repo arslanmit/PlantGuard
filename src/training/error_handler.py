@@ -270,7 +270,7 @@ class DataErrorRecovery(ErrorRecoveryStrategy):
         return error.category == ErrorCategory.DATA or any(keyword in error_msg for keyword in data_keywords)
 
     def recover(self, error: TrainingError, context: dict[str, Any]) -> bool:
-        """Attempt to recover from data errors."""
+        """Attempt to recover from plantguard.data errors."""
         logger.info("Attempting data error recovery...")
 
         recovery_actions = []

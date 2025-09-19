@@ -5,6 +5,7 @@ This package provides mobile-optimized components with AI agent support
 and comprehensive error handling for the PlantGuard plant disease detection system.
 """
 
+import importlib
 import logging
 
 # Version information
@@ -36,6 +37,12 @@ __all__ = [
     "__author__",
     "__version__",
 ]
+
+# Make key submodules available as direct attributes for compatibility with
+# dotted import paths used by the testing fixtures (e.g. patch targets).
+mobile_component_registry = importlib.import_module(
+    f"{__name__}.mobile_component_registry"
+)
 
 # Initialize logging for the mobile components package
 logger = logging.getLogger(__name__)

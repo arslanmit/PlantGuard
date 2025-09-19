@@ -14,8 +14,8 @@ import pytest
 import torch
 from PIL import Image
 
-from src.core.vision import VisionAdapter
-from src.training.model_registry import ModelRegistry
+from plantguard.core.vision import VisionAdapter
+from plantguard.training.model_registry import ModelRegistry
 
 
 class TestVisionAdapterRegistryIntegration:

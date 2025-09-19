@@ -848,7 +848,7 @@ class VisionAdapter:
         """
         try:
             # Import here to avoid circular imports
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             registry = ModelRegistry()
             model_info = registry.get_model(model_id)
@@ -1291,7 +1291,7 @@ class VisionAdapter:
 
             # Clear global/module-level caches and other resources if the
             # helper is already loaded in this module. Avoid importing
-            # src.core.vision during interpreter teardown since re-importing
+            # plantguard.core.vision during interpreter teardown since re-importing
             # may allocate new global caches and increase memory usage.
             try:
                 clear_fn = globals().get("clear_global_model_caches")
@@ -1349,7 +1349,7 @@ class VisionAdapter:
 
     # ===== Additional registry and health helper APIs expected by tests =====
     def load_from_registry_by_name(self, name: str) -> None:
-        from src.training.model_registry import ModelRegistry
+        from plantguard.training.model_registry import ModelRegistry
 
         registry = ModelRegistry()
         # First check primary registry
@@ -1382,7 +1382,7 @@ class VisionAdapter:
         raise LoadCheckpointError()
 
     def load_latest_from_registry(self, base_name: str) -> None:
-        from src.training.model_registry import ModelRegistry
+        from plantguard.training.model_registry import ModelRegistry
 
         registry = ModelRegistry()
         candidates = [m for m in registry.list_models() if base_name in getattr(m.metadata, "model_id", "")]
@@ -1429,7 +1429,7 @@ class VisionAdapter:
 
     def get_available_registry_models(self) -> list[str]:
         try:
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             registry = ModelRegistry()
             ids = [m.metadata.model_id for m in registry.list_models()]
@@ -1459,7 +1459,7 @@ class VisionAdapter:
 
     def compare_registry_models(self, model_ids: list[str]) -> dict[str, Any]:
         try:
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             registry = ModelRegistry()
             models = []
@@ -1540,7 +1540,7 @@ class VisionAdapter:
 
     def export_model(self, output_dir: str | Path | None = None, export_format: str = "pytorch") -> Path | None:
         try:
-            from src.training.model_registry import ModelRegistry
+            from plantguard.training.model_registry import ModelRegistry
 
             if not self.current_model_id:
                 return None

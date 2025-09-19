@@ -384,7 +384,7 @@ class MobileChatInterface(MobileBaseComponent):
             context = self._get_current_context()
 
             # Import text adapter
-            from src.core.nlp import ChatModel, TextAdapter
+            from plantguard.core.nlp import ChatModel, TextAdapter
 
             # Get or create adapters
             if "text_adapter" not in st.session_state:

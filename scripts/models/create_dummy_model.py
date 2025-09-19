@@ -17,7 +17,7 @@ import torch
 # Add project root to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.core.models import PlantDiseaseResNet50
+from plantguard.core.models import PlantDiseaseResNet50
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

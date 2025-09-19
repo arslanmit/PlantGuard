@@ -3,9 +3,9 @@
 import torch
 from torch import nn
 
-from src.training.config import TrainingConfig
-from src.training.optimizers import create_training_components
-from src.training.resource_manager import get_resource_manager
+from plantguard.training.config import TrainingConfig
+from plantguard.training.optimizers import create_training_components
+from plantguard.training.resource_manager import get_resource_manager
 from typing import Any, Dict, List, Optional, Tuple, Union, Generator
 
 
@@ -105,7 +105,7 @@ def test_resource_manager_integration() -> None:
 
 def test_configuration_templates() -> None:
     """Test that all configuration templates work."""
-    from src.training.config import ConfigTemplates
+    from plantguard.training.config import ConfigTemplates
 
     templates = [
         ConfigTemplates.quick_test(),
