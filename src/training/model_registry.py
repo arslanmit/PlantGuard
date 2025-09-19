@@ -12,7 +12,7 @@ import json
 import logging
 import shutil
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -325,7 +325,7 @@ class ModelRegistry:
             name=name,
             version=version_str,
             architecture=architecture,
-            training_date=datetime.now(),
+            training_date=datetime.now(timezone.utc),
             dataset_version=dataset_version,
             hyperparameters=hyperparameters,
             performance_metrics={k: float(v) for k, v in performance_metrics.items()},
@@ -424,7 +424,7 @@ class ModelRegistry:
             return False
         backup_dir = Path(backup_dir)
         backup_dir.mkdir(parents=True, exist_ok=True)
-        timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
         dst = backup_dir / f"{model_id}_backup_{timestamp}"
         try:
             shutil.copytree(self.registry_dir / model_id, dst)
@@ -451,7 +451,7 @@ class ModelRegistry:
                 md = None
 
             new_name = md.name if md and md.name else backup_path.name.split("_backup_")[0]
-            restored_version = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+            restored_version = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
             restored_id = f"{new_name}_restored_v{restored_version}"
             dst = self.registry_dir / restored_id
             shutil.copytree(backup_path, dst)
@@ -520,7 +520,7 @@ class ModelRegistry:
             deployment = {
                 "model_id": model_id,
                 "model_metadata": m.metadata.to_dict(),
-                "deployment_info": {"created": datetime.utcnow().isoformat()},
+                "deployment_info": {"created": datetime.now(timezone.utc).isoformat()},
                 "dependencies": [],
             }
             # Ensure deployment dict contains only JSON-serializable values
@@ -540,7 +540,7 @@ class ModelRegistry:
             return None
         # Create a lightweight optimized copy and register it as a new model
         base = m.metadata.model_id.rsplit("_v", 1)[0]
-        opt_version = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+        opt_version = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
         optimized_id = f"{base}_optimized_{optimization_level}_v{opt_version}"
         src_dir = self.registry_dir / m.metadata.model_id
         dst_dir = self.registry_dir / optimized_id
