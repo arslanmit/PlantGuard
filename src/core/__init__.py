@@ -53,4 +53,5 @@ def __getattr__(name: str) -> Any:
 
 
 def __dir__() -> list[str]:
-    return sorted(__all__)
+    # Include lazily exported adapter names while preserving standard module attrs
+    return sorted({*globals(), *__all__})
