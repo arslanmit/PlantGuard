@@ -1,6 +1,7 @@
 FROM python:3.11-slim
 
 ARG PYTORCH_INDEX_URL=""
+ARG TARGETARCH
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -11,16 +12,40 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg \
-    libsndfile1 \
-    libsm6 \
-    libxext6 \
-    libxrender1 \
-    libgl1 \
-    libglib2.0-0 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN set -eux; \
+    if [ "${TARGETARCH}" = "amd64" ]; then \
+        FFMPEG_URL="https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"; \
+    elif [ "${TARGETARCH}" = "arm64" ]; then \
+        FFMPEG_URL="https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-arm64-static.tar.xz"; \
+    else \
+        echo "Unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1; \
+    fi; \
+    python - "$FFMPEG_URL" <<'PY'
+import os
+import stat
+import sys
+import tarfile
+import tempfile
+import urllib.request
+import shutil
+
+url = sys.argv[1]
+with tempfile.TemporaryDirectory() as tmpdir:
+    archive_path = os.path.join(tmpdir, "ffmpeg.tar.xz")
+    urllib.request.urlretrieve(url, archive_path)
+    with tarfile.open(archive_path, mode="r:xz") as tar:
+        tar.extractall(tmpdir)
+    extracted_dir = next(
+        path
+        for path in (os.path.join(tmpdir, name) for name in os.listdir(tmpdir))
+        if os.path.isdir(path) and "ffmpeg" in os.path.basename(path)
+    )
+    for binary in ("ffmpeg", "ffprobe"):
+        src = os.path.join(extracted_dir, binary)
+        dst = os.path.join("/usr/local/bin", binary)
+        shutil.move(src, dst)
+        os.chmod(dst, os.stat(dst).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+PY
 
 COPY requirements.txt .
 
