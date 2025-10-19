@@ -1,5 +1,7 @@
 FROM python:3.11-slim
 
+ARG PYTORCH_INDEX_URL=""
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
@@ -21,7 +23,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+
+RUN python -m pip install --upgrade pip \
+    && if [ -n "$PYTORCH_INDEX_URL" ]; then \
+        python -m pip install --extra-index-url "$PYTORCH_INDEX_URL" torch torchvision torchaudio; \
+    fi \
+    && python -m pip install -r requirements.txt
 
 COPY . .
 RUN python -m pip install --no-deps -e .
