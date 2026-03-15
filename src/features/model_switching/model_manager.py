@@ -87,6 +87,23 @@ class PlantGuardModelManager:
         else:
             return torch.device("cpu")
 
+    def _is_runtime_checkpoint_valid(self, checkpoint_path: str | Path) -> bool:
+        """Return True only for checkpoints that are safe to expose for runtime inference."""
+        try:
+            from plantguard.core.vision import is_runtime_checkpoint_valid
+
+            return is_runtime_checkpoint_valid(checkpoint_path)
+        except Exception:
+            logger.debug("Runtime checkpoint validation failed for %s", checkpoint_path, exc_info=True)
+            return False
+
+    def _is_registry_model_deployable(self, model_info: Any) -> bool:
+        """Return True only when the registry entry points at a deployable checkpoint."""
+        model_path = getattr(model_info, "model_path", None)
+        if model_path is None:
+            return False
+        return self._is_runtime_checkpoint_valid(model_path)
+
     def load_model_configs(self) -> None:
         """Load model configurations from JSON file."""
         if not self.config_path.exists():
@@ -126,6 +143,8 @@ class PlantGuardModelManager:
 
     def create_default_config(self) -> None:
         """Create default model configuration file."""
+        local_resnet_path = Path("data/models/vision_resnet50.pt")
+        local_resnet_valid = self._is_runtime_checkpoint_valid(local_resnet_path)
         default_config = {
             "default_model": "vit_best",
             "models": {
@@ -152,11 +171,15 @@ class PlantGuardModelManager:
                 "local_resnet": {
                     "name": "Local ResNet50",
                     "type": "local",
-                    "model_id": "data/models/vision_resnet50.pt",
-                    "description": "Local ResNet50 model (requires training)",
-                    "accuracy": 0.05,
+                    "model_id": str(local_resnet_path),
+                    "description": (
+                        "Local ResNet50 model"
+                        if local_resnet_valid
+                        else "Local ResNet50 model is disabled until a full validated checkpoint is installed"
+                    ),
+                    "accuracy": 0.9 if local_resnet_valid else 0.0,
                     "confidence_threshold": 0.5,
-                    "enabled": False,
+                    "enabled": local_resnet_valid,
                     "device": "auto",
                 },
             },
@@ -175,6 +198,10 @@ class PlantGuardModelManager:
             registry_models = registry.list_models()
 
             for model_info in registry_models:
+                if not self._is_registry_model_deployable(model_info):
+                    logger.warning("Skipping invalid registry model in default config: %s", model_info.metadata.model_id)
+                    continue
+
                 model_key = f"registry_{model_info.metadata.model_id}"
                 accuracy = model_info.metadata.performance_metrics.get("accuracy", 0.0)
 
@@ -279,13 +306,20 @@ class PlantGuardModelManager:
             logger.info("Loading model: %s (%s)", config.name, config.type)
 
             if config.type == "huggingface":
-                self.current_adapter = self._load_huggingface_model(config)
+                adapter = self._load_huggingface_model(config)
             elif config.type == "local":
-                self.current_adapter = self._load_local_model(config)
+                adapter = self._load_local_model(config)
             else:
                 logger.error("Unsupported model type: %s", config.type)
                 return False
 
+            if hasattr(adapter, "check_model_health") and not adapter.check_model_health():
+                logger.error("Loaded model failed health check: %s", model_id)
+                self.current_adapter = None
+                self.current_model = None
+                return False
+
+            self.current_adapter = adapter
             self.current_model = config
             logger.info("Successfully loaded model: %s", config.name)
             return True
@@ -387,6 +421,9 @@ class PlantGuardModelManager:
         else:
             # Load from file path (legacy)
             adapter.load_checkpoint(config.model_id)
+
+        if not adapter.check_model_health():
+            raise RuntimeError(f"Local model failed integrity validation: {config.model_id}")
 
         return adapter
 
@@ -819,6 +856,10 @@ class PlantGuardModelManager:
             updated = False
 
             for model_info in registry_models:
+                if not self._is_registry_model_deployable(model_info):
+                    logger.warning("Skipping invalid registry model during sync: %s", model_info.metadata.model_id)
+                    continue
+
                 model_key = f"registry_{model_info.metadata.model_id}"
                 registry_model_id = f"registry:{model_info.metadata.model_id}"
                 accuracy = model_info.metadata.performance_metrics.get("accuracy", 0.0)
@@ -871,6 +912,13 @@ class PlantGuardModelManager:
                             raw = json.load(rf)
                         for model_id_key, entry in raw.get("models", {}).items():
                             meta = entry.get("metadata", {})
+                            model_path_value = entry.get("model_path")
+                            if not model_path_value:
+                                continue
+                            model_path = candidate / model_path_value
+                            if not self._is_runtime_checkpoint_valid(model_path):
+                                logger.warning("Skipping invalid registry model during fallback sync: %s", meta.get("model_id", model_id_key))
+                                continue
                             model_key = f"registry_{meta.get('model_id', model_id_key)}"
                             registry_model_id = f"registry:{meta.get('model_id', model_id_key)}"
                             accuracy = meta.get("performance_metrics", {}).get("accuracy", 0.0)

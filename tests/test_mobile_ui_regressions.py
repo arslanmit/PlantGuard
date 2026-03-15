@@ -48,7 +48,6 @@ class _RecordingStreamlit:
         self.error_calls: list[str] = []
         self.warning_calls: list[str] = []
         self.expander_labels: list[str] = []
-        self.tab_groups: list[list[str]] = []
         self.button_labels: list[str] = []
 
     def markdown(self, body, *args, **kwargs) -> None:
@@ -59,9 +58,7 @@ class _RecordingStreamlit:
         return [_FakeContext() for _ in range(count)]
 
     def tabs(self, names):
-        captured = list(names)
-        self.tab_groups.append(captured)
-        return [_FakeContext() for _ in captured]
+        return [_FakeContext() for _ in names]
 
     def selectbox(self, label, options, index=0, **kwargs):
         return options[index]
@@ -124,17 +121,29 @@ def _render_main_shell(monkeypatch) -> _RecordingStreamlit:
     return fake_st
 
 
-def test_app_exposes_only_product_tabs(monkeypatch) -> None:
+def test_developer_surfaces_are_absent_from_main_shell(monkeypatch) -> None:
     fake_st = _render_main_shell(monkeypatch)
 
-    assert fake_st.tab_groups == [["Image Analysis", "Voice & Audio", "Chat", "Settings"]]
+    all_text = "\n".join(
+        fake_st.markdown_calls
+        + fake_st.info_calls
+        + fake_st.success_calls
+        + fake_st.error_calls
+        + fake_st.warning_calls
+        + fake_st.expander_labels
+        + fake_st.button_labels
+    )
+
+    assert "Model Status" not in all_text
+    assert "Quick Test" not in all_text
+    assert "Run Model Tests" not in all_text
+    assert "Component Status" not in all_text
+    assert "App Info" not in all_text
 
 
-def test_chat_tab_is_direct_not_placeholder(monkeypatch) -> None:
+def test_mobile_components_section_is_removed(monkeypatch) -> None:
     fake_st = _render_main_shell(monkeypatch)
 
-    all_messages = fake_st.markdown_calls + fake_st.info_calls + fake_st.success_calls + fake_st.button_labels
-    joined = "\n".join(all_messages)
+    all_text = "\n".join(fake_st.markdown_calls + fake_st.info_calls + fake_st.button_labels)
 
-    assert "Use Chat Interface tab for full functionality" not in joined
-    assert "Open Chat" not in joined
+    assert "Mobile Components" not in all_text

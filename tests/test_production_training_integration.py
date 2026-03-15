@@ -4,14 +4,47 @@ import json
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
+from typing import Any
 
 import torch
 from PIL import Image
 
 from plantguard.core.model_manager import PlantGuardModelManager
+from plantguard.core.models import PlantDiseaseResNet50
 from plantguard.core.vision import VisionAdapter
 from plantguard.training.model_registry import ModelRegistry
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+
+
+def _load_real_class_names(num_classes: int = 38) -> list[str]:
+    class_names_path = Path(__file__).resolve().parents[1] / "data/models/class_names.json"
+    with class_names_path.open(encoding="utf-8") as handle:
+        return json.load(handle)[:num_classes]
+
+
+def _write_full_resnet_checkpoint(
+    checkpoint_path: Path,
+    *,
+    num_classes: int = 38,
+    include_registry_metadata: bool = True,
+    accuracy: float = 0.94,
+) -> Path:
+    torch.manual_seed(11)
+    model = PlantDiseaseResNet50(num_classes=num_classes, pretrained=False)
+    checkpoint = {
+        "model_state_dict": model.state_dict(),
+        "num_classes": num_classes,
+        "class_names": _load_real_class_names(num_classes),
+    }
+    if include_registry_metadata:
+        checkpoint["model_version"] = "1.0.0"
+        checkpoint["training_metadata"] = {
+            "training_date": "2024-08-17",
+            "dataset": "plantvillage",
+            "accuracy": accuracy,
+            "architecture": "resnet50",
+        }
+    torch.save(checkpoint, checkpoint_path)
+    return checkpoint_path
 
 
 class TestProductionTrainingIntegration:
@@ -38,13 +71,7 @@ class TestProductionTrainingIntegration:
         """Test VisionAdapter integration with ModelRegistry."""
         registry = ModelRegistry(self.registry_dir)
 
-        model_path = self.temp_dir / "test_model.pt"
-        checkpoint = {
-            "model_state_dict": {"layer.weight": torch.randn(10, 5)},
-            "num_classes": 38,
-            "class_names": [f"class_{class_idx}" for class_idx in range(38)],
-        }
-        torch.save(checkpoint, model_path)
+        model_path = _write_full_resnet_checkpoint(self.temp_dir / "test_model.pt")
 
         model_id = registry.register_model(
             model_path=model_path,
@@ -57,16 +84,10 @@ class TestProductionTrainingIntegration:
         )
 
         adapter = VisionAdapter()
+        adapter.load_from_registry(model_id)
 
-        # Mock the model creation/loading to avoid heavy imports
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
-
-            adapter.load_from_registry(model_id)
-
-            assert adapter.is_loaded
-            assert len(adapter.class_names) == 38
+        assert adapter.is_loaded
+        assert len(adapter.class_names) == 38
 
     def test_model_manager_registry_integration(self) -> None:
         """Test PlantGuardModelManager integration with registry models."""
@@ -123,13 +144,7 @@ class TestProductionTrainingIntegration:
         """Test model manager syncing with registry."""
         registry = ModelRegistry(self.registry_dir)
 
-        model_path = self.temp_dir / "sync_test_model.pt"
-        checkpoint = {
-            "model_state_dict": {"layer.weight": torch.randn(10, 5)},
-            "num_classes": 38,
-            "class_names": [f"class_{class_idx}" for class_idx in range(38)],
-        }
-        torch.save(checkpoint, model_path)
+        model_path = _write_full_resnet_checkpoint(self.temp_dir / "sync_test_model.pt", accuracy=0.90)
 
         model_id = registry.register_model(
             model_path=model_path,
@@ -150,12 +165,8 @@ class TestProductionTrainingIntegration:
         models = manager.list_available_models()
         assert len(models) == 0
 
-        with patch.object(manager, "_load_local_model") as mock_load:
-            mock_adapter = MagicMock()
-            mock_load.return_value = mock_adapter
-
-            success = manager.sync_with_registry()
-            assert success
+        success = manager.sync_with_registry()
+        assert success
 
         models = manager.list_available_models()
         assert len(models) == 1
@@ -203,13 +214,7 @@ class TestProductionTrainingIntegration:
         """Test model switcher script with registry support."""
         registry = ModelRegistry(self.registry_dir)
 
-        model_path = self.temp_dir / "switcher_test_model.pt"
-        checkpoint = {
-            "model_state_dict": {"layer.weight": torch.randn(10, 5)},
-            "num_classes": 38,
-            "class_names": [f"class_{class_idx}" for class_idx in range(38)],
-        }
-        torch.save(checkpoint, model_path)
+        model_path = _write_full_resnet_checkpoint(self.temp_dir / "switcher_test_model.pt", accuracy=0.85)
 
         model_id = registry.register_model(
             model_path=model_path,
@@ -259,19 +264,7 @@ class TestProductionTrainingIntegration:
         """Test complete workflow from plantguard.training to UI integration."""
         registry = ModelRegistry(self.registry_dir)
 
-        model_path = self.temp_dir / "workflow_model.pt"
-        checkpoint = {
-            "model_state_dict": {"layer.weight": torch.randn(10, 5)},
-            "num_classes": 38,
-            "class_names": [f"class_{class_idx}" for class_idx in range(38)],
-            "model_version": "1.0.0",
-            "training_metadata": {
-                "training_date": "2024-08-17",
-                "dataset": "plantvillage",
-                "accuracy": 0.94,
-            },
-        }
-        torch.save(checkpoint, model_path)
+        model_path = _write_full_resnet_checkpoint(self.temp_dir / "workflow_model.pt")
 
         model_id = registry.register_model(
             model_path=model_path,
@@ -287,14 +280,8 @@ class TestProductionTrainingIntegration:
         config_path = self.config_dir / "workflow_models.json"
         manager = PlantGuardModelManager(config_path=str(config_path), autoload_default=False)
 
-        with patch.object(manager, "_load_local_model") as mock_load:
-            mock_adapter = MagicMock()
-            mock_adapter.predict.return_value = ("test_class", 0.95)
-            mock_adapter.get_class_names.return_value = [f"class_{i}" for i in range(38)]
-            mock_load.return_value = mock_adapter
-
-            success = manager.sync_with_registry()
-            assert success
+        success = manager.sync_with_registry()
+        assert success
 
         models = manager.list_available_models()
         assert len(models) == 1
@@ -305,6 +292,7 @@ class TestProductionTrainingIntegration:
             with patch.object(manager, "_load_local_model") as mock_load:
                 mock_adapter = MagicMock()
                 mock_adapter.predict.return_value = ("healthy_plant", 0.95)
+                mock_adapter.check_model_health.return_value = True
                 mock_load.return_value = mock_adapter
 
                 success = manager.load_model(registry_model_key)

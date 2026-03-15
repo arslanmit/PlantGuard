@@ -1,4 +1,6 @@
-from typing import Any, Dict, List, Optional, Tuple, Union, Generator
+import json
+from collections.abc import Generator
+from typing import Any
 """Specialized integration tests for VisionAdapter with ModelRegistry.
 
 This module focuses specifically on testing the deep integration between
@@ -8,14 +10,50 @@ VisionAdapter and ModelRegistry components.
 
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 import torch
 from PIL import Image
 
-from plantguard.core.vision import VisionAdapter
+from plantguard.core.models import PlantDiseaseResNet50
+from plantguard.core.vision import LoadCheckpointError, VisionAdapter
 from plantguard.training.model_registry import ModelRegistry
+
+
+def _load_real_class_names(num_classes: int) -> list[str]:
+    class_names_path = Path(__file__).resolve().parents[1] / "data/models/class_names.json"
+    with class_names_path.open(encoding="utf-8") as handle:
+        return json.load(handle)[:num_classes]
+
+
+def _write_full_resnet_checkpoint(
+    checkpoint_path: Path,
+    *,
+    num_classes: int = 38,
+    class_names: list[str] | None = None,
+    include_registry_metadata: bool = True,
+    accuracy: float = 0.94,
+    version: str = "1.0.0",
+) -> Path:
+    torch.manual_seed(7)
+    model = PlantDiseaseResNet50(num_classes=num_classes, pretrained=False)
+    checkpoint = {
+        "model_state_dict": model.state_dict(),
+        "num_classes": num_classes,
+        "class_names": list(class_names or _load_real_class_names(num_classes)),
+    }
+    if include_registry_metadata:
+        checkpoint["model_version"] = version
+        checkpoint["training_metadata"] = {
+            "training_date": "2024-08-17",
+            "dataset": "plantvillage",
+            "accuracy": accuracy,
+            "architecture": "resnet50",
+            "epochs": 50,
+        }
+    torch.save(checkpoint, checkpoint_path)
+    return checkpoint_path
 
 
 class TestVisionAdapterRegistryIntegration:
@@ -37,27 +75,7 @@ class TestVisionAdapterRegistryIntegration:
     @pytest.fixture
     def sample_registry_model(self, temp_workspace, registry) -> Any:
         """Create a sample model in registry format."""
-        model_path = temp_workspace / "sample_model.pt"
-        checkpoint = {
-            "model_state_dict": {
-                "conv1.weight": torch.randn(64, 3, 7, 7),
-                "bn1.weight": torch.randn(64),
-                "bn1.bias": torch.randn(64),
-                "fc.weight": torch.randn(38, 2048),
-                "fc.bias": torch.randn(38),
-            },
-            "num_classes": 38,
-            "class_names": [f"class_{i}" for i in range(38)],
-            "model_version": "1.0.0",
-            "training_metadata": {
-                "training_date": "2024-08-17",
-                "dataset": "plantvillage",
-                "accuracy": 0.94,
-                "architecture": "resnet50",
-                "epochs": 50,
-            },
-        }
-        torch.save(checkpoint, model_path)
+        model_path = _write_full_resnet_checkpoint(temp_workspace / "sample_model.pt")
 
         model_id = registry.register_model(
             model_path=model_path,
@@ -78,23 +96,11 @@ class TestVisionAdapterRegistryIntegration:
 
         # Create registry format model
         registry_path = temp_workspace / "registry_model.pt"
-        registry_checkpoint = {
-            "model_state_dict": {"fc.weight": torch.randn(38, 2048), "fc.bias": torch.randn(38)},
-            "num_classes": 38,
-            "class_names": [f"class_{i}" for i in range(38)],
-            "model_version": "1.0.0",
-            "training_metadata": {"training_date": "2024-08-17", "accuracy": 0.94},
-        }
-        torch.save(registry_checkpoint, registry_path)
+        _write_full_resnet_checkpoint(registry_path)
 
         # Create legacy format model
         legacy_path = temp_workspace / "legacy_model.pt"
-        legacy_checkpoint = {
-            "model_state_dict": {"fc.weight": torch.randn(38, 2048), "fc.bias": torch.randn(38)},
-            "num_classes": 38,
-            # Missing registry metadata
-        }
-        torch.save(legacy_checkpoint, legacy_path)
+        _write_full_resnet_checkpoint(legacy_path, include_registry_metadata=False)
 
         # Test detection
         assert adapter.is_compatible_with_registry_format(str(registry_path))
@@ -104,35 +110,21 @@ class TestVisionAdapterRegistryIntegration:
         """Test loading model from registry by ID."""
         adapter = VisionAdapter()
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
+        adapter.load_from_registry(sample_registry_model)
 
-            # Load model from registry
-            adapter.load_from_registry(sample_registry_model)
-
-            # Verify adapter state
-            assert adapter.is_loaded
-            assert adapter.current_model_id == sample_registry_model
-            assert len(adapter.class_names) == 38
-            assert adapter.num_classes == 38
-
-            # Verify model creation was called with correct parameters
-            mock_create_model.assert_called_once_with(num_classes=38)
+        assert adapter.is_loaded
+        assert adapter.current_model_id == sample_registry_model
+        assert len(adapter.class_names) == 38
+        assert adapter.num_classes == 38
 
     def test_load_from_registry_by_name(self, registry, sample_registry_model) -> None:
         """Test loading model from registry by name."""
         adapter = VisionAdapter()
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
+        adapter.load_from_registry_by_name("sample_plantguard_model")
 
-            # Load model by name
-            adapter.load_from_registry_by_name("sample_plantguard_model")
-
-            assert adapter.is_loaded
-            assert adapter.current_model_id == sample_registry_model
+        assert adapter.is_loaded
+        assert adapter.current_model_id == sample_registry_model
 
     def test_load_latest_version(self, registry, temp_workspace) -> None:
         """Test loading latest version of a model."""
@@ -142,14 +134,11 @@ class TestVisionAdapterRegistryIntegration:
         model_ids = []
         for version in ["1.0.0", "1.0.1", "1.1.0"]:
             model_path = temp_workspace / f"model_{version.replace('.', '_')}.pt"
-            checkpoint = {
-                "model_state_dict": {"fc.weight": torch.randn(38, 2048), "fc.bias": torch.randn(38)},
-                "num_classes": 38,
-                "class_names": [f"class_{i}" for i in range(38)],
-                "model_version": version,
-                "training_metadata": {"accuracy": 0.90 + float(version.split(".")[1]) * 0.01},
-            }
-            torch.save(checkpoint, model_path)
+            _write_full_resnet_checkpoint(
+                model_path,
+                accuracy=0.90 + float(version.split(".")[1]) * 0.01,
+                version=version,
+            )
 
             model_id = registry.register_model(
                 model_path=model_path,
@@ -157,45 +146,33 @@ class TestVisionAdapterRegistryIntegration:
                 architecture="resnet50",
                 dataset_version="test_v1.0",
                 hyperparameters={"num_classes": 38},
-                performance_metrics={"accuracy": checkpoint["training_metadata"]["accuracy"]},
+                performance_metrics={"accuracy": 0.90 + float(version.split(".")[1]) * 0.01},
                 description=f"Version {version} of test model",
             )
             model_ids.append(model_id)
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
+        adapter.load_latest_from_registry("versioned_model")
 
-            # Load latest version
-            adapter.load_latest_from_registry("versioned_model")
-
-            # Should load the highest version (1.1.0)
-            assert adapter.is_loaded
-            assert adapter.current_model_id == model_ids[-1]  # Latest version
+        assert adapter.is_loaded
+        assert adapter.current_model_id == model_ids[-1]
 
     def test_model_metadata_access(self, registry, sample_registry_model) -> None:
         """Test accessing model metadata through VisionAdapter."""
         adapter = VisionAdapter()
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
+        adapter.load_from_registry(sample_registry_model)
 
-            adapter.load_from_registry(sample_registry_model)
+        metadata = adapter.get_model_metadata()
+        assert metadata is not None
+        assert metadata["model_id"] == sample_registry_model
+        assert metadata["architecture"] == "resnet50"
+        assert metadata["accuracy"] == 0.94
+        assert metadata["num_classes"] == 38
+        assert "plantguard" in metadata["tags"]
 
-            # Test metadata access
-            metadata = adapter.get_model_metadata()
-            assert metadata is not None
-            assert metadata["model_id"] == sample_registry_model
-            assert metadata["architecture"] == "resnet50"
-            assert metadata["accuracy"] == 0.94
-            assert metadata["num_classes"] == 38
-            assert "plantguard" in metadata["tags"]
-
-            # Test specific metadata queries
-            assert adapter.get_model_accuracy() == 0.94
-            assert adapter.get_model_architecture() == "resnet50"
-            assert adapter.get_dataset_version() == "plantvillage_v1.0"
+        assert adapter.get_model_accuracy() == 0.94
+        assert adapter.get_model_architecture() == "resnet50"
+        assert adapter.get_dataset_version() == "plantvillage_v1.0"
 
     def test_model_switching_between_registry_models(self, registry, temp_workspace) -> None:
         """Test switching between different registry models."""
@@ -210,17 +187,11 @@ class TestVisionAdapterRegistryIntegration:
         model_ids = []
         for config in model_configs:
             model_path = temp_workspace / f"{config['name']}.pt"
-            checkpoint = {
-                "model_state_dict": {
-                    "fc.weight": torch.randn(config["num_classes"], 2048),
-                    "fc.bias": torch.randn(config["num_classes"]),
-                },
-                "num_classes": config["num_classes"],
-                "class_names": [f"class_{i}" for i in range(config["num_classes"])],
-                "model_version": "1.0.0",
-                "training_metadata": {"accuracy": config["accuracy"], "architecture": "resnet50"},
-            }
-            torch.save(checkpoint, model_path)
+            _write_full_resnet_checkpoint(
+                model_path,
+                num_classes=config["num_classes"],
+                accuracy=config["accuracy"],
+            )
 
             model_id = registry.register_model(
                 model_path=model_path,
@@ -234,46 +205,25 @@ class TestVisionAdapterRegistryIntegration:
             )
             model_ids.append(model_id)
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
+        adapter.load_from_registry(model_ids[0])
+        assert adapter.num_classes == 10
+        assert adapter.get_model_accuracy() == 0.88
 
-            def mock_create_model_func(num_classes) -> Any:
-                mock_model = MagicMock()
-                mock_model.num_classes = num_classes
-                return mock_model
-
-            mock_create_model.side_effect = mock_create_model_func
-
-            # Load first model
-            adapter.load_from_registry(model_ids[0])
-            assert adapter.num_classes == 10
-            assert adapter.get_model_accuracy() == 0.88
-
-            # Switch to second model
-            adapter.load_from_registry(model_ids[1])
-            assert adapter.num_classes == 38
-            assert adapter.get_model_accuracy() == 0.95
-
-            # Verify model switching worked
-            assert adapter.current_model_id == model_ids[1]
+        adapter.load_from_registry(model_ids[1])
+        assert adapter.num_classes == 38
+        assert adapter.get_model_accuracy() == 0.95
+        assert adapter.current_model_id == model_ids[1]
 
     def test_prediction_with_registry_model(self, registry, sample_registry_model) -> None:
         """Test prediction workflow with registry-loaded model."""
         adapter = VisionAdapter()
+        adapter.load_from_registry(sample_registry_model)
+        assert adapter.model is not None
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-
-            # Mock prediction output
+        with patch.object(adapter.model, "forward") as mock_forward:
             mock_output = torch.randn(1, 38)
-            mock_output[0, 5] = 10.0  # Make class 5 have highest score
-            mock_model.return_value = mock_output
-            mock_model.eval.return_value = mock_model
-
-            mock_create_model.return_value = mock_model
-
-            adapter.load_from_registry(sample_registry_model)
-
-            # Test prediction
+            mock_output[0, 5] = 10.0
+            mock_forward.return_value = mock_output
             test_image = Image.new("RGB", (224, 224), color="green")
 
             with patch.object(adapter, "_preprocess_image") as mock_preprocess:
@@ -282,31 +232,23 @@ class TestVisionAdapterRegistryIntegration:
 
                 predicted_class, confidence = adapter.predict(test_image)
 
-                assert predicted_class == "class_5"  # Should match highest score
+                assert predicted_class == adapter.class_names[5]
                 assert isinstance(confidence, float)
                 assert 0.0 <= confidence <= 1.0
 
     def test_batch_prediction_with_registry_model(self, registry, sample_registry_model) -> None:
         """Test batch prediction with registry-loaded model."""
         adapter = VisionAdapter()
+        adapter.load_from_registry(sample_registry_model)
+        assert adapter.model is not None
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-
-            # Mock batch prediction output
+        with patch.object(adapter.model, "forward") as mock_forward:
             batch_size = 3
             mock_output = torch.randn(batch_size, 38)
             for i in range(batch_size):
-                mock_output[i, i] = 10.0  # Different class for each image
+                mock_output[i, i] = 10.0
+            mock_forward.return_value = mock_output
 
-            mock_model.return_value = mock_output
-            mock_model.eval.return_value = mock_model
-
-            mock_create_model.return_value = mock_model
-
-            adapter.load_from_registry(sample_registry_model)
-
-            # Test batch prediction
             test_images = [
                 Image.new("RGB", (224, 224), color="red"),
                 Image.new("RGB", (224, 224), color="green"),
@@ -321,33 +263,26 @@ class TestVisionAdapterRegistryIntegration:
 
                 assert len(results) == batch_size
                 for i, (predicted_class, confidence) in enumerate(results):
-                    assert predicted_class == f"class_{i}"
+                    assert predicted_class == adapter.class_names[i]
                     assert isinstance(confidence, float)
 
     def test_model_validation_and_health_check(self, registry, sample_registry_model) -> None:
         """Test model validation and health checks."""
         adapter = VisionAdapter()
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
+        adapter.load_from_registry(sample_registry_model)
 
-            adapter.load_from_registry(sample_registry_model)
+        is_healthy = adapter.check_model_health()
+        assert is_healthy
 
-            # Test model health check
-            is_healthy = adapter.check_model_health()
-            assert is_healthy
+        validation_result = adapter.validate_model()
+        assert validation_result["is_valid"]
+        assert validation_result["num_classes"] == 38
+        assert validation_result["architecture"] == "resnet50"
 
-            # Test model validation
-            validation_result = adapter.validate_model()
-            assert validation_result["is_valid"]
-            assert validation_result["num_classes"] == 38
-            assert validation_result["architecture"] == "resnet50"
-
-            # Test with corrupted model
-            adapter.model = None
-            is_healthy = adapter.check_model_health()
-            assert not is_healthy
+        adapter.model = None
+        is_healthy = adapter.check_model_health()
+        assert not is_healthy
 
     def test_legacy_model_migration(self, temp_workspace, registry) -> None:
         """Test migration of legacy models to registry format."""
@@ -355,12 +290,7 @@ class TestVisionAdapterRegistryIntegration:
 
         # Create legacy model
         legacy_path = temp_workspace / "legacy_model.pt"
-        legacy_checkpoint = {
-            "model_state_dict": {"fc.weight": torch.randn(38, 2048), "fc.bias": torch.randn(38)},
-            "num_classes": 38,
-            # Missing registry metadata
-        }
-        torch.save(legacy_checkpoint, legacy_path)
+        _write_full_resnet_checkpoint(legacy_path, include_registry_metadata=False)
 
         # Test migration
         migrated_path = temp_workspace / "migrated_model.pt"
@@ -377,14 +307,9 @@ class TestVisionAdapterRegistryIntegration:
         # Test that migrated model is registry compatible
         assert adapter.is_compatible_with_registry_format(str(migrated_path))
 
-        # Test loading migrated model
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
-
-            adapter.load_checkpoint(str(migrated_path))
-            assert adapter.is_loaded
-            assert len(adapter.class_names) == 38
+        adapter.load_checkpoint(str(migrated_path))
+        assert adapter.is_loaded
+        assert len(adapter.class_names) == 38
 
     def test_model_comparison_through_adapter(self, registry, temp_workspace) -> None:
         """Test model comparison functionality through VisionAdapter."""
@@ -396,14 +321,7 @@ class TestVisionAdapterRegistryIntegration:
 
         for i, accuracy in enumerate(accuracies):
             model_path = temp_workspace / f"comparison_model_{i}.pt"
-            checkpoint = {
-                "model_state_dict": {"fc.weight": torch.randn(38, 2048), "fc.bias": torch.randn(38)},
-                "num_classes": 38,
-                "class_names": [f"class_{j}" for j in range(38)],
-                "model_version": "1.0.0",
-                "training_metadata": {"accuracy": accuracy},
-            }
-            torch.save(checkpoint, model_path)
+            _write_full_resnet_checkpoint(model_path, accuracy=accuracy)
 
             model_id = registry.register_model(
                 model_path=model_path,
@@ -432,25 +350,18 @@ class TestVisionAdapterRegistryIntegration:
     def test_model_export_through_adapter(self, registry, sample_registry_model, temp_workspace) -> None:
         """Test model export functionality through VisionAdapter."""
         adapter = VisionAdapter()
+        adapter.load_from_registry(sample_registry_model)
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
+        export_path = temp_workspace / "exported_model.pt"
+        success = adapter.export_for_deployment(str(export_path))
+        assert success
+        assert export_path.exists()
 
-            adapter.load_from_registry(sample_registry_model)
-
-            # Test export for deployment
-            export_path = temp_workspace / "exported_model.pt"
-            success = adapter.export_for_deployment(str(export_path))
-            assert success
-            assert export_path.exists()
-
-            # Verify export format
-            exported_data = torch.load(export_path, map_location="cpu")
-            assert "model_state_dict" in exported_data
-            assert "deployment_info" in exported_data
-            assert "class_names" in exported_data
-            assert exported_data["deployment_info"]["optimized"] is True
+        exported_data = torch.load(export_path, map_location="cpu")
+        assert "model_state_dict" in exported_data
+        assert "deployment_info" in exported_data
+        assert "class_names" in exported_data
+        assert exported_data["deployment_info"]["optimized"] is True
 
     def test_error_handling_and_recovery(self, registry, temp_workspace) -> None:
         """Test error handling and recovery in registry integration."""
@@ -474,11 +385,8 @@ class TestVisionAdapterRegistryIntegration:
             description="Corrupted model for testing",
         )
 
-        # Should raise model creation error when model creation fails
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_create_model.side_effect = RuntimeError("Model creation failed")
-            with pytest.raises(RuntimeError):
-                adapter.load_from_registry(corrupted_id)
+        with pytest.raises(LoadCheckpointError):
+            adapter.load_from_registry(corrupted_id)
 
         # Test recovery after error
         assert not adapter.is_loaded
@@ -486,14 +394,7 @@ class TestVisionAdapterRegistryIntegration:
 
         # Should be able to load valid model after error
         valid_path = temp_workspace / "valid_model.pt"
-        valid_checkpoint = {
-            "model_state_dict": {"fc.weight": torch.randn(38, 2048), "fc.bias": torch.randn(38)},
-            "num_classes": 38,
-            "class_names": [f"class_{i}" for i in range(38)],
-            "model_version": "1.0.0",
-            "training_metadata": {"accuracy": 0.90},
-        }
-        torch.save(valid_checkpoint, valid_path)
+        _write_full_resnet_checkpoint(valid_path, accuracy=0.90)
 
         valid_id = registry.register_model(
             model_path=valid_path,
@@ -505,51 +406,38 @@ class TestVisionAdapterRegistryIntegration:
             description="Valid model for recovery testing",
         )
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
-
-            adapter.load_from_registry(valid_id)
-            assert adapter.is_loaded
+        adapter.load_from_registry(valid_id)
+        assert adapter.is_loaded
 
     def test_performance_monitoring_integration(self, registry, sample_registry_model) -> None:
         """Test performance monitoring integration."""
         adapter = VisionAdapter()
+        adapter.load_from_registry(sample_registry_model)
+        assert adapter.model is not None
 
-        with patch.object(adapter, "_create_model") as mock_create_model:
-            mock_model = MagicMock()
-            mock_create_model.return_value = mock_model
+        adapter.enable_performance_monitoring()
 
-            adapter.load_from_registry(sample_registry_model)
+        test_image = Image.new("RGB", (224, 224), color="green")
 
-            # Test performance monitoring
-            adapter.enable_performance_monitoring()
+        with patch.object(adapter, "_preprocess_image") as mock_preprocess:
+            mock_tensor = torch.randn(1, 3, 224, 224)
+            mock_preprocess.return_value = mock_tensor
 
-            # Simulate predictions to generate performance data
-            test_image = Image.new("RGB", (224, 224), color="green")
+            with patch.object(adapter.model, "forward") as mock_forward:
+                mock_output = torch.randn(1, 38)
+                mock_forward.return_value = mock_output
 
-            with patch.object(adapter, "_preprocess_image") as mock_preprocess:
-                mock_tensor = torch.randn(1, 3, 224, 224)
-                mock_preprocess.return_value = mock_tensor
+                for _ in range(10):
+                    adapter.predict(test_image)
 
-                with patch.object(adapter.model, "__call__") as mock_forward:
-                    mock_output = torch.randn(1, 38)
-                    mock_forward.return_value = mock_output
+        perf_stats = adapter.get_performance_stats()
+        assert perf_stats is not None
+        assert "avg_inference_time" in perf_stats
+        assert "total_predictions" in perf_stats
+        assert perf_stats["total_predictions"] == 10
 
-                    # Make multiple predictions
-                    for _ in range(10):
-                        adapter.predict(test_image)
-
-            # Get performance statistics
-            perf_stats = adapter.get_performance_stats()
-            assert perf_stats is not None
-            assert "avg_inference_time" in perf_stats
-            assert "total_predictions" in perf_stats
-            assert perf_stats["total_predictions"] == 10
-
-            # Test performance comparison with registry
-            perf_comparison = adapter.compare_performance_with_registry()
-            assert perf_comparison is not None
+        perf_comparison = adapter.compare_performance_with_registry()
+        assert perf_comparison is not None
 
 
 if __name__ == "__main__":
