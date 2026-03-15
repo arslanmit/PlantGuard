@@ -8,6 +8,7 @@ import contextlib
 import json
 import logging
 import os
+import re
 import sys
 import tempfile
 import time
@@ -41,6 +42,110 @@ from torchvision import transforms
 from .models import PlantDiseaseResNet50
 
 logger = logging.getLogger("plantguard.core.vision")
+
+
+_PLACEHOLDER_CLASS_RE = re.compile(r"^class_\d+$")
+
+
+class CheckpointIntegrityError(RuntimeError):
+    """Raised when a checkpoint exists but is not a valid runtime model."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+
+def _has_placeholder_class_names(class_names: list[str]) -> bool:
+    """Return True when class names are synthetic placeholders."""
+    return bool(class_names) and all(_PLACEHOLDER_CLASS_RE.fullmatch(name) for name in class_names)
+
+
+def _load_checkpoint_for_validation(checkpoint_path: str | Path) -> dict[str, Any]:
+    """Load a checkpoint on CPU without enabling runtime caches or device heuristics."""
+    try:
+        return torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    except TypeError:
+        return torch.load(checkpoint_path, map_location="cpu", weights_only=False)  # nosec B614
+
+
+def _extract_checkpoint_state_dict(checkpoint: dict[str, Any]) -> dict[str, torch.Tensor]:
+    """Extract a state dict from the checkpoint payload."""
+    for key in ("model_state_dict", "state_dict", "model", "weights"):
+        value = checkpoint.get(key)
+        if isinstance(value, dict):
+            return value
+
+    if all(isinstance(key, str) for key in checkpoint):
+        return checkpoint  # type: ignore[return-value]
+
+    raise KeyError("No compatible state_dict found in checkpoint")
+
+
+def _strip_state_dict_prefixes(state_dict: dict[str, torch.Tensor], prefixes: tuple[str, ...]) -> dict[str, torch.Tensor]:
+    """Normalize common model-state prefixes."""
+    normalized: dict[str, torch.Tensor] = {}
+    for key, value in state_dict.items():
+        new_key = key
+        for prefix in prefixes:
+            if new_key.startswith(prefix):
+                new_key = new_key[len(prefix) :]
+        normalized[new_key] = value
+    return normalized
+
+
+def _remap_checkpoint_keys_for_model(model_keys: set[str], state_dict: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
+    """Map legacy checkpoint keys onto the wrapped ResNet backbone layout."""
+    if not any(key.startswith("backbone.") for key in model_keys):
+        return state_dict
+    if any(key.startswith("backbone.") for key in state_dict):
+        return state_dict
+
+    backbone_suffix_map = {
+        key.split("backbone.", 1)[1]: key
+        for key in model_keys
+        if key.startswith("backbone.")
+    }
+    remapped: dict[str, torch.Tensor] = {}
+    for key, value in state_dict.items():
+        if key in backbone_suffix_map:
+            remapped[backbone_suffix_map[key]] = value
+        elif f"backbone.{key}" in model_keys:
+            remapped[f"backbone.{key}"] = value
+        else:
+            remapped[key] = value
+    return remapped
+
+
+def is_runtime_checkpoint_valid(checkpoint_path: str | Path) -> bool:
+    """Return True only when the checkpoint is structurally safe for runtime inference."""
+    path = Path(checkpoint_path)
+    if not path.exists() or not path.is_file():
+        return False
+    if path.stat().st_size == 0:
+        return False
+
+    try:
+        checkpoint = _load_checkpoint_for_validation(path)
+        if not isinstance(checkpoint, dict):
+            return False
+
+        num_classes = int(checkpoint.get("num_classes", 38))
+        class_names = checkpoint.get("class_names", [])
+        if not isinstance(class_names, list):
+            return False
+        if len(class_names) != num_classes:
+            return False
+        if _has_placeholder_class_names(class_names):
+            return False
+
+        state_dict = _extract_checkpoint_state_dict(checkpoint)
+        model = PlantDiseaseResNet50(num_classes=num_classes, pretrained=False)
+        cleaned_state = _strip_state_dict_prefixes(state_dict, ("model.", "module.", "net."))
+        cleaned_state = _remap_checkpoint_keys_for_model(set(model.state_dict().keys()), cleaned_state)
+        model.load_state_dict(cleaned_state, strict=True)
+        return True
+    except Exception:
+        logger.debug("Checkpoint integrity validation failed for %s", checkpoint_path, exc_info=True)
+        return False
 
 
 def clear_global_model_caches() -> None:
@@ -433,6 +538,7 @@ class VisionAdapter:
         self.transform: transforms.Compose | None = None
         self.class_names: list[str] = []
         self.is_loaded = False
+        self._integrity_valid = False
         self.class_to_readable: dict[str, str] = {}
         self.plant_types: dict[str, list[str]] = {}
         self.lazy_load = lazy_load
@@ -505,6 +611,17 @@ class VisionAdapter:
     def _raise_invalid_classes(self) -> NoReturn:
         """Raise when class list in mapping is invalid."""
         raise InvalidClassesError()
+
+    def _reset_loaded_state(self) -> None:
+        """Clear all state associated with the currently loaded model."""
+        self.is_loaded = False
+        self._integrity_valid = False
+        self.model = None
+        self.model_path = None
+        self.class_names = []
+        self.num_classes = 0
+        self.current_model_id = None
+        self._registry_metadata = None
 
     def predict(self, image: Image.Image) -> tuple[str, float]:
         """Predict disease class for input image.
@@ -663,37 +780,13 @@ class VisionAdapter:
 
         if not checkpoint_path.exists():
             raise CheckpointNotFoundError()
+        if checkpoint_path.stat().st_size == 0:
+            self._reset_loaded_state()
+            raise LoadCheckpointError() from CheckpointIntegrityError("Checkpoint file is empty")
 
         try:
             logger.info("Loading model checkpoint from %s", path)
-
-            # Use cached checkpoint loading for better performance. If loading
-            # fails (e.g., when the repository only contains a Git LFS pointer
-            # rather than the actual checkpoint weights), gracefully fall back
-            # to an uninitialized model so tests that don't require real
-            # weights can still exercise the code paths.
-            try:
-                checkpoint = load_cached_checkpoint(path)
-            except RuntimeError as exc:
-                logger.warning(
-                    "Checkpoint %s could not be loaded (%s); using a stub model",
-                    path,
-                    exc,
-                )
-
-                num_classes = 38
-                # Build a basic model with random weights
-                self.model = self._create_model(num_classes=num_classes)
-                self.model.to(self.device)
-                self.model.eval()
-
-                self.class_names = [f"class_{i}" for i in range(num_classes)]
-                self.is_loaded = True
-                self.model_path = path
-                self.num_classes = num_classes
-                self.current_model_id = path
-                self._registry_metadata = None
-                return
+            checkpoint = load_cached_checkpoint(path)
 
             # Extract information
             num_classes = checkpoint.get("num_classes", 38)
@@ -731,93 +824,22 @@ class VisionAdapter:
             if self.model is None:
                 raise RuntimeError("Failed to load model")
 
-            # Resolve state dict under various keys
-            state_dict: dict[str, torch.Tensor] | None = None
-            for key in ("model_state_dict", "state_dict", "model", "weights"):
-                if key in checkpoint and isinstance(checkpoint[key], dict):
-                    state_dict = checkpoint[key]
-                    break
+            state_dict = _extract_checkpoint_state_dict(checkpoint)
+            cleaned_state = _strip_state_dict_prefixes(state_dict, ("model.", "module.", "net."))
+            cleaned_state = _remap_checkpoint_keys_for_model(set(self.model.state_dict().keys()), cleaned_state)
 
-            if state_dict is None:
-                # Some checkpoints may be saved as raw state dict
-                if all(isinstance(k, str) for k in checkpoint):
-                    # Heuristic: looks like a state dict
-                    state_dict = checkpoint  # type: ignore[assignment]
-                else:
-                    raise KeyError("No compatible state_dict found in checkpoint")
-
-            # Strip common prefixes that appear in various training setups
-            def _strip_prefix(sd: dict[str, torch.Tensor], prefixes: tuple[str, ...]) -> dict[str, torch.Tensor]:
-                out: dict[str, torch.Tensor] = {}
-                for k, v in sd.items():
-                    new_k = k
-                    for p in prefixes:
-                        if new_k.startswith(p):
-                            new_k = new_k[len(p) :]
-                    out[new_k] = v
-                return out
-
-            cleaned_state = _strip_prefix(state_dict, ("model.", "module.", "net."))
-
-            # Some checkpoints were saved without the 'backbone.' prefix while
-            # the current model wraps the ResNet under `self.backbone`. In
-            # those cases the checkpoint will contain keys like 'fc.weight' but
-            # the model expects 'backbone.fc.weight' which triggers
-            # unexpected/missing key warnings. Detect this situation and
-            # remap keys by prepending 'backbone.' where it makes sense.
-            try:
-                model_keys = set(self.model.state_dict().keys())
-                # If the model uses 'backbone.' keys but the checkpoint does not
-                if any(k.startswith("backbone.") for k in model_keys) and not any(k.startswith("backbone.") for k in cleaned_state):
-                    logger.info("Detected backbone prefix mismatch - remapping checkpoint keys")
-                    logger.debug(f"Model keys (first 5): {sorted(model_keys)[:5]}")
-                    logger.debug(f"Checkpoint keys (first 5): {sorted(cleaned_state.keys())[:5]}")
-
-                    # Build a mapping of suffix -> full model key for backbone entries
-                    backbone_suffix_map: dict[str, str] = {k.split("backbone.", 1)[1]: k for k in model_keys if k.startswith("backbone.")}
-                    logger.debug(f"Backbone suffix map size: {len(backbone_suffix_map)}")
-
-                    remapped: dict[str, torch.Tensor] = {}
-                    skipped_keys = []
-
-                    for k, v in cleaned_state.items():
-                        if k in backbone_suffix_map:
-                            new_k = backbone_suffix_map[k]
-                            remapped[new_k] = v
-                            logger.debug(f"Mapped {k} -> {new_k}")
-                        elif ("backbone." + k) in model_keys:
-                            new_k = "backbone." + k
-                            remapped[new_k] = v
-                            logger.debug(f"Prefixed {k} -> {new_k}")
-                        else:
-                            # Skip unexpected keys that don't match any model key
-                            skipped_keys.append(k)
-                            logger.debug(f"Skipping unmappable key: {k}")
-
-                    cleaned_state = remapped
-                    logger.info(f"Remapped {len(remapped)} keys, skipped {len(skipped_keys)} unmappable keys")
-                    if skipped_keys:
-                        logger.warning(f"Skipped unmappable checkpoint keys: {skipped_keys}")
-            except Exception:
-                # Non-fatal; if remapping fails, fall through and try to load
-                logger.debug("State dict remapping for backbone prefix failed; proceeding without remap", exc_info=True)
-
-            # Try strict load first, then fall back to non-strict
             try:
                 self.model.load_state_dict(cleaned_state, strict=True)
-            except Exception:
-                logger.warning("Strict state_dict load failed; retrying with strict=False", exc_info=True)
-                missing, unexpected = self.model.load_state_dict(cleaned_state, strict=False)
-                if missing:
-                    logger.warning("Missing keys when loading state_dict: %s", missing)
-                if unexpected:
-                    logger.warning("Unexpected keys when loading state_dict: %s", unexpected)
+            except Exception as exc:
+                logger.warning("Strict state_dict load failed for %s", path, exc_info=True)
+                raise CheckpointIntegrityError("Checkpoint weights do not match PlantDiseaseResNet50") from exc
 
             # Move to optimal device and set eval mode
             self.model.to(self.device)
             self.model.eval()
 
             self.is_loaded = True
+            self._integrity_valid = True
             self.model_path = path
             self.num_classes = num_classes
             # For non-registry loads, use path as identifier
@@ -832,9 +854,7 @@ class VisionAdapter:
 
         except (FileNotFoundError, RuntimeError, KeyError, ValueError) as error:
             logger.exception("Failed to load checkpoint")
-            self.is_loaded = False
-            self.model = None
-            self.class_names = []
+            self._reset_loaded_state()
             raise LoadCheckpointError() from error
 
     def load_from_registry(self, model_id: str) -> None:
@@ -1258,10 +1278,12 @@ class VisionAdapter:
         """
         return {
             "is_loaded": self.is_loaded,
+            "integrity_valid": self._integrity_valid,
             "model_path": self.model_path,
             "device": str(self.device),
             "num_classes": len(self.class_names),
             "class_names": self.class_names.copy(),
+            "class_names_valid": bool(self.class_names) and not _has_placeholder_class_names(self.class_names),
             "has_readable_mapping": bool(self.class_to_readable),
             "has_plant_types": bool(self.plant_types),
         }
@@ -1503,7 +1525,13 @@ class VisionAdapter:
         return best.get("id")
 
     def check_model_health(self) -> bool:
-        return bool(self.is_loaded and self.model is not None and len(self.class_names) > 0)
+        return bool(
+            self.is_loaded
+            and self.model is not None
+            and self._integrity_valid
+            and len(self.class_names) > 0
+            and not _has_placeholder_class_names(self.class_names)
+        )
 
     def validate_model(self) -> dict[str, Any]:
         return {

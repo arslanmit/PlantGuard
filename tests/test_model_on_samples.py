@@ -20,11 +20,31 @@ from sklearn.metrics import (accuracy_score, classification_report,
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from plantguard.core.models import PlantDiseaseResNet50
 from plantguard.core.vision import VisionAdapter
 from plantguard.utils.logging import setup_logger
 
 # Setup logging
 logger = setup_logger("test_model", log_file="logs/test_model.log")
+
+
+def _write_valid_resnet_checkpoint(checkpoint_path: Path) -> Path:
+    class_names_path = Path(__file__).resolve().parents[1] / "data/models/class_names.json"
+    with class_names_path.open(encoding="utf-8") as handle:
+        class_names = json.load(handle)
+
+    torch.manual_seed(17)
+    model = PlantDiseaseResNet50(num_classes=len(class_names), pretrained=False)
+    checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint = {
+        "model_state_dict": model.state_dict(),
+        "num_classes": len(class_names),
+        "class_names": class_names,
+        "model_version": "1.0.0",
+        "training_metadata": {"accuracy": 0.91, "architecture": "resnet50"},
+    }
+    torch.save(checkpoint, checkpoint_path)
+    return checkpoint_path
 
 
 def load_test_metadata(metadata_path: str) -> dict[str, Any]:
@@ -104,6 +124,10 @@ def _load_and_initialize_model(
         return None
     else:
         logger.info("Model loaded successfully")
+
+    if not vision_adapter.check_model_health():
+        logger.error("Loaded model failed health validation")
+        return None
 
     model_info = vision_adapter.get_model_info()
     logger.info("Model info: %s", model_info)
@@ -403,17 +427,17 @@ def _create_temp_samples(tmp_path) -> Any:
     return str(images_dir), str(metadata_path)
 
 
-def test_evaluate_model_with_temp_samples(tmp_path) -> None:
+def test_evaluate_model_with_temp_samples(tmp_path: Path) -> None:
     """Pytest wrapper: create temp samples and call evaluate_model.
 
-    This test will skip if the required model checkpoint (`data/models/vision_resnet50.pt`) is not present.
+    This test uses a validated temporary checkpoint so evaluation exercises the
+    model path without relying on the repository's local runtime artifact.
     """
-    model_path = Path("data/models/vision_resnet50.pt")
-    if not model_path.exists():
-        pytest.skip("Model checkpoint not present; skipping sample evaluation test")
-
+    model_path = _write_valid_resnet_checkpoint(tmp_path / "vision_resnet50.pt")
     test_images_dir, metadata_path = _create_temp_samples(tmp_path)
 
     results = evaluate_model(str(model_path), test_images_dir, metadata_path)
-    # We expect a dict result; detailed assertions depend on available model
     assert isinstance(results, dict)
+    assert "error" not in results
+    assert results["summary"]["model_info"]["integrity_valid"] is True
+    assert results["summary"]["model_info"]["class_names_valid"] is True

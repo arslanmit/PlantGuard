@@ -507,6 +507,7 @@ class MobileLayoutManager:
     def get_layout_status(self) -> dict[str, Any]:
         """Get current layout status and configuration."""
         return {
+            "status": "ready",
             "layout_type": self.config.get("layout_type", "unknown"),
             "touch_target_size": self.config.get("touch_target_size", 0),
             "spacing_unit": self.config.get("spacing_unit", 0),

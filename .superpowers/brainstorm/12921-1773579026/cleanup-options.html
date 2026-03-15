@@ -1,0 +1,81 @@
+<h2>PlantGuard Cleanup Direction</h2>
+<p class="subtitle">Goal locked in: keep image, audio, chat, and a user-facing settings panel with model selection.</p>
+
+<div class="cards">
+  <div class="card" data-choice="surface-only" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">Option A: Surface-Only Cleanup</div>
+        <div class="mockup-body">
+          <div class="mock-nav">Header</div>
+          <div style="display:grid;gap:10px;margin-top:12px;">
+            <div style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;">Model Status</div>
+            <div style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;">Tabs: Image | Audio | Chat | Settings</div>
+            <div style="padding:10px;border:1px dashed #94a3b8;border-radius:10px;">Hidden but still coded: tests, diagnostics, mobile AI framework</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Surface-only cleanup</h3>
+      <p>Remove obvious developer controls from the visible UI, but leave most internal testing and diagnostic code in place.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Lowest implementation risk</li><li>Fastest cleanup</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Codebase still carries dead weight</li><li>Not a true "remove unnecessary things" pass</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="product-first" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">Option B: Product-First Cleanup</div>
+        <div class="mockup-body">
+          <div class="mock-nav">Header</div>
+          <div style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;margin-top:12px;">Tabs: Image | Audio | Chat | Settings</div>
+          <div style="display:grid;gap:10px;margin-top:12px;">
+            <div style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;">Image analysis flow</div>
+            <div style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;">Voice/audio flow</div>
+            <div style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;">Chat flow</div>
+            <div style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;">Settings: model selection + performance preferences</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Product-first cleanup</h3>
+      <p>Rewrite the main page around only the retained flows, move model selection into Settings, and remove runtime hooks for testing and status tooling.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Matches the product you described</li><li>Meaningful UI and code cleanup</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Moderate edit scope</li><li>Needs targeted regression updates</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="hard-prune" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup">
+        <div class="mockup-header">Option C: Hard Prune</div>
+        <div class="mockup-body">
+          <div class="mock-nav">Header</div>
+          <div style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;margin-top:12px;">Tabs: Image | Audio | Chat | Settings</div>
+          <div style="display:grid;gap:10px;margin-top:12px;">
+            <div style="padding:10px;border:1px solid #fecaca;border-radius:10px;">Delete testing framework modules</div>
+            <div style="padding:10px;border:1px solid #fecaca;border-radius:10px;">Delete AI-agent/mobile tester paths</div>
+            <div style="padding:10px;border:1px solid #fecaca;border-radius:10px;">Delete related tests and make targets</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Hard prune</h3>
+      <p>Do the product-first cleanup, then aggressively delete testing and diagnostic modules that appear unused from the shipped app.</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Smallest shipped surface</li><li>Removes the most dead code</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Highest chance of breaking validation or internal tooling</li><li>Needs careful dependency auditing first</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:20px;">Recommendation: Option B. It removes the visible clutter and the runtime developer wiring without blindly deleting every internal tool module in one pass.</p>
