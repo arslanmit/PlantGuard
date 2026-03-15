@@ -112,11 +112,35 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Global adapter instances for enhanced functionality
+def _get_model_config_mtime(config_path: str = "config/models.json") -> float:
+    """Return a cache-busting token for model-manager resources."""
+    path = Path(config_path)
+    if not path.exists():
+        return 0.0
+    return path.stat().st_mtime
+
+
 @st.cache_resource
-def load_core_adapters() -> tuple[Any, Any, Any]:
+def load_vision_model_manager(config_path: str = "config/models.json", config_mtime: float | None = None) -> Any:
+    """Load the shared vision model manager and ensure a usable vision model is active."""
+    _ = config_mtime
+    try:
+        from plantguard.core.model_manager import PlantGuardModelManager
+    except ModuleNotFoundError:
+        from core.model_manager import PlantGuardModelManager  # type: ignore
+
+    manager = PlantGuardModelManager(config_path=config_path)
+    return manager
+
+
+@st.cache_resource
+def load_core_adapters(config_path: str = "config/models.json", config_mtime: float | None = None) -> tuple[Any, Any, Any]:
     """Load and cache core PlantGuard adapters for mobile use."""
     try:
-        vision_adapter = VisionAdapter(lazy_load=True)
+        vision_manager = load_vision_model_manager(config_path=config_path, config_mtime=config_mtime)
+        vision_adapter = getattr(vision_manager, "current_adapter", None)
+        if vision_adapter is None:
+            vision_adapter = VisionAdapter(lazy_load=True)
         audio_adapter = AudioAdapter()
         text_adapter = TextAdapter()
 
@@ -133,7 +157,8 @@ def load_core_adapters() -> tuple[Any, Any, Any]:
 def get_model_status() -> dict[str, str]:
     """Get current model status for all adapters."""
     try:
-        vision_adapter, audio_adapter, text_adapter = load_core_adapters()
+        config_mtime = _get_model_config_mtime()
+        vision_adapter, audio_adapter, text_adapter = load_core_adapters(config_mtime=config_mtime)
         return {
             "vision": getattr(vision_adapter, "current_model_id", "ResNet50") if vision_adapter else "Not Loaded",
             "audio": getattr(audio_adapter, "model_name", "Whisper-tiny") if audio_adapter else "Not Loaded",
@@ -201,6 +226,7 @@ class MobilePlantGuardApp:
         self.image_analysis = None
         self.voice_interface = None
         self.chat_interface = None
+        self.vision_model_manager = None
 
         # Core adapters for full PlantGuard functionality
         self.vision_adapter = None
@@ -315,6 +341,15 @@ class MobilePlantGuardApp:
 
         if "mobile_performance_mode" not in st.session_state:
             st.session_state.mobile_performance_mode = "balanced"
+
+        if "preferred_audio_model" not in st.session_state:
+            st.session_state.preferred_audio_model = "openai/whisper-tiny"
+
+        if "preferred_text_model" not in st.session_state:
+            st.session_state.preferred_text_model = "gpt-3.5-turbo"
+
+        if "current_vision_model" not in st.session_state:
+            st.session_state.current_vision_model = None
 
         if "mobile_offline_mode" not in st.session_state:
             st.session_state.mobile_offline_mode = False
@@ -473,8 +508,17 @@ class MobilePlantGuardApp:
     def _load_core_adapters(self) -> None:
         """Load core PlantGuard adapters for enhanced mobile functionality."""
         try:
+            config_mtime = _get_model_config_mtime()
+            self.vision_model_manager = load_vision_model_manager(config_mtime=config_mtime)
             # Always fetch (cached) adapters to ensure instance fields are populated
-            self.vision_adapter, self.audio_adapter, self.text_adapter = load_core_adapters()
+            self.vision_adapter, self.audio_adapter, self.text_adapter = load_core_adapters(config_mtime=config_mtime)
+            if self.vision_model_manager and getattr(self.vision_model_manager, "current_adapter", None):
+                self.vision_adapter = self.vision_model_manager.current_adapter
+                current_model_key_getter = getattr(self.vision_model_manager, "get_current_model_key", None)
+                if callable(current_model_key_getter):
+                    current_model_key = current_model_key_getter()
+                    if current_model_key:
+                        st.session_state.current_vision_model = current_model_key
 
             # Determine loaded status
             loaded_ok = bool(self.vision_adapter and self.audio_adapter and self.text_adapter)
@@ -492,6 +536,48 @@ class MobilePlantGuardApp:
         except Exception as e:
             logger.error(f"Failed to load core adapters: {e}")
             st.session_state.mobile_adapters_loaded = False
+
+    def _get_available_vision_models(self) -> list[dict[str, Any]]:
+        """Return enabled vision models for the settings UI."""
+        if not self.vision_model_manager:
+            return []
+
+        return [
+            model
+            for model in self.vision_model_manager.list_available_models()
+            if model.get("enabled")
+        ]
+
+    def _apply_model_settings(self, vision_model: str | None, audio_model: str, text_model: str) -> bool:
+        """Apply user-selected settings while keeping only vision model switching live."""
+        st.session_state.preferred_audio_model = audio_model
+        st.session_state.preferred_text_model = text_model
+
+        if not vision_model:
+            st.error("No vision models are currently available.")
+            return False
+
+        if not self.vision_model_manager:
+            st.error("Vision model manager is unavailable.")
+            return False
+
+        vision_updated = self.vision_model_manager.switch_model_for_ui(vision_model)
+        if vision_updated and getattr(self.vision_model_manager, "current_adapter", None):
+            self.vision_adapter = self.vision_model_manager.current_adapter
+            st.session_state.current_vision_model = vision_model
+            st.success("Vision model updated. Audio and text preferences saved.")
+            return True
+
+        model_config = self.vision_model_manager.get_model_config(vision_model)
+        failure_reason = None
+        if isinstance(model_config, dict):
+            failure_reason = model_config.get("description")
+
+        if failure_reason:
+            st.error(f"Selected vision model is unavailable: {failure_reason}")
+        else:
+            st.error("Selected vision model could not be loaded.")
+        return False
 
     def _initialize_performance_optimization(self) -> None:
         """Initialize performance optimization for mobile app."""
@@ -743,30 +829,49 @@ class MobilePlantGuardApp:
 
         with col1:
             st.markdown("#### Model Selection")
-            vision_model = st.selectbox(
-                "Vision Model",
-                ["apple_vision_pro", "efficientnet_b0", "resnet50", "mobilenet_v2"],
-                key="vision_model_select",
-            )
+            available_vision_models = self._get_available_vision_models()
+            vision_model_ids = [model["id"] for model in available_vision_models]
+            vision_labels = {model["id"]: model.get("name", model["id"]) for model in available_vision_models}
+            current_vision_model = st.session_state.get("current_vision_model")
+            if current_vision_model not in vision_model_ids and self.vision_model_manager:
+                current_model_key_getter = getattr(self.vision_model_manager, "get_current_model_key", None)
+                if callable(current_model_key_getter):
+                    current_vision_model = current_model_key_getter()
+
+            vision_model = None
+            if vision_model_ids:
+                default_index = 0
+                if current_vision_model in vision_model_ids:
+                    default_index = vision_model_ids.index(current_vision_model)
+                vision_model = st.selectbox(
+                    "Vision Model",
+                    vision_model_ids,
+                    index=default_index,
+                    format_func=lambda model_id: vision_labels.get(model_id, model_id),
+                    key="vision_model_select",
+                )
+            else:
+                st.warning("No vision models are currently available.")
+
+            audio_model_options = ["openai/whisper-tiny", "openai/whisper-base", "openai/whisper-small"]
+            audio_default = st.session_state.get("preferred_audio_model", audio_model_options[0])
             audio_model = st.selectbox(
                 "Audio Model",
-                ["openai/whisper-tiny", "openai/whisper-base", "openai/whisper-small"],
+                audio_model_options,
+                index=audio_model_options.index(audio_default) if audio_default in audio_model_options else 0,
                 key="audio_model_select",
             )
+            text_model_options = ["gpt-3.5-turbo", "gpt-4", "claude-3-sonnet"]
+            text_default = st.session_state.get("preferred_text_model", text_model_options[0])
             text_model = st.selectbox(
                 "Text Model",
-                ["gpt-3.5-turbo", "gpt-4", "claude-3-sonnet"],
+                text_model_options,
+                index=text_model_options.index(text_default) if text_default in text_model_options else 0,
                 key="text_model_select",
             )
 
-            if st.button("Apply Models", key="apply_models", width="stretch"):
-                if self.vision_adapter:
-                    self.vision_adapter.model_name = vision_model
-                if self.audio_adapter:
-                    self.audio_adapter.model_name = audio_model
-                if self.text_adapter:
-                    self.text_adapter.model_name = text_model
-                st.success("Model settings updated")
+            if st.button("Apply Models", key="apply_models", width="stretch", disabled=not bool(vision_model_ids)):
+                self._apply_model_settings(vision_model, audio_model, text_model)
 
         with col2:
             st.markdown("#### Preferences")

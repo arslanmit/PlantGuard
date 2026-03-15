@@ -6,6 +6,7 @@ detection models easily through configuration.
 
 import json
 import logging
+import tempfile
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 from unittest.mock import MagicMock
@@ -104,6 +105,63 @@ class PlantGuardModelManager:
             return False
         return self._is_runtime_checkpoint_valid(model_path)
 
+    def _normalize_runtime_model_config(self, model_id: str, model_data: dict[str, Any]) -> None:
+        """Disable stale runtime entries that point at non-deployable checkpoints."""
+        model_type = model_data.get("type")
+        runtime_model_id = model_data.get("model_id")
+
+        if model_type != "local" or not isinstance(runtime_model_id, str):
+            return
+
+        if runtime_model_id.startswith("registry:"):
+            registry_model_id = runtime_model_id.split("registry:", 1)[1]
+            is_valid = self._is_registry_model_id_deployable(registry_model_id)
+        else:
+            is_valid = self._is_runtime_checkpoint_valid(runtime_model_id)
+
+        if is_valid:
+            return
+
+        model_data["enabled"] = False
+        if "resnet" in model_id.lower() or "resnet" in str(model_data.get("name", "")).lower():
+            model_data["description"] = "Local ResNet50 is unavailable until a validated runtime checkpoint is installed"
+
+    def _is_registry_model_id_deployable(self, registry_model_id: str) -> bool:
+        """Return True only when a registry-backed model id resolves to a deployable checkpoint."""
+        try:
+            from plantguard.training.model_registry import ModelRegistry
+
+            candidate = self.config_path.parent.parent / "models"
+            registry = ModelRegistry(candidate) if candidate.exists() else ModelRegistry()
+            model_info = registry.get_model(registry_model_id)
+            return bool(model_info and self._is_registry_model_deployable(model_info))
+        except (ModuleNotFoundError, FileNotFoundError, OSError, ValueError, json.JSONDecodeError):
+            logger.debug("Registry deployability check failed for %s", registry_model_id, exc_info=True)
+            return False
+
+    def _write_json_file(self, path: Path, data: dict[str, Any]) -> None:
+        """Write JSON atomically so readers never observe partial content."""
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, delete=False) as handle:
+            json.dump(data, handle, indent=2)
+            temp_path = Path(handle.name)
+        temp_path.replace(path)
+
+    def _autoload_configured_or_fallback_model(self, default_model: str | None) -> None:
+        """Load the configured default model, falling back to the first enabled loadable model."""
+        attempted_models: set[str] = set()
+
+        if default_model and default_model in self.models_config and self.models_config[default_model].enabled:
+            attempted_models.add(default_model)
+            if self.load_model(default_model):
+                return
+
+        for model_id, config in self.models_config.items():
+            if model_id in attempted_models or not config.enabled:
+                continue
+            if self.load_model(model_id):
+                return
+
     def load_model_configs(self) -> None:
         """Load model configurations from JSON file."""
         if not self.config_path.exists():
@@ -113,9 +171,7 @@ class PlantGuardModelManager:
                 self.create_default_config()
             else:
                 logger.info("Config file not found, creating empty config: %s", self.config_path)
-                self.config_path.parent.mkdir(parents=True, exist_ok=True)
-                with self.config_path.open("w", encoding="utf-8") as f:
-                    json.dump({"default_model": None, "models": {}}, f, indent=2)
+                self._write_json_file(self.config_path, {"default_model": None, "models": {}})
 
         try:
             with self.config_path.open(encoding="utf-8") as f:
@@ -126,13 +182,15 @@ class PlantGuardModelManager:
 
             self.models_config = {}
             for model_id, model_data in config_data.get("models", {}).items():
-                # ModelConfig captures known fields; extra keys stay in _config_data
-                self.models_config[model_id] = ModelConfig(model_data)
+                normalized_model_data = dict(model_data)
+                self._normalize_runtime_model_config(model_id, normalized_model_data)
+                self.models_config[model_id] = ModelConfig(normalized_model_data)
+                self._config_data.setdefault("models", {})[model_id] = normalized_model_data
 
             # Set default model if specified and autoloading enabled
             default_model = config_data.get("default_model")
-            if self.autoload_default and default_model and default_model in self.models_config:
-                self.load_model(default_model)
+            if self.autoload_default:
+                self._autoload_configured_or_fallback_model(default_model)
 
             logger.info("Loaded %d model configurations", len(self.models_config))
 
@@ -146,7 +204,7 @@ class PlantGuardModelManager:
         local_resnet_path = Path("data/models/vision_resnet50.pt")
         local_resnet_valid = self._is_runtime_checkpoint_valid(local_resnet_path)
         default_config = {
-            "default_model": "vit_best",
+            "default_model": "local_resnet",
             "models": {
                 "vit_best": {
                     "name": "Vision Transformer (Best Performance)",
@@ -229,11 +287,7 @@ class PlantGuardModelManager:
             logger.exception("Could not load registry models for config: %s", e)
 
         # Create config directory
-        self.config_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Save default config
-        with self.config_path.open("w", encoding="utf-8") as f:
-            json.dump(default_config, f, indent=2)
+        self._write_json_file(self.config_path, default_config)
 
         logger.info("Created default model config: %s", self.config_path)
 
@@ -271,13 +325,13 @@ class PlantGuardModelManager:
                     "tags": tags,
                     "architecture": architecture,
                     "inference_time": inference_time,
-                    "is_current": model_id == (self._get_current_model_key() if self.current_model else None),
+                    "is_current": model_id == (self.get_current_model_key() if self.current_model else None),
                 }
             )
 
         return models
 
-    def _get_current_model_key(self) -> str | None:
+    def get_current_model_key(self) -> str | None:
         """Return the config key for the currently loaded model, or None."""
         if not self.current_model:
             return None
@@ -286,6 +340,10 @@ class PlantGuardModelManager:
             if cfg is self.current_model:
                 return key
         return None
+
+    def _get_current_model_key(self) -> str | None:
+        """Backward-compatible alias for get_current_model_key()."""
+        return self.get_current_model_key()
 
     def load_model(self, model_id: str) -> bool:
         """Load a specific model by ID.
@@ -302,6 +360,9 @@ class PlantGuardModelManager:
             logger.warning("Model is disabled: %s", model_id)
             return False
 
+        previous_model = self.current_model
+        previous_adapter = self.current_adapter
+
         try:
             logger.info("Loading model: %s (%s)", config.name, config.type)
 
@@ -315,8 +376,8 @@ class PlantGuardModelManager:
 
             if hasattr(adapter, "check_model_health") and not adapter.check_model_health():
                 logger.error("Loaded model failed health check: %s", model_id)
-                self.current_adapter = None
-                self.current_model = None
+                self.current_adapter = previous_adapter
+                self.current_model = previous_model
                 return False
 
             self.current_adapter = adapter
@@ -326,6 +387,8 @@ class PlantGuardModelManager:
 
         except Exception as e:
             logger.error("Failed to load model %s: %s", model_id, e)
+            self.current_adapter = previous_adapter
+            self.current_model = previous_model
             return False
 
     def _load_huggingface_model(self, config: ModelConfig) -> VisionAdapterProtocol:
@@ -613,9 +676,9 @@ class PlantGuardModelManager:
             if hasattr(self, "_config_data"):
                 data = self._config_data
             else:
-                data = {"default_model": self._get_current_model_key(), "models": {}}
+                data = {"default_model": self.get_current_model_key(), "models": {}}
 
-            data["default_model"] = self._get_current_model_key()
+            data["default_model"] = self.get_current_model_key()
             # Ensure all known models are present in the serialized form
             data.setdefault("models", {})
             for key, cfg in self.models_config.items():
@@ -637,9 +700,7 @@ class PlantGuardModelManager:
                 )
                 data["models"][key] = entry
 
-            self.config_path.parent.mkdir(parents=True, exist_ok=True)
-            with self.config_path.open("w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2)
+            self._write_json_file(self.config_path, data)
             return True
         except Exception as e:
             logger.error("Failed to save config: %s", e)
@@ -816,8 +877,7 @@ class PlantGuardModelManager:
                 config_data["models"][model_id][key] = value
 
             # Save updated config
-            with self.config_path.open("w", encoding="utf-8") as f:
-                json.dump(config_data, f, indent=2)
+            self._write_json_file(self.config_path, config_data)
 
             # Reload configs
             self.load_model_configs()
@@ -944,8 +1004,7 @@ class PlantGuardModelManager:
 
             if updated:
                 # Save updated config
-                with self.config_path.open("w", encoding="utf-8") as f:
-                    json.dump(config_data, f, indent=2)
+                self._write_json_file(self.config_path, config_data)
 
                 # Reload configs
                 self.load_model_configs()

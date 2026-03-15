@@ -109,7 +109,8 @@ def _render_main_shell(monkeypatch) -> _RecordingStreamlit:
     fake_st = _RecordingStreamlit()
 
     monkeypatch.setattr(mobile_spa_app, "st", fake_st)
-    monkeypatch.setattr(mobile_spa_app, "load_core_adapters", lambda: (object(), object(), object()))
+    monkeypatch.setattr(mobile_spa_app, "load_core_adapters", lambda *args, **kwargs: (object(), object(), object()))
+    monkeypatch.setattr(mobile_spa_app, "load_vision_model_manager", lambda *args, **kwargs: None)
     monkeypatch.setattr(mobile_spa_app, "get_model_status", lambda: {"vision": "resnet50", "audio": "whisper", "text": "gpt"})
     monkeypatch.setattr(mobile_spa_app, "mobile_performance_optimizer", _FakePerformanceOptimizer())
 

@@ -12,9 +12,11 @@ This script orchestrates the complete production training pipeline including:
 
 
 import argparse
+import json
 import logging
 import shutil
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -50,11 +52,73 @@ class ProductionWorkflow:
         self.model_registry = ModelRegistry()
         self.config_path = config_path
         self.template = template
+        self.runtime_checkpoint_path = Path("data/models/vision_resnet50.pt")
+        self.model_config_path = Path("config/models.json")
 
         # Minimum requirements
         self.min_disk_space_gb = 10.0  # GB
         self.min_memory_gb = 4.0  # GB
         self.recommended_memory_gb = 8.0  # GB
+
+    def _write_json_file(self, path: Path, data: dict[str, object]) -> None:
+        """Write JSON atomically so readers never observe partial content."""
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=path.parent, delete=False) as handle:
+            json.dump(data, handle, indent=2)
+            temp_path = Path(handle.name)
+        temp_path.replace(path)
+
+    def _load_or_initialize_runtime_config(self) -> dict[str, object]:
+        """Load the runtime model config or create a minimal default structure."""
+        if self.model_config_path.exists():
+            with self.model_config_path.open(encoding="utf-8") as handle:
+                config_data = json.load(handle)
+            if isinstance(config_data, dict):
+                config_data.setdefault("models", {})
+                return config_data
+
+        return {"default_model": "local_resnet", "models": {}}
+
+    def _update_runtime_model_config(self, best_accuracy: float) -> None:
+        """Activate the promoted runtime ResNet50 checkpoint in the app config."""
+        config_data = self._load_or_initialize_runtime_config()
+        models = config_data.setdefault("models", {})
+        if not isinstance(models, dict):
+            raise ValueError("Runtime model config has invalid 'models' structure")
+
+        models["local_resnet"] = {
+            "name": "Local ResNet50",
+            "type": "local",
+            "model_id": str(self.runtime_checkpoint_path),
+            "description": "Local ResNet50 runtime checkpoint promoted from production training",
+            "accuracy": float(best_accuracy),
+            "confidence_threshold": 0.5,
+            "enabled": True,
+            "device": "auto",
+        }
+        config_data["default_model"] = "local_resnet"
+        self._write_json_file(self.model_config_path, config_data)
+
+    def _promote_runtime_checkpoint(self, checkpoint_path: Path, best_accuracy: float) -> Path:
+        """Validate and promote a trained checkpoint into the runtime model location."""
+        try:
+            from plantguard.core.vision import is_runtime_checkpoint_valid
+        except ModuleNotFoundError:
+            from core.vision import is_runtime_checkpoint_valid  # type: ignore
+
+        if not checkpoint_path.exists():
+            raise ValueError(f"Best model checkpoint not found: {checkpoint_path}")
+        if not is_runtime_checkpoint_valid(checkpoint_path):
+            raise ValueError(f"Checkpoint is not deployable as a runtime model: {checkpoint_path}")
+
+        self.runtime_checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(checkpoint_path, self.runtime_checkpoint_path)
+
+        if not is_runtime_checkpoint_valid(self.runtime_checkpoint_path):
+            raise ValueError(f"Promoted runtime checkpoint is invalid: {self.runtime_checkpoint_path}")
+
+        self._update_runtime_model_config(best_accuracy)
+        return self.runtime_checkpoint_path
 
     def validate_prerequisites(self) -> tuple[bool, list[str]]:
         """Validate all prerequisites for production training.
@@ -320,7 +384,7 @@ class ProductionWorkflow:
             self.logger.info(f"[DONE] Created symlink: {expected_path} -> {actual_dataset_path}")
 
         except Exception as e:
-            self.logger.error(f"[TODO] Failed to prepare dataset: {e}")
+            self.logger.error(f"Failed to prepare dataset: {e}")
             # Preserve original exception context for easier debugging
             raise RuntimeError(f"Could not prepare dataset for training: {e}") from e
 
@@ -347,7 +411,7 @@ class ProductionWorkflow:
             # Setup training
             self.logger.info("[SETUP] Setting up training environment...")
             if not trainer.setup_training():
-                self.logger.error("[TODO] Training setup failed")
+                self.logger.error("Training setup failed")
                 return False
 
             # Start training
@@ -356,6 +420,24 @@ class ProductionWorkflow:
 
             if training_result.success:
                 self.logger.info("[DONE] Training completed successfully!")
+
+                best_model_path = training_result.best_model_path or (Path(training_result.model_path) if training_result.model_path else None)
+                if best_model_path is None:
+                    self.logger.error("Training completed without a best model path")
+                    return False
+
+                try:
+                    promoted_checkpoint = self._promote_runtime_checkpoint(
+                        best_model_path,
+                        best_accuracy=training_result.best_accuracy,
+                    )
+                    self.logger.info("[WRITE] Runtime checkpoint promoted to: %s", promoted_checkpoint)
+                except ValueError as promotion_error:
+                    self.logger.error("Runtime checkpoint promotion failed: %s", promotion_error)
+                    return False
+                except Exception:
+                    self.logger.exception("Unexpected runtime checkpoint promotion failure")
+                    return False
 
                 # Register model
                 model_metadata = {
@@ -377,11 +459,11 @@ class ProductionWorkflow:
                 return True
 
             else:
-                self.logger.error(f"[TODO] Training failed: {training_result.error_message}")
+                self.logger.error(f"Training failed: {training_result.error_message}")
                 return False
 
         except Exception as e:
-            self.logger.error(f"[TODO] Production training failed: {e}")
+            self.logger.error(f"Production training failed: {e}")
             # Preserve original exception context when returning failure
             logger_exc = getattr(self, "logger", None)
             if logger_exc:
@@ -390,7 +472,7 @@ class ProductionWorkflow:
 
     def send_notification(self, success: bool, message: str) -> None:
         """Send training completion notification."""
-        status = "[DONE] SUCCESS" if success else "[TODO] FAILED"
+        status = "[DONE] SUCCESS" if success else "[FAILED]"
         self.logger.info(f"[NOTIFICATION] NOTIFICATION: {status} - {message}")
 
         # In a real production environment, you might send:
@@ -414,7 +496,7 @@ class ProductionWorkflow:
             is_valid, errors = self.validate_prerequisites()
 
             if not is_valid:
-                self.logger.error("[TODO] Prerequisites validation failed:")
+                self.logger.error("Prerequisites validation failed:")
                 for error in errors:
                     self.logger.error(f"   - {error}")
                 self.send_notification(False, "Prerequisites validation failed")

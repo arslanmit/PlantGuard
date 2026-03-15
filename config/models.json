@@ -1,5 +1,5 @@
 {
-  "default_model": "vit_best",
+  "default_model": "local_resnet",
   "models": {
     "vit_best": {
       "name": "Vision Transformer (Best Performance)",
