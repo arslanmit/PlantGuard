@@ -65,6 +65,15 @@ def _load_checkpoint_for_validation(checkpoint_path: str | Path) -> dict[str, An
         return torch.load(checkpoint_path, map_location="cpu", weights_only=True)
     except TypeError:
         return torch.load(checkpoint_path, map_location="cpu", weights_only=False)  # nosec B614
+    except Exception:
+        with contextlib.suppress(Exception):
+            import pathlib
+
+            from torch.serialization import add_safe_globals
+
+            add_safe_globals([pathlib.PosixPath])
+            return torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+        return torch.load(checkpoint_path, map_location="cpu", weights_only=False)  # nosec B614
 
 
 def _extract_checkpoint_state_dict(checkpoint: dict[str, Any]) -> dict[str, torch.Tensor]:
@@ -78,6 +87,20 @@ def _extract_checkpoint_state_dict(checkpoint: dict[str, Any]) -> dict[str, torc
         return checkpoint  # type: ignore[return-value]
 
     raise KeyError("No compatible state_dict found in checkpoint")
+
+
+def _infer_num_classes(checkpoint: dict[str, Any]) -> int:
+    """Infer the checkpoint class count from explicit metadata or fallback signals."""
+    raw_num_classes = checkpoint.get("num_classes")
+    if raw_num_classes is None:
+        config = checkpoint.get("config")
+        if isinstance(config, dict):
+            raw_num_classes = config.get("num_classes")
+    if raw_num_classes is None:
+        class_names = checkpoint.get("class_names")
+        if isinstance(class_names, list) and class_names:
+            raw_num_classes = len(class_names)
+    return int(raw_num_classes or 38)
 
 
 def _strip_state_dict_prefixes(state_dict: dict[str, torch.Tensor], prefixes: tuple[str, ...]) -> dict[str, torch.Tensor]:
@@ -95,7 +118,16 @@ def _strip_state_dict_prefixes(state_dict: dict[str, torch.Tensor], prefixes: tu
 def _remap_checkpoint_keys_for_model(model_keys: set[str], state_dict: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
     """Map legacy checkpoint keys onto the wrapped ResNet backbone layout."""
     if not any(key.startswith("backbone.") for key in model_keys):
-        return state_dict
+        if not any(key.startswith("backbone.") for key in state_dict):
+            return state_dict
+
+        stripped: dict[str, torch.Tensor] = {}
+        for key, value in state_dict.items():
+            if key.startswith("backbone."):
+                stripped[key[len("backbone.") :]] = value
+            else:
+                stripped[key] = value
+        return stripped
     if any(key.startswith("backbone.") for key in state_dict):
         return state_dict
 
@@ -110,6 +142,13 @@ def _remap_checkpoint_keys_for_model(model_keys: set[str], state_dict: dict[str,
             remapped[backbone_suffix_map[key]] = value
         elif f"backbone.{key}" in model_keys:
             remapped[f"backbone.{key}"] = value
+        elif key.startswith("fc.") and key.endswith((".weight", ".bias")):
+            classifier_param = key.rsplit(".", 1)[-1]
+            target_key = f"backbone.fc.{classifier_param}"
+            if target_key in model_keys:
+                remapped[target_key] = value
+            else:
+                remapped[key] = value
         else:
             remapped[key] = value
     return remapped
@@ -128,7 +167,7 @@ def is_runtime_checkpoint_valid(checkpoint_path: str | Path) -> bool:
         if not isinstance(checkpoint, dict):
             return False
 
-        num_classes = int(checkpoint.get("num_classes", 38))
+        num_classes = _infer_num_classes(checkpoint)
         class_names = checkpoint.get("class_names", [])
         if not isinstance(class_names, list):
             return False
@@ -789,7 +828,7 @@ class VisionAdapter:
             checkpoint = load_cached_checkpoint(path)
 
             # Extract information
-            num_classes = checkpoint.get("num_classes", 38)
+            num_classes = _infer_num_classes(checkpoint)
             self.class_names = checkpoint.get("class_names", [])
 
             if not self.class_names:

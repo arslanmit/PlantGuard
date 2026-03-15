@@ -111,12 +111,36 @@ mobile_performance_optimizer = ImportErrorRecovery.safe_import_from(
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+@st.cache_resource
+def load_vision_model_manager(config_path: str = "config/models.json") -> Any:
+    """Load the shared vision model manager and ensure a usable default vision model is active."""
+    try:
+        from plantguard.core.model_manager import PlantGuardModelManager
+    except ModuleNotFoundError:
+        from core.model_manager import PlantGuardModelManager  # type: ignore
+
+    manager = PlantGuardModelManager(config_path=config_path)
+
+    if manager.current_adapter and manager.current_model:
+        return manager
+
+    for model in manager.list_available_models():
+        if model.get("enabled") and manager.load_model(model["id"]):
+            return manager
+
+    return manager
+
+
 # Global adapter instances for enhanced functionality
 @st.cache_resource
 def load_core_adapters() -> tuple[Any, Any, Any]:
     """Load and cache core PlantGuard adapters for mobile use."""
     try:
-        vision_adapter = VisionAdapter(lazy_load=True)
+        vision_manager = load_vision_model_manager()
+        vision_adapter = getattr(vision_manager, "current_adapter", None)
+        if vision_adapter is None:
+            vision_adapter = VisionAdapter(lazy_load=True)
         audio_adapter = AudioAdapter()
         text_adapter = TextAdapter()
 
@@ -201,6 +225,7 @@ class MobilePlantGuardApp:
         self.image_analysis = None
         self.voice_interface = None
         self.chat_interface = None
+        self.vision_model_manager = None
 
         # Core adapters for full PlantGuard functionality
         self.vision_adapter = None
@@ -473,11 +498,27 @@ class MobilePlantGuardApp:
     def _load_core_adapters(self) -> None:
         """Load core PlantGuard adapters for enhanced mobile functionality."""
         try:
+            self.vision_model_manager = load_vision_model_manager()
             # Always fetch (cached) adapters to ensure instance fields are populated
             self.vision_adapter, self.audio_adapter, self.text_adapter = load_core_adapters()
+            if self.vision_model_manager and getattr(self.vision_model_manager, "current_adapter", None):
+                self.vision_adapter = self.vision_model_manager.current_adapter
+                current_model_key_getter = getattr(self.vision_model_manager, "_get_current_model_key", None)
+                if callable(current_model_key_getter):
+                    current_model_key = current_model_key_getter()
+                    if current_model_key:
+                        st.session_state.current_vision_model = current_model_key
 
             # Determine loaded status
-            loaded_ok = bool(self.vision_adapter and self.audio_adapter and self.text_adapter)
+            loaded_ok = bool(
+                self.vision_adapter
+                and self.audio_adapter
+                and self.text_adapter
+                and (
+                    not hasattr(self.vision_adapter, "check_model_health")
+                    or self.vision_adapter.check_model_health()
+                )
+            )
 
             # Only log when status changes or first time
             prev_status = st.session_state.get("mobile_adapters_loaded", None)
@@ -492,6 +533,38 @@ class MobilePlantGuardApp:
         except Exception as e:
             logger.error(f"Failed to load core adapters: {e}")
             st.session_state.mobile_adapters_loaded = False
+
+    def _get_available_vision_models(self) -> list[dict[str, Any]]:
+        """Return enabled vision models for the settings UI."""
+        if not self.vision_model_manager:
+            return []
+
+        return [
+            model
+            for model in self.vision_model_manager.list_available_models()
+            if model.get("enabled")
+        ]
+
+    def _apply_model_settings(self, vision_model: str, audio_model: str, text_model: str) -> bool:
+        """Apply user-selected model settings and load the chosen vision model."""
+        vision_updated = False
+        if self.vision_model_manager:
+            vision_updated = self.vision_model_manager.switch_model_for_ui(vision_model)
+            if vision_updated and getattr(self.vision_model_manager, "current_adapter", None):
+                self.vision_adapter = self.vision_model_manager.current_adapter
+                st.session_state.current_vision_model = vision_model
+
+        if not vision_updated:
+            st.error("Selected vision model is unavailable. Install a validated ResNet50 checkpoint first.")
+            return False
+
+        if self.audio_adapter and hasattr(self.audio_adapter, "model_name"):
+            self.audio_adapter.model_name = audio_model
+        if self.text_adapter and hasattr(self.text_adapter, "model_name"):
+            self.text_adapter.model_name = text_model
+
+        st.success("Model settings updated")
+        return True
 
     def _initialize_performance_optimization(self) -> None:
         """Initialize performance optimization for mobile app."""
@@ -743,9 +816,22 @@ class MobilePlantGuardApp:
 
         with col1:
             st.markdown("#### Model Selection")
+            available_vision_models = self._get_available_vision_models()
+            vision_model_ids = [model["id"] for model in available_vision_models] or ["vit_best"]
+            vision_labels = {
+                model["id"]: model.get("name", model["id"])
+                for model in available_vision_models
+            }
+            current_vision_model = st.session_state.get("current_vision_model")
+            default_index = 0
+            if current_vision_model in vision_model_ids:
+                default_index = vision_model_ids.index(current_vision_model)
+
             vision_model = st.selectbox(
                 "Vision Model",
-                ["apple_vision_pro", "efficientnet_b0", "resnet50", "mobilenet_v2"],
+                vision_model_ids,
+                index=default_index,
+                format_func=lambda model_id: vision_labels.get(model_id, model_id),
                 key="vision_model_select",
             )
             audio_model = st.selectbox(
@@ -759,14 +845,11 @@ class MobilePlantGuardApp:
                 key="text_model_select",
             )
 
+            if self.vision_model_manager and not any(model["id"] == "local_resnet" for model in available_vision_models):
+                st.warning("ResNet50 is unavailable until a validated runtime checkpoint is installed.")
+
             if st.button("Apply Models", key="apply_models", width="stretch"):
-                if self.vision_adapter:
-                    self.vision_adapter.model_name = vision_model
-                if self.audio_adapter:
-                    self.audio_adapter.model_name = audio_model
-                if self.text_adapter:
-                    self.text_adapter.model_name = text_model
-                st.success("Model settings updated")
+                self._apply_model_settings(vision_model, audio_model, text_model)
 
         with col2:
             st.markdown("#### Preferences")

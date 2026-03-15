@@ -50,6 +50,9 @@ class _RecordingStreamlit:
         self.expander_labels: list[str] = []
         self.tab_groups: list[list[str]] = []
         self.button_labels: list[str] = []
+        self.selectbox_values: dict[str, str] = {}
+        self.selectbox_calls: list[dict[str, object]] = []
+        self.clicked_buttons: set[str] = set()
 
     def markdown(self, body, *args, **kwargs) -> None:
         self.markdown_calls.append(str(body))
@@ -64,11 +67,20 @@ class _RecordingStreamlit:
         return [_FakeContext() for _ in captured]
 
     def selectbox(self, label, options, index=0, **kwargs):
-        return options[index]
+        value = self.selectbox_values.get(str(label), options[index])
+        self.selectbox_calls.append(
+            {
+                "label": str(label),
+                "options": list(options),
+                "index": index,
+                "value": value,
+            }
+        )
+        return value
 
     def button(self, label, *args, **kwargs) -> bool:
         self.button_labels.append(str(label))
-        return False
+        return str(label) in self.clicked_buttons
 
     def file_uploader(self, *args, **kwargs):
         return None
@@ -138,3 +150,76 @@ def test_chat_tab_is_direct_not_placeholder(monkeypatch) -> None:
 
     assert "Use Chat Interface tab for full functionality" not in joined
     assert "Open Chat" not in joined
+
+
+def test_apply_models_switches_vision_adapter_through_model_manager(monkeypatch) -> None:
+    fake_st = _RecordingStreamlit()
+    fake_st.selectbox_values = {
+        "Vision Model": "local_resnet",
+        "Audio Model": "openai/whisper-base",
+        "Text Model": "gpt-4",
+    }
+    fake_st.clicked_buttons = {"Apply Models"}
+
+    current_adapter = object()
+    resnet_adapter = object()
+    switch_calls: list[str] = []
+
+    class _FakeModelManager:
+        def __init__(self) -> None:
+            self.current_adapter = current_adapter
+
+        def list_available_models(self):
+            return [
+                {"id": "vit_best", "name": "Vision Transformer", "enabled": True},
+                {"id": "local_resnet", "name": "ResNet50", "enabled": True},
+            ]
+
+        def switch_model_for_ui(self, model_id: str) -> bool:
+            switch_calls.append(model_id)
+            self.current_adapter = resnet_adapter
+            return True
+
+    monkeypatch.setattr(mobile_spa_app, "st", fake_st)
+    monkeypatch.setattr(mobile_spa_app, "load_core_adapters", lambda: (current_adapter, object(), object()))
+    monkeypatch.setattr(mobile_spa_app, "mobile_performance_optimizer", _FakePerformanceOptimizer())
+    monkeypatch.setattr(mobile_spa_app, "load_vision_model_manager", lambda: _FakeModelManager())
+
+    app = mobile_spa_app.MobilePlantGuardApp()
+    app._render_web_settings_tab()
+
+    assert switch_calls == ["local_resnet"]
+    assert app.vision_adapter is resnet_adapter
+
+
+def test_app_starts_with_local_resnet_default_when_valid_checkpoint_is_available(monkeypatch) -> None:
+    fake_st = _RecordingStreamlit()
+    resnet_adapter = object()
+
+    class _FakeModelManager:
+        def __init__(self) -> None:
+            self.current_adapter = resnet_adapter
+            self.current_model = object()
+
+        def _get_current_model_key(self) -> str:
+            return "local_resnet"
+
+        def list_available_models(self):
+            return [
+                {"id": "vit_best", "name": "Vision Transformer", "enabled": True},
+                {"id": "local_resnet", "name": "ResNet50", "enabled": True},
+            ]
+
+    monkeypatch.setattr(mobile_spa_app, "st", fake_st)
+    monkeypatch.setattr(mobile_spa_app, "load_core_adapters", lambda: (resnet_adapter, object(), object()))
+    monkeypatch.setattr(mobile_spa_app, "mobile_performance_optimizer", _FakePerformanceOptimizer())
+    monkeypatch.setattr(mobile_spa_app, "load_vision_model_manager", lambda: _FakeModelManager())
+
+    app = mobile_spa_app.MobilePlantGuardApp()
+    app._render_web_settings_tab()
+
+    assert fake_st.session_state.current_vision_model == "local_resnet"
+    assert not fake_st.warning_calls
+
+    vision_call = next(call for call in fake_st.selectbox_calls if call["label"] == "Vision Model")
+    assert vision_call["value"] == "local_resnet"

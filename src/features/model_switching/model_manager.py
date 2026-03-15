@@ -126,8 +126,11 @@ class PlantGuardModelManager:
 
             self.models_config = {}
             for model_id, model_data in config_data.get("models", {}).items():
+                normalized_model_data = dict(model_data)
+                self._normalize_runtime_model_config(model_id, normalized_model_data)
                 # ModelConfig captures known fields; extra keys stay in _config_data
-                self.models_config[model_id] = ModelConfig(model_data)
+                self.models_config[model_id] = ModelConfig(normalized_model_data)
+                self._config_data.setdefault("models", {})[model_id] = normalized_model_data
 
             # Set default model if specified and autoloading enabled
             default_model = config_data.get("default_model")
@@ -141,12 +144,46 @@ class PlantGuardModelManager:
             # Fall back to create a default config
             self.create_default_config()
 
+    def _normalize_runtime_model_config(self, model_id: str, model_data: dict[str, Any]) -> None:
+        """Disable stale runtime entries that point at non-deployable checkpoints."""
+        model_type = model_data.get("type")
+        runtime_model_id = model_data.get("model_id")
+
+        if model_type != "local" or not isinstance(runtime_model_id, str):
+            return
+
+        if runtime_model_id.startswith("registry:"):
+            registry_model_id = runtime_model_id.split("registry:", 1)[1]
+            is_valid = self._is_registry_model_id_deployable(registry_model_id)
+        else:
+            is_valid = self._is_runtime_checkpoint_valid(runtime_model_id)
+
+        if is_valid:
+            return
+
+        model_data["enabled"] = False
+        if "resnet" in model_id.lower() or "resnet" in str(model_data.get("name", "")).lower():
+            model_data["description"] = "Local ResNet50 is unavailable until a validated runtime checkpoint is installed"
+
+    def _is_registry_model_id_deployable(self, registry_model_id: str) -> bool:
+        """Return True only when a registry-backed model id resolves to a deployable checkpoint."""
+        try:
+            from plantguard.training.model_registry import ModelRegistry
+
+            candidate = self.config_path.parent.parent / "models"
+            registry = ModelRegistry(candidate) if candidate.exists() else ModelRegistry()
+            model_info = registry.get_model(registry_model_id)
+            return bool(model_info and self._is_registry_model_deployable(model_info))
+        except Exception:
+            logger.debug("Registry deployability check failed for %s", registry_model_id, exc_info=True)
+            return False
+
     def create_default_config(self) -> None:
         """Create default model configuration file."""
         local_resnet_path = Path("data/models/vision_resnet50.pt")
         local_resnet_valid = self._is_runtime_checkpoint_valid(local_resnet_path)
         default_config = {
-            "default_model": "vit_best",
+            "default_model": "local_resnet" if local_resnet_valid else "vit_best",
             "models": {
                 "vit_best": {
                     "name": "Vision Transformer (Best Performance)",

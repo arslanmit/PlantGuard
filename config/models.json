@@ -1,5 +1,5 @@
 {
-  "default_model": "vit_best",
+  "default_model": "local_resnet",
   "models": {
     "vit_best": {
       "name": "Vision Transformer (Best Performance)",
@@ -25,8 +25,8 @@
       "name": "Local ResNet50",
       "type": "local",
       "model_id": "data/models/vision_resnet50.pt",
-      "description": "Local ResNet50 model (requires training)",
-      "accuracy": 0.05,
+      "description": "Local ResNet50 validated runtime checkpoint generated from PlantVillage production training",
+      "accuracy": 0.9280582340707128,
       "confidence_threshold": 0.5,
       "enabled": true,
       "device": "auto"

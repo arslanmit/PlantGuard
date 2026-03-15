@@ -2,6 +2,7 @@
 
 from .evaluator import ModelEvaluator, ModelMetrics, ValidationResult
 from .model_comparison import BenchmarkResult, ModelComparator, ModelRanking
+from .monitor import TrainingMonitor
 from .model_registry import ModelInfo, ModelMetadata, ModelRegistry
 from .model_validator import AutomatedModelValidator, AutomatedValidationResult, ValidationConfig
 
@@ -16,6 +17,7 @@ __all__ = [
     "ModelMetrics",
     "ModelRanking",
     "ModelRegistry",
+    "TrainingMonitor",
     "ValidationConfig",
     "ValidationResult",
 ]

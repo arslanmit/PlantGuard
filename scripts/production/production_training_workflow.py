@@ -12,6 +12,7 @@ This script orchestrates the complete production training pipeline including:
 
 
 import argparse
+import json
 import logging
 import shutil
 import sys
@@ -50,11 +51,74 @@ class ProductionWorkflow:
         self.model_registry = ModelRegistry()
         self.config_path = config_path
         self.template = template
+        self.runtime_checkpoint_path = Path("data/models/vision_resnet50.pt")
+        self.model_config_path = Path("config/models.json")
 
         # Minimum requirements
         self.min_disk_space_gb = 10.0  # GB
         self.min_memory_gb = 4.0  # GB
         self.recommended_memory_gb = 8.0  # GB
+
+    def _load_or_initialize_runtime_config(self) -> dict:
+        """Load model config, creating the project's default model config if missing."""
+        if not self.model_config_path.exists():
+            try:
+                from plantguard.core.model_manager import PlantGuardModelManager
+            except ModuleNotFoundError:
+                from core.model_manager import PlantGuardModelManager  # type: ignore
+
+            manager = PlantGuardModelManager(config_path=str(self.model_config_path), autoload_default=False)
+            manager.create_default_config()
+
+        with self.model_config_path.open(encoding="utf-8") as handle:
+            return json.load(handle)
+
+    def _update_runtime_model_config(self, checkpoint_path: Path, best_accuracy: float | None = None) -> None:
+        """Activate the promoted local ResNet50 checkpoint as the default runtime model."""
+        config_data = self._load_or_initialize_runtime_config()
+        config_data.setdefault("models", {})
+        config_data["models"].setdefault("local_resnet", {})
+
+        local_resnet_config = config_data["models"]["local_resnet"]
+        local_resnet_config.update(
+            {
+                "name": "Local ResNet50",
+                "type": "local",
+                "model_id": str(checkpoint_path),
+                "description": "Local ResNet50 validated runtime checkpoint generated from PlantVillage production training",
+                "accuracy": float(best_accuracy) if best_accuracy is not None else float(local_resnet_config.get("accuracy", 0.0)),
+                "confidence_threshold": local_resnet_config.get("confidence_threshold", 0.5),
+                "enabled": True,
+                "device": local_resnet_config.get("device", "auto"),
+            }
+        )
+        config_data["default_model"] = "local_resnet"
+
+        self.model_config_path.parent.mkdir(parents=True, exist_ok=True)
+        with self.model_config_path.open("w", encoding="utf-8") as handle:
+            json.dump(config_data, handle, indent=2)
+
+    def _promote_runtime_checkpoint(self, checkpoint_path: Path | str, best_accuracy: float | None = None) -> Path:
+        """Validate and publish a trained ResNet50 checkpoint for runtime inference."""
+        try:
+            from plantguard.core.vision import is_runtime_checkpoint_valid
+        except ModuleNotFoundError:
+            from core.vision import is_runtime_checkpoint_valid  # type: ignore
+
+        source_path = Path(checkpoint_path)
+        if not is_runtime_checkpoint_valid(source_path):
+            raise ValueError("Training did not produce a validated runtime checkpoint")
+
+        self.runtime_checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        if source_path.resolve() != self.runtime_checkpoint_path.resolve():
+            shutil.copy2(source_path, self.runtime_checkpoint_path)
+
+        if not is_runtime_checkpoint_valid(self.runtime_checkpoint_path):
+            raise ValueError("Promoted runtime checkpoint failed validation")
+
+        self._update_runtime_model_config(self.runtime_checkpoint_path, best_accuracy=best_accuracy)
+        self.logger.info("[WRITE] Promoted validated runtime checkpoint to: %s", self.runtime_checkpoint_path)
+        return self.runtime_checkpoint_path
 
     def validate_prerequisites(self) -> tuple[bool, list[str]]:
         """Validate all prerequisites for production training.
@@ -356,6 +420,19 @@ class ProductionWorkflow:
 
             if training_result.success:
                 self.logger.info("[DONE] Training completed successfully!")
+                best_model_path = training_result.best_model_path or (Path(training_result.model_path) if training_result.model_path else None)
+                if best_model_path is None:
+                    self.logger.error("[TODO] Training completed without a best model path")
+                    return False
+
+                try:
+                    promoted_checkpoint = self._promote_runtime_checkpoint(
+                        best_model_path,
+                        best_accuracy=training_result.best_accuracy,
+                    )
+                except Exception as e:
+                    self.logger.error("[TODO] Failed to promote runtime checkpoint: %s", e)
+                    return False
 
                 # Register model
                 model_metadata = {
@@ -364,9 +441,10 @@ class ProductionWorkflow:
                     "final_accuracy": training_result.best_accuracy,
                     "training_time": training_result.training_time,
                     "config": config.to_dict(),
+                    "runtime_checkpoint_path": str(promoted_checkpoint),
                 }
 
-                model_id = self.model_registry.register_model(model_path=training_result.best_model_path, metadata=model_metadata)
+                model_id = self.model_registry.register_model(model_path=best_model_path, metadata=model_metadata)
 
                 self.logger.info(f"[WRITE] Model registered with ID: {model_id}")
 

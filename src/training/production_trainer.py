@@ -15,8 +15,23 @@ import torch
 from torch import nn
 from torch.cuda.amp import GradScaler, autocast
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
+
+try:
+    from torch.utils.tensorboard import SummaryWriter
+except ModuleNotFoundError:
+    class SummaryWriter:  # type: ignore[override]
+        """No-op fallback when tensorboard extra is not installed."""
+
+        def __init__(self, *args, **kwargs) -> None:
+            self.args = args
+            self.kwargs = kwargs
+
+        def add_scalar(self, *args, **kwargs) -> None:
+            return None
+
+        def close(self) -> None:
+            return None
 
 from .checkpoint_manager import CheckpointData, CheckpointManager
 from .config import TrainingConfig
