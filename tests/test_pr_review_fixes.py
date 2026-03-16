@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import builtins
+from collections import namedtuple
 import json
 import sys
 import types
@@ -253,6 +255,41 @@ def test_production_workflow_rejects_invalid_runtime_checkpoint_promotion(
 
     assert not workflow.runtime_checkpoint_path.exists()
     assert not workflow.model_config_path.exists()
+
+
+def test_production_trainer_imports_without_tensorboard(monkeypatch: pytest.MonkeyPatch) -> None:
+    real_import = builtins.__import__
+
+    def _fake_import(name, globals=None, locals=None, fromlist=(), level=0):  # type: ignore[no-untyped-def]
+        if name == "torch.utils.tensorboard":
+            raise ModuleNotFoundError("No module named 'tensorboard'")
+        return real_import(name, globals, locals, fromlist, level)
+
+    monkeypatch.setattr(builtins, "__import__", _fake_import)
+    monkeypatch.delitem(sys.modules, "src.training.production_trainer", raising=False)
+    monkeypatch.delitem(sys.modules, "plantguard.training.production_trainer", raising=False)
+
+    module = import_module("src.training.production_trainer")
+
+    writer = module.SummaryWriter(Path("tmp_tensorboard"))
+    writer.add_scalar("Loss/Train", 0.1, 1)
+    writer.close()
+
+
+def test_production_workflow_accepts_restore_training_with_seven_gb_free_disk(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workflow_class = _get_production_workflow_class(monkeypatch)
+    workflow = workflow_class()
+    disk_usage = namedtuple("usage", "total used free")
+    seven_gb_free = int(7.1 * (1024**3))
+
+    monkeypatch.setattr("scripts.production.production_training_workflow.shutil.disk_usage", lambda _: disk_usage(20, 13, seven_gb_free))
+
+    valid, errors = workflow._validate_disk_space()
+
+    assert valid
+    assert not errors
 
 
 def test_training_monitor_json_safe_handles_circular_references() -> None:

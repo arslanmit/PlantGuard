@@ -573,7 +573,12 @@ class MobilePlantGuardApp:
         if isinstance(model_config, dict):
             failure_reason = model_config.get("description")
 
-        if failure_reason:
+        if vision_model == "local_resnet":
+            st.error(
+                "Local ResNet50 could not be loaded. Add a valid checkpoint at "
+                "**data/models/vision_resnet50.pt** (run production training and promote a model) to use it."
+            )
+        elif failure_reason:
             st.error(f"Selected vision model is unavailable: {failure_reason}")
         else:
             st.error("Selected vision model could not be loaded.")

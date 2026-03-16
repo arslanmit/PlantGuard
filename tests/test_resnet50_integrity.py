@@ -197,3 +197,15 @@ def test_model_manager_excludes_invalid_registry_models_from_default_config(tmp_
     available_model_ids = {model["id"] for model in manager.list_available_models()}
     assert f"registry_{valid_model_id}" in available_model_ids
     assert f"registry_{invalid_model_id}" not in available_model_ids
+
+
+def test_checked_in_runtime_resnet_checkpoint_is_valid() -> None:
+    runtime_checkpoint = Path("data/models/vision_resnet50.pt")
+
+    if not runtime_checkpoint.exists() or runtime_checkpoint.stat().st_size == 0:
+        pytest.skip("data/models/vision_resnet50.pt missing or empty; run production training and promote a checkpoint")
+
+    adapter = VisionAdapter(device="cpu")
+    adapter.load_checkpoint(str(runtime_checkpoint))
+
+    assert adapter.check_model_health()

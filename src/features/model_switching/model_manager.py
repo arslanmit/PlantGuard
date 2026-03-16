@@ -88,6 +88,14 @@ class PlantGuardModelManager:
         else:
             return torch.device("cpu")
 
+    def _resolve_local_checkpoint_path(self, model_id: str) -> Path:
+        """Resolve a local checkpoint path relative to project root (config dir's parent)."""
+        path = Path(model_id)
+        if path.is_absolute():
+            return path
+        root = self.config_path.parent.parent
+        return (root / model_id).resolve()
+
     def _is_runtime_checkpoint_valid(self, checkpoint_path: str | Path) -> bool:
         """Return True only for checkpoints that are safe to expose for runtime inference."""
         try:
@@ -117,9 +125,15 @@ class PlantGuardModelManager:
             registry_model_id = runtime_model_id.split("registry:", 1)[1]
             is_valid = self._is_registry_model_id_deployable(registry_model_id)
         else:
-            is_valid = self._is_runtime_checkpoint_valid(runtime_model_id)
+            resolved_path = self._resolve_local_checkpoint_path(runtime_model_id)
+            is_valid = self._is_runtime_checkpoint_valid(resolved_path)
 
         if is_valid:
+            return
+
+        # ResNet50 is the primary model: keep it enabled so we always try to load it first.
+        # If load_model() fails, autoload will fall back to another model.
+        if model_id == "local_resnet":
             return
 
         model_data["enabled"] = False
@@ -201,7 +215,7 @@ class PlantGuardModelManager:
 
     def create_default_config(self) -> None:
         """Create default model configuration file."""
-        local_resnet_path = Path("data/models/vision_resnet50.pt")
+        local_resnet_path = self._resolve_local_checkpoint_path("data/models/vision_resnet50.pt")
         local_resnet_valid = self._is_runtime_checkpoint_valid(local_resnet_path)
         default_config = {
             "default_model": "local_resnet",
@@ -229,7 +243,7 @@ class PlantGuardModelManager:
                 "local_resnet": {
                     "name": "Local ResNet50",
                     "type": "local",
-                    "model_id": str(local_resnet_path),
+                    "model_id": "data/models/vision_resnet50.pt",
                     "description": (
                         "Local ResNet50 model"
                         if local_resnet_valid
@@ -387,6 +401,15 @@ class PlantGuardModelManager:
 
         except Exception as e:
             logger.error("Failed to load model %s: %s", model_id, e)
+            if model_id == "local_resnet":
+                path = self._resolve_local_checkpoint_path(
+                    self.models_config[model_id].model_id
+                )
+                if not path.exists() or path.stat().st_size == 0:
+                    logger.warning(
+                        "ResNet50 checkpoint missing or empty at %s; run production training and promote a checkpoint to enable local_resnet.",
+                        path,
+                    )
             self.current_adapter = previous_adapter
             self.current_model = previous_model
             return False
@@ -482,8 +505,9 @@ class PlantGuardModelManager:
             registry_model_id = config.model_id[9:]  # Remove "registry:" prefix
             adapter.load_from_registry(registry_model_id)
         else:
-            # Load from file path (legacy)
-            adapter.load_checkpoint(config.model_id)
+            # Load from file path (legacy); resolve relative to project root so path matches validation
+            checkpoint_path = self._resolve_local_checkpoint_path(config.model_id)
+            adapter.load_checkpoint(str(checkpoint_path))
 
         if not adapter.check_model_health():
             raise RuntimeError(f"Local model failed integrity validation: {config.model_id}")

@@ -15,8 +15,27 @@ import torch
 from torch import nn
 from torch.cuda.amp import GradScaler, autocast
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
+
+try:
+    from torch.utils.tensorboard import SummaryWriter
+except ModuleNotFoundError as exc:
+    missing_name = getattr(exc, "name", None)
+    if missing_name not in {"tensorboard", "torch.utils.tensorboard", None} and "tensorboard" not in str(exc):
+        raise
+
+    class SummaryWriter:  # type: ignore[no-redef]
+        """No-op tensorboard writer when the optional dependency is unavailable."""
+
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            self.args = args
+            self.kwargs = kwargs
+
+        def add_scalar(self, *args: Any, **kwargs: Any) -> None:
+            return None
+
+        def close(self) -> None:
+            return None
 
 from .checkpoint_manager import CheckpointData, CheckpointManager
 from .config import TrainingConfig

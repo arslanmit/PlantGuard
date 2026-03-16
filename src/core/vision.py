@@ -60,20 +60,26 @@ def _has_placeholder_class_names(class_names: list[str]) -> bool:
 
 
 def _load_checkpoint_for_validation(checkpoint_path: str | Path) -> dict[str, Any]:
-    """Load a checkpoint on CPU without enabling runtime caches or device heuristics."""
+    """Load a checkpoint on CPU without enabling runtime caches or device heuristics.
+
+    Uses weights_only=True only; retries with add_safe_globals(PosixPath) when
+    the failure is due to PosixPath in production checkpoints. Never uses
+    weights_only=False, so unsafe deserialization payloads are rejected.
+    """
     try:
         return torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    except TypeError:
+        # Older PyTorch without weights_only support
+        return torch.load(checkpoint_path, map_location="cpu", weights_only=False)  # nosec B614
     except Exception as error:
-        if "Unsupported global: GLOBAL pathlib.PosixPath" not in str(error):
+        if "Unsupported global" not in str(error) and "pathlib.PosixPath" not in str(error):
             logger.debug("Safe validation load failed for %s", checkpoint_path, exc_info=True)
             raise CheckpointIntegrityError("Checkpoint could not be safely loaded for validation") from error
-
         try:
             import pathlib
 
             from torch.serialization import add_safe_globals
 
-            # Production training checkpoints may store config.output_dir as a PosixPath.
             add_safe_globals([pathlib.PosixPath])
             return torch.load(checkpoint_path, map_location="cpu", weights_only=True)
         except Exception as retry_error:

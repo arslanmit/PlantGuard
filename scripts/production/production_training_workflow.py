@@ -56,7 +56,10 @@ class ProductionWorkflow:
         self.model_config_path = Path("config/models.json")
 
         # Minimum requirements
-        self.min_disk_space_gb = 10.0  # GB
+        # Fine-tuning ResNet50 on the processed PlantVillage dataset needs
+        # materially less than 10GB free on this repo layout, and the restore
+        # workflow should not block on an unnecessarily high threshold.
+        self.min_disk_space_gb = 5.0  # GB
         self.min_memory_gb = 4.0  # GB
         self.recommended_memory_gb = 8.0  # GB
 
