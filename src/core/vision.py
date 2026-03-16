@@ -72,7 +72,8 @@ def _load_checkpoint_for_validation(checkpoint_path: str | Path) -> dict[str, An
         # Older PyTorch without weights_only support
         return torch.load(checkpoint_path, map_location="cpu", weights_only=False)  # nosec B614
     except Exception as error:
-        if "Unsupported global" not in str(error) and "pathlib.PosixPath" not in str(error):
+        # Only retry when the failure is due to PosixPath (e.g. production checkpoints with config.output_dir).
+        if "Unsupported global: GLOBAL pathlib.PosixPath" not in str(error):
             logger.debug("Safe validation load failed for %s", checkpoint_path, exc_info=True)
             raise CheckpointIntegrityError("Checkpoint could not be safely loaded for validation") from error
         try:
